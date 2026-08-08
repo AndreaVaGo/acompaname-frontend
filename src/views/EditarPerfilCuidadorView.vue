@@ -1,18 +1,20 @@
 <script setup>
-import { ref } from 'vue'
+import { ref } from "vue";
 
-const nombre = ref('Lucía Ferrer')
-const especialidad = ref('Auxiliar de enfermería geriátrica')
-const experiencia = ref(8)
-const tarifa = ref(14)
-const tipoCuidado = ref('ambos')
-const disponibilidad = ref('Lunes a viernes, mañanas y noches')
-const disponibleAhora = ref(true)
-const tieneVehiculo = ref(true)
-const bio = ref('Acompaño a personas mayores en hospital y en casa desde hace 8 años. Me tomo el tiempo de conocer a cada familia y de explicarlo todo con calma.')
+const nombre = ref("Lucía Ferrer");
+const especialidad = ref("Auxiliar de enfermería geriátrica");
+const experiencia = ref(8);
+const tarifa = ref(14);
+const tipoCuidado = ref("ambos");
+const disponibilidad = ref("Lunes a viernes, mañanas y noches");
+const disponibleAhora = ref(true);
+const tieneVehiculo = ref(true);
+const bio = ref(
+  "Acompaño a personas mayores en hospital y en casa desde hace 8 años. Me tomo el tiempo de conocer a cada familia y de explicarlo todo con calma.",
+);
 
 function guardarCambios() {
-  console.log('Perfil actualizado')
+  console.log("Perfil actualizado");
 }
 </script>
 
@@ -21,7 +23,9 @@ function guardarCambios() {
     <div class="editar-perfil__grid">
       <form class="editar-perfil__form" @submit.prevent="guardarCambios">
         <h1>Editar mi perfil</h1>
-        <p class="editar-perfil__subtitle">Así es como te ven las familias cuando buscan cuidador.</p>
+        <p class="editar-perfil__subtitle">
+          Así es como te ven las familias cuando buscan cuidador.
+        </p>
 
         <label for="nombre">Nombre completo</label>
         <input type="text" id="nombre" v-model="nombre" />
@@ -45,7 +49,9 @@ function guardarCambios() {
           <button
             type="button"
             class="editar-perfil__opcion"
-            :class="{ 'editar-perfil__opcion--active': tipoCuidado === 'hospitalario' }"
+            :class="{
+              'editar-perfil__opcion--active': tipoCuidado === 'hospitalario',
+            }"
             @click="tipoCuidado = 'hospitalario'"
           >
             Hospitalario
@@ -53,7 +59,9 @@ function guardarCambios() {
           <button
             type="button"
             class="editar-perfil__opcion"
-            :class="{ 'editar-perfil__opcion--active': tipoCuidado === 'domicilio' }"
+            :class="{
+              'editar-perfil__opcion--active': tipoCuidado === 'domicilio',
+            }"
             @click="tipoCuidado = 'domicilio'"
           >
             A domicilio
@@ -61,7 +69,9 @@ function guardarCambios() {
           <button
             type="button"
             class="editar-perfil__opcion"
-            :class="{ 'editar-perfil__opcion--active': tipoCuidado === 'ambos' }"
+            :class="{
+              'editar-perfil__opcion--active': tipoCuidado === 'ambos',
+            }"
             @click="tipoCuidado = 'ambos'"
           >
             Hospital y domicilio
@@ -134,8 +144,8 @@ function guardarCambios() {
     font-size: 0.9rem;
   }
 
-  & input[type='text'],
-  & input[type='number'],
+  & input[type="text"],
+  & input[type="number"],
   & textarea {
     padding: 12px 14px;
     border-radius: var(--radius-input);
@@ -226,5 +236,19 @@ function guardarCambios() {
   color: var(--color-text-muted);
   font-size: 0.9rem;
   margin-bottom: 16px;
+}
+
+@media (max-width: 768px) {
+  .editar-perfil {
+    padding: 24px 20px;
+  }
+
+  .editar-perfil__grid {
+    flex-direction: column;
+  }
+
+  .editar-perfil__row {
+    flex-direction: column;
+  }
 }
 </style>

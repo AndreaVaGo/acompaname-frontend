@@ -1,19 +1,19 @@
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 
-const router = useRouter()
+const router = useRouter();
 
-const cuidadorNombre = 'Daniel Ortega'
-const puntuacion = ref(0)
-const comentario = ref('')
+const cuidadorNombre = "Daniel Ortega";
+const puntuacion = ref(0);
+const comentario = ref("");
 
 function seleccionarEstrella(valor) {
-  puntuacion.value = valor
+  puntuacion.value = valor;
 }
 
 function enviarValoracion() {
-  router.push({ name: 'historial' })
+  router.push({ name: "historial" });
 }
 </script>
 
@@ -21,7 +21,9 @@ function enviarValoracion() {
   <div class="valorar">
     <div class="valorar__box">
       <h1>Valorar a {{ cuidadorNombre }}</h1>
-      <p class="valorar__subtitle">Tu opinión ayuda a otras familias a decidir.</p>
+      <p class="valorar__subtitle">
+        Tu opinión ayuda a otras familias a decidir.
+      </p>
 
       <form class="valorar__form" @submit.prevent="enviarValoracion">
         <div class="valorar__estrellas">
@@ -43,7 +45,11 @@ function enviarValoracion() {
           placeholder="Cuéntanos cómo fue tu experiencia..."
         ></textarea>
 
-        <button type="submit" class="btn btn--primary" :disabled="puntuacion === 0">
+        <button
+          type="submit"
+          class="btn btn--primary"
+          :disabled="puntuacion === 0"
+        >
           Enviar valoración
         </button>
       </form>
@@ -124,6 +130,12 @@ function enviarValoracion() {
   & .btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+}
+
+@media (max-width: 480px) {
+  .valorar__box {
+    padding: 24px;
   }
 }
 </style>

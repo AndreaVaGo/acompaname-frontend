@@ -1,10 +1,10 @@
 <script setup>
 const usuario = {
-  nombre: 'María López',
-  email: 'maria@correo.com',
-  telefono: '600 123 456',
-  tipo: 'Familia'
-}
+  nombre: "María López",
+  email: "maria@correo.com",
+  telefono: "600 123 456",
+  tipo: "Familia",
+};
 </script>
 
 <template>
@@ -78,5 +78,15 @@ const usuario = {
 .mi-perfil__box .btn {
   margin-top: 20px;
   width: 100%;
+}
+
+@media (max-width: 480px) {
+  .mi-perfil {
+    padding: 24px 20px;
+  }
+
+  .mi-perfil__box {
+    padding: 20px;
+  }
 }
 </style>
