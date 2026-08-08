@@ -4,6 +4,10 @@ import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue'
 import BuscarView from '../views/BuscarView.vue'
 import SolicitudesCuidadorView from '../views/SolicitudesCuidadorView.vue'
+import HistorialView from '../views/HistorialView.vue'
+import PerfilCuidadorView from '../views/PerfilCuidadorView.vue'
+import SolicitarServicioView from '../views/SolicitarServicioView.vue'
+import ConfirmacionView from '../views/ConfirmacionView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -12,7 +16,10 @@ const router = createRouter({
     { path: '/login', name: 'login', component: LoginView },
     { path: '/registro', name: 'registro', component: RegisterView },
     { path: '/buscar', name: 'buscar', component: BuscarView },
-    { path: '/solicitudes-cuidador', name: 'solicitudes-cuidador', component: SolicitudesCuidadorView }
+    { path: '/solicitudes-cuidador', name: 'solicitudes-cuidador', component: SolicitudesCuidadorView }, { path: '/historial', name: 'historial', component: HistorialView }, 
+    { path: '/cuidador/:id', name: 'perfil-cuidador', component: PerfilCuidadorView }, 
+    { path: '/solicitar/:id', name: 'solicitar', component: SolicitarServicioView }, 
+    { path: '/confirmacion', name: 'confirmacion', component: ConfirmacionView }
   ]
 })
 

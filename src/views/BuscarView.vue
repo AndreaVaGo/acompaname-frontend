@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue'
+import { RouterLink } from 'vue-router'
 
 const cuidadores = ref([
   {
@@ -95,7 +96,7 @@ const cuidadores = ref([
 
         <div class="buscar__card-footer">
           <span class="buscar__precio">{{ cuidador.tarifa }} €/hora</span>
-          <button class="btn btn--primary">Ver perfil</button>
+          <RouterLink :to="`/cuidador/${cuidador.id}`" class="btn btn--primary">Ver perfil</RouterLink>
         </div>
       </div>
     </div>
