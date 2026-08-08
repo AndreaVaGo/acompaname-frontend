@@ -8,6 +8,10 @@ import HistorialView from '../views/HistorialView.vue'
 import PerfilCuidadorView from '../views/PerfilCuidadorView.vue'
 import SolicitarServicioView from '../views/SolicitarServicioView.vue'
 import ConfirmacionView from '../views/ConfirmacionView.vue'
+import ValorarView from '../views/ValorarView.vue'
+import EditarPerfilCuidadorView from '../views/EditarPerfilCuidadorView.vue'
+import MiPerfilView from '../views/MiPerfilView.vue'
+
 
 const router = createRouter({
   history: createWebHistory(),
@@ -19,7 +23,11 @@ const router = createRouter({
     { path: '/solicitudes-cuidador', name: 'solicitudes-cuidador', component: SolicitudesCuidadorView }, { path: '/historial', name: 'historial', component: HistorialView }, 
     { path: '/cuidador/:id', name: 'perfil-cuidador', component: PerfilCuidadorView }, 
     { path: '/solicitar/:id', name: 'solicitar', component: SolicitarServicioView }, 
-    { path: '/confirmacion', name: 'confirmacion', component: ConfirmacionView }
+    { path: '/confirmacion', name: 'confirmacion', component: ConfirmacionView }, 
+    { path: '/valorar/:id', name: 'valorar', component: ValorarView },
+    { path: '/editar-perfil', name: 'editar-perfil', component: EditarPerfilCuidadorView },
+    { path: '/mi-perfil', name: 'mi-perfil', component: MiPerfilView }
+    
   ]
 })
 
