@@ -1,23 +1,41 @@
 <script setup>
-import { useRoute } from 'vue-router'
+import { useRoute } from "vue-router";
 
-const route = useRoute()
-const cuidadorId = route.params.id
+const route = useRoute();
+const cuidadorId = route.params.id;
 
 const cuidador = {
-  nombre: 'Lucía Ferrer',
-  especialidad: 'Auxiliar de enfermería geriátrica',
+  nombre: "Lucía Ferrer",
+  especialidad: "Auxiliar de enfermería geriátrica",
   experiencia: 8,
   tarifa: 14,
-  disponibilidad: 'Lunes a viernes, mañanas y noches',
-  bio: 'Acompaño a personas mayores en hospital y en casa desde hace 8 años. Me tomo el tiempo de conocer a cada familia y de explicarlo todo con calma.',
+  disponibilidad: "Lunes a viernes, mañanas y noches",
+  bio: "Acompaño a personas mayores en hospital y en casa desde hace 8 años. Me tomo el tiempo de conocer a cada familia y de explicarlo todo con calma.",
   valoracion: 4.7,
   resenas: [
-    { familia: 'Familia Serrano', puntuacion: 5, comentario: 'Lucía cuidó a mi padre cuatro noches en el hospital. Nos llamaba cada mañana para contarnos cómo había pasado la noche. Un alivio enorme.', fecha: '8 de junio de 2026' },
-    { familia: 'Familia Peña', puntuacion: 5, comentario: 'Muy cariñosa y puntual. Mi madre la esperaba con ganas cada día.', fecha: '19 de mayo de 2026' },
-    { familia: 'Familia Molins', puntuacion: 4, comentario: 'Gran profesional. Solo tuvimos que ajustar los horarios al principio.', fecha: '30 de abril de 2026' }
-  ]
-}
+    {
+      familia: "Familia Serrano",
+      puntuacion: 5,
+      comentario:
+        "Lucía cuidó a mi padre cuatro noches en el hospital. Nos llamaba cada mañana para contarnos cómo había pasado la noche. Un alivio enorme.",
+      fecha: "8 de junio de 2026",
+    },
+    {
+      familia: "Familia Peña",
+      puntuacion: 5,
+      comentario:
+        "Muy cariñosa y puntual. Mi madre la esperaba con ganas cada día.",
+      fecha: "19 de mayo de 2026",
+    },
+    {
+      familia: "Familia Molins",
+      puntuacion: 4,
+      comentario:
+        "Gran profesional. Solo tuvimos que ajustar los horarios al principio.",
+      fecha: "30 de abril de 2026",
+    },
+  ],
+};
 </script>
 
 <template>
@@ -34,7 +52,9 @@ const cuidador = {
 
         <ul class="perfil__datos">
           <li><strong>Experiencia:</strong> {{ cuidador.experiencia }} años</li>
-          <li><strong>Disponibilidad:</strong> {{ cuidador.disponibilidad }}</li>
+          <li>
+            <strong>Disponibilidad:</strong> {{ cuidador.disponibilidad }}
+          </li>
         </ul>
 
         <h2>Sobre mí</h2>
@@ -43,20 +63,33 @@ const cuidador = {
 
       <div class="perfil__sidebar">
         <p class="perfil__precio">{{ cuidador.tarifa }} €<span>/hora</span></p>
-        <p class="perfil__disponibilidad-corta">{{ cuidador.disponibilidad }}</p>
-        <button class="btn btn--primary perfil__solicitar">Solicitar servicio</button>
-        <p class="perfil__nota">Sin compromiso: la solicitud se envía y el cuidador la acepta o la rechaza.</p>
+        <p class="perfil__disponibilidad-corta">
+          {{ cuidador.disponibilidad }}
+        </p>
+        <button class="btn btn--primary perfil__solicitar">
+          Solicitar servicio
+        </button>
+        <p class="perfil__nota">
+          Sin compromiso: la solicitud se envía y el cuidador la acepta o la
+          rechaza.
+        </p>
       </div>
     </div>
 
     <div class="perfil__resenas">
       <h2>Reseñas recientes</h2>
-      <div class="perfil__resena" v-for="(resena, index) in cuidador.resenas" :key="index">
+      <div
+        class="perfil__resena"
+        v-for="(resena, index) in cuidador.resenas"
+        :key="index"
+      >
         <div class="perfil__resena-top">
           <strong>{{ resena.familia }}</strong>
           <span class="perfil__resena-fecha">{{ resena.fecha }}</span>
         </div>
-        <p class="perfil__resena-estrellas">{{ '⭐'.repeat(resena.puntuacion) }}</p>
+        <p class="perfil__resena-estrellas">
+          {{ "⭐".repeat(resena.puntuacion) }}
+        </p>
         <p>{{ resena.comentario }}</p>
       </div>
     </div>
@@ -197,5 +230,20 @@ const cuidador = {
 
 .perfil__resena-estrellas {
   margin: 0 0 6px;
+}
+
+@media (max-width: 768px) {
+  .perfil {
+    padding: 24px 20px;
+  }
+
+  .perfil__main {
+    flex-direction: column;
+  }
+
+  .perfil__info,
+  .perfil__sidebar {
+    padding: 20px;
+  }
 }
 </style>
