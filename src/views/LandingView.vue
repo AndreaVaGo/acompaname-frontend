@@ -36,8 +36,15 @@
       <div class="landing__steps-grid">
         <div class="landing__step-card">
           <span class="landing__step-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2">
-              <path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="var(--color-accent)"
+              stroke-width="2"
+            >
+              <path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6" />
             </svg>
           </span>
           <h3>1. Cuéntanos qué necesitas</h3>
@@ -45,8 +52,17 @@
         </div>
         <div class="landing__step-card">
           <span class="landing__step-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2">
-              <path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 6.9L12 17.3 5.7 20.8l1.7-6.9L2 9.2l7.1-.6z"/>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="var(--color-accent)"
+              stroke-width="2"
+            >
+              <path
+                d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 6.9L12 17.3 5.7 20.8l1.7-6.9L2 9.2l7.1-.6z"
+              />
             </svg>
           </span>
           <h3>2. Elige a la persona</h3>
@@ -54,8 +70,15 @@
         </div>
         <div class="landing__step-card">
           <span class="landing__step-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2">
-              <path d="M4 4h16v9c0 5-4 7-8 8-4-1-8-3-8-8V4z"/>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="var(--color-accent)"
+              stroke-width="2"
+            >
+              <path d="M4 4h16v9c0 5-4 7-8 8-4-1-8-3-8-8V4z" />
             </svg>
           </span>
           <h3>3. Solicita y acompaña</h3>
@@ -289,6 +312,43 @@
   & p {
     color: var(--color-secondary);
     font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .landing__hero {
+    flex-direction: column;
+    padding: 24px 20px;
+    gap: 24px;
+  }
+
+  .landing__hero-content {
+    max-width: 100%;
+  }
+
+  .landing__hero h1 {
+    font-size: 1.8rem;
+  }
+
+  .landing__hero-image img {
+    max-width: 100%;
+  }
+
+  .landing__divider {
+    margin: 0 20px;
+  }
+
+  .landing__steps {
+    padding: 24px 20px;
+  }
+
+  .landing__steps-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .landing__cta {
+    margin: 24px 20px;
+    padding: 24px;
   }
 }
 </style>

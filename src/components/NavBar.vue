@@ -69,4 +69,18 @@ const rolActual = ref(null)
     font-weight: bold;
   }
 }
+
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px 20px;
+  }
+
+  .navbar__links {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+}
 </style>
