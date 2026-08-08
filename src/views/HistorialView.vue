@@ -1,46 +1,46 @@
 <script setup>
-import { ref } from 'vue'
+import { ref } from "vue";
 
 const historial = ref([
   {
     id: 1,
-    nombre: 'Amina Boulaich',
-    paciente: 'Antonio Serrano',
+    nombre: "Amina Boulaich",
+    paciente: "Antonio Serrano",
     edad: 81,
-    tipoCuidado: 'Hospitalario',
-    fechaInicio: '2 de junio de 2026',
-    notas: 'Acompañamiento nocturno durante 2 noches.',
-    estado: 'completada',
-    valorada: true
+    tipoCuidado: "Hospitalario",
+    fechaInicio: "2 de junio de 2026",
+    notas: "Acompañamiento nocturno durante 2 noches.",
+    estado: "completada",
+    valorada: true,
   },
   {
     id: 2,
-    nombre: 'Daniel Ortega',
-    paciente: 'Pilar Ruiz',
+    nombre: "Daniel Ortega",
+    paciente: "Pilar Ruiz",
     edad: 88,
-    tipoCuidado: 'A domicilio',
-    fechaInicio: '21 de abril de 2026',
-    notas: 'Paseos y comidas entre semana.',
-    estado: 'completada',
-    valorada: false
+    tipoCuidado: "A domicilio",
+    fechaInicio: "21 de abril de 2026",
+    notas: "Paseos y comidas entre semana.",
+    estado: "completada",
+    valorada: false,
   },
   {
     id: 3,
-    nombre: 'Teresa Nogueira',
-    paciente: 'Pilar Ruiz',
+    nombre: "Teresa Nogueira",
+    paciente: "Pilar Ruiz",
     edad: 88,
-    tipoCuidado: 'Hospitalario',
-    fechaInicio: '9 de marzo de 2026',
-    notas: 'Turno de día durante el ingreso.',
-    estado: 'rechazada',
-    valorada: false
-  }
-])
+    tipoCuidado: "Hospitalario",
+    fechaInicio: "9 de marzo de 2026",
+    notas: "Turno de día durante el ingreso.",
+    estado: "rechazada",
+    valorada: false,
+  },
+]);
 
 function textoEstado(estado) {
-  if (estado === 'completada') return 'Completada'
-  if (estado === 'rechazada') return 'Rechazada'
-  return 'Pendiente'
+  if (estado === "completada") return "Completada";
+  if (estado === "rechazada") return "Rechazada";
+  return "Pendiente";
 }
 </script>
 
@@ -55,12 +55,17 @@ function textoEstado(estado) {
       <div class="historial__card" v-for="item in historial" :key="item.id">
         <div class="historial__card-top">
           <h3>{{ item.nombre }}</h3>
-          <span class="historial__estado" :class="'historial__estado--' + item.estado">
+          <span
+            class="historial__estado"
+            :class="'historial__estado--' + item.estado"
+          >
             {{ textoEstado(item.estado) }}
           </span>
         </div>
 
-        <p class="historial__paciente">{{ item.paciente }} · {{ item.edad }} años</p>
+        <p class="historial__paciente">
+          {{ item.paciente }} · {{ item.edad }} años
+        </p>
 
         <ul class="historial__detalles">
           <li>🏠 {{ item.tipoCuidado }}</li>
@@ -69,7 +74,9 @@ function textoEstado(estado) {
         </ul>
 
         <div class="historial__footer" v-if="item.estado === 'completada'">
-          <span v-if="item.valorada" class="historial__valorado">Valoración enviada ✓</span>
+          <span v-if="item.valorada" class="historial__valorado"
+            >Valoración enviada ✓</span
+          >
           <button v-else class="btn btn--primary">Dejar valoración</button>
         </div>
       </div>
@@ -177,5 +184,15 @@ function textoEstado(estado) {
   text-align: center;
   color: var(--color-text-muted);
   margin-top: 40px;
+}
+
+@media (max-width: 768px) {
+  .historial {
+    padding: 24px 20px;
+  }
+
+  .historial__grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
