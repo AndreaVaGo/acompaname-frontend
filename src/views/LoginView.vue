@@ -9,7 +9,9 @@
       </div>
 
       <h1>Iniciar sesión</h1>
-      <p class="login__subtitle">Bienvenida de nuevo. Nos alegra verte por aquí.</p>
+      <p class="login__subtitle">
+        Bienvenida de nuevo. Nos alegra verte por aquí.
+      </p>
 
       <form class="login__form">
         <label for="email">Email</label>
@@ -104,6 +106,12 @@
     color: var(--color-accent);
     font-weight: bold;
     text-decoration: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .login__box {
+    padding: 24px;
   }
 }
 </style>

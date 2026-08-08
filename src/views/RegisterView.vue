@@ -140,7 +140,7 @@ const rolSeleccionado = ref("familia");
     background-color: #fff0eb;
 
     &::after {
-      content: '✓';
+      content: "✓";
       position: absolute;
       top: 10px;
       right: 10px;
@@ -180,6 +180,16 @@ const rolSeleccionado = ref("familia");
     color: var(--color-accent);
     font-weight: bold;
     text-decoration: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .register__box {
+    padding: 24px;
+  }
+
+  .register__roles {
+    flex-direction: column;
   }
 }
 </style>
