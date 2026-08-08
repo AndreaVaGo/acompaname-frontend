@@ -1,0 +1,26 @@
+:root {
+  --color-bg: #eaf6ef;
+  --color-text: #1a2e2a;
+  --color-text-muted: #555;
+  --color-accent: #f2896b;
+  --color-accent-bg: #fbe0d6;
+  --color-secondary: #2e7d5b;
+  --color-secondary-bg: #d6f0e0;
+  --color-neutral-bg: #f0f0f0;
+  --color-info: #2d5fa8;
+  --color-info-bg: #dbe9fb;
+  --color-white: #ffffff;
+  --color-border: #ddd;
+
+  --radius-pill: 999px;
+  --radius-card: 16px;
+  --radius-input: 10px;
+
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+  --font-base: 'Segoe UI', sans-serif;
+
+  --gap-sm: 12px;
+  --gap-md: 20px;
+  --gap-lg: 40px;
+}

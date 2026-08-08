@@ -1,0 +1,247 @@
+<script setup>
+import { ref } from 'vue'
+
+const cuidadores = ref([
+  {
+    id: 1,
+    nombre: 'Lucía Ferrer',
+    especialidad: 'Auxiliar de enfermería geriátrica',
+    valoracion: 4.7,
+    resenas: 3,
+    tipoCuidado: 'Hospital y domicilio',
+    ciudad: 'Madrid',
+    disponible: true,
+    vehiculo: true,
+    tarifa: 14
+  },
+  {
+    id: 2,
+    nombre: 'Marcos Ibáñez',
+    especialidad: 'Cuidador de personas con movilidad reducida',
+    valoracion: 4.0,
+    resenas: 1,
+    tipoCuidado: 'A domicilio',
+    ciudad: 'Valencia',
+    disponible: true,
+    vehiculo: true,
+    tarifa: 12
+  },
+  {
+    id: 3,
+    nombre: 'Amina Boulaich',
+    especialidad: 'Acompañamiento hospitalario nocturno',
+    valoracion: 5.0,
+    resenas: 1,
+    tipoCuidado: 'Hospitalario',
+    ciudad: 'Barcelona',
+    disponible: true,
+    vehiculo: false,
+    tarifa: 16
+  }
+])
+</script>
+
+<template>
+  <div class="buscar">
+    <header class="buscar__header">
+      <h1>Cuidadores disponibles</h1>
+      <p>Elige el tipo de cuidado que necesitas y mira quién puede acompañaros.</p>
+    </header>
+
+    <div class="buscar__filters">
+      <div class="buscar__filter-group">
+        <label>Tipo de cuidado</label>
+        <div class="buscar__filter-options">
+          <button class="buscar__filter-btn buscar__filter-btn--active">Todos</button>
+          <button class="buscar__filter-btn">Hospitalario</button>
+          <button class="buscar__filter-btn">A domicilio</button>
+          <button class="buscar__filter-btn">Ambos</button>
+        </div>
+      </div>
+
+      <div class="buscar__filter-group">
+        <label>Disponibilidad</label>
+        <div class="buscar__filter-options">
+          <button class="buscar__filter-btn buscar__filter-btn--active">Cualquier disponibilidad</button>
+          <button class="buscar__filter-btn">Disponible ahora</button>
+        </div>
+      </div>
+
+      <div class="buscar__filter-group">
+        <label>Vehículo propio</label>
+        <div class="buscar__filter-options">
+          <button class="buscar__filter-btn buscar__filter-btn--active">Indiferente</button>
+          <button class="buscar__filter-btn">Con vehículo propio</button>
+        </div>
+      </div>
+    </div>
+
+    <p class="buscar__count">{{ cuidadores.length }} cuidadores para ti</p>
+
+    <div class="buscar__grid">
+      <div class="buscar__card" v-for="cuidador in cuidadores" :key="cuidador.id">
+        <h3>{{ cuidador.nombre }}</h3>
+        <p class="buscar__card-especialidad">{{ cuidador.especialidad }}</p>
+        <p class="buscar__card-valoracion">
+          ⭐ {{ cuidador.valoracion }} ({{ cuidador.resenas }} reseñas)
+        </p>
+
+        <div class="buscar__tags">
+          <span class="buscar__tag buscar__tag--cuidado">{{ cuidador.tipoCuidado }}</span>
+          <span class="buscar__tag buscar__tag--ciudad">{{ cuidador.ciudad }}</span>
+          <span class="buscar__tag buscar__tag--disponible" v-if="cuidador.disponible">Disponible ahora</span>
+          <span class="buscar__tag buscar__tag--vehiculo" v-if="cuidador.vehiculo">Vehículo propio</span>
+        </div>
+
+        <div class="buscar__card-footer">
+          <span class="buscar__precio">{{ cuidador.tarifa }} €/hora</span>
+          <button class="btn btn--primary">Ver perfil</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.buscar {
+  min-height: 100vh;
+  background-color: var(--color-bg);
+  font-family: var(--font-base);
+  color: var(--color-text);
+  padding: var(--gap-lg) 60px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.buscar__header {
+  & h1 {
+    font-size: 1.8rem;
+    margin-bottom: 6px;
+  }
+
+  & p {
+    color: var(--color-text-muted);
+    margin-bottom: 24px;
+  }
+}
+
+.buscar__filters {
+  background-color: var(--color-white);
+  border-radius: var(--radius-card);
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-card);
+}
+
+.buscar__filter-group {
+  margin-bottom: 16px;
+
+  & label {
+    display: block;
+    font-weight: bold;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+  }
+}
+
+.buscar__filter-options {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.buscar__filter-btn {
+  border: 1px solid var(--color-border);
+  background-color: var(--color-white);
+  color: var(--color-text);
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-family: inherit;
+
+  &--active {
+    background-color: var(--color-accent);
+    color: var(--color-white);
+    border-color: var(--color-accent);
+  }
+}
+
+.buscar__count {
+  color: var(--color-text-muted);
+  margin-bottom: 16px;
+}
+
+.buscar__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--gap-md);
+}
+
+.buscar__card {
+  background-color: var(--color-white);
+  border-radius: var(--radius-card);
+  padding: 20px;
+  box-shadow: var(--shadow-card);
+
+  & h3 {
+    margin: 0 0 4px;
+  }
+}
+
+.buscar__card-especialidad {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+}
+
+.buscar__card-valoracion {
+  font-size: 0.9rem;
+  margin-bottom: 12px;
+}
+
+.buscar__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.buscar__tag {
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 0.8rem;
+
+  &--cuidado {
+    background-color: var(--color-secondary-bg);
+    color: var(--color-secondary);
+  }
+
+  &--ciudad {
+    background-color: var(--color-neutral-bg);
+    color: var(--color-text-muted);
+  }
+
+  &--disponible {
+    background-color: var(--color-accent-bg);
+    color: #c65a35;
+  }
+
+  &--vehiculo {
+    background-color: var(--color-info-bg);
+    color: var(--color-info);
+  }
+}
+
+.buscar__card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #eee;
+  padding-top: 14px;
+}
+
+.buscar__precio {
+  font-weight: bold;
+}
+</style>
