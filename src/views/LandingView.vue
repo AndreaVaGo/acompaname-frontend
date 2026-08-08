@@ -2,17 +2,6 @@
 
 <template>
   <div class="landing">
-    <header class="landing__header">
-      <div class="landing__logo">
-        <span class="landing__logo-icon">♥</span>
-        <span class="landing__logo-text">Acompáñame</span>
-      </div>
-      <nav class="landing__nav">
-        <a href="#" class="landing__link landing__link--login">Iniciar sesión</a>
-        <button class="btn btn--primary">Registrarme</button>
-      </nav>
-    </header>
-
     <section class="landing__hero">
       <div class="landing__hero-content">
         <span class="landing__badge">
@@ -151,28 +140,8 @@
   }
 }
 
-.landing__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 60px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.landing__nav {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
 .landing__link {
   text-decoration: none;
-
-  &--login {
-    color: var(--color-accent);
-    font-weight: bold;
-  }
 
   &--view {
     color: var(--color-secondary);
