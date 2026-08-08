@@ -27,8 +27,12 @@
       </div>
 
       <div class="confirmacion__acciones">
-        <RouterLink to="/solicitudes" class="btn btn--primary">Ver mis solicitudes</RouterLink>
-        <RouterLink to="/buscar" class="btn btn--secondary">Seguir buscando</RouterLink>
+        <RouterLink to="/solicitudes" class="btn btn--primary"
+          >Ver mis solicitudes</RouterLink
+        >
+        <RouterLink to="/buscar" class="btn btn--secondary"
+          >Seguir buscando</RouterLink
+        >
       </div>
     </div>
   </div>
@@ -111,6 +115,12 @@
   & .btn {
     text-decoration: none;
     display: block;
+  }
+}
+
+@media (max-width: 480px) {
+  .confirmacion__box {
+    padding: 28px 20px;
   }
 }
 </style>

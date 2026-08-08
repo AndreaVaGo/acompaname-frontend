@@ -1,20 +1,20 @@
 <script setup>
-import { ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
-const route = useRoute()
-const router = useRouter()
+const route = useRoute();
+const router = useRouter();
 
-const cuidadorNombre = 'Lucía Ferrer'
+const cuidadorNombre = "Lucía Ferrer";
 
-const tipoCuidado = ref('')
-const fechaInicio = ref('')
-const nombrePaciente = ref('')
-const edadPaciente = ref('')
-const notas = ref('')
+const tipoCuidado = ref("");
+const fechaInicio = ref("");
+const nombrePaciente = ref("");
+const edadPaciente = ref("");
+const notas = ref("");
 
 function enviarSolicitud() {
-  router.push({ name: 'confirmacion' })
+  router.push({ name: "confirmacion" });
 }
 </script>
 
@@ -34,7 +34,9 @@ function enviarSolicitud() {
           <button
             type="button"
             class="solicitar__opcion"
-            :class="{ 'solicitar__opcion--active': tipoCuidado === 'hospitalario' }"
+            :class="{
+              'solicitar__opcion--active': tipoCuidado === 'hospitalario',
+            }"
             @click="tipoCuidado = 'hospitalario'"
           >
             Hospitalario
@@ -42,7 +44,9 @@ function enviarSolicitud() {
           <button
             type="button"
             class="solicitar__opcion"
-            :class="{ 'solicitar__opcion--active': tipoCuidado === 'domicilio' }"
+            :class="{
+              'solicitar__opcion--active': tipoCuidado === 'domicilio',
+            }"
             @click="tipoCuidado = 'domicilio'"
           >
             A domicilio
@@ -53,10 +57,20 @@ function enviarSolicitud() {
         <input type="date" id="fecha" v-model="fechaInicio" />
 
         <label for="paciente">Nombre del paciente</label>
-        <input type="text" id="paciente" v-model="nombrePaciente" placeholder="Antonio Serrano" />
+        <input
+          type="text"
+          id="paciente"
+          v-model="nombrePaciente"
+          placeholder="Antonio Serrano"
+        />
 
         <label for="edad">Edad del paciente</label>
-        <input type="number" id="edad" v-model="edadPaciente" placeholder="81" />
+        <input
+          type="number"
+          id="edad"
+          v-model="edadPaciente"
+          placeholder="81"
+        />
 
         <label for="notas">Información sobre el paciente</label>
         <textarea
@@ -151,6 +165,16 @@ function enviarSolicitud() {
     border-color: var(--color-accent);
     background-color: var(--color-accent-bg);
     font-weight: bold;
+  }
+}
+
+@media (max-width: 480px) {
+  .solicitar {
+    padding: 24px 16px;
+  }
+
+  .solicitar__box {
+    padding: 24px;
   }
 }
 </style>
