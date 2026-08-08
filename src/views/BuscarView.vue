@@ -1,59 +1,63 @@
 <script setup>
-import { ref } from 'vue'
-import { RouterLink } from 'vue-router'
+import { ref } from "vue";
+import { RouterLink } from "vue-router";
 
 const cuidadores = ref([
   {
     id: 1,
-    nombre: 'Lucía Ferrer',
-    especialidad: 'Auxiliar de enfermería geriátrica',
+    nombre: "Lucía Ferrer",
+    especialidad: "Auxiliar de enfermería geriátrica",
     valoracion: 4.7,
     resenas: 3,
-    tipoCuidado: 'Hospital y domicilio',
-    ciudad: 'Madrid',
+    tipoCuidado: "Hospital y domicilio",
+    ciudad: "Madrid",
     disponible: true,
     vehiculo: true,
-    tarifa: 14
+    tarifa: 14,
   },
   {
     id: 2,
-    nombre: 'Marcos Ibáñez',
-    especialidad: 'Cuidador de personas con movilidad reducida',
+    nombre: "Marcos Ibáñez",
+    especialidad: "Cuidador de personas con movilidad reducida",
     valoracion: 4.0,
     resenas: 1,
-    tipoCuidado: 'A domicilio',
-    ciudad: 'Valencia',
+    tipoCuidado: "A domicilio",
+    ciudad: "Valencia",
     disponible: true,
     vehiculo: true,
-    tarifa: 12
+    tarifa: 12,
   },
   {
     id: 3,
-    nombre: 'Amina Boulaich',
-    especialidad: 'Acompañamiento hospitalario nocturno',
+    nombre: "Amina Boulaich",
+    especialidad: "Acompañamiento hospitalario nocturno",
     valoracion: 5.0,
     resenas: 1,
-    tipoCuidado: 'Hospitalario',
-    ciudad: 'Barcelona',
+    tipoCuidado: "Hospitalario",
+    ciudad: "Barcelona",
     disponible: true,
     vehiculo: false,
-    tarifa: 16
-  }
-])
+    tarifa: 16,
+  },
+]);
 </script>
 
 <template>
   <div class="buscar">
     <header class="buscar__header">
       <h1>Cuidadores disponibles</h1>
-      <p>Elige el tipo de cuidado que necesitas y mira quién puede acompañaros.</p>
+      <p>
+        Elige el tipo de cuidado que necesitas y mira quién puede acompañaros.
+      </p>
     </header>
 
     <div class="buscar__filters">
       <div class="buscar__filter-group">
         <label>Tipo de cuidado</label>
         <div class="buscar__filter-options">
-          <button class="buscar__filter-btn buscar__filter-btn--active">Todos</button>
+          <button class="buscar__filter-btn buscar__filter-btn--active">
+            Todos
+          </button>
           <button class="buscar__filter-btn">Hospitalario</button>
           <button class="buscar__filter-btn">A domicilio</button>
           <button class="buscar__filter-btn">Ambos</button>
@@ -63,7 +67,9 @@ const cuidadores = ref([
       <div class="buscar__filter-group">
         <label>Disponibilidad</label>
         <div class="buscar__filter-options">
-          <button class="buscar__filter-btn buscar__filter-btn--active">Cualquier disponibilidad</button>
+          <button class="buscar__filter-btn buscar__filter-btn--active">
+            Cualquier disponibilidad
+          </button>
           <button class="buscar__filter-btn">Disponible ahora</button>
         </div>
       </div>
@@ -71,7 +77,9 @@ const cuidadores = ref([
       <div class="buscar__filter-group">
         <label>Vehículo propio</label>
         <div class="buscar__filter-options">
-          <button class="buscar__filter-btn buscar__filter-btn--active">Indiferente</button>
+          <button class="buscar__filter-btn buscar__filter-btn--active">
+            Indiferente
+          </button>
           <button class="buscar__filter-btn">Con vehículo propio</button>
         </div>
       </div>
@@ -80,7 +88,11 @@ const cuidadores = ref([
     <p class="buscar__count">{{ cuidadores.length }} cuidadores para ti</p>
 
     <div class="buscar__grid">
-      <div class="buscar__card" v-for="cuidador in cuidadores" :key="cuidador.id">
+      <div
+        class="buscar__card"
+        v-for="cuidador in cuidadores"
+        :key="cuidador.id"
+      >
         <h3>{{ cuidador.nombre }}</h3>
         <p class="buscar__card-especialidad">{{ cuidador.especialidad }}</p>
         <p class="buscar__card-valoracion">
@@ -88,15 +100,29 @@ const cuidadores = ref([
         </p>
 
         <div class="buscar__tags">
-          <span class="buscar__tag buscar__tag--cuidado">{{ cuidador.tipoCuidado }}</span>
-          <span class="buscar__tag buscar__tag--ciudad">{{ cuidador.ciudad }}</span>
-          <span class="buscar__tag buscar__tag--disponible" v-if="cuidador.disponible">Disponible ahora</span>
-          <span class="buscar__tag buscar__tag--vehiculo" v-if="cuidador.vehiculo">Vehículo propio</span>
+          <span class="buscar__tag buscar__tag--cuidado">{{
+            cuidador.tipoCuidado
+          }}</span>
+          <span class="buscar__tag buscar__tag--ciudad">{{
+            cuidador.ciudad
+          }}</span>
+          <span
+            class="buscar__tag buscar__tag--disponible"
+            v-if="cuidador.disponible"
+            >Disponible ahora</span
+          >
+          <span
+            class="buscar__tag buscar__tag--vehiculo"
+            v-if="cuidador.vehiculo"
+            >Vehículo propio</span
+          >
         </div>
 
         <div class="buscar__card-footer">
           <span class="buscar__precio">{{ cuidador.tarifa }} €/hora</span>
-          <RouterLink :to="`/cuidador/${cuidador.id}`" class="btn btn--primary">Ver perfil</RouterLink>
+          <RouterLink :to="`/cuidador/${cuidador.id}`" class="btn btn--primary"
+            >Ver perfil</RouterLink
+          >
         </div>
       </div>
     </div>
@@ -244,5 +270,24 @@ const cuidadores = ref([
 
 .buscar__precio {
   font-weight: bold;
+}
+
+@media (max-width: 900px) {
+  .buscar {
+    padding: 24px 20px;
+  }
+
+  .buscar__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .buscar__filter-options {
+    gap: 8px;
+  }
+
+  .buscar__filter-btn {
+    font-size: 0.85rem;
+    padding: 6px 12px;
+  }
 }
 </style>
