@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from "vue";
+import { RouterLink } from "vue-router";
 
 const historial = ref([
   {
@@ -75,9 +76,12 @@ function textoEstado(estado) {
 
         <div class="historial__footer" v-if="item.estado === 'completada'">
           <span v-if="item.valorada" class="historial__valorado"
-            >Valoración enviada ✓</span
-          >
-          <button v-else class="btn btn--primary">Dejar valoración</button>
+            >Valoración enviada ✓</span>
+          <RouterLink
+            v-else
+            :to="`/valorar/${item.id}`"
+            class="btn btn--primary">Dejar valoración
+          </RouterLink>
         </div>
       </div>
     </div>
