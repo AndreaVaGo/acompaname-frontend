@@ -1,7 +1,22 @@
 <script setup>
 import { ref } from "vue";
+import { RouterLink } from "vue-router";
 
 const rolSeleccionado = ref("familia");
+const nombre = ref("");
+const email = ref("");
+const password = ref("");
+const telefono = ref("");
+const error = ref("");
+
+function handleSubmit() {
+  if (!nombre.value || !email.value || !password.value || !telefono.value) {
+    error.value = "Por favor, rellena todos los campos.";
+    return;
+  }
+  error.value = "";
+  // aquí más adelante iría la llamada real de registro
+}
 </script>
 
 <template>
@@ -12,22 +27,38 @@ const rolSeleccionado = ref("familia");
         Solo necesitamos cuatro datos para empezar.
       </p>
 
-      <form class="register__form">
+      <form class="register__form" @submit.prevent="handleSubmit">
         <label for="nombre">Nombre completo</label>
-        <input type="text" id="nombre" placeholder="María López" />
+        <input
+          type="text"
+          id="nombre"
+          placeholder="María López"
+          v-model="nombre"
+        />
 
         <label for="email">Email</label>
-        <input type="email" id="email" placeholder="nombre@correo.com" />
+        <input
+          type="email"
+          id="email"
+          placeholder="nombre@correo.com"
+          v-model="email"
+        />
 
         <label for="password">Contraseña</label>
         <input
           type="password"
           id="password"
           placeholder="Mínimo 6 caracteres"
+          v-model="password"
         />
 
         <label for="telefono">Teléfono</label>
-        <input type="tel" id="telefono" placeholder="600 123 456" />
+        <input
+          type="tel"
+          id="telefono"
+          placeholder="600 123 456"
+          v-model="telefono"
+        />
 
         <label>¿Cómo vas a usar Acompáñame?</label>
         <div class="register__roles">
@@ -55,11 +86,13 @@ const rolSeleccionado = ref("familia");
           </button>
         </div>
 
+        <p v-if="error" class="register__error">{{ error }}</p>
+
         <button type="submit" class="btn btn--primary">Crear mi cuenta</button>
       </form>
 
       <p class="register__switch">
-        ¿Ya tienes cuenta? <a href="#">Iniciar sesión</a>
+        ¿Ya tienes cuenta? <RouterLink to="/login">Iniciar sesión</RouterLink>
       </p>
     </div>
   </div>
@@ -114,6 +147,16 @@ const rolSeleccionado = ref("familia");
     font-size: 1rem;
     font-family: inherit;
   }
+}
+
+.register__error {
+  background-color: #fdecea;
+  border: 1px solid #f5c6c0;
+  color: #c0392b;
+  font-size: 0.9rem;
+  padding: 10px 14px;
+  border-radius: var(--radius-input);
+  margin: -4px 0 16px;
 }
 
 .register__roles {

@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from "vue";
+import { RouterLink } from "vue-router";
 
 const email = ref("");
 const password = ref("");
@@ -51,7 +52,8 @@ function handleSubmit() {
       </form>
 
       <p class="login__switch">
-        ¿Todavía no tienes cuenta? <a href="#">Registrarme</a>
+        ¿Todavía no tienes cuenta?
+        <RouterLink to="/registro">Registrarme</RouterLink>
       </p>
     </div>
   </div>
