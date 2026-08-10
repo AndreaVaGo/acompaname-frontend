@@ -1,4 +1,19 @@
-<script setup></script>
+<script setup>
+import { ref } from "vue";
+
+const email = ref("");
+const password = ref("");
+const error = ref("");
+
+function handleSubmit() {
+  if (!email.value || !password.value) {
+    error.value = "Por favor, rellena todos los campos.";
+    return;
+  }
+  error.value = "";
+  // aquí más adelante iría la llamada real de login
+}
+</script>
 
 <template>
   <div class="login">
@@ -13,12 +28,24 @@
         Bienvenida de nuevo. Nos alegra verte por aquí.
       </p>
 
-      <form class="login__form">
+      <form class="login__form" @submit.prevent="handleSubmit">
         <label for="email">Email</label>
-        <input type="email" id="email" placeholder="tu@correo.com" />
+        <input
+          type="email"
+          id="email"
+          placeholder="tu@correo.com"
+          v-model="email"
+        />
 
         <label for="password">Contraseña</label>
-        <input type="password" id="password" placeholder="••••••" />
+        <input
+          type="password"
+          id="password"
+          placeholder="••••••"
+          v-model="password"
+        />
+
+        <p v-if="error" class="login__error">{{ error }}</p>
 
         <button type="submit" class="btn btn--primary">Entrar</button>
       </form>
@@ -107,6 +134,16 @@
     font-weight: bold;
     text-decoration: none;
   }
+}
+
+.login__error {
+  background-color: #fdecea;
+  border: 1px solid #f5c6c0;
+  color: #c0392b;
+  font-size: 0.9rem;
+  padding: 10px 14px;
+  border-radius: var(--radius-input);
+  margin: -4px 0 16px;
 }
 
 @media (max-width: 480px) {

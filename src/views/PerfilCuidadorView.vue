@@ -1,6 +1,7 @@
 <script setup>
 import { useRoute } from "vue-router";
 import { useAuthStore } from "../stores/auth";
+import { RouterLink } from 'vue-router';
 
 const route = useRoute();
 const cuidadorId = route.params.id;
