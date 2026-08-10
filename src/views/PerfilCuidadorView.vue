@@ -42,7 +42,7 @@ const cuidador = {
 
 <template>
   <div class="perfil">
-    <a href="#" class="perfil__back">← Volver</a>
+    <RouterLink to="/buscar" class="perfil__back">← Volver</RouterLink>
 
     <div class="perfil__main">
       <div class="perfil__info">
