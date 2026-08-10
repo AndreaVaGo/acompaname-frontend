@@ -1,13 +1,13 @@
 <script setup>
-import { ref } from 'vue'
-import { RouterLink } from 'vue-router'
 
-// Simulación temporal — más adelante vendrá del login real
-const rolActual = ref(null)
+import { RouterLink } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
+
+const authStore = useAuthStore()
 </script>
 
 <template>
-  <nav class="navbar" v-if="rolActual">
+  <nav class="navbar" v-if="authStore.rolActual">
     <RouterLink to="/" class="navbar__logo">
       <span class="navbar__logo-icon">♥</span>
       <span>Acompáñame</span>
@@ -15,11 +15,11 @@ const rolActual = ref(null)
 
     <div class="navbar__links">
       <RouterLink to="/">Inicio</RouterLink>
-      <RouterLink to="/buscar" v-if="rolActual === 'familia'">Buscar</RouterLink>
-      <RouterLink v-if="rolActual === 'familia'" to="/solicitudes">Solicitudes</RouterLink>
-      <RouterLink v-if="rolActual === 'cuidador'" to="/solicitudes-cuidador">Solicitudes</RouterLink>
-      <RouterLink v-if="rolActual === 'familia'" to="/mi-perfil">Perfil</RouterLink>
-      <RouterLink v-if="rolActual === 'cuidador'" to="/editar-perfil">Perfil</RouterLink>
+      <RouterLink to="/buscar" v-if="authStore.rolActual === 'familia'">Buscar</RouterLink>
+      <RouterLink v-if="authStore.rolActual === 'familia'" to="/solicitudes">Solicitudes</RouterLink>
+      <RouterLink v-if="authStore.rolActual === 'cuidador'" to="/solicitudes-cuidador">Solicitudes</RouterLink>
+      <RouterLink v-if="authStore.rolActual === 'familia'" to="/mi-perfil">Perfil</RouterLink>
+      <RouterLink v-if="authStore.rolActual === 'cuidador'" to="/editar-perfil">Perfil</RouterLink>
       <RouterLink to="/historial">Historial</RouterLink>
     </div>
   </nav>
