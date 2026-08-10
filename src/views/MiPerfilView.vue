@@ -1,10 +1,21 @@
 <script setup>
+import { useRouter } from "vue-router";
+import { useAuthStore } from "../stores/auth";
+
+const authStore = useAuthStore();
+const router = useRouter();
+
 const usuario = {
   nombre: "María López",
   email: "maria@correo.com",
   telefono: "600 123 456",
   tipo: "Familia",
 };
+
+function cerrarSesion() {
+  authStore.rolActual = null;
+  router.push("/");
+}
 </script>
 
 <template>
@@ -30,7 +41,7 @@ const usuario = {
         <strong>{{ usuario.tipo }}</strong>
       </div>
 
-      <button class="btn btn--secondary">Cerrar sesión</button>
+      <button class="btn btn--secondary" @click="cerrarSesion">Cerrar sesión</button>
     </div>
   </div>
 </template>

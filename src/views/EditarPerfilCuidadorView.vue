@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from "vue";
+import { RouterLink } from "vue-router";
 
 const nombre = ref("Lucía Ferrer");
 const especialidad = ref("Auxiliar de enfermería geriátrica");
@@ -12,9 +13,17 @@ const tieneVehiculo = ref(true);
 const bio = ref(
   "Acompaño a personas mayores en hospital y en casa desde hace 8 años. Me tomo el tiempo de conocer a cada familia y de explicarlo todo con calma.",
 );
+const error = ref("");
+const guardado = ref(false);
 
 function guardarCambios() {
-  console.log("Perfil actualizado");
+  if (!nombre.value || !especialidad.value || !disponibilidad.value) {
+    error.value = "Por favor, rellena todos los campos obligatorios.";
+    guardado.value = false;
+    return;
+  }
+  error.value = "";
+  guardado.value = true;
 }
 </script>
 
@@ -94,6 +103,9 @@ function guardarCambios() {
         <label for="bio">Sobre mí</label>
         <textarea id="bio" v-model="bio"></textarea>
 
+        <p v-if="error" class="editar-perfil__error">{{ error }}</p>
+        <p v-if="guardado" class="editar-perfil__guardado">Cambios guardados ✓</p>
+
         <button type="submit" class="btn btn--primary">Guardar cambios</button>
       </form>
 
@@ -101,7 +113,7 @@ function guardarCambios() {
         <h2>Tu valoración</h2>
         <p class="editar-perfil__valoracion">⭐ 4.7</p>
         <p class="editar-perfil__resenas">3 reseñas recibidas</p>
-        <button class="btn btn--secondary">Ver mi perfil público</button>
+        <RouterLink to="/cuidador/1" class="btn btn--secondary">Ver mi perfil público</RouterLink>
       </aside>
     </div>
   </div>
@@ -211,6 +223,26 @@ function guardarCambios() {
     width: auto;
     margin: 0;
   }
+}
+
+.editar-perfil__error {
+  background-color: #fdecea;
+  border: 1px solid #f5c6c0;
+  color: #c0392b;
+  font-size: 0.9rem;
+  padding: 10px 14px;
+  border-radius: var(--radius-input);
+  margin: -4px 0 16px;
+}
+
+.editar-perfil__guardado {
+  background-color: var(--color-secondary-bg);
+  color: var(--color-secondary);
+  font-size: 0.9rem;
+  padding: 10px 14px;
+  border-radius: var(--radius-input);
+  margin: -4px 0 16px;
+  font-weight: bold;
 }
 
 .editar-perfil__sidebar {
