@@ -11,6 +11,7 @@ import ConfirmacionView from '../views/ConfirmacionView.vue'
 import ValorarView from '../views/ValorarView.vue'
 import EditarPerfilCuidadorView from '../views/EditarPerfilCuidadorView.vue'
 import MiPerfilView from '../views/MiPerfilView.vue'
+import SolicitudesFamiliaView from '../views/SolicitudesFamiliaView.vue'
 
 
 const router = createRouter({
@@ -26,7 +27,8 @@ const router = createRouter({
     { path: '/confirmacion', name: 'confirmacion', component: ConfirmacionView }, 
     { path: '/valorar/:id', name: 'valorar', component: ValorarView },
     { path: '/editar-perfil', name: 'editar-perfil', component: EditarPerfilCuidadorView },
-    { path: '/mi-perfil', name: 'mi-perfil', component: MiPerfilView }
+    { path: '/mi-perfil', name: 'mi-perfil', component: MiPerfilView }, 
+    { path: '/solicitudes', name: 'solicitudes', component: SolicitudesFamiliaView }
     
   ]
 })
