@@ -1,8 +1,10 @@
 <script setup>
 import { useRoute } from "vue-router";
+import { useAuthStore } from "../stores/auth";
 
 const route = useRoute();
 const cuidadorId = route.params.id;
+const authStore = useAuthStore();
 
 const cuidador = {
   nombre: "Lucía Ferrer",
@@ -66,7 +68,9 @@ const cuidador = {
         <p class="perfil__disponibilidad-corta">
           {{ cuidador.disponibilidad }}
         </p>
-        <button class="btn btn--primary perfil__solicitar">
+        <button
+          v-if="authStore.rolActual === 'familia'"
+          class="btn btn--primary perfil__solicitar">
           Solicitar servicio
         </button>
         <p class="perfil__nota">
