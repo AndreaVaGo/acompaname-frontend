@@ -37,19 +37,25 @@ Este repositorio contiene exclusivamente el **frontend** de la aplicación, desa
 | Tecnología | Uso en el proyecto |
 |---|---|
 | **Vue 3** | Framework principal, usando la Composition API con `<script setup>` |
-| **Vue Router** | Navegación entre las 12 vistas de la aplicación, incluyendo rutas con parámetros dinámicos (`/cuidador/:id`) |
+| **Vue Router** | Navegación entre las 13 vistas de la aplicación, incluyendo rutas con parámetros dinámicos (`/cuidador/:id`) |
+| **Pinia** | Gestión de estado compartido (rol de usuario activo) entre componentes |
 | **Vite** | Entorno de desarrollo con recarga en caliente (HMR) y build de producción |
 | **CSS nativo** | Sin frameworks de estilos externos; metodología **BEM** y **variables CSS globales** (`:root`) para mantener consistencia visual |
 
 ## Arquitectura del proyecto
 
-```
+\```
 acompaname-frontend/
 ├── public/
 ├── src/
 │   ├── assets/            # Imágenes del proyecto
 │   ├── components/
-│   │   └── NavBar.vue      # Navegación compartida entre vistas
+│   │   ├── NavBar.vue      # Navegación compartida entre vistas
+│   │   └── SolicitudCard.vue  # Tarjeta de solicitud, reutilizada en las vistas de Familia y Cuidador
+│   ├── pinia/
+│   │   └── index.js         # Instancia de Pinia
+│   ├── stores/
+│   │   └── auth.js          # Store con el rol de usuario activo
 │   ├── router/
 │   │   └── index.js         # Definición de todas las rutas
 │   ├── styles/
@@ -60,9 +66,9 @@ acompaname-frontend/
 │   └── main.js
 ├── index.html
 └── package.json
-```
+\```
 
-Esta estructura separa claramente responsabilidades: las **vistas** (`views/`) representan pantallas completas, los **componentes** (`components/`) contienen piezas reutilizables entre vistas, y los **estilos globales** (`styles/`) evitan duplicar valores de diseño (colores, espaciados) en cada archivo.
+Esta estructura separa claramente responsabilidades: las **vistas** (`views/`) representan pantallas completas, los **componentes** (`components/`) contienen piezas reutilizables entre vistas, el **store** (`stores/`) centraliza el estado compartido, y los **estilos globales** (`styles/`) evitan duplicar valores de diseño (colores, espaciados) en cada archivo.
 
 ## Pantallas implementadas
 
@@ -74,18 +80,25 @@ Esta estructura separa claramente responsabilidades: las **vistas** (`views/`) r
 6. **Solicitud de servicio** — formulario para pedir el acompañamiento a un cuidador concreto
 7. **Confirmación de solicitud**
 8. **Historial de solicitudes** (Familia) — estado final de cada acompañamiento gestionado, con acceso a valorar
-9. **Formulario de valoración** — puntuación de 1 a 5 estrellas y comentario
-10. **Solicitudes recibidas** (Cuidador) — gestión de aceptar/rechazar
-11. **Edición de perfil de cuidador**
-12. **Mi perfil** (Familia)
+9. **Solicitudes enviadas** (Familia) — estado de las solicitudes que ha enviado a distintos cuidadores
+10. **Formulario de valoración** — puntuación de 1 a 5 estrellas y comentario
+11. **Solicitudes recibidas** (Cuidador) — gestión de aceptar/rechazar
+12. **Edición de perfil de cuidador**
+13. **Mi perfil** (Familia)
 
 Cada vista incluye sus correspondientes estados vacíos (por ejemplo, "Aún no tienes solicitudes") para que la interfaz nunca se muestre rota cuando no hay datos disponibles.
 
 ## Decisiones técnicas
 
-**BEM + variables CSS globales.** Se adoptó esta convención de nomenclatura (`bloque__elemento--modificador`) junto con variables centralizadas en `:root` para los colores, radios de borde, sombras y espaciados. Esto evita repetir valores sueltos por todo el proyecto y facilita que un cambio de diseño (por ejemplo, el color de acento) se propague automáticamente a las 12 vistas sin tener que editarlas una a una.
+**BEM + variables CSS globales.** Se adoptó esta convención de nomenclatura (`bloque__elemento--modificador`) junto con variables centralizadas en `:root` para los colores, radios de borde, sombras y espaciados. Esto evita repetir valores sueltos por todo el proyecto y facilita que un cambio de diseño (por ejemplo, el color de acento) se propague automáticamente a las 13 vistas sin tener que editarlas una a una.
 
 **Componente `NavBar` compartido.** En lugar de repetir la navegación en cada vista, se extrajo a un único componente incluido en `App.vue`, que muestra distintos enlaces según el rol del usuario (Familia ve "Buscar", Cuidador no) y oculta el menú por completo en pantallas donde no hay sesión iniciada (Landing, Login, Registro).
+
+**Estado compartido con Pinia.** El rol de usuario activo (Familia o Cuidador) se gestiona en un store (`useAuthStore`) en lugar de vivir como una variable local en `NavBar.vue`. Esto permite que cualquier vista, no solo la navegación, pueda consultar y reaccionar al rol actual — por ejemplo, ocultando el botón "Solicitar servicio" en el perfil de un cuidador cuando quien lo visualiza es otro cuidador, no una familia.
+
+**Componente `SolicitudCard` reutilizable.** La tarjeta que muestra una solicitud (familia/cuidador, tipo de cuidado, fecha, notas y estado) se repetía casi de forma idéntica en las vistas de "Solicitudes recibidas" y "Solicitudes enviadas", con la única diferencia de mostrar o no los botones de Aceptar/Rechazar. Se extrajo a un componente único que recibe esos datos por *props*, evitando duplicar el HTML y el CSS en dos archivos.
+
+**Validación básica de formularios.** Los formularios de Login, Registro y Solicitud de servicio comprueban que los campos obligatorios no estén vacíos antes de continuar, mostrando un mensaje de error visible en caso contrario. Como todavía no hay backend, esta validación es puramente de cliente (JavaScript), a la espera de la validación adicional que aportará la API REST.
 
 **Datos simulados (mock) en cada vista.** Como el desarrollo del frontend se inició antes de que el backend con Spring Boot estuviera disponible en el temario del bootcamp, cada vista trabaja con datos de ejemplo definidos directamente en su `<script setup>` mediante `ref()`. Esta decisión permitió avanzar el frontend en paralelo sin bloquear el proyecto, y la sustitución por llamadas reales a la API REST se hará sin cambios estructurales, ya que la lógica de renderizado (`v-for`, `v-if`, interpolación) es independiente del origen de los datos.
 
@@ -101,7 +114,7 @@ La gestión del proyecto se organizó en JIRA con épicas, historias de usuario 
 
 ## Instalación y uso
 
-```bash
+\```bash
 # Clonar el repositorio
 git clone https://github.com/AndreaVaGo/acompaname-frontend.git
 
@@ -113,7 +126,7 @@ npm install
 
 # Arrancar el servidor de desarrollo
 npm run dev
-```
+\```
 
 La aplicación quedará disponible en `http://localhost:5173`.
 
@@ -128,7 +141,7 @@ La aplicación quedará disponible en `http://localhost:5173`.
 ## Próximos pasos
 
 - Conexión con la API REST del backend (Spring Boot), sustituyendo los datos simulados por peticiones reales
-- Autenticación de usuarios y protección de rutas según el rol
+- Autenticación de usuarios real y protección de rutas según el rol
 - Persistencia de sesión
 
 ## Autora
