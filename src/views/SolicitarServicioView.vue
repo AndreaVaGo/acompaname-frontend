@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { RouterLink } from "vue-router";
 
 const route = useRoute();
 const router = useRouter();
@@ -12,15 +13,26 @@ const fechaInicio = ref("");
 const nombrePaciente = ref("");
 const edadPaciente = ref("");
 const notas = ref("");
+const error = ref("");
 
 function enviarSolicitud() {
+  if (
+    !tipoCuidado.value ||
+    !fechaInicio.value ||
+    !nombrePaciente.value ||
+    !edadPaciente.value
+  ) {
+    error.value = "Por favor, rellena todos los campos obligatorios.";
+    return;
+  }
+  error.value = "";
   router.push({ name: "confirmacion" });
 }
 </script>
 
 <template>
   <div class="solicitar">
-    <a href="#" class="solicitar__back">← Volver al perfil</a>
+    <RouterLink :to="`/cuidador/${route.params.id}`" class="solicitar__back">← Volver al perfil</RouterLink>
 
     <div class="solicitar__box">
       <h1>Solicitar a {{ cuidadorNombre }}</h1>
@@ -78,6 +90,8 @@ function enviarSolicitud() {
           v-model="notas"
           placeholder="Horario de medicación, alergias, rutinas diarias, movilidad, cualquier detalle que el cuidador deba conocer..."
         ></textarea>
+
+        <p v-if="error" class="solicitar__error">{{ error }}</p>
 
         <button type="submit" class="btn btn--primary">Enviar solicitud</button>
       </form>
@@ -144,6 +158,16 @@ function enviarSolicitud() {
     min-height: 90px;
     resize: vertical;
   }
+}
+
+.solicitar__error {
+  background-color: #fdecea;
+  border: 1px solid #f5c6c0;
+  color: #c0392b;
+  font-size: 0.9rem;
+  padding: 10px 14px;
+  border-radius: var(--radius-input);
+  margin: -4px 0 16px;
 }
 
 .solicitar__opciones {
