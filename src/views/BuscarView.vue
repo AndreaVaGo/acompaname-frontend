@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { RouterLink } from "vue-router";
 
 const cuidadores = ref([
@@ -40,6 +40,18 @@ const cuidadores = ref([
     tarifa: 16,
   },
 ]);
+
+const busqueda = ref("");
+
+const cuidadoresFiltrados = computed(() => {
+  return cuidadores.value.filter(
+    (cuidador) =>
+      cuidador.nombre.toLowerCase().includes(busqueda.value.toLowerCase()) ||
+      cuidador.especialidad
+        .toLowerCase()
+        .includes(busqueda.value.toLowerCase()),
+  );
+});
 </script>
 
 <template>
@@ -50,6 +62,16 @@ const cuidadores = ref([
         Elige el tipo de cuidado que necesitas y mira quién puede acompañaros.
       </p>
     </header>
+
+    <div class="buscar__search">
+      <input
+        type="text"
+        v-model="busqueda"
+        placeholder="Buscar por nombre o especialidad..."
+        class="buscar__input"
+      />
+      <button class="btn btn--primary">Buscar</button>
+    </div>
 
     <div class="buscar__filters">
       <div class="buscar__filter-group">
@@ -85,12 +107,15 @@ const cuidadores = ref([
       </div>
     </div>
 
-    <p class="buscar__count">{{ cuidadores.length }} cuidadores para ti</p>
+    <p class="buscar__count">
+      {{ cuidadoresFiltrados.length }}
+      {{ cuidadoresFiltrados.length === 1 ? "cuidador" : "cuidadores" }} para ti
+    </p>
 
     <div class="buscar__grid">
       <div
         class="buscar__card"
-        v-for="cuidador in cuidadores"
+        v-for="cuidador in cuidadoresFiltrados"
         :key="cuidador.id"
       >
         <h3>{{ cuidador.nombre }}</h3>
@@ -150,6 +175,21 @@ const cuidadores = ref([
     color: var(--color-text-muted);
     margin-bottom: 24px;
   }
+}
+
+.buscar__search {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.buscar__input {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: var(--radius-input);
+  border: 1px solid var(--color-border);
+  font-size: 1rem;
+  font-family: inherit;
 }
 
 .buscar__filters {
