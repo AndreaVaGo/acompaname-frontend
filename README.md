@@ -17,6 +17,7 @@ Proyecto Final del Bootcamp de Desarrollo Web Full Stack — Factoría F5.
 - [Instalación y uso](#instalación-y-uso)
 - [Bocetos iniciales](#bocetos-iniciales)
 - [Screenshots](#screenshots)
+- [Diagramas técnicos](#diagramas-técnicos)
 - [Running Tests](#running-tests)
 - [Tools](#tools)
 - [Enlaces del proyecto](#enlaces-del-proyecto)
@@ -171,6 +172,14 @@ Buscar cuidadores
 Solicitar servicio
 ![solicitar](./src/assets/solicitar.png)
 
+## Diagramas técnicos
+
+Diagrama Entidad-Relación
+![diagrama-er](./src/assets/diagrama-er-acompaname.png)
+
+Diagrama de clases
+![diagrama-clases](./src/assets/diagrama-clases-acompaname.png)
+
 ## Running Tests
 
 El proyecto incluye tests unitarios con Vitest y Vue Test Utils para varios componentes clave:
@@ -198,7 +207,6 @@ npm run test:unit
 - **Repositorio backend**: *(pendiente)*
 - **Gestión del proyecto (JIRA)**: *(pendiente)*
 - **Prototipo de diseño (Lovable)**: *(pendiente)*
-- **Diagramas técnicos**: `assets/diagrama-er-acompaname.png` · `assets/diagrama-clases-acompaname.png`
 - **Presentación**: *(pendiente)*
 
 ## Known Issues
