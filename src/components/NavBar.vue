@@ -1,9 +1,8 @@
 <script setup>
+import { RouterLink } from "vue-router";
+import { useAuthStore } from "../stores/auth";
 
-import { RouterLink } from 'vue-router'
-import { useAuthStore } from '../stores/auth'
-
-const authStore = useAuthStore()
+const authStore = useAuthStore();
 </script>
 
 <template>
@@ -15,11 +14,23 @@ const authStore = useAuthStore()
 
     <div class="navbar__links">
       <RouterLink to="/">Inicio</RouterLink>
-      <RouterLink to="/buscar" v-if="authStore.rolActual === 'familia'">Buscar</RouterLink>
-      <RouterLink v-if="authStore.rolActual === 'familia'" to="/solicitudes">Solicitudes</RouterLink>
-      <RouterLink v-if="authStore.rolActual === 'cuidador'" to="/solicitudes-cuidador">Solicitudes</RouterLink>
-      <RouterLink v-if="authStore.rolActual === 'familia'" to="/mi-perfil">Perfil</RouterLink>
-      <RouterLink v-if="authStore.rolActual === 'cuidador'" to="/editar-perfil">Perfil</RouterLink>
+      <RouterLink to="/buscar" v-if="authStore.rolActual === 'familia'"
+        >Buscar</RouterLink
+      >
+      <RouterLink v-if="authStore.rolActual === 'familia'" to="/solicitudes"
+        >Solicitudes</RouterLink
+      >
+      <RouterLink
+        v-if="authStore.rolActual === 'cuidador'"
+        to="/solicitudes-cuidador"
+        >Solicitudes</RouterLink
+      >
+      <RouterLink v-if="authStore.rolActual === 'familia'" to="/mi-perfil"
+        >Perfil</RouterLink
+      >
+      <RouterLink v-if="authStore.rolActual === 'cuidador'" to="/editar-perfil"
+        >Perfil</RouterLink
+      >
       <RouterLink to="/historial">Historial</RouterLink>
     </div>
   </nav>
@@ -56,6 +67,7 @@ const authStore = useAuthStore()
 
 .navbar__links {
   display: flex;
+  align-items: center;
   gap: var(--gap-md);
 
   & a {
