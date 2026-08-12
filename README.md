@@ -15,9 +15,15 @@ Proyecto Final del Bootcamp de Desarrollo Web Full Stack — Factoría F5.
 - [Decisiones técnicas](#decisiones-técnicas)
 - [Metodología de trabajo](#metodología-de-trabajo)
 - [Instalación y uso](#instalación-y-uso)
+- [Bocetos iniciales](#bocetos-iniciales)
+- [Screenshots](#screenshots)
+- [Running Tests](#running-tests)
+- [Tools](#tools)
 - [Enlaces del proyecto](#enlaces-del-proyecto)
+- [Known Issues](#known-issues)
 - [Próximos pasos](#próximos-pasos)
 - [Autora](#autora)
+- [Disclaimer](#disclaimer)
 
 ---
 
@@ -44,7 +50,7 @@ Este repositorio contiene exclusivamente el **frontend** de la aplicación, desa
 
 ## Arquitectura del proyecto
 
-\```
+```
 acompaname-frontend/
 ├── public/
 ├── src/
@@ -61,12 +67,13 @@ acompaname-frontend/
 │   ├── styles/
 │   │   ├── variables.css    # Paleta de colores, radios, sombras, espaciados
 │   │   └── base.css         # Estilos compartidos (botones)
+│   ├── tests/                # Tests unitarios de componentes (Vitest)
 │   ├── views/               # Una vista por pantalla completa
 │   ├── App.vue               # Componente raíz (NavBar + RouterView)
 │   └── main.js
 ├── index.html
 └── package.json
-\```
+```
 
 Esta estructura separa claramente responsabilidades: las **vistas** (`views/`) representan pantallas completas, los **componentes** (`components/`) contienen piezas reutilizables entre vistas, el **store** (`stores/`) centraliza el estado compartido, y los **estilos globales** (`styles/`) evitan duplicar valores de diseño (colores, espaciados) en cada archivo.
 
@@ -114,7 +121,7 @@ La gestión del proyecto se organizó en JIRA con épicas, historias de usuario 
 
 ## Instalación y uso
 
-\```bash
+```bash
 # Clonar el repositorio
 git clone https://github.com/AndreaVaGo/acompaname-frontend.git
 
@@ -126,9 +133,65 @@ npm install
 
 # Arrancar el servidor de desarrollo
 npm run dev
-\```
+```
 
 La aplicación quedará disponible en `http://localhost:5173`.
+
+## Bocetos iniciales
+
+Landing
+![boceto-landing](./src/assets/boceto_landing.png)
+
+Registro
+![boceto-registro](./src/assets/boceto_registro.png)
+
+Buscar cuidadores
+![boceto-buscar](./src/assets/boceto_buscar.png)
+
+Perfil de cuidador (vista Familia)
+![boceto-perfil-familia](./src/assets/boceto_perfil_familia.png)
+
+Perfil de cuidador (vista Cuidador)
+![boceto-perfil-cuidador](./src/assets/boceto_perfil_cuidador_rol.png)
+
+Solicitar servicio
+![boceto-solicitar](./src/assets/boceto_solicitar.png)
+
+Solicitudes recibidas
+![boceto-solicitudes](./src/assets/boceto_solicitudes_cuidador.png)
+
+## Screenshots
+
+Landing
+![landing](./src/assets/landing.png)
+
+Buscar cuidadores
+![buscar](./src/assets/buscar.png)
+
+Solicitar servicio
+![solicitar](./src/assets/solicitar.png)
+
+## Running Tests
+
+El proyecto incluye tests unitarios con Vitest y Vue Test Utils para varios componentes clave:
+- `SolicitudCard` — renderizado correcto según las props recibidas
+- `NavBar` — visibilidad de los enlaces según el rol activo (Pinia)
+- `LoginView` / `RegisterView` — validación de campos obligatorios
+
+Para ejecutarlos:
+
+```bash
+npm run test:unit
+```
+
+## Tools
+
+- Visual Studio Code
+- Vue 3 (Composition API)
+- Pinia
+- Vue Router
+- Vite
+- Vitest + Vue Test Utils
 
 ## Enlaces del proyecto
 
@@ -137,6 +200,10 @@ La aplicación quedará disponible en `http://localhost:5173`.
 - **Prototipo de diseño (Lovable)**: *(pendiente)*
 - **Diagramas técnicos**: `assets/diagrama-er-acompaname.png` · `assets/diagrama-clases-acompaname.png`
 - **Presentación**: *(pendiente)*
+
+## Known Issues
+
+Sin incidencias relevantes detectadas hasta la fecha. Si encuentras algo, no dudes en abrir un issue.
 
 ## Próximos pasos
 
@@ -147,3 +214,13 @@ La aplicación quedará disponible en `http://localhost:5173`.
 ## Autora
 
 Andrea — Proyecto Final, Bootcamp Desarrollo Web Full Stack, Factoría F5.
+
+## Disclaimer
+
+Este proyecto ha sido desarrollado como parte de un bootcamp con fines educativos. Los autores no se responsabilizan de los problemas, daños o pérdidas que puedan derivarse de su uso.
+
+Este proyecto no está pensado para uso comercial. Al utilizar este código, se reconoce que es un trabajo en progreso, creado por estudiantes, sin garantías de ningún tipo.
+
+Uso bajo tu propia responsabilidad.
+
+Gracias ❤️
