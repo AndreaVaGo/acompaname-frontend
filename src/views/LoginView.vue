@@ -1,18 +1,31 @@
 <script setup>
 import { ref } from "vue";
-import { RouterLink } from "vue-router";
+import { RouterLink, useRouter } from "vue-router";
+import AuthRepository from "@/repositories/AuthRepository";
+import { useAuthStore } from "@/stores/auth";
 
 const email = ref("");
 const password = ref("");
 const error = ref("");
 
-function handleSubmit() {
+const authRepository = new AuthRepository();
+const authStore = useAuthStore();
+const router = useRouter();
+
+async function handleSubmit() {
   if (!email.value || !password.value) {
     error.value = "Por favor, rellena todos los campos.";
     return;
   }
   error.value = "";
-  // aquí más adelante iría la llamada real de login
+
+  try {
+    const data = await authRepository.login(email.value, password.value);
+    authStore.login(data.username, password.value, data.roles);
+    router.push("/");
+  } catch (err) {
+    error.value = "Email o contraseña incorrectos.";
+  }
 }
 </script>
 
