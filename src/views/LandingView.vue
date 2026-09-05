@@ -1,6 +1,5 @@
 <script setup>
-import { RouterLink } from 'vue-router';
-
+import { RouterLink } from "vue-router";
 </script>
 
 <template>
@@ -17,8 +16,12 @@ import { RouterLink } from 'vue-router';
           hospital o en casa. Sin llamadas interminables ni papeleo.
         </p>
         <div class="landing__hero-actions">
-          <RouterLink to="/registro" class="btn btn--primary">Registrarme</RouterLink>
-          <RouterLink to="/login" class="btn btn--secondary">Iniciar sesión</RouterLink>
+          <RouterLink to="/registro" class="btn btn--primary"
+            >Registrarme</RouterLink
+          >
+          <RouterLink to="/login" class="btn btn--secondary"
+            >Iniciar sesión</RouterLink
+          >
         </div>
         <RouterLink to="/buscar" class="landing__link landing__link--view">
           ¿Solo quieres mirar? Ver cuidadores disponibles
@@ -99,7 +102,9 @@ import { RouterLink } from 'vue-router';
         Publica tu perfil, recibe solicitudes de familias cercanas y gestiona tu
         agenda desde un único sitio.
       </p>
-     <RouterLink to="/registro" class="btn btn--primary">Crear mi perfil de cuidador</RouterLink>
+      <RouterLink to="/registro" class="btn btn--primary"
+        >Crear mi perfil de cuidador</RouterLink
+      >
     </section>
 
     <hr class="landing__divider" />
@@ -170,7 +175,7 @@ import { RouterLink } from 'vue-router';
   text-decoration: none;
 
   &--view {
-    color: var(--color-secondary);
+    color: var(--color-accent);
     font-size: 0.9rem;
   }
 }
