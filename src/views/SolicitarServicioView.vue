@@ -1,12 +1,19 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { RouterLink } from "vue-router";
+import SolicitudRepository from "@/repositories/SolicitudRepository";
+import CuidadorRepository from "@/repositories/CuidadorRepository";
+import { useAuthStore } from "@/stores/auth";
 
 const route = useRoute();
 const router = useRouter();
+const authStore = useAuthStore();
+const solicitudRepository = new SolicitudRepository();
+const cuidadorRepository = new CuidadorRepository();
 
-const cuidadorNombre = "Lucía Ferrer";
+const cuidadorId = route.params.id;
+const cuidadorNombre = ref("");
 
 const tipoCuidado = ref("");
 const fechaInicio = ref("");
@@ -15,7 +22,16 @@ const edadPaciente = ref("");
 const notas = ref("");
 const error = ref("");
 
-function enviarSolicitud() {
+onMounted(async () => {
+  try {
+    const cuidador = await cuidadorRepository.getById(cuidadorId);
+    cuidadorNombre.value = cuidador.usuarioNombre;
+  } catch (err) {
+    error.value = "No se pudo cargar el cuidador.";
+  }
+});
+
+async function enviarSolicitud() {
   if (
     !tipoCuidado.value ||
     !fechaInicio.value ||
@@ -26,13 +42,29 @@ function enviarSolicitud() {
     return;
   }
   error.value = "";
-  router.push({ name: "confirmacion" });
+
+  try {
+    await solicitudRepository.create({
+      tipoCuidado: tipoCuidado.value,
+      nombrePaciente: nombrePaciente.value,
+      notas: notas.value,
+      edadPaciente: Number(edadPaciente.value),
+      fechaCuidado: fechaInicio.value,
+      familiaId: authStore.id,
+      cuidadorId: Number(cuidadorId),
+    });
+    router.push({ name: "confirmacion" });
+  } catch (err) {
+    error.value = "No se pudo enviar la solicitud. Inténtalo de nuevo.";
+  }
 }
 </script>
 
 <template>
   <div class="solicitar">
-    <RouterLink :to="`/cuidador/${route.params.id}`" class="solicitar__back">← Volver al perfil</RouterLink>
+    <RouterLink :to="`/cuidador/${route.params.id}`" class="solicitar__back"
+      >← Volver al perfil</RouterLink
+    >
 
     <div class="solicitar__box">
       <h1>Solicitar a {{ cuidadorNombre }}</h1>
