@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from "vue";
-import { RouterLink } from "vue-router";
+import { RouterLink, useRouter } from "vue-router";
+import AuthRepository from "@/repositories/AuthRepository";
 
 const rolSeleccionado = ref("familia");
 const nombre = ref("");
@@ -9,13 +10,33 @@ const password = ref("");
 const telefono = ref("");
 const error = ref("");
 
-function handleSubmit() {
+const authRepository = new AuthRepository();
+const router = useRouter();
+
+const ROLES_IDS = {
+  familia: 4,
+  cuidador: 5,
+};
+
+async function handleSubmit() {
   if (!nombre.value || !email.value || !password.value || !telefono.value) {
     error.value = "Por favor, rellena todos los campos.";
     return;
   }
   error.value = "";
-  // aquí más adelante iría la llamada real de registro
+
+  try {
+    await authRepository.register({
+      nombre: nombre.value,
+      email: email.value,
+      telefono: telefono.value,
+      password: password.value,
+      rolesIds: [ROLES_IDS[rolSeleccionado.value]],
+    });
+    router.push("/login");
+  } catch (err) {
+    error.value = "No se pudo completar el registro. Revisa los datos.";
+  }
 }
 </script>
 
