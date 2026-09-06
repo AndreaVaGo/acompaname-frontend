@@ -21,7 +21,7 @@ async function handleSubmit() {
 
   try {
     const data = await authRepository.login(email.value, password.value);
-    authStore.login(data.username, password.value, data.roles);
+    authStore.login(data.id, data.username, password.value, data.roles);
     router.push("/");
   } catch (err) {
     error.value = "Email o contraseña incorrectos.";
