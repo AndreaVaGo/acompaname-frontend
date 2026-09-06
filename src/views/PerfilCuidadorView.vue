@@ -1,62 +1,50 @@
 <script setup>
+import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { useAuthStore } from "../stores/auth";
-import { RouterLink } from 'vue-router';
+import { RouterLink } from "vue-router";
+import CuidadorRepository from "@/repositories/CuidadorRepository";
 
 const route = useRoute();
 const cuidadorId = route.params.id;
 const authStore = useAuthStore();
+const cuidadorRepository = new CuidadorRepository();
 
-const cuidador = {
-  nombre: "Lucía Ferrer",
-  especialidad: "Auxiliar de enfermería geriátrica",
-  experiencia: 8,
-  tarifa: 14,
-  disponibilidad: "Lunes a viernes, mañanas y noches",
-  bio: "Acompaño a personas mayores en hospital y en casa desde hace 8 años. Me tomo el tiempo de conocer a cada familia y de explicarlo todo con calma.",
-  valoracion: 4.7,
-  resenas: [
-    {
-      familia: "Familia Serrano",
-      puntuacion: 5,
-      comentario:
-        "Lucía cuidó a mi padre cuatro noches en el hospital. Nos llamaba cada mañana para contarnos cómo había pasado la noche. Un alivio enorme.",
-      fecha: "8 de junio de 2026",
-    },
-    {
-      familia: "Familia Peña",
-      puntuacion: 5,
-      comentario:
-        "Muy cariñosa y puntual. Mi madre la esperaba con ganas cada día.",
-      fecha: "19 de mayo de 2026",
-    },
-    {
-      familia: "Familia Molins",
-      puntuacion: 4,
-      comentario:
-        "Gran profesional. Solo tuvimos que ajustar los horarios al principio.",
-      fecha: "30 de abril de 2026",
-    },
-  ],
-};
+const cuidador = ref(null);
+const cargando = ref(true);
+const error = ref("");
+
+onMounted(async () => {
+  try {
+    cuidador.value = await cuidadorRepository.getById(cuidadorId);
+  } catch (err) {
+    error.value = "No se pudo cargar el perfil del cuidador.";
+  } finally {
+    cargando.value = false;
+  }
+});
 </script>
 
 <template>
-  <div class="perfil">
+  <div class="perfil" v-if="cuidador">
     <RouterLink to="/buscar" class="perfil__back">← Volver</RouterLink>
 
     <div class="perfil__main">
       <div class="perfil__info">
-        <h1>{{ cuidador.nombre }}</h1>
+        <h1>{{ cuidador.usuarioNombre }}</h1>
         <p class="perfil__especialidad">{{ cuidador.especialidad }}</p>
-        <p class="perfil__valoracion">
-          ⭐ {{ cuidador.valoracion }} · {{ cuidador.resenas.length }} reseñas
-        </p>
 
         <ul class="perfil__datos">
-          <li><strong>Experiencia:</strong> {{ cuidador.experiencia }} años</li>
           <li>
-            <strong>Disponibilidad:</strong> {{ cuidador.disponibilidad }}
+            <strong>Experiencia:</strong> {{ cuidador.anosExperiencia }} años
+          </li>
+          <li>
+            <strong>Disponibilidad:</strong>
+            {{
+              cuidador.disponibleAhora
+                ? "Disponible ahora"
+                : "No disponible ahora"
+            }}
           </li>
         </ul>
 
@@ -65,13 +53,13 @@ const cuidador = {
       </div>
 
       <div class="perfil__sidebar">
-        <p class="perfil__precio">{{ cuidador.tarifa }} €<span>/hora</span></p>
-        <p class="perfil__disponibilidad-corta">
-          {{ cuidador.disponibilidad }}
+        <p class="perfil__precio">
+          {{ cuidador.tarifaHora }} €<span>/hora</span>
         </p>
         <button
-          v-if="authStore.rolActual === 'familia'"
-          class="btn btn--primary perfil__solicitar">
+          v-if="authStore.rol === 'FAMILIA'"
+          class="btn btn--primary perfil__solicitar"
+        >
           Solicitar servicio
         </button>
         <p class="perfil__nota">
@@ -80,25 +68,9 @@ const cuidador = {
         </p>
       </div>
     </div>
-
-    <div class="perfil__resenas">
-      <h2>Reseñas recientes</h2>
-      <div
-        class="perfil__resena"
-        v-for="(resena, index) in cuidador.resenas"
-        :key="index"
-      >
-        <div class="perfil__resena-top">
-          <strong>{{ resena.familia }}</strong>
-          <span class="perfil__resena-fecha">{{ resena.fecha }}</span>
-        </div>
-        <p class="perfil__resena-estrellas">
-          {{ "⭐".repeat(resena.puntuacion) }}
-        </p>
-        <p>{{ resena.comentario }}</p>
-      </div>
-    </div>
   </div>
+  <p v-else-if="error">{{ error }}</p>
+  <p v-else>Cargando...</p>
 </template>
 
 <style scoped>
