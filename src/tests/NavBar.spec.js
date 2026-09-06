@@ -17,7 +17,7 @@ describe('NavBar', () => {
 
   test('muestra el enlace Buscar cuando el rol es familia', () => {
     const authStore = useAuthStore()
-    authStore.rolActual = 'familia'
+    authStore.login('ana@test.com', '12345678', 'FAMILIA')
 
     const wrapper = mount(NavBar, {
       global: {

@@ -1,12 +1,18 @@
 <script setup>
-import { RouterLink } from "vue-router";
+import { RouterLink, useRouter } from "vue-router";
 import { useAuthStore } from "../stores/auth";
 
 const authStore = useAuthStore();
+const router = useRouter();
+
+function handleLogout() {
+  authStore.logout();
+  router.push("/login");
+}
 </script>
 
 <template>
-  <nav class="navbar" v-if="authStore.rolActual">
+  <nav class="navbar" v-if="authStore.estaAutenticado">
     <RouterLink to="/" class="navbar__logo">
       <span class="navbar__logo-icon">♥</span>
       <span>Acompáñame</span>
@@ -14,24 +20,25 @@ const authStore = useAuthStore();
 
     <div class="navbar__links">
       <RouterLink to="/">Inicio</RouterLink>
-      <RouterLink to="/buscar" v-if="authStore.rolActual === 'familia'"
+      <RouterLink to="/buscar" v-if="authStore.rol === 'FAMILIA'"
         >Buscar</RouterLink
       >
-      <RouterLink v-if="authStore.rolActual === 'familia'" to="/solicitudes"
+      <RouterLink v-if="authStore.rol === 'FAMILIA'" to="/solicitudes"
         >Solicitudes</RouterLink
       >
-      <RouterLink
-        v-if="authStore.rolActual === 'cuidador'"
-        to="/solicitudes-cuidador"
+      <RouterLink v-if="authStore.rol === 'CUIDADOR'" to="/solicitudes-cuidador"
         >Solicitudes</RouterLink
       >
-      <RouterLink v-if="authStore.rolActual === 'familia'" to="/mi-perfil"
+      <RouterLink v-if="authStore.rol === 'FAMILIA'" to="/mi-perfil"
         >Perfil</RouterLink
       >
-      <RouterLink v-if="authStore.rolActual === 'cuidador'" to="/editar-perfil"
+      <RouterLink v-if="authStore.rol === 'CUIDADOR'" to="/editar-perfil"
         >Perfil</RouterLink
       >
       <RouterLink to="/historial">Historial</RouterLink>
+      <button class="navbar__logout" @click="handleLogout">
+        Cerrar sesión
+      </button>
     </div>
   </nav>
 </template>
