@@ -1,52 +1,30 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { RouterLink } from "vue-router";
+import CuidadorRepository from "@/repositories/CuidadorRepository";
 
-const cuidadores = ref([
-  {
-    id: 1,
-    nombre: "Lucía Ferrer",
-    especialidad: "Auxiliar de enfermería geriátrica",
-    valoracion: 4.7,
-    resenas: 3,
-    tipoCuidado: "Hospital y domicilio",
-    ciudad: "Madrid",
-    disponible: true,
-    vehiculo: true,
-    tarifa: 14,
-  },
-  {
-    id: 2,
-    nombre: "Marcos Ibáñez",
-    especialidad: "Cuidador de personas con movilidad reducida",
-    valoracion: 4.0,
-    resenas: 1,
-    tipoCuidado: "A domicilio",
-    ciudad: "Valencia",
-    disponible: true,
-    vehiculo: true,
-    tarifa: 12,
-  },
-  {
-    id: 3,
-    nombre: "Amina Boulaich",
-    especialidad: "Acompañamiento hospitalario nocturno",
-    valoracion: 5.0,
-    resenas: 1,
-    tipoCuidado: "Hospitalario",
-    ciudad: "Barcelona",
-    disponible: true,
-    vehiculo: false,
-    tarifa: 16,
-  },
-]);
-
+const cuidadorRepository = new CuidadorRepository();
+const cuidadores = ref([]);
 const busqueda = ref("");
+const cargando = ref(true);
+const error = ref("");
+
+onMounted(async () => {
+  try {
+    cuidadores.value = await cuidadorRepository.getAll();
+  } catch (err) {
+    error.value = "No se pudieron cargar los cuidadores.";
+  } finally {
+    cargando.value = false;
+  }
+});
 
 const cuidadoresFiltrados = computed(() => {
   return cuidadores.value.filter(
     (cuidador) =>
-      cuidador.nombre.toLowerCase().includes(busqueda.value.toLowerCase()) ||
+      cuidador.usuarioNombre
+        .toLowerCase()
+        .includes(busqueda.value.toLowerCase()) ||
       cuidador.especialidad
         .toLowerCase()
         .includes(busqueda.value.toLowerCase()),
@@ -118,33 +96,24 @@ const cuidadoresFiltrados = computed(() => {
         v-for="cuidador in cuidadoresFiltrados"
         :key="cuidador.id"
       >
-        <h3>{{ cuidador.nombre }}</h3>
+        <h3>{{ cuidador.usuarioNombre }}</h3>
         <p class="buscar__card-especialidad">{{ cuidador.especialidad }}</p>
-        <p class="buscar__card-valoracion">
-          ⭐ {{ cuidador.valoracion }} ({{ cuidador.resenas }} reseñas)
-        </p>
 
         <div class="buscar__tags">
-          <span class="buscar__tag buscar__tag--cuidado">{{
-            cuidador.tipoCuidado
-          }}</span>
-          <span class="buscar__tag buscar__tag--ciudad">{{
-            cuidador.ciudad
-          }}</span>
           <span
             class="buscar__tag buscar__tag--disponible"
-            v-if="cuidador.disponible"
+            v-if="cuidador.disponibleAhora"
             >Disponible ahora</span
           >
           <span
             class="buscar__tag buscar__tag--vehiculo"
-            v-if="cuidador.vehiculo"
+            v-if="cuidador.tieneVehiculo"
             >Vehículo propio</span
           >
         </div>
 
         <div class="buscar__card-footer">
-          <span class="buscar__precio">{{ cuidador.tarifa }} €/hora</span>
+          <span class="buscar__precio">{{ cuidador.tarifaHora }} €/hora</span>
           <RouterLink :to="`/cuidador/${cuidador.id}`" class="btn btn--primary"
             >Ver perfil</RouterLink
           >
