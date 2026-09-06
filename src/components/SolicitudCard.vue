@@ -14,29 +14,31 @@ defineProps([
       <h3>{{ nombreMostrado }}</h3>
       <span
         class="solicitudes__estado"
-        :class="'solicitudes__estado--' + solicitud.estado"
+        :class="'solicitudes__estado--' + solicitud.estado.toLowerCase()"
       >
         {{
-          solicitud.estado === "pendiente"
+          solicitud.estado === "PENDIENTE"
             ? "Pendiente"
-            : solicitud.estado === "aceptada"
+            : solicitud.estado === "ACEPTADA"
               ? "Aceptada"
-              : "Rechazada"
+              : solicitud.estado === "RECHAZADA"
+                ? "Rechazada"
+                : "Completada"
         }}
       </span>
     </div>
 
-    <p class="solicitudes__paciente">{{ solicitud.paciente }}</p>
+    <p class="solicitudes__paciente">{{ solicitud.nombrePaciente }}</p>
 
     <ul class="solicitudes__detalles">
       <li>🏠 {{ solicitud.tipoCuidado }}</li>
-      <li>📅 Inicio: {{ solicitud.fechaInicio }}</li>
+      <li>📅 Inicio: {{ solicitud.fechaCuidado }}</li>
       <li>📝 {{ solicitud.notas }}</li>
     </ul>
 
     <div
       class="solicitudes__acciones"
-      v-if="mostrarAcciones && solicitud.estado === 'pendiente'"
+      v-if="mostrarAcciones && solicitud.estado === 'PENDIENTE'"
     >
       <button class="btn btn--primary" @click="aceptar(solicitud.id)">
         Aceptar

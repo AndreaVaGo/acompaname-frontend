@@ -1,27 +1,22 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import SolicitudCard from "../components/SolicitudCard.vue";
+import SolicitudRepository from "@/repositories/SolicitudRepository";
 
-const solicitudes = ref([
-  {
-    id: 1,
-    cuidador: "Lucía Ferrer",
-    paciente: "Antonio Serrano",
-    tipoCuidado: "Hospitalario",
-    fechaInicio: "12 de agosto de 2026",
-    notas: "Ingreso previsto de 4 noches en el Hospital La Paz.",
-    estado: "pendiente",
-  },
-  {
-    id: 2,
-    cuidador: "Marta Gómez",
-    paciente: "Antonio Serrano",
-    tipoCuidado: "A domicilio",
-    fechaInicio: "20 de agosto de 2026",
-    notas: "Apoyo por las tardes, tres días por semana.",
-    estado: "aceptada",
-  },
-]);
+const solicitudRepository = new SolicitudRepository();
+const solicitudes = ref([]);
+const cargando = ref(true);
+const error = ref("");
+
+onMounted(async () => {
+  try {
+    solicitudes.value = await solicitudRepository.getMisSolicitudes();
+  } catch (err) {
+    error.value = "No se pudieron cargar tus solicitudes.";
+  } finally {
+    cargando.value = false;
+  }
+});
 </script>
 
 <template>
@@ -36,7 +31,7 @@ const solicitudes = ref([
         v-for="solicitud in solicitudes"
         :key="solicitud.id"
         :solicitud="solicitud"
-        :nombreMostrado="solicitud.cuidador"
+        :nombreMostrado="solicitud.cuidadorNombre"
         :mostrarAcciones="false"
       />
     </div>
