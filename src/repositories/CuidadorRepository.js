@@ -1,15 +1,23 @@
-import Repository from './Repository'
+import Repository from "./Repository";
 
 export default class CuidadorRepository extends Repository {
   constructor() {
-    super("http://localhost:8080/api/v1")
+    super("http://localhost:8080/api/v1");
   }
 
   async getAll() {
-    return this.get("/cuidadores")
+    return this.get("/cuidadores");
   }
 
   async getById(id) {
-    return this.get(`/cuidadores/${id}`)
+    return this.get(`/cuidadores/${id}`);
+  }
+
+  async getMiPerfil() {
+    return this.get("/cuidadores/mi-perfil");
+  }
+
+  async update(id, cuidadorData) {
+    return this.put(`/cuidadores/${id}`, cuidadorData);
   }
 }

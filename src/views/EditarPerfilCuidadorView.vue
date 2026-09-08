@@ -1,29 +1,63 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { RouterLink } from "vue-router";
+import CuidadorRepository from "@/repositories/CuidadorRepository";
+import { useAuthStore } from "@/stores/auth";
 
-const nombre = ref("Lucía Ferrer");
-const especialidad = ref("Auxiliar de enfermería geriátrica");
-const experiencia = ref(8);
-const tarifa = ref(14);
-const tipoCuidado = ref("ambos");
-const disponibilidad = ref("Lunes a viernes, mañanas y noches");
+const cuidadorRepository = new CuidadorRepository();
+const authStore = useAuthStore();
+
+const perfilId = ref(null);
+const especialidad = ref("");
+const anosExperiencia = ref(0);
+const tarifaHora = ref(0);
 const disponibleAhora = ref(true);
 const tieneVehiculo = ref(true);
-const bio = ref(
-  "Acompaño a personas mayores en hospital y en casa desde hace 8 años. Me tomo el tiempo de conocer a cada familia y de explicarlo todo con calma.",
-);
+const bio = ref("");
 const error = ref("");
 const guardado = ref(false);
+const cargando = ref(true);
 
-function guardarCambios() {
-  if (!nombre.value || !especialidad.value || !disponibilidad.value) {
+onMounted(async () => {
+  try {
+    const perfil = await cuidadorRepository.getMiPerfil();
+    perfilId.value = perfil.id;
+    especialidad.value = perfil.especialidad;
+    anosExperiencia.value = perfil.anosExperiencia;
+    tarifaHora.value = perfil.tarifaHora;
+    disponibleAhora.value = perfil.disponibleAhora;
+    tieneVehiculo.value = perfil.tieneVehiculo;
+    bio.value = perfil.bio;
+  } catch (err) {
+    error.value = "No se pudo cargar tu perfil.";
+  } finally {
+    cargando.value = false;
+  }
+});
+
+async function guardarCambios() {
+  if (!especialidad.value || !bio.value) {
     error.value = "Por favor, rellena todos los campos obligatorios.";
     guardado.value = false;
     return;
   }
   error.value = "";
-  guardado.value = true;
+
+  try {
+    await cuidadorRepository.update(perfilId.value, {
+      especialidad: especialidad.value,
+      anosExperiencia: Number(anosExperiencia.value),
+      tarifaHora: Number(tarifaHora.value),
+      bio: bio.value,
+      tieneVehiculo: tieneVehiculo.value,
+      disponibleAhora: disponibleAhora.value,
+      usuarioId: authStore.id,
+    });
+    guardado.value = true;
+  } catch (err) {
+    error.value = "No se pudieron guardar los cambios.";
+    guardado.value = false;
+  }
 }
 </script>
 
@@ -36,59 +70,19 @@ function guardarCambios() {
           Así es como te ven las familias cuando buscan cuidador.
         </p>
 
-        <label for="nombre">Nombre completo</label>
-        <input type="text" id="nombre" v-model="nombre" />
-
         <label for="especialidad">Especialidad</label>
         <input type="text" id="especialidad" v-model="especialidad" />
 
         <div class="editar-perfil__row">
           <div>
             <label for="experiencia">Años de experiencia</label>
-            <input type="number" id="experiencia" v-model="experiencia" />
+            <input type="number" id="experiencia" v-model="anosExperiencia" />
           </div>
           <div>
             <label for="tarifa">Tarifa por hora (€)</label>
-            <input type="number" id="tarifa" v-model="tarifa" />
+            <input type="number" id="tarifa" v-model="tarifaHora" />
           </div>
         </div>
-
-        <label>Tipo de cuidado que ofrezco</label>
-        <div class="editar-perfil__opciones">
-          <button
-            type="button"
-            class="editar-perfil__opcion"
-            :class="{
-              'editar-perfil__opcion--active': tipoCuidado === 'hospitalario',
-            }"
-            @click="tipoCuidado = 'hospitalario'"
-          >
-            Hospitalario
-          </button>
-          <button
-            type="button"
-            class="editar-perfil__opcion"
-            :class="{
-              'editar-perfil__opcion--active': tipoCuidado === 'domicilio',
-            }"
-            @click="tipoCuidado = 'domicilio'"
-          >
-            A domicilio
-          </button>
-          <button
-            type="button"
-            class="editar-perfil__opcion"
-            :class="{
-              'editar-perfil__opcion--active': tipoCuidado === 'ambos',
-            }"
-            @click="tipoCuidado = 'ambos'"
-          >
-            Hospital y domicilio
-          </button>
-        </div>
-
-        <label for="disponibilidad">Disponibilidad</label>
-        <input type="text" id="disponibilidad" v-model="disponibilidad" />
 
         <label class="editar-perfil__checkbox">
           <input type="checkbox" v-model="disponibleAhora" />
@@ -108,13 +102,6 @@ function guardarCambios() {
 
         <button type="submit" class="btn btn--primary">Guardar cambios</button>
       </form>
-
-      <aside class="editar-perfil__sidebar">
-        <h2>Tu valoración</h2>
-        <p class="editar-perfil__valoracion">⭐ 4.7</p>
-        <p class="editar-perfil__resenas">3 reseñas recibidas</p>
-        <RouterLink to="/cuidador/1" class="btn btn--secondary">Ver mi perfil público</RouterLink>
-      </aside>
     </div>
   </div>
 </template>
