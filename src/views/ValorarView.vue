@@ -1,19 +1,46 @@
 <script setup>
-import { ref } from "vue";
-import { useRouter } from "vue-router";
+import { ref, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import SolicitudRepository from "@/repositories/SolicitudRepository";
+import ValoracionRepository from "@/repositories/ValoracionRepository";
 
+const route = useRoute();
 const router = useRouter();
+const solicitudRepository = new SolicitudRepository();
+const valoracionRepository = new ValoracionRepository();
 
-const cuidadorNombre = "Daniel Ortega";
+const solicitudId = route.params.id;
+const cuidadorNombre = ref("");
 const puntuacion = ref(0);
 const comentario = ref("");
+const error = ref("");
+
+onMounted(async () => {
+  try {
+    const solicitud = await solicitudRepository.getById(solicitudId);
+    cuidadorNombre.value = solicitud.cuidadorNombre;
+  } catch (err) {
+    error.value = "No se pudo cargar la solicitud.";
+  }
+});
 
 function seleccionarEstrella(valor) {
   puntuacion.value = valor;
 }
 
-function enviarValoracion() {
-  router.push({ name: "historial" });
+async function enviarValoracion() {
+  if (puntuacion.value === 0) return;
+  try {
+    await valoracionRepository.create({
+      comentario: comentario.value,
+      puntuacion: puntuacion.value,
+      fecha: new Date().toISOString().split("T")[0],
+      solicitudId: Number(solicitudId),
+    });
+    router.push({ name: "historial" });
+  } catch (err) {
+    error.value = "No se pudo enviar la valoración.";
+  }
 }
 </script>
 
@@ -44,6 +71,8 @@ function enviarValoracion() {
           v-model="comentario"
           placeholder="Cuéntanos cómo fue tu experiencia..."
         ></textarea>
+
+        <p v-if="error" class="valorar__error">{{ error }}</p>
 
         <button
           type="submit"
