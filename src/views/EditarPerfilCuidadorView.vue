@@ -98,7 +98,9 @@ async function guardarCambios() {
         <textarea id="bio" v-model="bio"></textarea>
 
         <p v-if="error" class="editar-perfil__error">{{ error }}</p>
-        <p v-if="guardado" class="editar-perfil__guardado">Cambios guardados ✓</p>
+        <p v-if="guardado" class="editar-perfil__guardado">
+          Cambios guardados ✓
+        </p>
 
         <button type="submit" class="btn btn--primary">Guardar cambios</button>
       </form>

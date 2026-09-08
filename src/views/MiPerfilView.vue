@@ -1,25 +1,35 @@
 <script setup>
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../stores/auth";
+import UsuarioRepository from "@/repositories/UsuarioRepository";
 
 const authStore = useAuthStore();
 const router = useRouter();
+const usuarioRepository = new UsuarioRepository();
 
-const usuario = {
-  nombre: "María López",
-  email: "maria@correo.com",
-  telefono: "600 123 456",
-  tipo: "Familia",
-};
+const usuario = ref(null);
+const cargando = ref(true);
+const error = ref("");
+
+onMounted(async () => {
+  try {
+    usuario.value = await usuarioRepository.getById(authStore.id);
+  } catch (err) {
+    error.value = "No se pudieron cargar tus datos.";
+  } finally {
+    cargando.value = false;
+  }
+});
 
 function cerrarSesion() {
-  authStore.rolActual = null;
+  authStore.logout();
   router.push("/");
 }
 </script>
 
 <template>
-  <div class="mi-perfil">
+  <div class="mi-perfil" v-if="usuario">
     <h1>Mi perfil</h1>
     <p class="mi-perfil__subtitle">Los datos de contacto de tu familia.</p>
 
@@ -38,12 +48,16 @@ function cerrarSesion() {
       </div>
       <div class="mi-perfil__fila">
         <span>Tipo de cuenta</span>
-        <strong>{{ usuario.tipo }}</strong>
+        <strong>{{ usuario.roles.join(", ") }}</strong>
       </div>
 
-      <button class="btn btn--secondary" @click="cerrarSesion">Cerrar sesión</button>
+      <button class="btn btn--secondary" @click="cerrarSesion">
+        Cerrar sesión
+      </button>
     </div>
   </div>
+  <p v-else-if="error">{{ error }}</p>
+  <p v-else>Cargando...</p>
 </template>
 
 <style scoped>
