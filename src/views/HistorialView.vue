@@ -1,42 +1,32 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { RouterLink } from "vue-router";
+import SolicitudRepository from "@/repositories/SolicitudRepository";
+import ValoracionRepository from "@/repositories/ValoracionRepository";
 
-const historial = ref([
-  {
-    id: 1,
-    nombre: "Amina Boulaich",
-    paciente: "Antonio Serrano",
-    edad: 81,
-    tipoCuidado: "Hospitalario",
-    fechaInicio: "2 de junio de 2026",
-    notas: "Acompañamiento nocturno durante 2 noches.",
-    estado: "completada",
-    valorada: true,
-  },
-  {
-    id: 2,
-    nombre: "Daniel Ortega",
-    paciente: "Pilar Ruiz",
-    edad: 88,
-    tipoCuidado: "A domicilio",
-    fechaInicio: "21 de abril de 2026",
-    notas: "Paseos y comidas entre semana.",
-    estado: "completada",
-    valorada: false,
-  },
-  {
-    id: 3,
-    nombre: "Teresa Nogueira",
-    paciente: "Pilar Ruiz",
-    edad: 88,
-    tipoCuidado: "Hospitalario",
-    fechaInicio: "9 de marzo de 2026",
-    notas: "Turno de día durante el ingreso.",
-    estado: "rechazada",
-    valorada: false,
-  },
-]);
+const solicitudRepository = new SolicitudRepository();
+const valoracionRepository = new ValoracionRepository();
+const historial = ref([]);
+
+onMounted(async () => {
+  const todas = await solicitudRepository.getMisSolicitudes();
+  const valoraciones = await valoracionRepository.getAll();
+  const idsValorados = valoraciones.map((v) => v.solicitudId);
+
+  historial.value = todas
+    .filter((s) => s.estado === "COMPLETADA" || s.estado === "RECHAZADA")
+    .map((s) => ({
+      id: s.id,
+      nombre: s.cuidadorNombre,
+      paciente: s.nombrePaciente,
+      edad: s.edadPaciente,
+      tipoCuidado: s.tipoCuidado,
+      fechaInicio: s.fechaCuidado,
+      notas: s.notas,
+      estado: s.estado.toLowerCase(),
+      valorada: idsValorados.includes(s.id),
+    }));
+});
 
 function textoEstado(estado) {
   if (estado === "completada") return "Completada";
@@ -76,11 +66,13 @@ function textoEstado(estado) {
 
         <div class="historial__footer" v-if="item.estado === 'completada'">
           <span v-if="item.valorada" class="historial__valorado"
-            >Valoración enviada ✓</span>
+            >Valoración enviada ✓</span
+          >
           <RouterLink
             v-else
             :to="`/valorar/${item.id}`"
-            class="btn btn--primary">Dejar valoración
+            class="btn btn--primary"
+            >Dejar valoración
           </RouterLink>
         </div>
       </div>
