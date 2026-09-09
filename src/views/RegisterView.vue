@@ -1,7 +1,8 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 import AuthRepository from "@/repositories/AuthRepository";
+import RoleRepository from "../repositories/RoleRepository";
 
 const rolSeleccionado = ref("familia");
 const nombre = ref("");
@@ -12,11 +13,12 @@ const error = ref("");
 
 const authRepository = new AuthRepository();
 const router = useRouter();
+const roleRepository = new RoleRepository();
+const rolesDisponibles = ref([]);
 
-const ROLES_IDS = {
-  familia: 4,
-  cuidador: 5,
-};
+onMounted(async () => {
+  rolesDisponibles.value = await roleRepository.getAll();
+});
 
 async function handleSubmit() {
   if (!nombre.value || !email.value || !password.value || !telefono.value) {
@@ -31,7 +33,11 @@ async function handleSubmit() {
       email: email.value,
       telefono: telefono.value,
       password: password.value,
-      rolesIds: [ROLES_IDS[rolSeleccionado.value]],
+      rolesIds: [
+        rolesDisponibles.value.find(
+          (r) => r.name === rolSeleccionado.value.toUpperCase(),
+        )?.id,
+      ],
     });
     router.push("/login");
   } catch (err) {
