@@ -12,6 +12,8 @@ import ValorarView from '../views/ValorarView.vue'
 import EditarPerfilCuidadorView from '../views/EditarPerfilCuidadorView.vue'
 import MiPerfilView from '../views/MiPerfilView.vue'
 import SolicitudesFamiliaView from '../views/SolicitudesFamiliaView.vue'
+import CheckoutView from '../views/CheckoutView.vue'  
+
 
 
 const router = createRouter({
@@ -28,7 +30,8 @@ const router = createRouter({
     { path: '/valorar/:id', name: 'valorar', component: ValorarView },
     { path: '/editar-perfil', name: 'editar-perfil', component: EditarPerfilCuidadorView },
     { path: '/mi-perfil', name: 'mi-perfil', component: MiPerfilView }, 
-    { path: '/solicitudes', name: 'solicitudes', component: SolicitudesFamiliaView }
+    { path: '/solicitudes', name: 'solicitudes', component: SolicitudesFamiliaView },
+    { path: '/pagar/:id', name: 'pagar', component: CheckoutView }
     
   ]
 })
