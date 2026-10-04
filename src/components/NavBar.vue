@@ -113,9 +113,9 @@ function handleLogout() {
 }
 
 .navbar__logout {
-  background-color: var(--color-white);
-  border: 1px solid var(--color-border);
-  color: var(--color-text);
+  background-color: var(--color-accent);
+  border: 1px solid var(--color-accent);
+  color: var(--color-white);
   padding: 8px 16px;
   border-radius: var(--radius-pill);
   cursor: pointer;
@@ -124,8 +124,7 @@ function handleLogout() {
 }
 
 .navbar__logout:hover {
-  border-color: var(--color-accent);
-  color: var(--color-accent);
+  opacity: 0.9;
 }
 
 @media (max-width: 768px) {
