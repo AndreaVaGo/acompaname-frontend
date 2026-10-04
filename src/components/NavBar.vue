@@ -42,7 +42,9 @@ function handleLogout() {
       >
       <RouterLink to="/historial">Historial</RouterLink>
 
-      <span class="navbar__usuario">{{ authStore.email }}</span>
+      <span class="navbar__avatar" :title="authStore.email">
+        {{ authStore.email.charAt(0).toUpperCase() }}
+      </span>
       <button class="navbar__logout" @click="handleLogout">
         Cerrar sesión
       </button>
@@ -96,9 +98,18 @@ function handleLogout() {
   }
 }
 
-.navbar__usuario {
-  color: var(--color-text-muted);
-  font-size: 0.85rem;
+.navbar__avatar {
+  background-color: var(--color-accent-bg);
+  color: var(--color-accent);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.9rem;
+  cursor: default;
 }
 
 .navbar__logout {
