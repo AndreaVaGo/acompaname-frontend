@@ -31,8 +31,15 @@ onMounted(async () => {
 
     <div class="perfil__main">
       <div class="perfil__info">
-        <h1>{{ cuidador.usuarioNombre }}</h1>
-        <p class="perfil__especialidad">{{ cuidador.especialidad }}</p>
+        <div class="perfil__cabecera">
+          <span class="perfil__avatar">{{
+            cuidador.usuarioNombre.charAt(0).toUpperCase()
+          }}</span>
+          <div>
+            <h1>{{ cuidador.usuarioNombre }}</h1>
+            <p class="perfil__especialidad">{{ cuidador.especialidad }}</p>
+          </div>
+        </div>
 
         <ul class="perfil__datos">
           <li>
@@ -76,11 +83,10 @@ onMounted(async () => {
 
 <style scoped>
 .perfil {
-  min-height: 100vh;
   background-color: var(--color-bg);
   font-family: var(--font-base);
   color: var(--color-text);
-  padding: var(--gap-lg) 60px;
+  padding: var(--gap-lg) 60px 60px;
   max-width: 1000px;
   margin: 0 auto;
 }
@@ -105,10 +111,6 @@ onMounted(async () => {
   padding: 28px;
   box-shadow: var(--shadow-card);
 
-  & h1 {
-    margin-bottom: 4px;
-  }
-
   & h2 {
     margin-top: 20px;
     margin-bottom: 8px;
@@ -116,9 +118,34 @@ onMounted(async () => {
   }
 }
 
+.perfil__cabecera {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+
+  & h1 {
+    margin: 0 0 4px;
+  }
+}
+
+.perfil__avatar {
+  background-color: var(--color-accent-bg);
+  color: var(--color-accent);
+  width: 64px;
+  height: 64px;
+  min-width: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.6rem;
+}
+
 .perfil__especialidad {
   color: var(--color-text-muted);
-  margin-bottom: 8px;
+  margin: 0;
 }
 
 .perfil__valoracion {
