@@ -216,12 +216,12 @@ async function enviarSolicitud() {
   background-color: var(--color-white);
   cursor: pointer;
   font-family: inherit;
+}
 
-  &--active {
-    border-color: var(--color-accent);
-    background-color: var(--color-accent-bg);
-    font-weight: bold;
-  }
+.solicitar__opcion--active {
+  border-color: var(--color-accent);
+  background-color: var(--color-accent-bg);
+  font-weight: bold;
 }
 
 @media (max-width: 480px) {
