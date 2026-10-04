@@ -33,9 +33,16 @@ function handleLogout() {
         >Perfil</RouterLink
       >
       <RouterLink v-if="authStore.rol === 'CUIDADOR'" to="/editar-perfil"
-        >Perfil</RouterLink
+        >Editar perfil</RouterLink
+      >
+      <RouterLink
+        v-if="authStore.rol === 'CUIDADOR'"
+        :to="`/cuidador/${authStore.id}`"
+        >Ver mi perfil público</RouterLink
       >
       <RouterLink to="/historial">Historial</RouterLink>
+
+      <span class="navbar__usuario">{{ authStore.email }}</span>
       <button class="navbar__logout" @click="handleLogout">
         Cerrar sesión
       </button>
@@ -87,6 +94,27 @@ function handleLogout() {
     color: var(--color-accent);
     font-weight: bold;
   }
+}
+
+.navbar__usuario {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.navbar__logout {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+
+.navbar__logout:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
 }
 
 @media (max-width: 768px) {
