@@ -62,3 +62,42 @@ async function rechazar(id) {
     </div>
   </div>
 </template>
+<style scoped>
+.solicitudes {
+  min-height: 100vh;
+  background-color: var(--color-bg);
+  font-family: var(--font-base);
+  color: var(--color-text);
+  padding: var(--gap-lg) 60px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.solicitudes__header {
+  & h1 {
+    font-size: 1.8rem;
+    margin-bottom: 6px;
+  }
+
+  & p {
+    color: var(--color-text-muted);
+    margin-bottom: 24px;
+  }
+}
+
+.solicitudes__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--gap-md);
+}
+
+@media (max-width: 768px) {
+  .solicitudes {
+    padding: 24px 20px;
+  }
+
+  .solicitudes__grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
