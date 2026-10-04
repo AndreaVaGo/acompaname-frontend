@@ -178,28 +178,7 @@ async function guardarCambios() {
   }
 }
 
-.editar-perfil__opciones {
-  display: flex;
-  gap: var(--gap-sm);
-  margin-bottom: var(--gap-md);
-}
 
-.editar-perfil__opcion {
-  flex: 1;
-  padding: 10px;
-  border-radius: var(--radius-input);
-  border: 1px solid var(--color-border);
-  background-color: var(--color-white);
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 0.85rem;
-
-  &--active {
-    border-color: var(--color-accent);
-    background-color: var(--color-accent-bg);
-    font-weight: bold;
-  }
-}
 
 .editar-perfil__checkbox {
   display: flex;
