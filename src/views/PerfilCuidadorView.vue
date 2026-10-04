@@ -56,12 +56,13 @@ onMounted(async () => {
         <p class="perfil__precio">
           {{ cuidador.tarifaHora }} €<span>/hora</span>
         </p>
-        <button
+        <RouterLink
           v-if="authStore.rol === 'FAMILIA'"
+          :to="`/solicitar/${cuidadorId}`"
           class="btn btn--primary perfil__solicitar"
         >
           Solicitar servicio
-        </button>
+        </RouterLink>
         <p class="perfil__nota">
           Sin compromiso: la solicitud se envía y el cuidador la acepta o la
           rechaza.
@@ -169,6 +170,9 @@ onMounted(async () => {
 .perfil__solicitar {
   width: 100%;
   margin-bottom: 12px;
+  display: block;
+  text-align: center;
+  text-decoration: none;
 }
 
 .perfil__nota {
