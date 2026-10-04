@@ -195,12 +195,12 @@ const cuidadoresFiltrados = computed(() => {
   cursor: pointer;
   font-size: 0.9rem;
   font-family: inherit;
+}
 
-  &--active {
-    background-color: var(--color-accent);
-    color: var(--color-white);
-    border-color: var(--color-accent);
-  }
+.buscar__filter-btn--active {
+  background-color: var(--color-accent);
+  color: var(--color-white);
+  border-color: var(--color-accent);
 }
 
 .buscar__count {
@@ -247,26 +247,16 @@ const cuidadoresFiltrados = computed(() => {
   padding: 4px 12px;
   border-radius: var(--radius-pill);
   font-size: 0.8rem;
+}
 
-  &--cuidado {
-    background-color: var(--color-secondary-bg);
-    color: var(--color-secondary);
-  }
+.buscar__tag--disponible {
+  background-color: var(--color-accent-bg);
+  color: #c65a35;
+}
 
-  &--ciudad {
-    background-color: var(--color-neutral-bg);
-    color: var(--color-text-muted);
-  }
-
-  &--disponible {
-    background-color: var(--color-accent-bg);
-    color: #c65a35;
-  }
-
-  &--vehiculo {
-    background-color: var(--color-info-bg);
-    color: var(--color-info);
-  }
+.buscar__tag--vehiculo {
+  background-color: var(--color-info-bg);
+  color: var(--color-info);
 }
 
 .buscar__card-footer {
