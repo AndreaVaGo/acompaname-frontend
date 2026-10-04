@@ -7,15 +7,18 @@ import CuidadorRepository from "../repositories/CuidadorRepository";
 import SolicitudRepository from "../repositories/SolicitudRepository";
 import { useAuthStore } from "../stores/auth";
 
-const router = createRouter({
-  history: createWebHistory(),
-  routes: [
-    { path: "/solicitar/:id", name: "solicitar", component: SolicitarServicioView },
-    { path: "/confirmacion", name: "confirmacion", component: { template: "<div>ok</div>" } },
-  ],
-});
+function crearRouter() {
+  return createRouter({
+    history: createWebHistory(),
+    routes: [
+      { path: "/solicitar/:id", name: "solicitar", component: SolicitarServicioView },
+      { path: "/confirmacion", name: "confirmacion", component: { template: "<div>ok</div>" } },
+    ],
+  });
+}
 
 async function montarVista() {
+  const router = crearRouter();
   await router.push("/solicitar/3");
   await router.isReady();
 
@@ -31,7 +34,7 @@ async function montarVista() {
 
   await new Promise((resolve) => setTimeout(resolve, 0));
 
-  return wrapper;
+  return { wrapper, router };
 }
 
 describe("SolicitarServicioView", () => {
@@ -40,7 +43,7 @@ describe("SolicitarServicioView", () => {
       usuarioNombre: "Pepe",
     });
 
-    const wrapper = await montarVista();
+    const { wrapper } = await montarVista();
 
     expect(wrapper.text()).toContain("Pepe");
   });
@@ -50,7 +53,7 @@ describe("SolicitarServicioView", () => {
       new Error("fallo")
     );
 
-    const wrapper = await montarVista();
+    const { wrapper } = await montarVista();
 
     expect(wrapper.text()).toContain("No se pudo cargar el cuidador.");
   });
@@ -63,7 +66,7 @@ describe("SolicitarServicioView", () => {
       .spyOn(SolicitudRepository.prototype, "create")
       .mockResolvedValue({});
 
-    const wrapper = await montarVista();
+    const { wrapper } = await montarVista();
 
     await wrapper.find("form").trigger("submit.prevent");
 
@@ -81,17 +84,15 @@ describe("SolicitarServicioView", () => {
       .spyOn(SolicitudRepository.prototype, "create")
       .mockResolvedValue({});
 
-    const wrapper = await montarVista();
+    const { wrapper, router } = await montarVista();
 
     const opciones = wrapper.findAll(".solicitar__opcion");
-    await opciones[0].trigger("click"); // hospitalario
+    await opciones[0].trigger("click");
 
     await wrapper.find("#fecha").setValue("2026-10-10");
     await wrapper.find("#paciente").setValue("Antonio Serrano");
     await wrapper.find("#edad").setValue("81");
     await wrapper.find("#notas").setValue("Alergia a la penicilina");
-
-    const pushSpy = vi.spyOn(router, "push");
 
     await wrapper.find("form").trigger("submit.prevent");
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -105,7 +106,7 @@ describe("SolicitarServicioView", () => {
       familiaId: 1,
       cuidadorId: 3,
     });
-    expect(pushSpy).toHaveBeenCalledWith({ name: "confirmacion" });
+    expect(router.currentRoute.value.name).toBe("confirmacion");
   });
 
   test("muestra error si falla el envío de la solicitud", async () => {
@@ -116,10 +117,10 @@ describe("SolicitarServicioView", () => {
       new Error("fallo")
     );
 
-    const wrapper = await montarVista();
+    const { wrapper } = await montarVista();
 
     const opciones = wrapper.findAll(".solicitar__opcion");
-    await opciones[1].trigger("click"); // domicilio
+    await opciones[1].trigger("click");
 
     await wrapper.find("#fecha").setValue("2026-10-10");
     await wrapper.find("#paciente").setValue("Antonio Serrano");
