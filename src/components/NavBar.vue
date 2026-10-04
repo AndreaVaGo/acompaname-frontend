@@ -1,13 +1,24 @@
 <script setup>
 import { RouterLink, useRouter } from "vue-router";
 import { useAuthStore } from "../stores/auth";
+import CuidadorRepository from "@/repositories/CuidadorRepository";
 
 const authStore = useAuthStore();
 const router = useRouter();
+const cuidadorRepository = new CuidadorRepository();
 
 function handleLogout() {
   authStore.logout();
   router.push("/login");
+}
+
+async function verMiPerfilPublico() {
+  try {
+    const perfil = await cuidadorRepository.getMiPerfil();
+    router.push(`/cuidador/${perfil.id}`);
+  } catch (err) {
+    console.error("No se pudo cargar tu perfil público", err);
+  }
 }
 </script>
 
@@ -35,11 +46,13 @@ function handleLogout() {
       <RouterLink v-if="authStore.rol === 'CUIDADOR'" to="/editar-perfil"
         >Editar perfil</RouterLink
       >
-      <RouterLink
+      <button
         v-if="authStore.rol === 'CUIDADOR'"
-        :to="`/cuidador/${authStore.id}`"
-        >Ver mi perfil público</RouterLink
+        class="navbar__link-btn"
+        @click="verMiPerfilPublico"
       >
+        Ver mi perfil público
+      </button>
       <RouterLink to="/historial">Historial</RouterLink>
 
       <span class="navbar__avatar" :title="authStore.email">
@@ -96,6 +109,17 @@ function handleLogout() {
     color: var(--color-accent);
     font-weight: bold;
   }
+}
+
+.navbar__link-btn {
+  background: none;
+  border: none;
+  color: var(--color-text);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 0;
 }
 
 .navbar__avatar {
