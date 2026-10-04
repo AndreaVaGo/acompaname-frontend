@@ -46,6 +46,10 @@ onMounted(async () => {
             <strong>Experiencia:</strong> {{ cuidador.anosExperiencia }} años
           </li>
           <li>
+            <span
+              class="perfil__badge"
+              :class="{ 'perfil__badge--activo': cuidador.disponibleAhora }"
+            ></span>
             <strong>Disponibilidad:</strong>
             {{
               cuidador.disponibleAhora
@@ -159,12 +163,30 @@ onMounted(async () => {
 
   & li {
     margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
+}
+
+.perfil__badge {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #999;
+  display: inline-block;
+}
+
+.perfil__badge--activo {
+  background-color: var(--color-secondary);
 }
 
 .perfil__bio {
   color: #444;
   line-height: 1.5;
+  font-style: italic;
+  border-left: 3px solid var(--color-accent-bg);
+  padding-left: 14px;
 }
 
 .perfil__sidebar {
