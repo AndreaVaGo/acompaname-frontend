@@ -128,11 +128,11 @@ async function enviarValoracion() {
   cursor: pointer;
   filter: grayscale(100%);
   opacity: 0.4;
+}
 
-  &--active {
-    filter: grayscale(0%);
-    opacity: 1;
-  }
+.valorar__estrella--active {
+  filter: grayscale(0%);
+  opacity: 1;
 }
 
 .valorar__form {
