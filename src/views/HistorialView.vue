@@ -136,16 +136,16 @@ function textoEstado(estado) {
   border-radius: var(--radius-pill);
   font-size: 0.8rem;
   font-weight: bold;
+}
 
-  &--completada {
-    background-color: var(--color-accent-bg);
-    color: #c65a35;
-  }
+.historial__estado--completada {
+  background-color: var(--color-accent-bg);
+  color: #c65a35;
+}
 
-  &--rechazada {
-    background-color: var(--color-neutral-bg);
-    color: #777;
-  }
+.historial__estado--rechazada {
+  background-color: var(--color-neutral-bg);
+  color: #777;
 }
 
 .historial__paciente {
