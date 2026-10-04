@@ -1,4 +1,6 @@
 <script setup>
+import { RouterLink } from "vue-router";
+
 defineProps([
   "solicitud",
   "nombreMostrado",
@@ -47,6 +49,15 @@ defineProps([
         Rechazar
       </button>
     </div>
+
+    <div
+      class="solicitudes__acciones"
+      v-if="!mostrarAcciones && solicitud.estado === 'ACEPTADA'"
+    >
+      <RouterLink :to="`/pagar/${solicitud.id}`" class="btn btn--primary">
+        Pagar
+      </RouterLink>
+    </div>
   </div>
 </template>
 
@@ -74,21 +85,21 @@ defineProps([
   border-radius: var(--radius-pill);
   font-size: 0.8rem;
   font-weight: bold;
+}
 
-  &--pendiente {
-    background-color: var(--color-accent-bg);
-    color: #c65a35;
-  }
+.solicitudes__estado--pendiente {
+  background-color: var(--color-accent-bg);
+  color: #c65a35;
+}
 
-  &--aceptada {
-    background-color: var(--color-secondary-bg);
-    color: var(--color-secondary);
-  }
+.solicitudes__estado--aceptada {
+  background-color: var(--color-secondary-bg);
+  color: var(--color-secondary);
+}
 
-  &--rechazada {
-    background-color: var(--color-neutral-bg);
-    color: #777;
-  }
+.solicitudes__estado--rechazada {
+  background-color: var(--color-neutral-bg);
+  color: #777;
 }
 
 .solicitudes__paciente {
