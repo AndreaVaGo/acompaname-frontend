@@ -67,14 +67,12 @@ onMounted(async () => {
   gap: var(--gap-md);
 }
 
-
-
 @media (max-width: 768px) {
-  .solicitudes-page {
+  .solicitudes {
     padding: 24px 20px;
   }
 
-  .solicitudes-grid {
+  .solicitudes__grid {
     grid-template-columns: 1fr;
   }
 }
