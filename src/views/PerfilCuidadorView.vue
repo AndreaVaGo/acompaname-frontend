@@ -37,7 +37,7 @@ onMounted(async () => {
           }}</span>
           <div>
             <h1>{{ cuidador.usuarioNombre }}</h1>
-            <p class="perfil__especialidad">{{ cuidador.especialidad }}</p>
+            <span class="perfil__tag">{{ cuidador.especialidad }}</span>
           </div>
         </div>
 
@@ -104,6 +104,7 @@ onMounted(async () => {
 
 .perfil__main {
   display: flex;
+  align-items: flex-start;
   gap: var(--gap-md);
   margin-bottom: 24px;
 }
@@ -129,7 +130,7 @@ onMounted(async () => {
   margin-bottom: 16px;
 
   & h1 {
-    margin: 0 0 4px;
+    margin: 0 0 6px;
   }
 }
 
@@ -147,9 +148,14 @@ onMounted(async () => {
   font-size: 1.6rem;
 }
 
-.perfil__especialidad {
-  color: var(--color-text-muted);
-  margin: 0;
+.perfil__tag {
+  display: inline-block;
+  background-color: var(--color-accent-bg);
+  color: var(--color-accent);
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 0.85rem;
+  font-weight: bold;
 }
 
 .perfil__valoracion {
