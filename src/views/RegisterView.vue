@@ -204,27 +204,27 @@ async function handleSubmit() {
   cursor: pointer;
   font-family: inherit;
   position: relative;
+}
 
-  &--active {
-    border: 2px solid var(--color-accent);
-    background-color: #fff0eb;
+.register__role--active {
+  border: 2px solid var(--color-accent);
+  background-color: #fff0eb;
+}
 
-    &::after {
-      content: "✓";
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background-color: var(--color-accent);
-      color: var(--color-white);
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.7rem;
-    }
-  }
+.register__role--active::after {
+  content: "✓";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: var(--color-accent);
+  color: var(--color-white);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
 }
 
 .register__role-icon {
