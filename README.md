@@ -6,7 +6,7 @@ Este repositorio contiene la **aplicación web** del proyecto, desarrollada con 
 
 Proyecto final del bootcamp de Desarrollo Web Full Stack (850h) en **Factoría F5 — Digital Academy**.
 
-![Vue](https://img.shields.io/badge/Vue-3-42b883) ![Vite](https://img.shields.io/badge/Vite-8-646CFF) ![Pinia](https://img.shields.io/badge/Pinia-estado-yellow) ![Vitest](https://img.shields.io/badge/tests-32-success) ![Responsive](https://img.shields.io/badge/responsive-768px-blue)
+![Vue](https://img.shields.io/badge/Vue-3-42b883) ![Vite](https://img.shields.io/badge/Vite-8-646CFF) ![Pinia](https://img.shields.io/badge/Pinia-estado-yellow) ![Vitest](https://img.shields.io/badge/tests-27-success) ![Responsive](https://img.shields.io/badge/responsive-768px-blue)
 
 ---
 
@@ -126,8 +126,7 @@ Esta estructura separa claramente responsabilidades: las **vistas** (`views/`) r
 | 10 | 💳 **Checkout** (Familia) | `/pagar/:id` | Pago simulado de un servicio |
 | 11 | ⭐ **Formulario de valoración** | `/valorar/:id` | Puntuación de 1 a 5 estrellas y comentario |
 | 12 | 📥 **Solicitudes recibidas** (Cuidador) | `/solicitudes-cuidador` | Gestión de aceptar/rechazar |
-| 13 | ⚙️ **Edición de perfil de cuidador** | `/editar-perfil` | Modificar los datos del perfil profesional |
-| 14 | 👤 **Mi perfil** | `/mi-perfil` | Datos de la cuenta |
+| 13 | 👤 **Mi perfil** | `/mi-perfil` | Datos de la cuenta |
 
 Cada vista incluye sus correspondientes estados vacíos (por ejemplo, "Aún no tienes solicitudes") y mensajes de error ante fallos de carga o de envío, para que la interfaz nunca se muestre rota ni en blanco.
 
@@ -466,12 +465,11 @@ El proyecto incluye tests unitarios con Vitest y Vue Test Utils para las vistas 
 - `BuscarView`, `MiPerfilView` — carga de datos desde la API
 - `SolicitudesFamiliaView`, `SolicitudesCuidadorView` — gestión de solicitudes
 - `SolicitarServicioView` — validación de campos obligatorios, envío correcto y manejo de errores
-- `EditarPerfilCuidadorView` — carga del perfil, validación y guardado de cambios
 - `PerfilCuidadorView` — visibilidad condicional del botón de solicitud según el rol
 - `ValorarView` — selección de puntuación, envío de valoración y redirección
 - `HistorialView` — filtrado de solicitudes finalizadas y estado de valoración (valorada / pendiente)
 
-**🎯 Total: 32 tests repartidos en 13 archivos.**
+**🎯 Total: 27 tests repartidos en 12 archivos.**
 
 Para ejecutarlos:
 
@@ -520,26 +518,15 @@ npm run test:unit
 - 🔐 Implementar autenticación basada en JWT (actualmente Basic Auth)
 - 🌐 Revisar la configuración de CORS tras la migración a JWT
 - 💳 Conectar el checkout con el endpoint de pagos del backend y, más adelante, con una pasarela real
-- 🎨 Alinear la edición del perfil de cuidador con el prototipo de Lovable
+- 🎨 Añadir la edición del perfil del cuidador siguiendo el prototipo de Lovable (`/perfil`, con la tarjeta «Tu valoración» y «Ver mi perfil público»)
 - 🚀 Desplegar frontend y backend
 
 ---
 
 ## 👩‍💻 Autora
 
-**Andrea Vallina González** — Proyecto Final, Bootcamp Desarrollo Web Full Stack, Factoría F5.
+**Andrea Vallina González** — Proyecto Final, Bootcamp Desarrollo Web Full Stack, Factoría F5. Proyecto con fines educativos.
 
 - GitHub: [@AndreaVaGo](https://github.com/AndreaVaGo)
 - LinkedIn: [Andrea Vallina González](https://www.linkedin.com/in/andrea-vallina-gonzalez/)
 
----
-
-## ⚠️ Disclaimer
-
-Este proyecto ha sido desarrollado como parte de un bootcamp con fines educativos. Los autores no se responsabilizan de los problemas, daños o pérdidas que puedan derivarse de su uso.
-
-Este proyecto no está pensado para uso comercial. Al utilizar este código, se reconoce que es un trabajo en progreso, creado por estudiantes, sin garantías de ningún tipo.
-
-Uso bajo tu propia responsabilidad.
-
-Gracias ❤️
