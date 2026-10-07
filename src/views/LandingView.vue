@@ -23,9 +23,12 @@ import { RouterLink } from "vue-router";
             >Iniciar sesión</RouterLink
           >
         </div>
-        <RouterLink to="/buscar" class="landing__link landing__link--view">
-          ¿Solo quieres mirar? Ver cuidadores disponibles
-        </RouterLink>
+        <p class="landing__hint">
+          ¿Solo quieres mirar?
+          <RouterLink to="/buscar" class="landing__link"
+            >Ver cuidadores disponibles</RouterLink
+          >
+        </p>
       </div>
       <div class="landing__hero-image">
         <img
@@ -158,26 +161,31 @@ import { RouterLink } from "vue-router";
   font-weight: bold;
   cursor: pointer;
   font-family: inherit;
+  text-decoration: none;
+  display: inline-block;
+}
 
-  &--primary {
-    background-color: var(--color-accent);
-    color: var(--color-white);
-  }
+.btn--primary {
+  background-color: var(--color-accent);
+  color: var(--color-white);
+}
 
-  &--secondary {
-    background-color: var(--color-white);
-    color: var(--color-text);
-    border: 1px solid var(--color-border);
-  }
+.btn--secondary {
+  background-color: var(--color-white);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.landing__hint {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  margin: 0;
 }
 
 .landing__link {
-  text-decoration: none;
-
-  &--view {
-    color: var(--color-accent);
-    font-size: 0.9rem;
-  }
+  color: var(--color-secondary);
+  font-weight: bold;
+  text-decoration: underline;
 }
 
 .landing__hero {
