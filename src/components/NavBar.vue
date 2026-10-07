@@ -1,4 +1,5 @@
 <script setup>
+import { ref, computed } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 import { useAuthStore } from "../stores/auth";
 import CuidadorRepository from "@/repositories/CuidadorRepository";
@@ -7,7 +8,18 @@ const authStore = useAuthStore();
 const router = useRouter();
 const cuidadorRepository = new CuidadorRepository();
 
+const menuAbierto = ref(false);
+
+const inicial = computed(() =>
+  authStore.email ? authStore.email.charAt(0).toUpperCase() : "?",
+);
+
+const tipoCuenta = computed(() =>
+  authStore.rol === "FAMILIA" ? "Cuenta de familia" : "Cuenta de cuidador",
+);
+
 function handleLogout() {
+  menuAbierto.value = false;
   authStore.logout();
   router.push("/login");
 }
@@ -20,6 +32,15 @@ async function verMiPerfilPublico() {
     console.error("No se pudo cargar tu perfil público", err);
   }
 }
+
+function irAMiPerfil() {
+  menuAbierto.value = false;
+  if (authStore.rol === "FAMILIA") {
+    router.push("/mi-perfil");
+  } else {
+    verMiPerfilPublico();
+  }
+}
 </script>
 
 <template>
@@ -30,38 +51,66 @@ async function verMiPerfilPublico() {
     </RouterLink>
 
     <div class="navbar__links" v-if="authStore.estaAutenticado">
-      <RouterLink to="/">Inicio</RouterLink>
-      <RouterLink to="/buscar" v-if="authStore.rol === 'FAMILIA'"
+      <RouterLink to="/" class="navbar__link">Inicio</RouterLink>
+      <RouterLink
+        v-if="authStore.rol === 'FAMILIA'"
+        to="/buscar"
+        class="navbar__link"
         >Buscar</RouterLink
       >
-      <RouterLink v-if="authStore.rol === 'FAMILIA'" to="/solicitudes"
+      <RouterLink
+        v-if="authStore.rol === 'FAMILIA'"
+        to="/solicitudes"
+        class="navbar__link"
         >Solicitudes</RouterLink
       >
-      <RouterLink v-if="authStore.rol === 'CUIDADOR'" to="/solicitudes-cuidador"
-        >Solicitudes</RouterLink
-      >
-      <RouterLink v-if="authStore.rol === 'FAMILIA'" to="/mi-perfil"
-        >Perfil</RouterLink
-      >
-      <button
+      <RouterLink
         v-if="authStore.rol === 'CUIDADOR'"
-        class="navbar__link-btn"
-        @click="verMiPerfilPublico"
+        to="/solicitudes-cuidador"
+        class="navbar__link"
+        >Solicitudes</RouterLink
       >
-        Ver mi perfil público
-      </button>
-      <RouterLink to="/historial">Historial</RouterLink>
+      <RouterLink to="/historial" class="navbar__link">Historial</RouterLink>
 
-      <span class="navbar__avatar" :title="authStore.email">
-        {{ authStore.email.charAt(0).toUpperCase() }}
-      </span>
-      <button class="navbar__logout" @click="handleLogout">
-        Cerrar sesión
-      </button>
+      <div class="navbar__account">
+        <button
+          type="button"
+          class="navbar__avatar"
+          aria-label="Abrir menú de mi cuenta"
+          :title="authStore.email"
+          @click="menuAbierto = !menuAbierto"
+        >
+          {{ inicial }}
+        </button>
+
+        <template v-if="menuAbierto">
+          <div class="navbar__overlay" @click="menuAbierto = false"></div>
+          <div class="navbar__menu">
+            <div class="navbar__menu-header">
+              {{ authStore.email }}
+              <span class="navbar__menu-role">{{ tipoCuenta }}</span>
+            </div>
+            <button
+              type="button"
+              class="navbar__menu-item"
+              @click="irAMiPerfil"
+            >
+              Mi perfil
+            </button>
+            <button
+              type="button"
+              class="navbar__menu-item"
+              @click="handleLogout"
+            >
+              Cerrar sesión
+            </button>
+          </div>
+        </template>
+      </div>
     </div>
 
     <div class="navbar__links" v-else>
-      <RouterLink to="/login">Iniciar sesión</RouterLink>
+      <RouterLink to="/login" class="navbar__link">Iniciar sesión</RouterLink>
       <RouterLink to="/registro" class="navbar__cta">Registrarme</RouterLink>
     </div>
   </nav>
@@ -99,68 +148,112 @@ async function verMiPerfilPublico() {
 .navbar__links {
   display: flex;
   align-items: center;
-  gap: var(--gap-md);
-
-  & a {
-    color: var(--color-text);
-    text-decoration: none;
-    font-size: 0.95rem;
-  }
-
-  & a.router-link-active {
-    color: var(--color-accent);
-    font-weight: bold;
-  }
+  gap: 6px;
 }
 
-.navbar__links a.navbar__cta {
-  background-color: var(--color-accent);
-  border: 1px solid var(--color-accent);
-  color: var(--color-white);
+.navbar__link {
+  color: var(--color-text-muted);
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 600;
   padding: 8px 16px;
   border-radius: var(--radius-pill);
-  font-size: 0.9rem;
-  font-weight: normal;
 }
 
-.navbar__link-btn {
-  background: none;
-  border: none;
+.navbar__link:hover {
+  background-color: var(--color-neutral-bg);
   color: var(--color-text);
+}
+
+.navbar__link.router-link-exact-active {
+  background-color: var(--color-secondary-bg);
+  color: var(--color-text);
+}
+
+.navbar__cta {
+  background-color: var(--color-accent);
+  color: var(--color-white);
   text-decoration: none;
   font-size: 0.95rem;
-  font-family: inherit;
-  cursor: pointer;
-  padding: 0;
+  padding: 10px 20px;
+  border-radius: var(--radius-pill);
+  margin-left: 6px;
+}
+
+.navbar__account {
+  position: relative;
+  margin-left: 10px;
 }
 
 .navbar__avatar {
-  background-color: var(--color-accent-bg);
-  color: var(--color-accent);
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border: 2px solid var(--color-border);
+  background-color: var(--color-secondary-bg);
+  color: var(--color-text);
   font-weight: bold;
-  font-size: 0.9rem;
-  cursor: default;
-}
-
-.navbar__logout {
-  background-color: var(--color-accent);
-  border: 1px solid var(--color-accent);
-  color: var(--color-white);
-  padding: 8px 16px;
-  border-radius: var(--radius-pill);
-  cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-family: inherit;
+  cursor: pointer;
 }
 
-.navbar__logout:hover {
-  opacity: 0.9;
+.navbar__avatar:hover {
+  background-color: var(--color-neutral-bg);
+}
+
+.navbar__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+}
+
+.navbar__menu {
+  position: absolute;
+  right: 0;
+  top: 54px;
+  z-index: 20;
+  min-width: 230px;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 8px;
+}
+
+.navbar__menu-header {
+  display: block;
+  padding: 8px 12px;
+  font-weight: bold;
+  font-size: 0.95rem;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 6px;
+  word-break: break-all;
+}
+
+.navbar__menu-role {
+  display: block;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.navbar__menu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 10px 12px;
+  border-radius: var(--radius-input);
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.navbar__menu-item:hover {
+  background-color: var(--color-neutral-bg);
 }
 
 @media (max-width: 768px) {
@@ -173,7 +266,6 @@ async function verMiPerfilPublico() {
   .navbar__links {
     flex-wrap: wrap;
     justify-content: center;
-    gap: 12px;
   }
 }
 </style>
