@@ -48,111 +48,117 @@ async function handleSubmit() {
 
 <template>
   <div class="register">
-    <div class="register__box">
+    <div class="register__wrapper">
       <h1>Crear cuenta</h1>
       <p class="register__subtitle">
         Solo necesitamos cuatro datos para empezar.
       </p>
 
-      <form class="register__form" @submit.prevent="handleSubmit">
-        <label for="nombre">Nombre completo</label>
-        <input
-          type="text"
-          id="nombre"
-          placeholder="María López"
-          v-model="nombre"
-        />
+      <div class="register__box">
+        <form class="register__form" @submit.prevent="handleSubmit">
+          <label for="nombre">Nombre completo</label>
+          <input
+            type="text"
+            id="nombre"
+            placeholder="María López"
+            v-model="nombre"
+          />
 
-        <label for="email">Email</label>
-        <input
-          type="email"
-          id="email"
-          placeholder="nombre@correo.com"
-          v-model="email"
-        />
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            placeholder="nombre@correo.com"
+            v-model="email"
+          />
 
-        <label for="password">Contraseña</label>
-        <input
-          type="password"
-          id="password"
-          placeholder="Mínimo 6 caracteres"
-          v-model="password"
-        />
+          <label for="password">Contraseña</label>
+          <input
+            type="password"
+            id="password"
+            placeholder="Mínimo 6 caracteres"
+            v-model="password"
+          />
 
-        <label for="telefono">Teléfono</label>
-        <input
-          type="tel"
-          id="telefono"
-          placeholder="600 123 456"
-          v-model="telefono"
-        />
+          <label for="telefono">Teléfono</label>
+          <input
+            type="tel"
+            id="telefono"
+            placeholder="600 123 456"
+            v-model="telefono"
+          />
 
-        <label>¿Cómo vas a usar Acompáñame?</label>
-        <div class="register__roles">
-          <button
-            type="button"
-            class="register__role"
-            :class="{ 'register__role--active': rolSeleccionado === 'familia' }"
-            @click="rolSeleccionado = 'familia'"
-          >
-            <span class="register__role-icon">
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="var(--color-accent)"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                <circle cx="9" cy="7" r="4" />
-                <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-              </svg>
-            </span>
-            <span class="register__role-title">Familia</span>
-            <span class="register__role-desc">Busco cuidador</span>
+          <label>¿Cómo vas a usar Acompáñame?</label>
+          <div class="register__roles">
+            <button
+              type="button"
+              class="register__role"
+              :class="{
+                'register__role--active': rolSeleccionado === 'familia',
+              }"
+              @click="rolSeleccionado = 'familia'"
+            >
+              <span class="register__role-icon">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="var(--color-accent)"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+              </span>
+              <span class="register__role-title">Familia</span>
+              <span class="register__role-desc">Busco cuidador</span>
+            </button>
+            <button
+              type="button"
+              class="register__role"
+              :class="{
+                'register__role--active': rolSeleccionado === 'cuidador',
+              }"
+              @click="rolSeleccionado = 'cuidador'"
+            >
+              <span class="register__role-icon">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="var(--color-accent)"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"
+                  />
+                  <path
+                    d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"
+                  />
+                  <path d="m18 15-2-2" />
+                  <path d="m15 18-2-2" />
+                </svg>
+              </span>
+              <span class="register__role-title">Cuidador</span>
+              <span class="register__role-desc">Ofrezco servicios</span>
+            </button>
+          </div>
+
+          <p v-if="error" class="register__error">{{ error }}</p>
+
+          <button type="submit" class="btn btn--primary">
+            Crear mi cuenta
           </button>
-          <button
-            type="button"
-            class="register__role"
-            :class="{
-              'register__role--active': rolSeleccionado === 'cuidador',
-            }"
-            @click="rolSeleccionado = 'cuidador'"
-          >
-            <span class="register__role-icon">
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="var(--color-accent)"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path
-                  d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"
-                />
-                <path
-                  d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"
-                />
-                <path d="m18 15-2-2" />
-                <path d="m15 18-2-2" />
-              </svg>
-            </span>
-            <span class="register__role-title">Cuidador</span>
-            <span class="register__role-desc">Ofrezco servicios</span>
-          </button>
-        </div>
-
-        <p v-if="error" class="register__error">{{ error }}</p>
-
-        <button type="submit" class="btn btn--primary">Crear mi cuenta</button>
-      </form>
+        </form>
+      </div>
 
       <p class="register__switch">
         ¿Ya tienes cuenta? <RouterLink to="/login">Iniciar sesión</RouterLink>
@@ -163,33 +169,35 @@ async function handleSubmit() {
 
 <style scoped>
 .register {
-  min-height: 100vh;
   background-color: var(--color-bg);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   font-family: var(--font-base);
   color: var(--color-text);
-  padding: 20px;
+  padding: 24px 20px 32px;
+}
+
+.register__wrapper {
+  max-width: 420px;
+  width: 100%;
+}
+
+.register h1 {
+  font-size: 1.8rem;
+  margin: 0 0 6px;
+}
+
+.register__subtitle {
+  color: var(--color-text-muted);
+  margin: 0 0 20px;
 }
 
 .register__box {
   background-color: var(--color-white);
   border-radius: var(--radius-card);
-  padding: 40px;
-  max-width: 420px;
-  width: 100%;
+  padding: 24px;
   box-shadow: var(--shadow-card);
-}
-
-.register h1 {
-  font-size: 1.6rem;
-  margin-bottom: 8px;
-}
-
-.register__subtitle {
-  color: var(--color-text-muted);
-  margin-bottom: 24px;
 }
 
 .register__form {
@@ -203,10 +211,10 @@ async function handleSubmit() {
   }
 
   & input {
-    padding: 12px 14px;
+    padding: 10px 14px;
     border-radius: var(--radius-input);
     border: 1px solid var(--color-border);
-    margin-bottom: var(--gap-md);
+    margin-bottom: 14px;
     font-size: 1rem;
     font-family: inherit;
   }
@@ -225,7 +233,7 @@ async function handleSubmit() {
 .register__roles {
   display: flex;
   gap: var(--gap-sm);
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .register__role {
@@ -263,7 +271,7 @@ async function handleSubmit() {
 
 .register__switch {
   text-align: center;
-  margin-top: var(--gap-md);
+  margin-top: 20px;
   font-size: 0.9rem;
 
   & a {
@@ -274,8 +282,12 @@ async function handleSubmit() {
 }
 
 @media (max-width: 480px) {
+  .register {
+    padding: 16px 16px 24px;
+  }
+
   .register__box {
-    padding: 24px;
+    padding: 18px;
   }
 
   .register__roles {
