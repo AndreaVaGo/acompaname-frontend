@@ -9,10 +9,9 @@ import PerfilCuidadorView from '../views/PerfilCuidadorView.vue'
 import SolicitarServicioView from '../views/SolicitarServicioView.vue'
 import ConfirmacionView from '../views/ConfirmacionView.vue'
 import ValorarView from '../views/ValorarView.vue'
-import EditarPerfilCuidadorView from '../views/EditarPerfilCuidadorView.vue'
 import MiPerfilView from '../views/MiPerfilView.vue'
 import SolicitudesFamiliaView from '../views/SolicitudesFamiliaView.vue'
-import CheckoutView from '../views/CheckoutView.vue'  
+import CheckoutView from '../views/CheckoutView.vue'
 
 
 
@@ -28,7 +27,6 @@ const router = createRouter({
     { path: '/solicitar/:id', name: 'solicitar', component: SolicitarServicioView }, 
     { path: '/confirmacion', name: 'confirmacion', component: ConfirmacionView }, 
     { path: '/valorar/:id', name: 'valorar', component: ValorarView },
-    { path: '/editar-perfil', name: 'editar-perfil', component: EditarPerfilCuidadorView },
     { path: '/mi-perfil', name: 'mi-perfil', component: MiPerfilView }, 
     { path: '/solicitudes', name: 'solicitudes', component: SolicitudesFamiliaView },
     { path: '/pagar/:id', name: 'pagar', component: CheckoutView }
