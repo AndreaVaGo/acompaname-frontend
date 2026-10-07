@@ -23,13 +23,13 @@ async function verMiPerfilPublico() {
 </script>
 
 <template>
-  <nav class="navbar" v-if="authStore.estaAutenticado">
+  <nav class="navbar">
     <RouterLink to="/" class="navbar__logo">
       <span class="navbar__logo-icon">♥</span>
       <span>Acompáñame</span>
     </RouterLink>
 
-    <div class="navbar__links">
+    <div class="navbar__links" v-if="authStore.estaAutenticado">
       <RouterLink to="/">Inicio</RouterLink>
       <RouterLink to="/buscar" v-if="authStore.rol === 'FAMILIA'"
         >Buscar</RouterLink
@@ -58,6 +58,11 @@ async function verMiPerfilPublico() {
       <button class="navbar__logout" @click="handleLogout">
         Cerrar sesión
       </button>
+    </div>
+
+    <div class="navbar__links" v-else>
+      <RouterLink to="/login">Iniciar sesión</RouterLink>
+      <RouterLink to="/registro" class="navbar__cta">Registrarme</RouterLink>
     </div>
   </nav>
 </template>
@@ -106,6 +111,16 @@ async function verMiPerfilPublico() {
     color: var(--color-accent);
     font-weight: bold;
   }
+}
+
+.navbar__links a.navbar__cta {
+  background-color: var(--color-accent);
+  border: 1px solid var(--color-accent);
+  color: var(--color-white);
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  font-size: 0.9rem;
+  font-weight: normal;
 }
 
 .navbar__link-btn {
