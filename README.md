@@ -159,6 +159,10 @@ El desarrollo siguió un enfoque iterativo: primero se construyó la estructura 
 
 La gestión del proyecto se organizó en **JIRA** (proyecto `ACOM`) con 8 épicas, 19 historias de usuario redactadas con criterios de aceptación en formato Gherkin (Given/When/Then), 16 tareas técnicas y 5 sprints entre agosto y octubre de 2026. El control de versiones se llevó con commits descriptivos en inglés, agrupados por unidad funcional (una vista, un bloque de responsive, un refactor concreto, un archivo de test).
 
+🔗 Tablero de JIRA: https://saludosalamanecer-1780468848301.atlassian.net/jira/software/projects/ACOM/boards/34/timeline?rangeMode=MONTHS
+
+![Cronograma de JIRA](docs/jira/jira-cronograma.png)
+
 ---
 
 ## 🎨 Diseño: bocetos, mockups y prototipo
@@ -497,7 +501,7 @@ npm run test:unit
 |---|---|
 | Repositorio backend | https://github.com/AndreaVaGo/acompaname-backend |
 | Repositorio frontend | https://github.com/AndreaVaGo/acompaname-frontend |
-| Gestión del proyecto (JIRA) | <ENLACE_JIRA> |
+| Gestión del proyecto (JIRA) | https://saludosalamanecer-1780468848301.atlassian.net/jira/software/projects/ACOM/boards/34/timeline?rangeMode=MONTHS |
 | Diseño en Figma | <ENLACE_FIGMA> |
 | Prototipo (Lovable) | <ENLACE_LOVABLE> |
 | Presentación | <ENLACE_PRESENTACION> |
