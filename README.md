@@ -1,49 +1,66 @@
+# 🤝 Acompáñame — Frontend
 
-Esta estructura separa claramente responsabilidades: las **vistas** (`views/`) representan pantallas completas, los **componentes** (`components/`) contienen piezas reutilizables entre vistas, los **repositorios** (`repositories/`) encapsulan toda la comunicación con la API, el **store** (`stores/`) centraliza el estado de sesión, y los **estilos globales** (`styles/`) evitan duplicar valores de diseño (colores, espaciados) en cada archivo.
+**Acompáñame** es una plataforma de marketplace que conecta a familias que necesitan cuidados para un ser querido con cuidadores profesionales verificados. Nace para cubrir el hueco entre la atención residencial a tiempo completo y las listas de espera de la atención formal.
 
-## 📱 Pantallas implementadas
+Este repositorio contiene la **aplicación web** del proyecto, desarrollada con **Vue 3**. La API REST (Spring Boot) vive en un repositorio independiente, enlazado más abajo.
 
-| # | Pantalla | Descripción |
-|---|---|---|
-| 1 | 🏠 **Landing** | Página pública de bienvenida, con propuesta de valor y accesos a registro/login |
-| 2 | ✍️ **Registro** | Formulario con selección de rol (Familia / Cuidador), cargado dinámicamente desde la API |
-| 3 | 🔑 **Inicio de sesión** | |
-| 4 | 🔍 **Búsqueda de cuidadores** | Listado con filtros por tipo de cuidado, disponibilidad y vehículo propio |
-| 5 | 🧑‍⚕️ **Perfil de cuidador** (público) | Datos profesionales, valoración media y reseñas de familias |
-| 6 | 📝 **Solicitud de servicio** | Formulario para pedir el acompañamiento a un cuidador concreto |
-| 7 | ✅ **Confirmación de solicitud** | |
-| 8 | 📜 **Historial de solicitudes** (Familia) | Estado final de cada acompañamiento gestionado, con acceso a valorar |
-| 9 | 📨 **Solicitudes enviadas** (Familia) | Estado de las solicitudes que ha enviado a distintos cuidadores |
-| 10 | ⭐ **Formulario de valoración** | Puntuación de 1 a 5 estrellas y comentario |
-| 11 | 📥 **Solicitudes recibidas** (Cuidador) | Gestión de aceptar/rechazar |
-| 12 | ⚙️ **Edición de perfil de cuidador** | |
-| 13 | 👤 **Mi perfil** (Familia) | |
+Proyecto final del bootcamp de Desarrollo Web Full Stack (850h) en **Factoría F5 — Digital Academy**.
 
-Cada vista incluye sus correspondientes estados vacíos (por ejemplo, "Aún no tienes solicitudes") y mensajes de error ante fallos de carga o de envío, para que la interfaz nunca se muestre rota ni en blanco.
+![Vue](https://img.shields.io/badge/Vue-3-42b883) ![Vite](https://img.shields.io/badge/Vite-8-646CFF) ![Pinia](https://img.shields.io/badge/Pinia-estado-yellow) ![Vitest](https://img.shields.io/badge/tests-32-success) ![Responsive](https://img.shields.io/badge/responsive-768px-blue)
 
-## 🧩 Decisiones técnicas
+---
 
-🎨 **BEM + variables CSS globales.** Se adoptó esta convención de nomenclatura (`bloque__elemento--modificador`) junto con variables centralizadas en `:root` para los colores, radios de borde, sombras y espaciados. Esto evita repetir valores sueltos por todo el proyecto y facilita que un cambio de diseño (por ejemplo, el color de acento) se propague automáticamente a las 13 vistas sin tener que editarlas una a una.
+## 📑 Tabla de contenidos
 
-🧭 **Componente `NavBar` compartido.** En lugar de repetir la navegación en cada vista, se extrajo a un único componente incluido en `App.vue`, que muestra distintos enlaces según el rol del usuario (Familia ve "Buscar", Cuidador no) y oculta el menú por completo en pantallas donde no hay sesión iniciada (Landing, Login, Registro).
+- [Descripción del proyecto](#-descripción-del-proyecto)
+- [Tecnologías utilizadas](#-tecnologías-utilizadas)
+- [Instalación y uso](#-instalación-y-uso)
+- [Estructura del proyecto](#-estructura-del-proyecto)
+- [Pantallas y rutas](#-pantallas-y-rutas)
+- [Decisiones técnicas](#-decisiones-técnicas)
+- [Metodología de trabajo](#-metodología-de-trabajo)
+- [Diseño: bocetos, mockups y prototipo](#-diseño-bocetos-mockups-y-prototipo)
+- [Screenshots](#-screenshots)
+- [Diagramas técnicos](#-diagramas-técnicos)
+- [Tests](#-tests)
+- [Herramientas](#-herramientas)
+- [Enlaces del proyecto](#-enlaces-del-proyecto)
+- [Problemas conocidos](#-problemas-conocidos)
+- [Próximos pasos](#-próximos-pasos)
+- [Autora](#-autora)
 
-🔌 **Repository Pattern para el consumo de la API.** Cada entidad tiene su propio repositorio (`UsuarioRepository`, `SolicitudRepository`, etc.) que extiende de una clase base (`Repository.js`) con los métodos genéricos `get`/`post`/`put`/`delete`. Esta clase base añade automáticamente las cabeceras de autenticación (Basic Auth, leyendo las credenciales guardadas en `sessionStorage` tras el login), de forma que las vistas nunca gestionan la autenticación directamente, solo llaman a métodos de negocio como `getMiPerfil()` o `getMisSolicitudes()`. Este patrón también simplifica el testing: los componentes se testean mockeando únicamente el repositorio correspondiente (`vi.spyOn(Repository.prototype, "metodo")`), sin necesidad de levantar el backend real durante los tests.
+---
 
-🍍 **Estado de sesión con Pinia.** El store `useAuthStore` guarda `id`, `email`, `rol` y `credenciales` del usuario autenticado (persistidos en `sessionStorage` para sobrevivir recargas de página), con acciones `login()` y `logout()`. Esto permite que cualquier vista consulte el rol o los datos del usuario activo — por ejemplo, para mostrar u ocultar el botón "Solicitar servicio" en el perfil de un cuidador según si quien lo visualiza es una familia o otro cuidador.
+## 📖 Descripción del proyecto
 
-🃏 **Componente `SolicitudCard` reutilizable.** La tarjeta que muestra una solicitud (familia/cuidador, tipo de cuidado, fecha, notas y estado) se repetía casi de forma idéntica en las vistas de "Solicitudes recibidas" y "Solicitudes enviadas", con la única diferencia de mostrar o no los botones de Aceptar/Rechazar. Se extrajo a un componente único que recibe esos datos por *props*, evitando duplicar el HTML y el CSS en dos archivos.
+**Acompáñame** resuelve un problema real: encontrar apoyo puntual y de confianza para el cuidado de personas mayores o dependientes, sin necesidad de contratar servicios residenciales completos.
 
-✅ **Validación de formularios.** Los formularios de Login, Registro, Solicitud de servicio y Valoración comprueban que los campos obligatorios no estén vacíos antes de enviar la petición, mostrando un mensaje de error visible en caso contrario. Además, cada llamada a la API está envuelta en `try/catch` para mostrar un mensaje de error legible si el backend responde con un fallo, en lugar de dejar la interfaz colgada o en blanco.
+Las **familias** pueden:
+- Registrarse e iniciar sesión
+- Buscar cuidadores con filtros y consultar su perfil
+- Enviar solicitudes de servicio y seguir su estado
+- Pagar el servicio (checkout simulado)
+- Valorar el servicio una vez completado
 
-⚡ **Reactividad e interactividad real.** Varias vistas incluyen lógica funcional más allá de la maqueta visual: el cambio de estado de una solicitud (Aceptar/Rechazar) actualiza la interfaz al instante gracias a `ref()`, el selector de rol en el registro usa *class binding* dinámico (`:class`), y el selector de estrellas en la valoración es completamente interactivo.
+Los **cuidadores** pueden:
+- Registrarse y gestionar su perfil profesional
+- Recibir solicitudes y aceptarlas o rechazarlas
 
-📱 **Diseño responsive con media queries.** Todas las vistas incluyen ajustes para pantallas móviles (principalmente en el punto de corte de 768px), transformando disposiciones en columnas (grid, flex en fila) a disposiciones apiladas verticales, y reduciendo espaciados para aprovechar mejor el espacio disponible.
+---
 
-## 🔄 Metodología de trabajo
+## 🛠 Tecnologías utilizadas
 
-El desarrollo siguió un enfoque iterativo: primero se construyó la estructura HTML de cada vista con datos de ejemplo, después se aplicaron los estilos comparando visualmente con el prototipo de diseño, posteriormente se refactorizó el CSS a BEM con variables globales, y finalmente se sustituyeron los datos de ejemplo por llamadas reales a la API REST a través del Repository Pattern, una vez que el backend estuvo disponible.
+| Categoría | Tecnología |
+|---|---|
+| Framework | Vue 3 (Composition API, `<script setup>`) |
+| Build tool | Vite 8 |
+| Estado | Pinia |
+| Rutas | Vue Router 5 |
+| Consumo de API | Repository Pattern sobre `fetch` con Basic Auth |
+| Estilos | CSS puro, BEM y variables CSS |
+| Tests | Vitest, Vue Test Utils, jsdom |
 
-La gestión del proyecto se organizó en **JIRA** con épicas, historias de usuario redactadas con criterios de aceptación en formato Gherkin (Given/When/Then) y reparto en sprints. El control de versiones se llevó con commits descriptivos en inglés, agrupados por unidad funcional (una vista, un bloque de responsive, un refactor concreto, un archivo de test).
+---
 
 ## 🚀 Instalación y uso
 
@@ -63,7 +80,92 @@ npm run dev
 
 La aplicación quedará disponible en `http://localhost:5173` 🎉. Para que funcione completamente, el backend debe estar arrancado en `http://localhost:8080` (ver el README del repositorio de backend).
 
-## ✏️ Bocetos iniciales
+| Comando | Descripción |
+|---|---|
+| `npm run dev` | Servidor de desarrollo |
+| `npm run build` | Build de producción |
+| `npm run preview` | Previsualizar el build |
+| `npm run test:unit` | Ejecutar los tests |
+
+---
+
+## 📁 Estructura del proyecto
+
+```
+src/
+├── assets/          Imágenes, bocetos y diagramas
+├── components/      NavBar, SolicitudCard (reutilizables)
+├── pinia/           Configuración de Pinia
+├── repositories/    Auth, Cuidador, Role, Solicitud, Usuario, Valoracion + Repository base
+├── router/          Definición de rutas
+├── stores/          auth.js (estado de sesión)
+├── styles/          variables.css, base.css, style.css
+├── tests/           Tests de componentes y vistas
+├── views/           Una vista por pantalla
+├── App.vue
+└── main.js
+```
+
+Esta estructura separa claramente responsabilidades: las **vistas** (`views/`) representan pantallas completas, los **componentes** (`components/`) contienen piezas reutilizables entre vistas, los **repositorios** (`repositories/`) encapsulan toda la comunicación con la API, el **store** (`stores/`) centraliza el estado de sesión, y los **estilos globales** (`styles/`) evitan duplicar valores de diseño (colores, espaciados) en cada archivo.
+
+---
+
+## 📱 Pantallas y rutas
+
+| # | Pantalla | Ruta | Descripción |
+|---|---|---|---|
+| 1 | 🏠 **Landing** | `/` | Página pública de bienvenida, con propuesta de valor y accesos a registro/login |
+| 2 | ✍️ **Registro** | `/registro` | Formulario con selección de rol (Familia / Cuidador), cargado dinámicamente desde la API |
+| 3 | 🔑 **Inicio de sesión** | `/login` | Acceso con email y contraseña |
+| 4 | 🔍 **Búsqueda de cuidadores** | `/buscar` | Listado con filtros por tipo de cuidado, disponibilidad y vehículo propio |
+| 5 | 🧑‍⚕️ **Perfil de cuidador** (público) | `/cuidador/:id` | Datos profesionales, valoración media y reseñas de familias |
+| 6 | 📝 **Solicitud de servicio** | `/solicitar/:id` | Formulario para pedir el acompañamiento a un cuidador concreto |
+| 7 | ✅ **Confirmación de solicitud** | `/confirmacion` | Aviso de solicitud enviada |
+| 8 | 📜 **Historial de solicitudes** (Familia) | `/historial` | Estado final de cada acompañamiento, con acceso a valorar |
+| 9 | 📨 **Solicitudes enviadas** (Familia) | `/solicitudes` | Estado de las solicitudes enviadas a distintos cuidadores |
+| 10 | 💳 **Checkout** (Familia) | `/pagar/:id` | Pago simulado de un servicio |
+| 11 | ⭐ **Formulario de valoración** | `/valorar/:id` | Puntuación de 1 a 5 estrellas y comentario |
+| 12 | 📥 **Solicitudes recibidas** (Cuidador) | `/solicitudes-cuidador` | Gestión de aceptar/rechazar |
+| 13 | ⚙️ **Edición de perfil de cuidador** | `/editar-perfil` | Modificar los datos del perfil profesional |
+| 14 | 👤 **Mi perfil** | `/mi-perfil` | Datos de la cuenta |
+
+Cada vista incluye sus correspondientes estados vacíos (por ejemplo, "Aún no tienes solicitudes") y mensajes de error ante fallos de carga o de envío, para que la interfaz nunca se muestre rota ni en blanco.
+
+---
+
+## 🧩 Decisiones técnicas
+
+🎨 **BEM + variables CSS globales.** Se adoptó esta convención de nomenclatura (`bloque__elemento--modificador`) junto con variables centralizadas en `:root` para los colores, radios de borde, sombras y espaciados. Esto evita repetir valores sueltos por todo el proyecto y facilita que un cambio de diseño (por ejemplo, el color de acento) se propague automáticamente a todas las vistas sin tener que editarlas una a una.
+
+🧭 **Componente `NavBar` compartido.** En lugar de repetir la navegación en cada vista, se extrajo a un único componente incluido en `App.vue`, que muestra distintos enlaces según el rol del usuario (Familia ve "Buscar", Cuidador no) y oculta el menú por completo en pantallas donde no hay sesión iniciada (Landing, Login, Registro).
+
+🔌 **Repository Pattern para el consumo de la API.** Cada entidad tiene su propio repositorio (`UsuarioRepository`, `SolicitudRepository`, etc.) que extiende de una clase base (`Repository.js`) con los métodos genéricos `get`/`post`/`put`/`delete`. Esta clase base añade automáticamente las cabeceras de autenticación (Basic Auth, leyendo las credenciales guardadas en `sessionStorage` tras el login), de forma que las vistas nunca gestionan la autenticación directamente, solo llaman a métodos de negocio como `getMiPerfil()` o `getMisSolicitudes()`. Este patrón también simplifica el testing: los componentes se testean mockeando únicamente el repositorio correspondiente (`vi.spyOn(Repository.prototype, "metodo")`), sin necesidad de levantar el backend real durante los tests.
+
+🍍 **Estado de sesión con Pinia.** El store `useAuthStore` guarda `id`, `email`, `rol` y `credenciales` del usuario autenticado (persistidos en `sessionStorage` para sobrevivir recargas de página), con acciones `login()` y `logout()`. Esto permite que cualquier vista consulte el rol o los datos del usuario activo — por ejemplo, para mostrar u ocultar el botón "Solicitar servicio" en el perfil de un cuidador según si quien lo visualiza es una familia o otro cuidador.
+
+🃏 **Componente `SolicitudCard` reutilizable.** La tarjeta que muestra una solicitud (familia/cuidador, tipo de cuidado, fecha, notas y estado) se repetía casi de forma idéntica en las vistas de "Solicitudes recibidas" y "Solicitudes enviadas", con la única diferencia de mostrar o no los botones de Aceptar/Rechazar. Se extrajo a un componente único que recibe esos datos por _props_, evitando duplicar el HTML y el CSS en dos archivos.
+
+✅ **Validación de formularios.** Los formularios de Login, Registro, Solicitud de servicio y Valoración comprueban que los campos obligatorios no estén vacíos antes de enviar la petición, mostrando un mensaje de error visible en caso contrario. Además, cada llamada a la API está envuelta en `try/catch` para mostrar un mensaje de error legible si el backend responde con un fallo, en lugar de dejar la interfaz colgada o en blanco.
+
+⚡ **Reactividad e interactividad real.** Varias vistas incluyen lógica funcional más allá de la maqueta visual: el cambio de estado de una solicitud (Aceptar/Rechazar) actualiza la interfaz al instante gracias a `ref()`, el selector de rol en el registro usa _class binding_ dinámico (`:class`), y el selector de estrellas en la valoración es completamente interactivo.
+
+📱 **Diseño responsive con media queries.** Todas las vistas incluyen ajustes para pantallas móviles (principalmente en el punto de corte de 768px), transformando disposiciones en columnas (grid, flex en fila) a disposiciones apiladas verticales, y reduciendo espaciados para aprovechar mejor el espacio disponible.
+
+---
+
+## 🔄 Metodología de trabajo
+
+El desarrollo siguió un enfoque iterativo: primero se construyó la estructura HTML de cada vista con datos de ejemplo, después se aplicaron los estilos comparando visualmente con el prototipo de diseño, posteriormente se refactorizó el CSS a BEM con variables globales, y finalmente se sustituyeron los datos de ejemplo por llamadas reales a la API REST a través del Repository Pattern, una vez que el backend estuvo disponible.
+
+La gestión del proyecto se organizó en **JIRA** (proyecto `ACOM`) con 8 épicas, 19 historias de usuario redactadas con criterios de aceptación en formato Gherkin (Given/When/Then), 16 tareas técnicas y 5 sprints entre agosto y octubre de 2026. El control de versiones se llevó con commits descriptivos en inglés, agrupados por unidad funcional (una vista, un bloque de responsive, un refactor concreto, un archivo de test).
+
+---
+
+## 🎨 Diseño: bocetos, mockups y prototipo
+
+Proceso de diseño: **bocetos → wireframes → mockups → prototipo**, pensado para móvil, tablet y escritorio.
+
+### ✏️ Bocetos iniciales
 
 Landing
 ![boceto-landing](./src/assets/boceto_landing.png)
@@ -86,6 +188,25 @@ Solicitar servicio
 Solicitudes recibidas
 ![boceto-solicitudes](./src/assets/boceto_solicitudes_cuidador.png)
 
+### 🖼️ Mockups (escritorio)
+
+| Landing | Login | Registro |
+|---|---|---|
+| ![Landing](docs/design/01-landing_escritorio.png) | ![Login](docs/design/02-login_escritorio.png) | ![Registro](docs/design/03-registro_escritorio.png) |
+
+| Buscar | Perfil del cuidador | Solicitar |
+|---|---|---|
+| ![Buscar](docs/design/04-buscar_escritorio.png) | ![Perfil](docs/design/05-perfil-cuidador_escritorio.png) | ![Solicitar](docs/design/06-solicitar_escritorio.png) |
+
+| Mis solicitudes | Solicitudes recibidas | Historial | Valorar |
+|---|---|---|---|
+| ![Mis solicitudes](docs/design/07-solicitudes-familia_escritorio.png) | ![Solicitudes recibidas](docs/design/08-solicitudes-cuidador_escritorio.png) | ![Historial](docs/design/09-historial_escritorio.png) | ![Valorar](docs/design/10-valorar_escritorio.png) |
+
+- **Figma:** <ENLACE_FIGMA>
+- **Prototipo en Lovable:** <ENLACE_LOVABLE>
+
+---
+
 ## 📸 Screenshots
 
 Landing
@@ -97,7 +218,103 @@ Buscar cuidadores
 Solicitar servicio
 ![solicitar](./src/assets/solicitar.png)
 
+---
+
 ## 📊 Diagramas técnicos
+
+### Arquitectura del frontend
+
+```mermaid
+flowchart TD
+    subgraph UI["🖼️ Vistas (Vue)"]
+        Login[LoginView]
+        Register[RegisterView]
+        Buscar[BuscarView]
+        Perfil[PerfilCuidadorView]
+        Solicitar[SolicitarServicioView]
+        SolFam[SolicitudesFamiliaView]
+        SolCui[SolicitudesCuidadorView]
+    end
+
+    subgraph STATE["🗂️ Estado global (Pinia)"]
+        AuthStore[authStore]
+    end
+
+    subgraph REPO["🔌 Repositories"]
+        AuthRepo[AuthRepository]
+        CuidadorRepo[CuidadorRepository]
+        SolicitudRepo[SolicitudRepository]
+    end
+
+    subgraph API["☁️ Backend API"]
+        Spring[Spring Boot REST API]
+    end
+
+    Login --> AuthRepo
+    Register --> AuthRepo
+    Buscar --> CuidadorRepo
+    Perfil --> CuidadorRepo
+    Solicitar --> SolicitudRepo
+    SolFam --> SolicitudRepo
+    SolCui --> SolicitudRepo
+
+    AuthRepo --> AuthStore
+    AuthStore --> UI
+
+    AuthRepo --> Spring
+    CuidadorRepo --> Spring
+    SolicitudRepo --> Spring
+
+    classDef ui fill:#fff0eb,stroke:#e8734a,stroke-width:2px,color:#333;
+    classDef state fill:#eaf4ff,stroke:#3a7bd5,stroke-width:2px,color:#333;
+    classDef repo fill:#eafbea,stroke:#2ecc71,stroke-width:2px,color:#333;
+    classDef api fill:#f5eaff,stroke:#8e44ad,stroke-width:2px,color:#333;
+
+    class Login,Register,Buscar,Perfil,Solicitar,SolFam,SolCui ui;
+    class AuthStore state;
+    class AuthRepo,CuidadorRepo,SolicitudRepo repo;
+    class Spring api;
+```
+
+### Flujo de navegación
+
+```mermaid
+flowchart LR
+    Start([Usuario entra]) --> Login[LoginView]
+    Login -- "no tiene cuenta" --> Register[RegisterView]
+    Register --> Login
+    Login -- "autenticado" --> Nav[NavBar]
+
+    Nav --> Buscar[BuscarView]
+    Nav --> SolFam[SolicitudesFamiliaView]
+    Nav --> SolCui[SolicitudesCuidadorView]
+
+    Buscar --> Perfil[PerfilCuidadorView]
+    Perfil --> Solicitar[SolicitarServicioView]
+    Solicitar --> SolFam
+
+    classDef entry fill:#fff0eb,stroke:#e8734a,stroke-width:2px;
+    classDef nav fill:#eaf4ff,stroke:#3a7bd5,stroke-width:2px;
+    classDef view fill:#eafbea,stroke:#2ecc71,stroke-width:2px;
+
+    class Start,Login,Register entry;
+    class Nav nav;
+    class Buscar,SolFam,SolCui,Perfil,Solicitar view;
+```
+
+### Casos de uso
+
+| Visitante | Familia | Cuidador |
+|---|---|---|
+| ![Visitante](docs/diagrams/casos-visitante.png) | ![Familia](docs/diagrams/casos-familia.png) | ![Cuidador](docs/diagrams/casos-cuidador.png) |
+
+### Secuencia: registro y login
+
+![Secuencia registro y login](docs/diagrams/sec1.png)
+
+### Secuencia: solicitar un servicio
+
+![Secuencia solicitud](docs/diagrams/sec2.png)
 
 ### Diagrama Entidad-Relación
 
@@ -233,9 +450,11 @@ classDiagram
     PagoEntity --> EstadoPago
 ```
 
-## ✅ Running Tests
+---
 
-El proyecto incluye tests unitarios con Vitest y Vue Test Utils para las 13 vistas y componentes conectados a la API real. Cada test mockea el repositorio correspondiente (`vi.spyOn(Repository.prototype, "metodo")`) en lugar de depender de que el backend esté levantado:
+## ✅ Tests
+
+El proyecto incluye tests unitarios con Vitest y Vue Test Utils para las vistas y componentes conectados a la API real. Cada test mockea el repositorio correspondiente (`vi.spyOn(Repository.prototype, "metodo")`) en lugar de depender de que el backend esté levantado:
 
 - `LoginView`, `RegisterView` — validación de campos y flujo de autenticación
 - `NavBar` — visibilidad de enlaces según el rol activo (Pinia)
@@ -256,7 +475,9 @@ Para ejecutarlos:
 npm run test:unit
 ```
 
-## 🧰 Tools
+---
+
+## 🧰 Herramientas
 
 - 💻 Visual Studio Code
 - 🖖 Vue 3 (Composition API)
@@ -266,27 +487,48 @@ npm run test:unit
 - ✅ Vitest + Vue Test Utils
 - 📮 Postman (pruebas de integración con el backend)
 - 🗄️ DBeaver (inspección de la base de datos durante el desarrollo)
+- 📋 JIRA (gestión del proyecto)
+
+---
 
 ## 🔗 Enlaces del proyecto
 
-- **Repositorio backend**: https://github.com/AndreaVaGo/acompaname-backend
-- **Gestión del proyecto (JIRA)**: *(pendiente)*
-- **Prototipo de diseño (Lovable)**: *(pendiente)*
-- **Presentación**: *(pendiente)*
+| Recurso | Enlace |
+|---|---|
+| Repositorio backend | https://github.com/AndreaVaGo/acompaname-backend |
+| Repositorio frontend | https://github.com/AndreaVaGo/acompaname-frontend |
+| Gestión del proyecto (JIRA) | <ENLACE_JIRA> |
+| Diseño en Figma | <ENLACE_FIGMA> |
+| Prototipo (Lovable) | <ENLACE_LOVABLE> |
+| Presentación | <ENLACE_PRESENTACION> |
 
-## 🐞 Known Issues
+---
 
-Sin incidencias relevantes detectadas hasta la fecha. Si encuentras algo, no dudes en abrir un issue.
+## 🐞 Problemas conocidos
+
+- El checkout (`/pagar/:id`) es una simulación y todavía no está conectado al endpoint `PATCH /pagos/{id}/pagar` del backend.
+- La autenticación es Basic Auth: las credenciales viajan en cada petición.
+
+---
 
 ## 🗺️ Próximos pasos
 
 - 🔐 Implementar autenticación basada en JWT (actualmente Basic Auth)
 - 🌐 Revisar la configuración de CORS tras la migración a JWT
-- 💳 Checkout simulado estilo Stripe (maquetación de pago, sin conexión real a una pasarela de pago)
+- 💳 Conectar el checkout con el endpoint de pagos del backend y, más adelante, con una pasarela real
+- 🎨 Alinear la edición del perfil de cuidador con el prototipo de Lovable
+- 🚀 Desplegar frontend y backend
+
+---
 
 ## 👩‍💻 Autora
 
-**Andrea** — Proyecto Final, Bootcamp Desarrollo Web Full Stack, Factoría F5.
+**Andrea Vallina González** — Proyecto Final, Bootcamp Desarrollo Web Full Stack, Factoría F5.
+
+- GitHub: [@AndreaVaGo](https://github.com/AndreaVaGo)
+- LinkedIn: [Andrea Vallina González](https://www.linkedin.com/in/andrea-vallina-gonzalez/)
+
+---
 
 ## ⚠️ Disclaimer
 
