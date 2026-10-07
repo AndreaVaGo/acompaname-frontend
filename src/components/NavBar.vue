@@ -1,14 +1,19 @@
 <script setup>
 import { ref, computed } from "vue";
-import { RouterLink, useRouter } from "vue-router";
+import { RouterLink, useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "../stores/auth";
 import CuidadorRepository from "@/repositories/CuidadorRepository";
 
 const authStore = useAuthStore();
 const router = useRouter();
+const route = useRoute();
 const cuidadorRepository = new CuidadorRepository();
 
 const menuAbierto = ref(false);
+
+const esPantallaAcceso = computed(
+  () => route.path === "/login" || route.path === "/registro",
+);
 
 const inicial = computed(() =>
   authStore.email ? authStore.email.charAt(0).toUpperCase() : "?",
@@ -109,7 +114,7 @@ function irAMiPerfil() {
       </div>
     </div>
 
-    <div class="navbar__links" v-else>
+    <div class="navbar__links" v-else-if="!esPantallaAcceso">
       <RouterLink to="/login" class="navbar__link">Iniciar sesión</RouterLink>
       <RouterLink to="/registro" class="navbar__cta">Registrarme</RouterLink>
     </div>
