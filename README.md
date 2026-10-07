@@ -36,7 +36,6 @@ Proyecto final del bootcamp de Desarrollo Web Full Stack (850h) en **Factoría F
 **Acompáñame** resuelve un problema real: encontrar apoyo puntual y de confianza para el cuidado de personas mayores o dependientes, sin necesidad de contratar servicios residenciales completos.
 
 Las **familias** pueden:
-
 - Registrarse e iniciar sesión
 - Buscar cuidadores con filtros y consultar su perfil
 - Enviar solicitudes de servicio y seguir su estado
@@ -44,7 +43,6 @@ Las **familias** pueden:
 - Valorar el servicio una vez completado
 
 Los **cuidadores** pueden:
-
 - Registrarse y gestionar su perfil profesional
 - Recibir solicitudes y aceptarlas o rechazarlas
 
@@ -52,15 +50,15 @@ Los **cuidadores** pueden:
 
 ## 🛠 Tecnologías utilizadas
 
-| Categoría      | Tecnología                                      |
-| -------------- | ----------------------------------------------- |
-| Framework      | Vue 3 (Composition API, `<script setup>`)       |
-| Build tool     | Vite 8                                          |
-| Estado         | Pinia                                           |
-| Rutas          | Vue Router 5                                    |
+| Categoría | Tecnología |
+|---|---|
+| Framework | Vue 3 (Composition API, `<script setup>`) |
+| Build tool | Vite 8 |
+| Estado | Pinia |
+| Rutas | Vue Router 5 |
 | Consumo de API | Repository Pattern sobre `fetch` con Basic Auth |
-| Estilos        | CSS puro, BEM y variables CSS                   |
-| Tests          | Vitest, Vue Test Utils, jsdom                   |
+| Estilos | CSS puro, BEM y variables CSS |
+| Tests | Vitest, Vue Test Utils, jsdom |
 
 ---
 
@@ -82,12 +80,12 @@ npm run dev
 
 La aplicación quedará disponible en `http://localhost:5173` 🎉. Para que funcione completamente, el backend debe estar arrancado en `http://localhost:8080` (ver el README del repositorio de backend).
 
-| Comando             | Descripción            |
-| ------------------- | ---------------------- |
-| `npm run dev`       | Servidor de desarrollo |
-| `npm run build`     | Build de producción    |
-| `npm run preview`   | Previsualizar el build |
-| `npm run test:unit` | Ejecutar los tests     |
+| Comando | Descripción |
+|---|---|
+| `npm run dev` | Servidor de desarrollo |
+| `npm run build` | Build de producción |
+| `npm run preview` | Previsualizar el build |
+| `npm run test:unit` | Ejecutar los tests |
 
 ---
 
@@ -114,21 +112,21 @@ Esta estructura separa claramente responsabilidades: las **vistas** (`views/`) r
 
 ## 📱 Pantallas y rutas
 
-| #   | Pantalla                                  | Ruta                    | Descripción                                                                              |
-| --- | ----------------------------------------- | ----------------------- | ---------------------------------------------------------------------------------------- |
-| 1   | 🏠 **Landing**                            | `/`                     | Página pública de bienvenida, con propuesta de valor y accesos a registro/login          |
-| 2   | ✍️ **Registro**                           | `/registro`             | Formulario con selección de rol (Familia / Cuidador), cargado dinámicamente desde la API |
-| 3   | 🔑 **Inicio de sesión**                   | `/login`                | Acceso con email y contraseña                                                            |
-| 4   | 🔍 **Búsqueda de cuidadores**             | `/buscar`               | Listado con filtros por tipo de cuidado, disponibilidad y vehículo propio                |
-| 5   | 🧑‍⚕️ **Perfil de cuidador** (público)       | `/cuidador/:id`         | Datos profesionales, valoración media y reseñas de familias                              |
-| 6   | 📝 **Solicitud de servicio**              | `/solicitar/:id`        | Formulario para pedir el acompañamiento a un cuidador concreto                           |
-| 7   | ✅ **Confirmación de solicitud**          | `/confirmacion`         | Aviso de solicitud enviada                                                               |
-| 8   | 📜 **Historial de solicitudes** (Familia) | `/historial`            | Estado final de cada acompañamiento, con acceso a valorar                                |
-| 9   | 📨 **Solicitudes enviadas** (Familia)     | `/solicitudes`          | Estado de las solicitudes enviadas a distintos cuidadores                                |
-| 10  | 💳 **Checkout** (Familia)                 | `/pagar/:id`            | Pago simulado de un servicio                                                             |
-| 11  | ⭐ **Formulario de valoración**           | `/valorar/:id`          | Puntuación de 1 a 5 estrellas y comentario                                               |
-| 12  | 📥 **Solicitudes recibidas** (Cuidador)   | `/solicitudes-cuidador` | Gestión de aceptar/rechazar                                                              |
-| 13  | 👤 **Mi perfil**                          | `/mi-perfil`            | Datos de la cuenta                                                                       |
+| # | Pantalla | Ruta | Descripción |
+|---|---|---|---|
+| 1 | 🏠 **Landing** | `/` | Página pública de bienvenida, con propuesta de valor y accesos a registro/login |
+| 2 | ✍️ **Registro** | `/registro` | Formulario con selección de rol (Familia / Cuidador), cargado dinámicamente desde la API |
+| 3 | 🔑 **Inicio de sesión** | `/login` | Acceso con email y contraseña |
+| 4 | 🔍 **Búsqueda de cuidadores** | `/buscar` | Listado con filtros por tipo de cuidado, disponibilidad y vehículo propio |
+| 5 | 🧑‍⚕️ **Perfil de cuidador** (público) | `/cuidador/:id` | Datos profesionales, valoración media y reseñas de familias |
+| 6 | 📝 **Solicitud de servicio** | `/solicitar/:id` | Formulario para pedir el acompañamiento a un cuidador concreto |
+| 7 | ✅ **Confirmación de solicitud** | `/confirmacion` | Aviso de solicitud enviada |
+| 8 | 📜 **Historial de solicitudes** (Familia) | `/historial` | Estado final de cada acompañamiento, con acceso a valorar |
+| 9 | 📨 **Solicitudes enviadas** (Familia) | `/solicitudes` | Estado de las solicitudes enviadas a distintos cuidadores |
+| 10 | 💳 **Checkout** (Familia) | `/pagar/:id` | Pago simulado de un servicio |
+| 11 | ⭐ **Formulario de valoración** | `/valorar/:id` | Puntuación de 1 a 5 estrellas y comentario |
+| 12 | 📥 **Solicitudes recibidas** (Cuidador) | `/solicitudes-cuidador` | Gestión de aceptar/rechazar |
+| 13 | 👤 **Mi perfil** | `/mi-perfil` | Datos de la cuenta |
 
 Cada vista incluye sus correspondientes estados vacíos (por ejemplo, "Aún no tienes solicitudes") y mensajes de error ante fallos de carga o de envío, para que la interfaz nunca se muestre rota ni en blanco.
 
@@ -197,16 +195,16 @@ Solicitudes recibidas
 
 ### 🖼️ Mockups (escritorio)
 
-| Landing                                           | Login                                         | Registro                                            |
-| ------------------------------------------------- | --------------------------------------------- | --------------------------------------------------- |
+| Landing | Login | Registro |
+|---|---|---|
 | ![Landing](docs/design/01-landing_escritorio.png) | ![Login](docs/design/02-login_escritorio.png) | ![Registro](docs/design/03-registro_escritorio.png) |
 
-| Buscar                                          | Perfil del cuidador                                      | Solicitar                                             |
-| ----------------------------------------------- | -------------------------------------------------------- | ----------------------------------------------------- |
+| Buscar | Perfil del cuidador | Solicitar |
+|---|---|---|
 | ![Buscar](docs/design/04-buscar_escritorio.png) | ![Perfil](docs/design/05-perfil-cuidador_escritorio.png) | ![Solicitar](docs/design/06-solicitar_escritorio.png) |
 
-| Mis solicitudes                                                       | Solicitudes recibidas                                                        | Historial                                             | Valorar                                           |
-| --------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ----------------------------------------------------- | ------------------------------------------------- |
+| Mis solicitudes | Solicitudes recibidas | Historial | Valorar |
+|---|---|---|---|
 | ![Mis solicitudes](docs/design/07-solicitudes-familia_escritorio.png) | ![Solicitudes recibidas](docs/design/08-solicitudes-cuidador_escritorio.png) | ![Historial](docs/design/09-historial_escritorio.png) | ![Valorar](docs/design/10-valorar_escritorio.png) |
 
 - **Figma:** <ENLACE_FIGMA>
@@ -311,8 +309,8 @@ flowchart LR
 
 ### Casos de uso
 
-| Visitante                                       | Familia                                     | Cuidador                                      |
-| ----------------------------------------------- | ------------------------------------------- | --------------------------------------------- |
+| Visitante | Familia | Cuidador |
+|---|---|---|
 | ![Visitante](docs/diagrams/casos-visitante.png) | ![Familia](docs/diagrams/casos-familia.png) | ![Cuidador](docs/diagrams/casos-cuidador.png) |
 
 ### Secuencia: registro y login
@@ -499,14 +497,14 @@ npm run test:unit
 
 ## 🔗 Enlaces del proyecto
 
-| Recurso                     | Enlace                                                                                                                |
-| --------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Repositorio backend         | https://github.com/AndreaVaGo/acompaname-backend                                                                      |
-| Repositorio frontend        | https://github.com/AndreaVaGo/acompaname-frontend                                                                     |
+| Recurso | Enlace |
+|---|---|
+| Repositorio backend | https://github.com/AndreaVaGo/acompaname-backend |
+| Repositorio frontend | https://github.com/AndreaVaGo/acompaname-frontend |
 | Gestión del proyecto (JIRA) | https://saludosalamanecer-1780468848301.atlassian.net/jira/software/projects/ACOM/boards/34/timeline?rangeMode=MONTHS |
-| Diseño en Figma             | <ENLACE_FIGMA>                                                                                                        |
-| Prototipo (Lovable)         | <ENLACE_LOVABLE>                                                                                                      |
-| Presentación                | <ENLACE_PRESENTACION>                                                                                                 |
+| Diseño en Figma | <ENLACE_FIGMA> |
+| Prototipo (Lovable) | <ENLACE_LOVABLE> |
+| Presentación | [docs/presentacion.pdf](docs/presentacion.pdf) |
 
 ---
 
@@ -534,3 +532,4 @@ npm run test:unit
 - GitHub: [@AndreaVaGo](https://github.com/AndreaVaGo)
 - LinkedIn: [Andrea Vallina González](https://www.linkedin.com/in/andrea-vallina-gonzalez/)
 
+---
