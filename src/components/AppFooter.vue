@@ -12,25 +12,27 @@
 
 <style scoped>
 .footer {
+  margin-top: auto;
   border-top: 1px solid var(--color-border);
-  background-color: var(--color-white);
+  background-color: var(--color-bg);
 }
 
 .footer__content {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 24px 20px;
+  padding: 12px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .footer__logo {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   font-weight: bold;
+  font-size: 0.9rem;
   color: var(--color-text);
 }
 
@@ -40,7 +42,7 @@
 
 .footer__text {
   color: var(--color-text-muted);
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 }
 
 @media (max-width: 768px) {
