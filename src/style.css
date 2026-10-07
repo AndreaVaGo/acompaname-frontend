@@ -7,3 +7,9 @@ body {
   font-family: 'Segoe UI', Roboto, sans-serif;
   background-color: #eaf6ef;
 }
+
+#app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
