@@ -43,9 +43,6 @@ async function verMiPerfilPublico() {
       <RouterLink v-if="authStore.rol === 'FAMILIA'" to="/mi-perfil"
         >Perfil</RouterLink
       >
-      <RouterLink v-if="authStore.rol === 'CUIDADOR'" to="/editar-perfil"
-        >Editar perfil</RouterLink
-      >
       <button
         v-if="authStore.rol === 'CUIDADOR'"
         class="navbar__link-btn"
