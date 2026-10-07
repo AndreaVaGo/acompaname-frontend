@@ -110,15 +110,6 @@ import { RouterLink } from "vue-router";
       >
     </section>
 
-    <hr class="landing__divider" />
-
-    <footer class="landing__footer">
-      <div class="landing__logo">
-        <span class="landing__logo-icon">♥</span>
-        <span class="landing__logo-text">Acompáñame</span>
-      </div>
-      <p>Acompáñame · Nunca sola, nunca solo · 2026</p>
-    </footer>
   </div>
 </template>
 
@@ -132,25 +123,6 @@ import { RouterLink } from "vue-router";
   & h2,
   & h3 {
     margin: 0;
-  }
-}
-
-.landing__logo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: bold;
-  font-size: 1.2rem;
-
-  & .landing__logo-icon {
-    background-color: var(--color-accent-bg);
-    border-radius: 50%;
-    padding: 8px 10px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--color-accent);
-    font-size: 0.9rem;
   }
 }
 
@@ -314,21 +286,6 @@ import { RouterLink } from "vue-router";
   border-radius: 50%;
   margin-bottom: 12px;
   font-size: 1.3rem;
-}
-
-.landing__footer {
-  text-align: center;
-  padding: 28px 20px;
-
-  & .landing__logo {
-    justify-content: center;
-    margin-bottom: 6px;
-  }
-
-  & p {
-    color: var(--color-secondary);
-    font-size: 0.85rem;
-  }
 }
 
 @media (max-width: 768px) {
