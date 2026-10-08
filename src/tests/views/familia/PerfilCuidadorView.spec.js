@@ -28,7 +28,9 @@ async function montarVista(rol) {
   });
 
   const authStore = useAuthStore(pinia);
-  authStore.login(1, "ana@test.com", "12345678", rol);
+  if (rol) {
+    authStore.login(1, "ana@test.com", "12345678", rol);
+  }
 
   await new Promise((resolve) => setTimeout(resolve, 0));
 
@@ -92,5 +94,21 @@ describe("PerfilCuidadorView", () => {
     const wrapper = await montarVista("CUIDADOR");
 
     expect(wrapper.find(".perfil__solicitar").exists()).toBe(false);
+  });
+
+  test("un visitante sin sesión ve el enlace para iniciar sesión", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
+      usuarioNombre: "Pepe",
+      especialidad: "Geriatría",
+      anosExperiencia: 4,
+      tarifaHora: 18,
+      disponibleAhora: true,
+      bio: "Cuidador con experiencia",
+    });
+
+    const wrapper = await montarVista(null);
+
+    expect(wrapper.text()).toContain("Inicia sesión para solicitar");
+    expect(wrapper.text()).not.toContain("Solicitar servicio");
   });
 });
