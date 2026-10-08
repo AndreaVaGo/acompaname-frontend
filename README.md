@@ -479,6 +479,8 @@ Para ejecutarlos:
 npm run test:unit
 ```
 
+![Resultado de los tests del frontend](docs/screenshots/tests-frontend.png)
+
 ---
 
 ## 🧰 Herramientas
