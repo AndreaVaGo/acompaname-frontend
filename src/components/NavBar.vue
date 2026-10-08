@@ -38,6 +38,11 @@ async function verMiPerfilPublico() {
   }
 }
 
+function irAEditarPerfil() {
+  menuAbierto.value = false;
+  router.push("/editar-perfil");
+}
+
 function irAMiPerfil() {
   menuAbierto.value = false;
   if (authStore.rol === "FAMILIA") {
@@ -121,6 +126,14 @@ function irAMiPerfil() {
               @click="irAMiPerfil"
             >
               Mi perfil
+            </button>
+            <button
+              v-if="authStore.rol === 'CUIDADOR'"
+              type="button"
+              class="navbar__menu-item"
+              @click="irAEditarPerfil"
+            >
+              Editar mi perfil
             </button>
             <button
               type="button"
