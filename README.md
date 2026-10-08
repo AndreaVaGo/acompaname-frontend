@@ -214,14 +214,28 @@ Solicitudes recibidas
 
 ## 📸 Screenshots
 
+Capturas de la aplicación en funcionamiento (vista de escritorio, salvo la última).
+
 Landing
-![landing](./src/assets/landing.png)
+![landing](docs/screenshots/landing.png)
+
+Login
+![login](docs/screenshots/login.png)
+
+Registro (rol cuidador)
+![registro](docs/screenshots/registro.png)
 
 Buscar cuidadores
-![buscar](./src/assets/buscar.png)
+![buscar](docs/screenshots/buscar.png)
 
 Solicitar servicio
-![solicitar](./src/assets/solicitar.png)
+![solicitar](docs/screenshots/solicitar.png)
+
+Solicitudes recibidas (cuidador)
+![solicitudes-cuidador](docs/screenshots/solicitudes-cuidador.png)
+
+Registro en vista móvil (responsive, 768px)
+![registro-movil](docs/screenshots/registro-movil.png)
 
 ---
 
