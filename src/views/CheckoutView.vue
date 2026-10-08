@@ -1,11 +1,15 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import PagoRepository from "@/repositories/PagoRepository";
 
 const route = useRoute();
 const router = useRouter();
-const solicitudId = route.params.id;
+const solicitudId = Number(route.params.id);
+const pagoRepository = new PagoRepository();
 
+const pago = ref(null);
+const cargando = ref(true);
 const numeroTarjeta = ref("");
 const nombreTitular = ref("");
 const caducidad = ref("");
@@ -13,7 +17,21 @@ const cvv = ref("");
 const error = ref("");
 const procesando = ref(false);
 
-function pagar() {
+onMounted(async () => {
+  try {
+    const pagos = await pagoRepository.getMisPagos();
+    pago.value = pagos.find((p) => p.solicitudId === solicitudId) || null;
+    if (!pago.value) {
+      error.value = "No se ha encontrado el pago de esta solicitud.";
+    }
+  } catch (err) {
+    error.value = "No se pudo cargar el pago.";
+  } finally {
+    cargando.value = false;
+  }
+});
+
+async function pagar() {
   if (
     !numeroTarjeta.value ||
     !nombreTitular.value ||
@@ -26,10 +44,14 @@ function pagar() {
   error.value = "";
   procesando.value = true;
 
-  setTimeout(() => {
-    procesando.value = false;
+  try {
+    await pagoRepository.marcarComoPagado(pago.value.id);
     router.push({ name: "solicitudes" });
-  }, 1500);
+  } catch (err) {
+    error.value = "No se pudo realizar el pago.";
+  } finally {
+    procesando.value = false;
+  }
 }
 </script>
 
@@ -41,7 +63,21 @@ function pagar() {
         Pago simulado — no se realiza ningún cargo real.
       </p>
 
-      <form class="checkout__form" @submit.prevent="pagar">
+      <p v-if="cargando">Cargando pago...</p>
+
+      <p v-if="pago" class="checkout__importe">
+        Importe: <strong>{{ pago.importe }} €</strong>
+      </p>
+
+      <p v-if="pago && pago.estado === 'COMPLETADO'" class="checkout__info">
+        Este servicio ya está pagado.
+      </p>
+
+      <form
+        v-if="pago && pago.estado !== 'COMPLETADO'"
+        class="checkout__form"
+        @submit.prevent="pagar"
+      >
         <label for="numero">Número de tarjeta</label>
         <input
           type="text"
@@ -88,6 +124,8 @@ function pagar() {
           {{ procesando ? "Procesando..." : "Pagar" }}
         </button>
       </form>
+
+      <p v-if="error && !pago" class="checkout__error">{{ error }}</p>
     </div>
   </div>
 </template>
@@ -121,6 +159,16 @@ function pagar() {
 .checkout__subtitle {
   color: var(--color-text-muted);
   margin-bottom: 24px;
+}
+
+.checkout__importe {
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+}
+
+.checkout__info {
+  color: var(--color-secondary);
+  font-weight: bold;
 }
 
 .checkout__form {
