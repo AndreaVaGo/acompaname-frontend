@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import pinia from '../pinia/pinia'
+import { useAuthStore } from '../stores/auth'
 import LandingView from '../views/comun/LandingView.vue'
 import LoginView from '../views/auth/LoginView.vue'
 import RegisterView from '../views/auth/RegisterView.vue'
@@ -14,6 +16,7 @@ import MiPerfilView from '../views/comun/MiPerfilView.vue'
 import SolicitudesFamiliaView from '../views/familia/SolicitudesFamiliaView.vue'
 import CheckoutView from '../views/familia/CheckoutView.vue'
 
+// Las rutas con meta.requiereLogin solo se pueden ver con la sesión iniciada
 const router = createRouter({
   history: createWebHistory(),
   routes: [
@@ -21,18 +24,25 @@ const router = createRouter({
     { path: '/login', name: 'login', component: LoginView },
     { path: '/registro', name: 'registro', component: RegisterView },
     { path: '/buscar', name: 'buscar', component: BuscarView },
-    { path: '/solicitudes-cuidador', name: 'solicitudes-cuidador', component: SolicitudesCuidadorView },
-    { path: '/editar-perfil', name: 'editar-perfil', component: EditarPerfilView },
-    { path: '/historial', name: 'historial', component: HistorialView },
     { path: '/cuidador/:id', name: 'perfil-cuidador', component: PerfilCuidadorView },
-    { path: '/solicitar/:id', name: 'solicitar', component: SolicitarServicioView },
-    { path: '/confirmacion', name: 'confirmacion', component: ConfirmacionView },
-    { path: '/valorar/:id', name: 'valorar', component: ValorarView },
-    { path: '/mi-perfil', name: 'mi-perfil', component: MiPerfilView },
-    { path: '/solicitudes', name: 'solicitudes', component: SolicitudesFamiliaView },
-    { path: '/pagar/:id', name: 'pagar', component: CheckoutView }
-    
+    { path: '/solicitudes-cuidador', name: 'solicitudes-cuidador', component: SolicitudesCuidadorView, meta: { requiereLogin: true } },
+    { path: '/editar-perfil', name: 'editar-perfil', component: EditarPerfilView, meta: { requiereLogin: true } },
+    { path: '/historial', name: 'historial', component: HistorialView, meta: { requiereLogin: true } },
+    { path: '/solicitar/:id', name: 'solicitar', component: SolicitarServicioView, meta: { requiereLogin: true } },
+    { path: '/confirmacion', name: 'confirmacion', component: ConfirmacionView, meta: { requiereLogin: true } },
+    { path: '/valorar/:id', name: 'valorar', component: ValorarView, meta: { requiereLogin: true } },
+    { path: '/mi-perfil', name: 'mi-perfil', component: MiPerfilView, meta: { requiereLogin: true } },
+    { path: '/solicitudes', name: 'solicitudes', component: SolicitudesFamiliaView, meta: { requiereLogin: true } },
+    { path: '/pagar/:id', name: 'pagar', component: CheckoutView, meta: { requiereLogin: true } }
   ]
+})
+
+// Si la ruta pide sesión y no hay, se manda al login
+router.beforeEach((to) => {
+  const authStore = useAuthStore(pinia)
+  if (to.meta.requiereLogin && !authStore.estaAutenticado) {
+    return { name: 'login' }
+  }
 })
 
 export default router
