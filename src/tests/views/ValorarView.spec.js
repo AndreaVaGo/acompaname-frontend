@@ -1,9 +1,9 @@
 import { describe, test, expect, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createRouter, createWebHistory } from "vue-router";
-import ValorarView from "../views/ValorarView.vue";
-import SolicitudRepository from "../repositories/SolicitudRepository";
-import ValoracionRepository from "../repositories/ValoracionRepository";
+import ValorarView from "../../views/ValorarView.vue";
+import SolicitudRepository from "../../repositories/SolicitudRepository";
+import ValoracionRepository from "../../repositories/ValoracionRepository";
 
 function crearRouter() {
   return createRouter({

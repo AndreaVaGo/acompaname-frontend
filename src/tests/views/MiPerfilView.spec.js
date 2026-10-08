@@ -2,9 +2,9 @@ import { describe, test, expect, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createRouter, createWebHistory } from "vue-router";
 import { createPinia } from "pinia";
-import MiPerfilView from "../views/MiPerfilView.vue";
-import UsuarioRepository from "../repositories/UsuarioRepository";
-import { useAuthStore } from "../stores/auth";
+import MiPerfilView from "../../views/MiPerfilView.vue";
+import UsuarioRepository from "../../repositories/UsuarioRepository";
+import { useAuthStore } from "../../stores/auth";
 
 vi.spyOn(UsuarioRepository.prototype, "getById").mockResolvedValue({
   id: 1,

@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeEach } from "vitest";
 import { createPinia, setActivePinia } from "pinia";
-import { useAuthStore } from "../stores/auth";
+import { useAuthStore } from "../../stores/auth";
 
 describe("auth store", () => {
   beforeEach(() => {

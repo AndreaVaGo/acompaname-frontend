@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest'
 import { shallowMount } from '@vue/test-utils'
-import SolicitudCard from '../components/SolicitudCard.vue'
+import SolicitudCard from '../../components/SolicitudCard.vue'
 
 describe('SolicitudCard', () => {
   test('muestra el nombre correcto', () => {

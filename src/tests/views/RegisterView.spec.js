@@ -1,8 +1,8 @@
 import { describe, test, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createRouter, createWebHistory } from 'vue-router'
-import RegisterView from '../views/RegisterView.vue'
-import RoleRepository from '../repositories/RoleRepository'
+import RegisterView from '../../views/RegisterView.vue'
+import RoleRepository from '../../repositories/RoleRepository'
 
 vi.spyOn(RoleRepository.prototype, 'getAll').mockResolvedValue([
   { id: 4, name: 'FAMILIA' },
