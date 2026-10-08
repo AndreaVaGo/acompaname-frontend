@@ -27,10 +27,11 @@ export async function rellenarRegistro(page, usuario) {
   await page.fill("#password", usuario.password);
   await page.fill("#telefono", usuario.telefono);
 
+  // Cada botón de rol tiene un texto distinto: "Ofrezco servicios" / "Busco cuidador"
   if (usuario.rol === "cuidador") {
-    await page.getByRole("button", { name: "Cuidador" }).click();
+    await page.getByRole("button", { name: "Ofrezco servicios" }).click();
   } else {
-    await page.getByRole("button", { name: "Familia" }).click();
+    await page.getByRole("button", { name: "Busco cuidador" }).click();
   }
 
   await page.getByRole("button", { name: "Crear mi cuenta" }).click();
