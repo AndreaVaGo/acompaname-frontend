@@ -2,7 +2,7 @@
 import { ref, onMounted } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 import AuthRepository from "@/repositories/AuthRepository";
-import RoleRepository from "../repositories/RoleRepository";
+import RoleRepository from "../../repositories/RoleRepository";
 
 const rolSeleccionado = ref("familia");
 const nombre = ref("");

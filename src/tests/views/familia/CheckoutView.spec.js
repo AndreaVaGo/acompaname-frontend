@@ -1,8 +1,8 @@
 import { describe, test, expect, vi, afterEach } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createRouter, createWebHistory } from "vue-router";
-import CheckoutView from "../../views/CheckoutView.vue";
-import PagoRepository from "../../repositories/PagoRepository";
+import CheckoutView from "../../../views/familia/CheckoutView.vue";
+import PagoRepository from "../../../repositories/PagoRepository";
 
 function crearRouter() {
   return createRouter({

@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import SolicitudCard from "../components/SolicitudCard.vue";
+import SolicitudCard from "../../components/SolicitudCard.vue";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
 
 const solicitudRepository = new SolicitudRepository();

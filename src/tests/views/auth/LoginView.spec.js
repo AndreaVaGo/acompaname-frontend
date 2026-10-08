@@ -2,7 +2,7 @@ import { describe, test, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createRouter, createWebHistory } from 'vue-router'
 import { createPinia } from 'pinia'
-import LoginView from '../../views/LoginView.vue'
+import LoginView from '../../../views/auth/LoginView.vue'
 
 const router = createRouter({
   history: createWebHistory(),

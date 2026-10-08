@@ -1,8 +1,8 @@
 import { describe, test, expect, vi, afterEach } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createRouter, createWebHistory } from "vue-router";
-import ConfirmacionView from "../../views/ConfirmacionView.vue";
-import SolicitudRepository from "../../repositories/SolicitudRepository";
+import ConfirmacionView from "../../../views/familia/ConfirmacionView.vue";
+import SolicitudRepository from "../../../repositories/SolicitudRepository";
 
 function crearRouter() {
   return createRouter({

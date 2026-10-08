@@ -2,9 +2,9 @@ import { describe, test, expect, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createRouter, createWebHistory } from "vue-router";
 import { createPinia } from "pinia";
-import PerfilCuidadorView from "../../views/PerfilCuidadorView.vue";
-import CuidadorRepository from "../../repositories/CuidadorRepository";
-import { useAuthStore } from "../../stores/auth";
+import PerfilCuidadorView from "../../../views/familia/PerfilCuidadorView.vue";
+import CuidadorRepository from "../../../repositories/CuidadorRepository";
+import { useAuthStore } from "../../../stores/auth";
 
 function crearRouter() {
   return createRouter({

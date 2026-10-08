@@ -1,15 +1,14 @@
 import { describe, test, expect, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createRouter, createWebHistory } from "vue-router";
-import SolicitudesCuidadorView from "../../views/SolicitudesCuidadorView.vue";
-import SolicitudRepository from "../../repositories/SolicitudRepository";
+import SolicitudesFamiliaView from "../../../views/familia/SolicitudesFamiliaView.vue";
+import SolicitudRepository from "../../../repositories/SolicitudRepository";
 
 vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
   {
     id: 1,
-    familiaNombre: "Ana",
+    cuidadorNombre: "Pepe",
     nombrePaciente: "Antonio",
-    edadPaciente: 81,
     tipoCuidado: "Hospitalario",
     fechaCuidado: "2026-09-10",
     notas: "test",
@@ -22,14 +21,14 @@ const router = createRouter({
   routes: [],
 });
 
-describe("SolicitudesCuidadorView", () => {
-  test("muestra las solicitudes recibidas", async () => {
-    const wrapper = mount(SolicitudesCuidadorView, {
+describe("SolicitudesFamiliaView", () => {
+  test("muestra las solicitudes cargadas", async () => {
+    const wrapper = mount(SolicitudesFamiliaView, {
       global: { plugins: [router] },
     });
 
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    expect(wrapper.text()).toContain("Ana");
+    expect(wrapper.text()).toContain("Pepe");
   });
 });

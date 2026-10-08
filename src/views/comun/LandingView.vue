@@ -32,7 +32,7 @@ import { RouterLink } from "vue-router";
       </div>
       <div class="landing__hero-image">
         <img
-          src="../assets/hero.jpg"
+          src="../../assets/hero.jpg"
           alt="Cuidadora acompañando a una persona mayor"
         />
       </div>
