@@ -1,4 +1,27 @@
-<script setup></script>
+<script setup>
+import { ref, onMounted } from "vue";
+import { useRoute, RouterLink } from "vue-router";
+import SolicitudRepository from "@/repositories/SolicitudRepository";
+
+const route = useRoute();
+const solicitudRepository = new SolicitudRepository();
+
+const solicitud = ref(null);
+const error = ref("");
+
+const tipos = {
+  hospitalario: "Hospital",
+  domicilio: "Domicilio",
+};
+
+onMounted(async () => {
+  try {
+    solicitud.value = await solicitudRepository.getById(route.query.id);
+  } catch (err) {
+    error.value = "No se pudieron cargar los datos de la solicitud.";
+  }
+});
+</script>
 
 <template>
   <div class="confirmacion">
@@ -6,23 +29,25 @@
       <div class="confirmacion__icon">✓</div>
 
       <h1>Solicitud enviada</h1>
-      <p class="confirmacion__texto">
-        Hemos avisado a <strong>Lucía Ferrer</strong>. Recibirás un aviso en
-        cuanto responda, normalmente en menos de 24 horas.
+      <p v-if="solicitud" class="confirmacion__texto">
+        Hemos avisado a <strong>{{ solicitud.cuidadorNombre }}</strong
+        >. Recibirás un aviso en cuanto responda, normalmente en menos de 24
+        horas.
       </p>
+      <p v-if="error" class="confirmacion__texto">{{ error }}</p>
 
-      <div class="confirmacion__resumen">
+      <div v-if="solicitud" class="confirmacion__resumen">
         <div class="confirmacion__fila">
           <span>Tipo de cuidado</span>
-          <strong>Hospital y domicilio</strong>
+          <strong>{{ tipos[solicitud.tipoCuidado] || solicitud.tipoCuidado }}</strong>
         </div>
         <div class="confirmacion__fila">
           <span>Fecha de inicio</span>
-          <strong>21 de agosto de 2026</strong>
+          <strong>{{ solicitud.fechaCuidado }}</strong>
         </div>
         <div class="confirmacion__fila">
           <span>Paciente</span>
-          <strong>Antonio Serrano, 81 años</strong>
+          <strong>{{ solicitud.nombrePaciente }}, {{ solicitud.edadPaciente }} años</strong>
         </div>
       </div>
 
