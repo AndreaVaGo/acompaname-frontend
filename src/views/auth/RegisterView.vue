@@ -76,7 +76,7 @@ async function handleSubmit() {
           <input
             type="password"
             id="password"
-            placeholder="Mínimo 6 caracteres"
+            placeholder="Mínimo 8 caracteres"
             v-model="password"
           />
 
