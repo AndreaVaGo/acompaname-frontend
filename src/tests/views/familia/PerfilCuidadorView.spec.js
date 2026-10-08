@@ -1,4 +1,4 @@
-import { describe, test, expect, vi } from "vitest";
+import { describe, test, expect, vi, beforeEach } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createRouter, createWebHistory } from "vue-router";
 import { createPinia } from "pinia";
@@ -38,6 +38,11 @@ async function montarVista(rol) {
 }
 
 describe("PerfilCuidadorView", () => {
+  // Cada test empieza sin sesión iniciada
+  beforeEach(() => {
+    sessionStorage.clear();
+  });
+
   test("muestra los datos del cuidador", async () => {
     vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
       usuarioNombre: "Pepe",
