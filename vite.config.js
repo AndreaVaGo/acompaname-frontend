@@ -12,5 +12,7 @@ export default defineConfig({
   },
   test: {
     environment: 'jsdom',
+    // Los tests e2e los ejecuta Playwright, no Vitest
+    exclude: ['**/node_modules/**', '**/dist/**', 'e2e/**'],
   },
 })
