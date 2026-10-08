@@ -31,38 +31,35 @@ async function handleSubmit() {
 
 <template>
   <div class="login">
-    <div class="login__box">
-      <div class="login__logo">
-        <span class="login__logo-icon">♥</span>
-        <span class="login__logo-text">Acompáñame</span>
-      </div>
-
+    <div class="login__wrapper">
       <h1>Iniciar sesión</h1>
       <p class="login__subtitle">
         Bienvenida de nuevo. Nos alegra verte por aquí.
       </p>
 
-      <form class="login__form" @submit.prevent="handleSubmit">
-        <label for="email">Email</label>
-        <input
-          type="email"
-          id="email"
-          placeholder="tu@correo.com"
-          v-model="email"
-        />
+      <div class="login__box">
+        <form class="login__form" @submit.prevent="handleSubmit">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            placeholder="tu@correo.com"
+            v-model="email"
+          />
 
-        <label for="password">Contraseña</label>
-        <input
-          type="password"
-          id="password"
-          placeholder="••••••"
-          v-model="password"
-        />
+          <label for="password">Contraseña</label>
+          <input
+            type="password"
+            id="password"
+            placeholder="••••••"
+            v-model="password"
+          />
 
-        <p v-if="error" class="login__error">{{ error }}</p>
+          <p v-if="error" class="login__error">{{ error }}</p>
 
-        <button type="submit" class="btn btn--primary">Entrar</button>
-      </form>
+          <button type="submit" class="btn btn--primary">Entrar</button>
+        </form>
+      </div>
 
       <p class="login__switch">
         ¿Todavía no tienes cuenta?
@@ -74,49 +71,35 @@ async function handleSubmit() {
 
 <style scoped>
 .login {
-  min-height: 100vh;
   background-color: var(--color-bg);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   font-family: var(--font-base);
   color: var(--color-text);
+  padding: 24px 20px 32px;
+}
+
+.login__wrapper {
+  max-width: 420px;
+  width: 100%;
+}
+
+.login h1 {
+  font-size: 1.8rem;
+  margin: 0 0 6px;
+}
+
+.login__subtitle {
+  color: var(--color-text-muted);
+  margin: 0 0 20px;
 }
 
 .login__box {
   background-color: var(--color-white);
   border-radius: var(--radius-card);
-  padding: 40px;
-  max-width: 400px;
-  width: 100%;
+  padding: 24px;
   box-shadow: var(--shadow-card);
-}
-
-.login__logo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: bold;
-  font-size: 1.1rem;
-  margin-bottom: 24px;
-
-  & .login__logo-icon {
-    background-color: var(--color-accent-bg);
-    border-radius: 50%;
-    padding: 8px 10px;
-    color: var(--color-accent);
-    font-size: 0.9rem;
-  }
-}
-
-.login h1 {
-  font-size: 1.6rem;
-  margin-bottom: 8px;
-}
-
-.login__subtitle {
-  color: var(--color-text-muted);
-  margin-bottom: 24px;
 }
 
 .login__form {
@@ -130,24 +113,12 @@ async function handleSubmit() {
   }
 
   & input {
-    padding: 12px 14px;
+    padding: 10px 14px;
     border-radius: var(--radius-input);
     border: 1px solid var(--color-border);
-    margin-bottom: var(--gap-md);
+    margin-bottom: 14px;
     font-size: 1rem;
     font-family: inherit;
-  }
-}
-
-.login__switch {
-  text-align: center;
-  margin-top: var(--gap-md);
-  font-size: 0.9rem;
-
-  & a {
-    color: var(--color-accent);
-    font-weight: bold;
-    text-decoration: none;
   }
 }
 
@@ -161,9 +132,25 @@ async function handleSubmit() {
   margin: -4px 0 16px;
 }
 
+.login__switch {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 0.9rem;
+
+  & a {
+    color: var(--color-accent);
+    font-weight: bold;
+    text-decoration: none;
+  }
+}
+
 @media (max-width: 480px) {
+  .login {
+    padding: 16px 16px 24px;
+  }
+
   .login__box {
-    padding: 24px;
+    padding: 18px;
   }
 }
 </style>
