@@ -44,7 +44,7 @@ async function enviarSolicitud() {
   error.value = "";
 
   try {
-    await solicitudRepository.create({
+    const solicitudCreada = await solicitudRepository.create({
       tipoCuidado: tipoCuidado.value,
       nombrePaciente: nombrePaciente.value,
       notas: notas.value,
@@ -53,7 +53,7 @@ async function enviarSolicitud() {
       familiaId: authStore.id,
       cuidadorId: Number(cuidadorId),
     });
-    router.push({ name: "confirmacion" });
+    router.push({ name: "confirmacion", query: { id: solicitudCreada.id } });
   } catch (err) {
     error.value = "No se pudo enviar la solicitud. Inténtalo de nuevo.";
   }
