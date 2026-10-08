@@ -14,5 +14,12 @@ export default defineConfig({
     environment: 'jsdom',
     // Los tests e2e los ejecuta Playwright, no Vitest
     exclude: ['**/node_modules/**', '**/dist/**', 'e2e/**'],
+    // Informe de cobertura (npm run test:coverage)
+    coverage: {
+      provider: 'v8',
+      include: ['src/**/*.{js,vue}'],
+      exclude: ['src/tests/**', 'src/main.js'],
+      reporter: ['text', 'html'],
+    },
   },
 })
