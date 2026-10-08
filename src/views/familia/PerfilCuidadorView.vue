@@ -74,6 +74,13 @@ onMounted(async () => {
         >
           Solicitar servicio
         </RouterLink>
+        <RouterLink
+          v-if="!authStore.estaAutenticado"
+          to="/login"
+          class="btn btn--primary perfil__solicitar"
+        >
+          Inicia sesión para solicitar
+        </RouterLink>
         <p class="perfil__nota">
           Sin compromiso: la solicitud se envía y el cuidador la acepta o la
           rechaza.
