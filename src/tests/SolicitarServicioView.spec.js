@@ -82,7 +82,7 @@ describe("SolicitarServicioView", () => {
     });
     const createSpy = vi
       .spyOn(SolicitudRepository.prototype, "create")
-      .mockResolvedValue({});
+      .mockResolvedValue({ id: 9 });
 
     const { wrapper, router } = await montarVista();
 
@@ -107,6 +107,7 @@ describe("SolicitarServicioView", () => {
       cuidadorId: 3,
     });
     expect(router.currentRoute.value.name).toBe("confirmacion");
+    expect(router.currentRoute.value.query.id).toBe("9");
   });
 
   test("muestra error si falla el envío de la solicitud", async () => {
