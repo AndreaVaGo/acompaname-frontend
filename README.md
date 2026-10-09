@@ -39,7 +39,7 @@ Las **familias** pueden:
 - Registrarse e iniciar sesión
 - Buscar cuidadores con filtros y consultar su perfil
 - Enviar solicitudes de servicio y seguir su estado
-- Pagar el servicio (checkout simulado)
+- Pagar el servicio (el pago se marca como completado en el backend; los datos de la tarjeta son de prueba)
 - Valorar el servicio una vez completado
 
 Los **cuidadores** pueden:
@@ -123,7 +123,7 @@ Esta estructura separa claramente responsabilidades: las **vistas** (`views/`) r
 | 7 | ✅ **Confirmación de solicitud** | `/confirmacion` | Aviso de solicitud enviada |
 | 8 | 📜 **Historial de solicitudes** (Familia) | `/historial` | Estado final de cada acompañamiento, con acceso a valorar |
 | 9 | 📨 **Solicitudes enviadas** (Familia) | `/solicitudes` | Estado de las solicitudes enviadas a distintos cuidadores |
-| 10 | 💳 **Checkout** (Familia) | `/pagar/:id` | Pago simulado de un servicio |
+| 10 | 💳 **Checkout** (Familia) | `/pagar/:id` | Pago de un servicio (tarjeta de prueba) |
 | 11 | ⭐ **Formulario de valoración** | `/valorar/:id` | Puntuación de 1 a 5 estrellas y comentario |
 | 12 | 📥 **Solicitudes recibidas** (Cuidador) | `/solicitudes-cuidador` | Gestión de aceptar/rechazar |
 | 13 | 👤 **Mi perfil** | `/mi-perfil` | Datos de la cuenta |
@@ -553,7 +553,7 @@ npm run test:e2e
 
 ## 🐞 Problemas conocidos
 
-- El checkout (`/pagar/:id`) es una simulación y todavía no está conectado al endpoint `PATCH /pagos/{id}/pagar` del backend.
+- El checkout (`/pagar/:id`) llama al endpoint `PATCH /pagos/{id}/pagar` del backend y el pago queda como completado, pero los datos de la tarjeta son de prueba: no se cobra nada ni hay pasarela de pago real.
 - La autenticación es Basic Auth: las credenciales viajan en cada petición.
 
 ---
@@ -562,7 +562,7 @@ npm run test:e2e
 
 - 🔐 Implementar autenticación basada en JWT (actualmente Basic Auth)
 - 🌐 Revisar la configuración de CORS tras la migración a JWT
-- 💳 Conectar el checkout con el endpoint de pagos del backend y, más adelante, con una pasarela real
+- 💳 Conectar el checkout con una pasarela de pago real (por ejemplo Stripe en modo test)
 - 🎨 Añadir la edición del perfil del cuidador siguiendo el prototipo de Lovable (`/perfil`, con la tarjeta «Tu valoración» y «Ver mi perfil público»)
 - 🚀 Desplegar frontend y backend
 
