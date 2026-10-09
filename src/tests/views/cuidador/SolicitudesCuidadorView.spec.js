@@ -32,4 +32,19 @@ describe("SolicitudesCuidadorView", () => {
 
     expect(wrapper.text()).toContain("Ana");
   });
+
+  test("muestra un error si no se puede aceptar la solicitud", async () => {
+    vi.spyOn(SolicitudRepository.prototype, "cambiarEstado").mockRejectedValue(
+      new Error("fallo"),
+    );
+    const wrapper = mount(SolicitudesCuidadorView, {
+      global: { plugins: [router] },
+    });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper.find("button.btn--primary").trigger("click");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(wrapper.text()).toContain("No se pudo aceptar la solicitud.");
+  });
 });
