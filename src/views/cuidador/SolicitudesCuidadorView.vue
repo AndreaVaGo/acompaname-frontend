@@ -49,6 +49,8 @@ async function rechazar(id) {
       <p>Solicitudes que las familias te han enviado.</p>
     </header>
 
+    <p v-if="error" class="solicitudes__error">{{ error }}</p>
+
     <div class="solicitudes__grid">
       <SolicitudCard
         v-for="solicitud in solicitudes"
@@ -83,6 +85,16 @@ async function rechazar(id) {
     color: var(--color-text-muted);
     margin-bottom: 24px;
   }
+}
+
+.solicitudes__error {
+  background-color: #fdecea;
+  border: 1px solid #f5c6c0;
+  color: #c0392b;
+  font-size: 0.9rem;
+  padding: 10px 14px;
+  border-radius: var(--radius-input);
+  margin-bottom: 16px;
 }
 
 .solicitudes__grid {
