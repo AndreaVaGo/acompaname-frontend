@@ -207,7 +207,7 @@ Solicitudes recibidas
 |---|---|---|---|
 | ![Mis solicitudes](docs/design/07-solicitudes-familia_escritorio.png) | ![Solicitudes recibidas](docs/design/08-solicitudes-cuidador_escritorio.png) | ![Historial](docs/design/09-historial_escritorio.png) | ![Valorar](docs/design/10-valorar_escritorio.png) |
 
-- **Figma:** <ENLACE_FIGMA>
+- **Figma:** https://www.figma.com/design/iNrrCJOe6CkQXTxhGzK7rj/Acomp%C3%A1%C3%B1ame
 - **Prototipo en Lovable:** https://care-connection-hub-18.lovable.app
 
 ---
@@ -518,7 +518,7 @@ npm run test:unit
 | Repositorio backend | https://github.com/AndreaVaGo/acompaname-backend |
 | Repositorio frontend | https://github.com/AndreaVaGo/acompaname-frontend |
 | Gestión del proyecto (JIRA) | https://saludosalamanecer-1780468848301.atlassian.net/jira/software/projects/ACOM/boards/34/timeline?rangeMode=MONTHS |
-| Diseño en Figma | <ENLACE_FIGMA> |
+| Diseño en Figma | https://www.figma.com/design/iNrrCJOe6CkQXTxhGzK7rj/Acomp%C3%A1%C3%B1ame |
 | Prototipo (Lovable) | https://care-connection-hub-18.lovable.app |
 | Presentación | [docs/presentacion.pdf](docs/presentacion.pdf) |
 
@@ -543,7 +543,7 @@ npm run test:unit
 
 ## 👩‍💻 Autora
 
-**Andrea Vallina González** — Proyecto Final, Bootcamp Desarrollo Web Full Stack, Factoría F5. Proyecto con fines educativos.
+**Andrea Vallina González** — Proyecto Final, Bootcamp Desarrollo Web Full Stack, Factoría F5.
 
 - GitHub: [@AndreaVaGo](https://github.com/AndreaVaGo)
 - LinkedIn: [Andrea Vallina González](https://www.linkedin.com/in/andrea-vallina-gonzalez/)
