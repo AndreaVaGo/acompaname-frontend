@@ -127,6 +127,7 @@ Esta estructura separa claramente responsabilidades: las **vistas** (`views/`) r
 | 11 | ⭐ **Formulario de valoración** | `/valorar/:id` | Puntuación de 1 a 5 estrellas y comentario |
 | 12 | 📥 **Solicitudes recibidas** (Cuidador) | `/solicitudes-cuidador` | Gestión de aceptar/rechazar |
 | 13 | 👤 **Mi perfil** | `/mi-perfil` | Datos de la cuenta |
+| 14 | ✏️ **Editar perfil** (Cuidador) | `/editar-perfil` | Formulario para cambiar especialidad, experiencia, tarifa, descripción y disponibilidad |
 
 Cada vista incluye sus correspondientes estados vacíos (por ejemplo, "Aún no tienes solicitudes") y mensajes de error ante fallos de carga o de envío, para que la interfaz nunca se muestre rota ni en blanco.
 
