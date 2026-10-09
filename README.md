@@ -473,27 +473,53 @@ classDiagram
 
 ## ✅ Tests
 
-El proyecto incluye tests unitarios con Vitest y Vue Test Utils para las vistas y componentes conectados a la API real. Cada test mockea el repositorio correspondiente (`vi.spyOn(Repository.prototype, "metodo")`) en lugar de depender de que el backend esté levantado:
+El proyecto tiene **63 tests unitarios** (Vitest + Vue Test Utils) y **9 tests e2e** (Playwright). Los unitarios mockean el repositorio correspondiente (`vi.spyOn(Repository.prototype, "metodo")`) para no depender de que el backend esté levantado.
 
-- `LoginView`, `RegisterView` — validación de campos y flujo de autenticación
-- `NavBar` — visibilidad de enlaces según el rol activo (Pinia)
-- `SolicitudCard` — renderizado según props
-- `BuscarView`, `MiPerfilView` — carga de datos desde la API
-- `SolicitudesFamiliaView`, `SolicitudesCuidadorView` — gestión de solicitudes
-- `SolicitarServicioView` — validación de campos obligatorios, envío correcto y manejo de errores
-- `PerfilCuidadorView` — visibilidad condicional del botón de solicitud según el rol
-- `ValorarView` — selección de puntuación, envío de valoración y redirección
-- `HistorialView` — filtrado de solicitudes finalizadas y estado de valoración (valorada / pendiente)
+### Tests unitarios
 
-**🎯 Total: 27 tests repartidos en 12 archivos.**
+Están en `src/tests/`, con la misma estructura de carpetas que `src/`:
 
-Para ejecutarlos:
+| Carpeta | Qué comprueba | Tests |
+|---|---|---|
+| `components/` | `AppFooter`, `NavBar` (enlaces según el rol) y `SolicitudCard` | 4 |
+| `stores/` | `AuthStore` (login, logout y rol activo) | 6 |
+| `views/auth/` | `LoginView` y `RegisterView` | 2 |
+| `views/comun/` | `LandingView`, `HistorialView` y `MiPerfilView` | 10 |
+| `views/cuidador/` | `EditarPerfilView` y `SolicitudesCuidadorView` (aceptar, rechazar y errores) | 12 |
+| `views/familia/` | `BuscarView`, `PerfilCuidadorView`, `SolicitarServicioView`, `SolicitudesFamiliaView`, `ConfirmacionView`, `CheckoutView` y `ValorarView` | 29 |
 
 ```bash
 npm run test:unit
 ```
 
 ![Resultado de los tests del frontend](docs/screenshots/tests-frontend.png)
+
+### Cobertura
+
+La cobertura se mide con `@vitest/coverage-v8`. Se genera el informe en la carpeta `coverage/` (abre `coverage/index.html` en el navegador).
+
+```bash
+npm run test:coverage
+```
+
+Resultado actual: **79 % de líneas**, **86 % de ramas** y **79 % de sentencias**, por encima del 70 % mínimo que se pedía.
+
+![Cobertura de los tests del frontend](docs/screenshots/cobertura-frontend.png)
+
+### Tests e2e (Playwright)
+
+Los tests e2e abren un navegador de verdad y usan la aplicación completa, así que **necesitan el backend arrancado** (con su base de datos). El frontend lo arranca Playwright si no está en marcha.
+
+- `registro-login.spec.js` (5): registrarse, iniciar sesión, contraseña incorrecta, email repetido y cerrar sesión.
+- `flujo-solicitud.spec.js` (1): la familia solicita un servicio, el cuidador lo acepta y la familia paga.
+- `visitante.spec.js` (3): un visitante ve los cuidadores y las rutas privadas lo mandan al login.
+
+```bash
+npm run test:e2e
+```
+
+![Login e2e](docs/screenshots/e2e-01-login.png)
+![Buscar cuidadores e2e](docs/screenshots/e2e-05-buscar.png)
 
 ---
 
@@ -505,6 +531,7 @@ npm run test:unit
 - 🧭 Vue Router
 - ⚡ Vite
 - ✅ Vitest + Vue Test Utils
+- 🎭 Playwright (tests e2e)
 - 📮 Postman (pruebas de integración con el backend)
 - 🗄️ DBeaver (inspección de la base de datos durante el desarrollo)
 - 📋 JIRA (gestión del proyecto)
