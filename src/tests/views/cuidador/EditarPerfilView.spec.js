@@ -2,6 +2,11 @@ import { describe, test, expect, vi, afterEach } from "vitest";
 import { mount } from "@vue/test-utils";
 import EditarPerfilView from "../../../views/cuidador/EditarPerfilView.vue";
 import CuidadorRepository from "../../../repositories/CuidadorRepository";
+import { reducirImagen } from "../../../utils/reducirImagen";
+
+vi.mock("../../../utils/reducirImagen", () => ({
+  reducirImagen: vi.fn(),
+}));
 
 const perfil = {
   id: 3,
@@ -21,6 +26,16 @@ async function montarVista() {
   return wrapper;
 }
 
+async function elegirArchivo(wrapper, archivo) {
+  const input = wrapper.find("#foto");
+  Object.defineProperty(input.element, "files", {
+    value: [archivo],
+    configurable: true,
+  });
+  await input.trigger("change");
+  await new Promise((resolve) => setTimeout(resolve, 0));
+}
+
 async function enviar(wrapper) {
   await wrapper.find("form").trigger("submit.prevent");
   await new Promise((resolve) => setTimeout(resolve, 0));
@@ -29,6 +44,7 @@ async function enviar(wrapper) {
 describe("EditarPerfilView", () => {
   afterEach(() => {
     vi.restoreAllMocks();
+    reducirImagen.mockReset();
   });
 
   test("carga el perfil del cuidador en el formulario", async () => {
@@ -143,33 +159,80 @@ describe("EditarPerfilView", () => {
 
     const wrapper = await montarVista();
 
-    expect(wrapper.find("#foto").element.value).toBe(
-      "https://ejemplo.com/foto.jpg"
-    );
     expect(wrapper.find("img").attributes("src")).toBe(
       "https://ejemplo.com/foto.jpg"
     );
   });
 
-  test("guarda el enlace de la foto nueva", async () => {
+  test("guarda la foto elegida desde el ordenador", async () => {
     vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue(
       perfil
     );
     const updateSpy = vi
       .spyOn(CuidadorRepository.prototype, "update")
       .mockResolvedValue({});
+    reducirImagen.mockResolvedValue("data:image/jpeg;base64,AAAA");
 
     const wrapper = await montarVista();
-    await wrapper.find("#foto").setValue("https://ejemplo.com/nueva.jpg");
+    await elegirArchivo(wrapper, { type: "image/png", name: "foto.png" });
+
+    expect(wrapper.find("img").attributes("src")).toBe(
+      "data:image/jpeg;base64,AAAA"
+    );
+
     await enviar(wrapper);
 
     expect(updateSpy).toHaveBeenCalledWith(
       3,
-      expect.objectContaining({ foto: "https://ejemplo.com/nueva.jpg" })
+      expect.objectContaining({ foto: "data:image/jpeg;base64,AAAA" })
     );
   });
 
-  test("sin foto muestra la inicial del nombre", async () => {
+  test("avisa si el archivo elegido no es una imagen", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue(
+      perfil
+    );
+
+    const wrapper = await montarVista();
+    await elegirArchivo(wrapper, { type: "application/pdf", name: "a.pdf" });
+
+    expect(wrapper.text()).toContain("Elige un archivo de imagen.");
+    expect(reducirImagen).not.toHaveBeenCalled();
+  });
+
+  test("avisa si no se puede cargar la imagen", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue(
+      perfil
+    );
+    reducirImagen.mockRejectedValue(new Error("fallo"));
+
+    const wrapper = await montarVista();
+    await elegirArchivo(wrapper, { type: "image/png", name: "foto.png" });
+
+    expect(wrapper.text()).toContain("No se pudo cargar la imagen.");
+  });
+
+  test("quitar la foto guarda el perfil sin foto", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue({
+      ...perfil,
+      foto: "data:image/jpeg;base64,AAAA",
+    });
+    const updateSpy = vi
+      .spyOn(CuidadorRepository.prototype, "update")
+      .mockResolvedValue({});
+
+    const wrapper = await montarVista();
+    await wrapper.find("#quitar-foto").trigger("click");
+    await enviar(wrapper);
+
+    expect(wrapper.find("img").exists()).toBe(false);
+    expect(updateSpy).toHaveBeenCalledWith(
+      3,
+      expect.objectContaining({ foto: null })
+    );
+  });
+
+  test("sin foto muestra el monigote", async () => {
     vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue(
       perfil
     );
@@ -177,7 +240,8 @@ describe("EditarPerfilView", () => {
     const wrapper = await montarVista();
 
     expect(wrapper.find("img").exists()).toBe(false);
-    expect(wrapper.text()).toContain("P");
+    expect(wrapper.find(".foto-cuidador--sin-foto").exists()).toBe(true);
+    expect(wrapper.find("#quitar-foto").exists()).toBe(false);
   });
 
   test("muestra error si falla el guardado", async () => {
