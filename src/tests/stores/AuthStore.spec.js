@@ -61,6 +61,24 @@ describe("auth store", () => {
     expect(sessionStorage.getItem("credenciales")).toBeNull();
   });
 
+  test("setFoto guarda la foto en el store", () => {
+    const store = useAuthStore();
+
+    store.setFoto("data:image/jpeg;base64,AAAA");
+
+    expect(store.foto).toBe("data:image/jpeg;base64,AAAA");
+  });
+
+  test("logout borra la foto", () => {
+    const store = useAuthStore();
+    store.login(5, "ana@test.com", "12345678", "CUIDADOR");
+    store.setFoto("data:image/jpeg;base64,AAAA");
+
+    store.logout();
+
+    expect(store.foto).toBe("");
+  });
+
   test("recupera la sesión desde sessionStorage al recargar la página", () => {
     sessionStorage.setItem("id", "8");
     sessionStorage.setItem("email", "pepe@test.com");
