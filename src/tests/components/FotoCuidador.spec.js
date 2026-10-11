@@ -13,16 +13,17 @@ describe("FotoCuidador", () => {
     expect(imagen.attributes("src")).toBe("https://ejemplo.com/foto.jpg");
   });
 
-  test("muestra la inicial si no hay foto", () => {
+  test("muestra el monigote si no hay foto", () => {
     const wrapper = mount(FotoCuidador, {
       props: { foto: "", nombre: "ana" },
     });
 
     expect(wrapper.find("img").exists()).toBe(false);
-    expect(wrapper.text()).toBe("A");
+    expect(wrapper.find(".foto-cuidador--sin-foto").exists()).toBe(true);
+    expect(wrapper.find("svg").exists()).toBe(true);
   });
 
-  test("muestra la inicial si la foto no carga", async () => {
+  test("muestra el monigote si la foto no carga", async () => {
     const wrapper = mount(FotoCuidador, {
       props: { foto: "https://ejemplo.com/rota.jpg", nombre: "Pepe" },
     });
@@ -30,7 +31,7 @@ describe("FotoCuidador", () => {
     await wrapper.find("img").trigger("error");
 
     expect(wrapper.find("img").exists()).toBe(false);
-    expect(wrapper.text()).toBe("P");
+    expect(wrapper.find(".foto-cuidador--sin-foto").exists()).toBe(true);
   });
 
   test("vuelve a probar con la foto nueva después de un fallo", async () => {
