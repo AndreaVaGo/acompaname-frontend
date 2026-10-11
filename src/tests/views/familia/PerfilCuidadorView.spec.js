@@ -77,7 +77,7 @@ describe("PerfilCuidadorView", () => {
     );
   });
 
-  test("muestra la inicial si el cuidador no tiene foto", async () => {
+  test("muestra el monigote si el cuidador no tiene foto", async () => {
     vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
       usuarioNombre: "Pepe",
       especialidad: "Geriatría",
@@ -90,7 +90,7 @@ describe("PerfilCuidadorView", () => {
     const wrapper = await montarVista("FAMILIA");
 
     expect(wrapper.find("img").exists()).toBe(false);
-    expect(wrapper.find(".foto-cuidador--inicial").text()).toBe("P");
+    expect(wrapper.find(".foto-cuidador--sin-foto").exists()).toBe(true);
   });
 
   test("muestra un mensaje de error si falla la carga", async () => {
