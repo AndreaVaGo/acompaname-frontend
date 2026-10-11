@@ -165,7 +165,7 @@ Cada vista incluye sus correspondientes estados vacíos (por ejemplo, "Aún no t
 
 El desarrollo siguió un enfoque iterativo: primero se construyó la estructura HTML de cada vista con datos de ejemplo, después se aplicaron los estilos comparando visualmente con el prototipo de diseño, posteriormente se refactorizó el CSS a BEM con variables globales, y finalmente se sustituyeron los datos de ejemplo por llamadas reales a la API REST a través del Repository Pattern, una vez que el backend estuvo disponible.
 
-La gestión del proyecto se organizó en **JIRA** (proyecto <mark>ACOM</mark>) con 8 épicas, 19 historias de usuario redactadas con criterios de aceptación en formato Gherkin (Given/When/Then), 35 tareas técnicas y 5 sprints entre agosto y octubre de 2026. El control de versiones se llevó con commits descriptivos en inglés, agrupados por unidad funcional (una vista, un bloque de responsive, un refactor concreto, un archivo de test).
+La gestión del proyecto se organizó en **JIRA** (proyecto <mark>ACOM</mark>) con 8 épicas, 19 historias de usuario redactadas con criterios de aceptación en formato Gherkin (Given/When/Then), 39 tareas técnicas y 5 sprints entre agosto y octubre de 2026. El control de versiones se llevó con commits descriptivos en inglés, agrupados por unidad funcional (una vista, un bloque de responsive, un refactor concreto, un archivo de test).
 
 🔗 Tablero de JIRA: https://saludosalamanecer-1780468848301.atlassian.net/jira/software/projects/ACOM/boards/34/timeline?rangeMode=MONTHS
 
