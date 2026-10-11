@@ -127,6 +127,8 @@ defineProps([
 
   & .btn {
     flex: 1;
+    text-align: center;
+    text-decoration: none;
   }
 }
 </style>
