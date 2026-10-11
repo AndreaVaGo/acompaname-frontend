@@ -130,8 +130,54 @@ describe("EditarPerfilView", () => {
       tieneVehiculo: true,
       disponibleAhora: true,
       usuarioId: 8,
+      foto: null,
     });
     expect(wrapper.text()).toContain("Perfil guardado correctamente.");
+  });
+
+  test("carga la foto del perfil en el formulario", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue({
+      ...perfil,
+      foto: "https://ejemplo.com/foto.jpg",
+    });
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.find("#foto").element.value).toBe(
+      "https://ejemplo.com/foto.jpg"
+    );
+    expect(wrapper.find("img").attributes("src")).toBe(
+      "https://ejemplo.com/foto.jpg"
+    );
+  });
+
+  test("guarda el enlace de la foto nueva", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue(
+      perfil
+    );
+    const updateSpy = vi
+      .spyOn(CuidadorRepository.prototype, "update")
+      .mockResolvedValue({});
+
+    const wrapper = await montarVista();
+    await wrapper.find("#foto").setValue("https://ejemplo.com/nueva.jpg");
+    await enviar(wrapper);
+
+    expect(updateSpy).toHaveBeenCalledWith(
+      3,
+      expect.objectContaining({ foto: "https://ejemplo.com/nueva.jpg" })
+    );
+  });
+
+  test("sin foto muestra la inicial del nombre", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue(
+      perfil
+    );
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.find("img").exists()).toBe(false);
+    expect(wrapper.text()).toContain("P");
   });
 
   test("muestra error si falla el guardado", async () => {
