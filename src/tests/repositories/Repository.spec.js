@@ -1,18 +1,16 @@
 import { describe, test, expect, vi, afterEach } from "vitest";
 import Repository from "../../repositories/Repository";
 
-function simularFetch(respuesta, ok = true) {
-  const fetchFalso = vi.fn().mockResolvedValue({
+function prepararFetch(respuesta, ok = true) {
+  return vi.spyOn(globalThis, "fetch").mockResolvedValue({
     ok: ok,
     json: async () => respuesta,
   });
-  vi.stubGlobal("fetch", fetchFalso);
-  return fetchFalso;
 }
 
 describe("Repository", () => {
   afterEach(() => {
-    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
     sessionStorage.clear();
   });
 
@@ -35,7 +33,7 @@ describe("Repository", () => {
   });
 
   test("get pide la ruta y devuelve el JSON", async () => {
-    const fetchFalso = simularFetch([{ id: 1 }]);
+    const fetchFalso = prepararFetch([{ id: 1 }]);
     const repository = new Repository("http://prueba");
 
     const resultado = await repository.get("/cosas");
@@ -45,16 +43,21 @@ describe("Repository", () => {
   });
 
   test("get lanza un error si la respuesta no es correcta", async () => {
-    simularFetch({}, false);
+    prepararFetch({}, false);
     const repository = new Repository("http://prueba");
 
-    await expect(repository.get("/cosas")).rejects.toThrow(
-      "Error en la petición GET"
-    );
+    let mensaje = "";
+    try {
+      await repository.get("/cosas");
+    } catch (error) {
+      mensaje = error.message;
+    }
+
+    expect(mensaje).toBe("Error en la petición GET");
   });
 
   test("post envía los datos con POST", async () => {
-    const fetchFalso = simularFetch({ id: 2 });
+    const fetchFalso = prepararFetch({ id: 2 });
     const repository = new Repository("http://prueba");
     const datos = { nombre: "Ana" };
 
@@ -66,16 +69,21 @@ describe("Repository", () => {
   });
 
   test("post lanza un error si la respuesta no es correcta", async () => {
-    simularFetch({}, false);
+    prepararFetch({}, false);
     const repository = new Repository("http://prueba");
 
-    await expect(repository.post("/cosas", {})).rejects.toThrow(
-      "Error en la petición POST"
-    );
+    let mensaje = "";
+    try {
+      await repository.post("/cosas", {});
+    } catch (error) {
+      mensaje = error.message;
+    }
+
+    expect(mensaje).toBe("Error en la petición POST");
   });
 
   test("put envía los datos con PUT", async () => {
-    const fetchFalso = simularFetch({ id: 3 });
+    const fetchFalso = prepararFetch({ id: 3 });
     const repository = new Repository("http://prueba");
     const datos = { nombre: "Luis" };
 
@@ -87,16 +95,21 @@ describe("Repository", () => {
   });
 
   test("put lanza un error si la respuesta no es correcta", async () => {
-    simularFetch({}, false);
+    prepararFetch({}, false);
     const repository = new Repository("http://prueba");
 
-    await expect(repository.put("/cosas/3", {})).rejects.toThrow(
-      "Error en la petición PUT"
-    );
+    let mensaje = "";
+    try {
+      await repository.put("/cosas/3", {});
+    } catch (error) {
+      mensaje = error.message;
+    }
+
+    expect(mensaje).toBe("Error en la petición PUT");
   });
 
   test("delete llama a la ruta con DELETE", async () => {
-    const fetchFalso = simularFetch({});
+    const fetchFalso = prepararFetch({});
     const repository = new Repository("http://prueba");
 
     await repository.delete("/cosas/3");
@@ -106,11 +119,16 @@ describe("Repository", () => {
   });
 
   test("delete lanza un error si la respuesta no es correcta", async () => {
-    simularFetch({}, false);
+    prepararFetch({}, false);
     const repository = new Repository("http://prueba");
 
-    await expect(repository.delete("/cosas/3")).rejects.toThrow(
-      "Error en la petición DELETE"
-    );
+    let mensaje = "";
+    try {
+      await repository.delete("/cosas/3");
+    } catch (error) {
+      mensaje = error.message;
+    }
+
+    expect(mensaje).toBe("Error en la petición DELETE");
   });
 });
