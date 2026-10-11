@@ -7,6 +7,8 @@ export const useAuthStore = defineStore('auth', () => {
   const rol = ref(sessionStorage.getItem('rol') || '')
   const credenciales = ref(sessionStorage.getItem('credenciales') || '')
   const estaAutenticado = ref(!!sessionStorage.getItem('credenciales'))
+  // La foto no se guarda en sessionStorage porque puede ser grande
+  const foto = ref('')
 
   function login(idUsuario, emailUsuario, passwordUsuario, rolUsuario) {
     id.value = idUsuario
@@ -21,12 +23,17 @@ export const useAuthStore = defineStore('auth', () => {
     sessionStorage.setItem('credenciales', credenciales.value)
   }
 
+  function setFoto(nuevaFoto) {
+    foto.value = nuevaFoto
+  }
+
   function logout() {
     id.value = ''
     email.value = ''
     rol.value = ''
     credenciales.value = ''
     estaAutenticado.value = false
+    foto.value = ''
 
     sessionStorage.removeItem('id')
     sessionStorage.removeItem('email')
@@ -34,5 +41,15 @@ export const useAuthStore = defineStore('auth', () => {
     sessionStorage.removeItem('credenciales')
   }
 
-  return { id, email, rol, credenciales, estaAutenticado, login, logout }
+  return {
+    id,
+    email,
+    rol,
+    credenciales,
+    estaAutenticado,
+    foto,
+    login,
+    setFoto,
+    logout,
+  }
 })
