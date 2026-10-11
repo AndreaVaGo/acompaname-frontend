@@ -2,9 +2,12 @@
 import { ref, onMounted } from "vue";
 import SolicitudCard from "../../components/SolicitudCard.vue";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
+import PagoRepository from "@/repositories/PagoRepository";
 
 const solicitudRepository = new SolicitudRepository();
+const pagoRepository = new PagoRepository();
 const solicitudes = ref([]);
+const idsPagados = ref([]);
 const cargando = ref(true);
 const error = ref("");
 
@@ -15,6 +18,16 @@ onMounted(async () => {
     error.value = "No se pudieron cargar tus solicitudes.";
   } finally {
     cargando.value = false;
+  }
+
+  // Si falla la carga de pagos, la lista se ve igual y solo no marca ninguno como pagado
+  try {
+    const pagos = await pagoRepository.getMisPagos();
+    idsPagados.value = pagos
+      .filter((pago) => pago.estado === "COMPLETADO")
+      .map((pago) => pago.solicitudId);
+  } catch (err) {
+    idsPagados.value = [];
   }
 });
 </script>
@@ -33,6 +46,7 @@ onMounted(async () => {
         :solicitud="solicitud"
         :nombreMostrado="solicitud.cuidadorNombre"
         :mostrarAcciones="false"
+        :pagado="idsPagados.includes(solicitud.id)"
       />
     </div>
   </div>
