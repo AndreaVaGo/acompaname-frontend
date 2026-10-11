@@ -509,7 +509,7 @@ La cobertura se mide con <mark>@vitest/coverage-v8</mark>. Se genera el informe 
 npm run test:coverage
 ```
 
-Resultado actual: **79 % de líneas**, **86 % de ramas** y **79 % de sentencias**, por encima del 70 % mínimo que se pedía.
+Resultado actual: **78 % de líneas**, **88 % de ramas** y **77 % de sentencias**, por encima del 70 % mínimo que se pedía.
 
 ![Cobertura de los tests del frontend](docs/screenshots/cobertura-frontend.png)
 
