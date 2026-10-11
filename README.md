@@ -178,38 +178,38 @@ Proceso de diseño: **bocetos → wireframes → mockups → prototipo**, pensad
 
 ### ✏️ Bocetos iniciales
 
-Landing
+**<ins>Landing</ins>**
 ![boceto-landing](./src/assets/boceto_landing.png)
 
-Registro
+**<ins>Registro</ins>**
 ![boceto-registro](./src/assets/boceto_registro.png)
 
-Buscar cuidadores
+**<ins>Buscar cuidadores</ins>**
 ![boceto-buscar](./src/assets/boceto_buscar.png)
 
-Perfil de cuidador (vista Familia)
+**<ins>Perfil de cuidador (vista Familia)</ins>**
 ![boceto-perfil-familia](./src/assets/boceto_perfil_familia.png)
 
-Perfil de cuidador (vista Cuidador)
+**<ins>Perfil de cuidador (vista Cuidador)</ins>**
 ![boceto-perfil-cuidador](./src/assets/boceto_perfil_cuidador_rol.png)
 
-Solicitar servicio
+**<ins>Solicitar servicio</ins>**
 ![boceto-solicitar](./src/assets/boceto_solicitar.png)
 
-Solicitudes recibidas
+**<ins>Solicitudes recibidas</ins>**
 ![boceto-solicitudes](./src/assets/boceto_solicitudes_cuidador.png)
 
 ### 🖼️ Mockups (escritorio)
 
-| Landing | Login | Registro |
+| <ins>Landing</ins> | <ins>Login</ins> | <ins>Registro</ins> |
 |---|---|---|
 | ![Landing](docs/design/01-landing_escritorio.png) | ![Login](docs/design/02-login_escritorio.png) | ![Registro](docs/design/03-registro_escritorio.png) |
 
-| Buscar | Perfil del cuidador | Solicitar |
+| <ins>Buscar</ins> | <ins>Perfil del cuidador</ins> | <ins>Solicitar</ins> |
 |---|---|---|
 | ![Buscar](docs/design/04-buscar_escritorio.png) | ![Perfil](docs/design/05-perfil-cuidador_escritorio.png) | ![Solicitar](docs/design/06-solicitar_escritorio.png) |
 
-| Mis solicitudes | Solicitudes recibidas | Historial | Valorar |
+| <ins>Mis solicitudes</ins> | <ins>Solicitudes recibidas</ins> | <ins>Historial</ins> | <ins>Valorar</ins> |
 |---|---|---|---|
 | ![Mis solicitudes](docs/design/07-solicitudes-familia_escritorio.png) | ![Solicitudes recibidas](docs/design/08-solicitudes-cuidador_escritorio.png) | ![Historial](docs/design/09-historial_escritorio.png) | ![Valorar](docs/design/10-valorar_escritorio.png) |
 
@@ -222,25 +222,25 @@ Solicitudes recibidas
 
 Capturas de la aplicación en funcionamiento (vista de escritorio, salvo la última).
 
-Landing
+**<ins>Landing</ins>**
 ![landing](docs/screenshots/landing.png)
 
-Login
+**<ins>Login</ins>**
 ![login](docs/screenshots/login.png)
 
-Registro (rol cuidador)
+**<ins>Registro (rol cuidador)</ins>**
 ![registro](docs/screenshots/registro.png)
 
-Buscar cuidadores
+**<ins>Buscar cuidadores</ins>**
 ![buscar](docs/screenshots/buscar.png)
 
-Solicitar servicio
+**<ins>Solicitar servicio</ins>**
 ![solicitar](docs/screenshots/solicitar.png)
 
-Solicitudes recibidas (cuidador)
+**<ins>Solicitudes recibidas (cuidador)</ins>**
 ![solicitudes-cuidador](docs/screenshots/solicitudes-cuidador.png)
 
-Registro en vista móvil (responsive, 768px)
+**<ins>Registro en vista móvil (responsive, 768px)</ins>**
 ![registro-movil](docs/screenshots/registro-movil.png)
 
 ---
@@ -329,7 +329,7 @@ flowchart LR
 
 ### Casos de uso
 
-| Visitante | Familia | Cuidador |
+| <ins>Visitante</ins> | <ins>Familia</ins> | <ins>Cuidador</ins> |
 |---|---|---|
 | ![Visitante](docs/diagrams/casos-visitante.png) | ![Familia](docs/diagrams/casos-familia.png) | ![Cuidador](docs/diagrams/casos-cuidador.png) |
 
