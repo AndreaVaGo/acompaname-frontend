@@ -6,10 +6,10 @@ export default class UsuarioRepository extends Repository {
   }
 
   async getById(id) {
-    return this.getById(`/usuarios/${id}`);
+    return this.get(`/usuarios/${id}`);
   }
 
   async update(id, usuarioData) {
-    return this.update(`/usuarios/${id}`, usuarioData);
+    return this.put(`/usuarios/${id}`, usuarioData);
   }
 }
