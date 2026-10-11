@@ -7,25 +7,30 @@ import ValoracionRepository from "@/repositories/ValoracionRepository";
 const solicitudRepository = new SolicitudRepository();
 const valoracionRepository = new ValoracionRepository();
 const historial = ref([]);
+const error = ref("");
 
 onMounted(async () => {
-  const todas = await solicitudRepository.getMisSolicitudes();
-  const valoraciones = await valoracionRepository.getAll();
-  const idsValorados = valoraciones.map((v) => v.solicitudId);
+  try {
+    const todas = await solicitudRepository.getMisSolicitudes();
+    const valoraciones = await valoracionRepository.getAll();
+    const idsValorados = valoraciones.map((v) => v.solicitudId);
 
-  historial.value = todas
-    .filter((s) => s.estado === "COMPLETADA" || s.estado === "RECHAZADA")
-    .map((s) => ({
-      id: s.id,
-      nombre: s.cuidadorNombre,
-      paciente: s.nombrePaciente,
-      edad: s.edadPaciente,
-      tipoCuidado: s.tipoCuidado,
-      fechaInicio: s.fechaCuidado,
-      notas: s.notas,
-      estado: s.estado.toLowerCase(),
-      valorada: idsValorados.includes(s.id),
-    }));
+    historial.value = todas
+      .filter((s) => s.estado === "COMPLETADA" || s.estado === "RECHAZADA")
+      .map((s) => ({
+        id: s.id,
+        nombre: s.cuidadorNombre,
+        paciente: s.nombrePaciente,
+        edad: s.edadPaciente,
+        tipoCuidado: s.tipoCuidado,
+        fechaInicio: s.fechaCuidado,
+        notas: s.notas,
+        estado: s.estado.toLowerCase(),
+        valorada: idsValorados.includes(s.id),
+      }));
+  } catch (err) {
+    error.value = "No se pudo cargar tu historial.";
+  }
 });
 
 function textoEstado(estado) {
@@ -41,6 +46,8 @@ function textoEstado(estado) {
       <h1>Historial de solicitudes</h1>
       <p>El estado final de cada acompañamiento que has gestionado.</p>
     </header>
+
+    <p v-if="error" class="historial__error">{{ error }}</p>
 
     <div class="historial__grid" v-if="historial.length">
       <div class="historial__card" v-for="item in historial" :key="item.id">
@@ -78,7 +85,7 @@ function textoEstado(estado) {
       </div>
     </div>
 
-    <p class="historial__empty" v-else>
+    <p class="historial__empty" v-else-if="!error">
       Aún no tienes solicitudes en tu historial.
     </p>
   </div>
@@ -174,6 +181,15 @@ function textoEstado(estado) {
   color: var(--color-secondary);
   font-weight: bold;
   font-size: 0.9rem;
+}
+
+.historial__error {
+  background-color: #fdecea;
+  border: 1px solid #f5c6c0;
+  color: #c0392b;
+  font-size: 0.9rem;
+  padding: 10px 14px;
+  border-radius: var(--radius-input);
 }
 
 .historial__empty {
