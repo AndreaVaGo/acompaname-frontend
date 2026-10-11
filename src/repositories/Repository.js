@@ -1,3 +1,5 @@
+export const API_URL = "http://localhost:8080/api/v1"
+
 export default class Repository {
   constructor(uri) {
     this.uri = uri
