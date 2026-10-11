@@ -4,6 +4,7 @@ import { useRoute } from "vue-router";
 import { useAuthStore } from "../../stores/auth";
 import { RouterLink } from "vue-router";
 import CuidadorRepository from "@/repositories/CuidadorRepository";
+import FotoCuidador from "@/components/FotoCuidador.vue";
 
 const route = useRoute();
 const cuidadorId = route.params.id;
@@ -32,9 +33,11 @@ onMounted(async () => {
     <div class="perfil__main">
       <div class="perfil__info">
         <div class="perfil__cabecera">
-          <span class="perfil__avatar">{{
-            cuidador.usuarioNombre.charAt(0).toUpperCase()
-          }}</span>
+          <FotoCuidador
+            :foto="cuidador.foto"
+            :nombre="cuidador.usuarioNombre"
+            :tamano="80"
+          />
           <div>
             <h1>{{ cuidador.usuarioNombre }}</h1>
             <span class="perfil__tag">{{ cuidador.especialidad }}</span>
@@ -139,20 +142,6 @@ onMounted(async () => {
   & h1 {
     margin: 0 0 6px;
   }
-}
-
-.perfil__avatar {
-  background-color: var(--color-accent-bg);
-  color: var(--color-accent);
-  width: 64px;
-  height: 64px;
-  min-width: 64px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 1.6rem;
 }
 
 .perfil__tag {
