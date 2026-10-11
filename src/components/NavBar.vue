@@ -14,7 +14,6 @@ const usuarioRepository = new UsuarioRepository();
 
 const menuAbierto = ref(false);
 const nombre = ref("");
-const foto = ref("");
 
 const esPantallaAcceso = computed(
   () => route.path === "/login" || route.path === "/registro",
@@ -32,7 +31,6 @@ const tipoCuenta = computed(() =>
 async function cargarDatosCuenta() {
   if (!authStore.estaAutenticado) {
     nombre.value = "";
-    foto.value = "";
     return;
   }
 
@@ -42,7 +40,7 @@ async function cargarDatosCuenta() {
 
     if (authStore.rol === "CUIDADOR") {
       const perfil = await cuidadorRepository.getMiPerfil();
-      foto.value = perfil.foto || "";
+      authStore.setFoto(perfil.foto || "");
     }
   } catch (err) {
     console.error("No se pudieron cargar los datos de tu cuenta", err);
@@ -141,7 +139,7 @@ function irAMiPerfil() {
         >
           <FotoCuidador
             v-if="authStore.rol === 'CUIDADOR'"
-            :foto="foto"
+            :foto="authStore.foto"
             :nombre="nombre"
             :tamano="40"
           />
