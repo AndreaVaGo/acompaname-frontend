@@ -3,8 +3,10 @@ import { ref, onMounted } from "vue";
 import CuidadorRepository from "@/repositories/CuidadorRepository";
 import FotoCuidador from "@/components/FotoCuidador.vue";
 import { reducirImagen } from "@/utils/reducirImagen";
+import { useAuthStore } from "@/stores/auth";
 
 const cuidadorRepository = new CuidadorRepository();
+const authStore = useAuthStore();
 
 const perfil = ref(null);
 const especialidad = ref("");
@@ -86,6 +88,8 @@ async function guardar() {
       usuarioId: perfil.value.usuarioId,
       foto: foto.value.trim() || null,
     });
+    // Así el círculo del menú de arriba cambia al momento
+    authStore.setFoto(foto.value);
     guardado.value = true;
   } catch (err) {
     error.value = "No se pudo guardar tu perfil. Revisa los datos.";
