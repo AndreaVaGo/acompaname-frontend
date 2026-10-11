@@ -59,6 +59,40 @@ describe("PerfilCuidadorView", () => {
     expect(wrapper.text()).toContain("Geriatría");
   });
 
+  test("muestra la foto del cuidador si la tiene", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
+      usuarioNombre: "Pepe",
+      especialidad: "Geriatría",
+      anosExperiencia: 4,
+      tarifaHora: 18,
+      disponibleAhora: true,
+      bio: "Cuidador con experiencia",
+      foto: "https://ejemplo.com/pepe.jpg",
+    });
+
+    const wrapper = await montarVista("FAMILIA");
+
+    expect(wrapper.find("img").attributes("src")).toBe(
+      "https://ejemplo.com/pepe.jpg"
+    );
+  });
+
+  test("muestra la inicial si el cuidador no tiene foto", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
+      usuarioNombre: "Pepe",
+      especialidad: "Geriatría",
+      anosExperiencia: 4,
+      tarifaHora: 18,
+      disponibleAhora: true,
+      bio: "Cuidador con experiencia",
+    });
+
+    const wrapper = await montarVista("FAMILIA");
+
+    expect(wrapper.find("img").exists()).toBe(false);
+    expect(wrapper.find(".foto-cuidador--inicial").text()).toBe("P");
+  });
+
   test("muestra un mensaje de error si falla la carga", async () => {
     vi.spyOn(CuidadorRepository.prototype, "getById").mockRejectedValue(
       new Error("fallo")
