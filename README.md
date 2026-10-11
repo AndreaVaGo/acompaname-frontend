@@ -8,7 +8,7 @@ Este repositorio contiene la **aplicación web** del proyecto, desarrollada con 
 
 Proyecto final del bootcamp de Desarrollo Web Full Stack (850h) en **Factoría F5 — Digital Academy**.
 
-![Vue](https://img.shields.io/badge/Vue-3-42b883) ![Vite](https://img.shields.io/badge/Vite-8-646CFF) ![Pinia](https://img.shields.io/badge/Pinia-estado-yellow) ![Vitest](https://img.shields.io/badge/tests-27-success) ![Responsive](https://img.shields.io/badge/responsive-768px-blue)
+![Vue](https://img.shields.io/badge/Vue-3-42b883) ![Vite](https://img.shields.io/badge/Vite-8-646CFF) ![Pinia](https://img.shields.io/badge/Pinia-estado-yellow) ![Vitest](https://img.shields.io/badge/tests-82-success) ![Responsive](https://img.shields.io/badge/responsive-768px-blue)
 
 ---
 
@@ -99,13 +99,14 @@ La aplicación quedará disponible en <mark>http://localhost:5173</mark> 🎉.
 ```
 src/
 ├── assets/          Imágenes, bocetos y diagramas
-├── components/      NavBar, SolicitudCard (reutilizables)
+├── components/      NavBar, SolicitudCard, FotoCuidador (reutilizables)
 ├── pinia/           Configuración de Pinia
 ├── repositories/    Auth, Cuidador, Role, Solicitud, Usuario, Valoracion + Repository base
 ├── router/          Definición de rutas
 ├── stores/          auth.js (estado de sesión)
 ├── styles/          variables.css, base.css, style.css
 ├── tests/           Tests de componentes y vistas
+├── utils/           reducirImagen.js (reduce las fotos antes de subirlas)
 ├── views/           Una vista por pantalla
 ├── App.vue
 └── main.js
@@ -132,7 +133,7 @@ Esta estructura separa claramente responsabilidades: las **vistas** (<mark>views
 | 11 | ⭐ **Formulario de valoración** | <mark>/valorar/:id</mark> | Puntuación de 1 a 5 estrellas y comentario |
 | 12 | 📥 **Solicitudes recibidas** (Cuidador) | <mark>/solicitudes-cuidador</mark> | Gestión de aceptar/rechazar |
 | 13 | 👤 **Mi perfil** | <mark>/mi-perfil</mark> | Datos de la cuenta |
-| 14 | ✏️ **Editar perfil** (Cuidador) | <mark>/editar-perfil</mark> | Formulario para cambiar especialidad, experiencia, tarifa, descripción y disponibilidad |
+| 14 | ✏️ **Editar perfil** (Cuidador) | <mark>/editar-perfil</mark> | Formulario para cambiar la foto (se elige desde el ordenador), especialidad, experiencia, tarifa, descripción y disponibilidad |
 
 Cada vista incluye sus correspondientes estados vacíos (por ejemplo, "Aún no tienes solicitudes") y mensajes de error ante fallos de carga o de envío, para que la interfaz nunca se muestre rota ni en blanco.
 
@@ -479,7 +480,7 @@ classDiagram
 
 ## ✅ Tests
 
-El proyecto tiene **63 tests unitarios** (Vitest + Vue Test Utils) y **9 tests e2e** (Playwright). Los unitarios mockean el repositorio correspondiente (<mark>vi.spyOn(Repository.prototype, "metodo")</mark>) para no depender de que el backend esté levantado.
+El proyecto tiene **82 tests unitarios** (Vitest + Vue Test Utils) y **9 tests e2e** (Playwright). Los unitarios mockean el repositorio correspondiente (<mark>vi.spyOn(Repository.prototype, "metodo")</mark>) para no depender de que el backend esté levantado.
 
 ### Tests unitarios
 
@@ -487,12 +488,12 @@ Están en <mark>src/tests/</mark>, con la misma estructura de carpetas que <mark
 
 | Carpeta | Qué comprueba | Tests |
 |---|---|---|
-| 🧱 <mark>components/</mark> | <mark>AppFooter</mark>, <mark>NavBar</mark> (enlaces según el rol) y <mark>SolicitudCard</mark> | 4 |
-| 🍍 <mark>stores/</mark> | <mark>AuthStore</mark> (login, logout y rol activo) | 6 |
+| 🧱 <mark>components/</mark> | <mark>AppFooter</mark>, <mark>NavBar</mark> (enlaces, nombre y foto), <mark>FotoCuidador</mark> y <mark>SolicitudCard</mark> | 11 |
+| 🍍 <mark>stores/</mark> | <mark>AuthStore</mark> (login, logout, rol activo y foto) | 8 |
 | 🔑 <mark>views/auth/</mark> | <mark>LoginView</mark> y <mark>RegisterView</mark> | 2 |
 | 🌍 <mark>views/comun/</mark> | <mark>LandingView</mark>, <mark>HistorialView</mark> y <mark>MiPerfilView</mark> | 10 |
-| 🧑‍⚕️ <mark>views/cuidador/</mark> | <mark>EditarPerfilView</mark> y <mark>SolicitudesCuidadorView</mark> (aceptar, rechazar y errores) | 12 |
-| 👨‍👩‍👧 <mark>views/familia/</mark> | <mark>BuscarView</mark>, <mark>PerfilCuidadorView</mark>, <mark>SolicitarServicioView</mark>, <mark>SolicitudesFamiliaView</mark>, <mark>ConfirmacionView</mark>, <mark>CheckoutView</mark> y <mark>ValorarView</mark> | 29 |
+| 🧑‍⚕️ <mark>views/cuidador/</mark> | <mark>EditarPerfilView</mark> y <mark>SolicitudesCuidadorView</mark> (aceptar, rechazar, errores y foto de perfil) | 19 |
+| 👨‍👩‍👧 <mark>views/familia/</mark> | <mark>BuscarView</mark>, <mark>PerfilCuidadorView</mark>, <mark>SolicitarServicioView</mark>, <mark>SolicitudesFamiliaView</mark>, <mark>ConfirmacionView</mark>, <mark>CheckoutView</mark> y <mark>ValorarView</mark> | 32 |
 
 ```bash
 npm run test:unit
@@ -572,7 +573,7 @@ npm run test:e2e
 - 🔐 Implementar autenticación basada en JWT (actualmente Basic Auth)
 - 🌐 Revisar la configuración de CORS tras la migración a JWT
 - 💳 Conectar el checkout con una pasarela de pago real (por ejemplo Stripe en modo test)
-- 🎨 Añadir la edición del perfil del cuidador siguiendo el prototipo de Lovable (<mark>/perfil</mark>, con la tarjeta «Tu valoración» y «Ver mi perfil público»)
+- 🖼️ Guardar las fotos de perfil como archivos en un almacenamiento externo (ahora se envían reducidas a 300 px y se guardan como texto)
 - 🚀 Desplegar frontend y backend
 
 ---
