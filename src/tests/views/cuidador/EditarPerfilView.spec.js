@@ -1,8 +1,10 @@
-import { describe, test, expect, vi, afterEach } from "vitest";
+import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import { mount } from "@vue/test-utils";
+import { createPinia, setActivePinia } from "pinia";
 import EditarPerfilView from "../../../views/cuidador/EditarPerfilView.vue";
 import CuidadorRepository from "../../../repositories/CuidadorRepository";
 import { reducirImagen } from "../../../utils/reducirImagen";
+import { useAuthStore } from "../../../stores/auth";
 
 vi.mock("../../../utils/reducirImagen", () => ({
   reducirImagen: vi.fn(),
@@ -42,6 +44,10 @@ async function enviar(wrapper) {
 }
 
 describe("EditarPerfilView", () => {
+  beforeEach(() => {
+    setActivePinia(createPinia());
+  });
+
   afterEach(() => {
     vi.restoreAllMocks();
     reducirImagen.mockReset();
@@ -186,6 +192,21 @@ describe("EditarPerfilView", () => {
       3,
       expect.objectContaining({ foto: "data:image/jpeg;base64,AAAA" })
     );
+  });
+
+  test("al guardar actualiza la foto del menú de arriba", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue(
+      perfil
+    );
+    vi.spyOn(CuidadorRepository.prototype, "update").mockResolvedValue({});
+    reducirImagen.mockResolvedValue("data:image/jpeg;base64,AAAA");
+    const authStore = useAuthStore();
+
+    const wrapper = await montarVista();
+    await elegirArchivo(wrapper, { type: "image/png", name: "foto.png" });
+    await enviar(wrapper);
+
+    expect(authStore.foto).toBe("data:image/jpeg;base64,AAAA");
   });
 
   test("avisa si el archivo elegido no es una imagen", async () => {
