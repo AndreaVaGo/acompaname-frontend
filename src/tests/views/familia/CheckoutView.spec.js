@@ -113,7 +113,7 @@ describe("CheckoutView", () => {
     expect(pagarSpy).not.toHaveBeenCalled();
   });
 
-  test("paga correctamente y redirige a las solicitudes", async () => {
+  test("paga correctamente y muestra la confirmación", async () => {
     vi.spyOn(PagoRepository.prototype, "getMisPagos").mockResolvedValue([
       pagoPendiente,
     ]);
@@ -128,6 +128,28 @@ describe("CheckoutView", () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(pagarSpy).toHaveBeenCalledWith(3);
+    expect(wrapper.text()).toContain("¡Pago realizado!");
+    expect(wrapper.text()).toContain("15 €");
+    expect(wrapper.find("form").exists()).toBe(false);
+    expect(router.currentRoute.value.name).toBe("pagar");
+  });
+
+  test("desde la confirmación se puede ir a las solicitudes", async () => {
+    vi.spyOn(PagoRepository.prototype, "getMisPagos").mockResolvedValue([
+      pagoPendiente,
+    ]);
+    vi.spyOn(PagoRepository.prototype, "marcarComoPagado").mockResolvedValue(
+      {}
+    );
+
+    const { wrapper, router } = await montarVista();
+
+    await rellenarTarjeta(wrapper);
+    await wrapper.find("form").trigger("submit.prevent");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    await wrapper.find("button").trigger("click");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
     expect(router.currentRoute.value.name).toBe("solicitudes");
   });
 
