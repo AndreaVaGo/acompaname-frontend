@@ -16,6 +16,7 @@ const caducidad = ref("");
 const cvv = ref("");
 const error = ref("");
 const procesando = ref(false);
+const pagado = ref(false);
 
 onMounted(async () => {
   try {
@@ -46,12 +47,16 @@ async function pagar() {
 
   try {
     await pagoRepository.marcarComoPagado(pago.value.id);
-    router.push({ name: "solicitudes" });
+    pagado.value = true;
   } catch (err) {
     error.value = "No se pudo realizar el pago.";
   } finally {
     procesando.value = false;
   }
+}
+
+function verSolicitudes() {
+  router.push({ name: "solicitudes" });
 }
 </script>
 
@@ -65,7 +70,7 @@ async function pagar() {
 
       <p v-if="cargando">Cargando pago...</p>
 
-      <p v-if="pago" class="checkout__importe">
+      <p v-if="pago && !pagado" class="checkout__importe">
         Importe: <strong>{{ pago.importe }} €</strong>
       </p>
 
@@ -73,8 +78,19 @@ async function pagar() {
         Este servicio ya está pagado.
       </p>
 
+      <div v-if="pagado" class="checkout__exito">
+        <p class="checkout__exito-icono">✓</p>
+        <h2>¡Pago realizado!</h2>
+        <p>
+          Hemos registrado tu pago de <strong>{{ pago.importe }} €</strong>.
+        </p>
+        <button type="button" class="btn btn--primary" @click="verSolicitudes">
+          Ver mis solicitudes
+        </button>
+      </div>
+
       <form
-        v-if="pago && pago.estado !== 'COMPLETADO'"
+        v-if="pago && pago.estado !== 'COMPLETADO' && !pagado"
         class="checkout__form"
         @submit.prevent="pagar"
       >
@@ -169,6 +185,40 @@ async function pagar() {
 .checkout__info {
   color: var(--color-secondary);
   font-weight: bold;
+}
+
+.checkout__exito {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--gap-sm);
+
+  & h2 {
+    font-size: 1.3rem;
+    margin: 0;
+  }
+
+  & p {
+    margin: 0;
+  }
+
+  & .btn {
+    width: 100%;
+    margin-top: 12px;
+  }
+}
+
+.checkout__exito-icono {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: var(--color-accent-bg);
+  color: var(--color-accent);
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .checkout__form {
