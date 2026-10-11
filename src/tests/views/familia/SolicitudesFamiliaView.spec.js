@@ -77,4 +77,15 @@ describe("SolicitudesFamiliaView", () => {
     expect(wrapper.text()).toContain("Pepe");
     expect(wrapper.findAll(".solicitudes__pagado").length).toBe(0);
   });
+
+  test("muestra un error si falla la carga de solicitudes", async () => {
+    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockRejectedValue(
+      new Error("fallo")
+    );
+    vi.spyOn(PagoRepository.prototype, "getMisPagos").mockResolvedValue([]);
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.text()).toContain("No se pudieron cargar tus solicitudes.");
+  });
 });
