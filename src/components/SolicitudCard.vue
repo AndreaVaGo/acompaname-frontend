@@ -5,6 +5,7 @@ defineProps([
   "solicitud",
   "nombreMostrado",
   "mostrarAcciones",
+  "pagado",
   "aceptar",
   "rechazar",
 ]);
@@ -52,11 +53,18 @@ defineProps([
 
     <div
       class="solicitudes__acciones"
-      v-if="!mostrarAcciones && solicitud.estado === 'ACEPTADA'"
+      v-if="!mostrarAcciones && solicitud.estado === 'ACEPTADA' && !pagado"
     >
       <RouterLink :to="`/pagar/${solicitud.id}`" class="btn btn--primary">
         Pagar
       </RouterLink>
+    </div>
+
+    <div
+      class="solicitudes__acciones"
+      v-if="!mostrarAcciones && solicitud.estado === 'ACEPTADA' && pagado"
+    >
+      <p class="solicitudes__pagado">Pagado ✓</p>
     </div>
   </div>
 </template>
@@ -130,5 +138,16 @@ defineProps([
     text-align: center;
     text-decoration: none;
   }
+}
+
+.solicitudes__pagado {
+  flex: 1;
+  margin: 0;
+  padding: 12px 24px;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-secondary-bg);
+  color: var(--color-secondary);
+  font-weight: bold;
+  text-align: center;
 }
 </style>
