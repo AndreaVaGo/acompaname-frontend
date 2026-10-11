@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue";
 import CuidadorRepository from "@/repositories/CuidadorRepository";
 import FotoCuidador from "@/components/FotoCuidador.vue";
+import { reducirImagen } from "@/utils/reducirImagen";
 
 const cuidadorRepository = new CuidadorRepository();
 
@@ -34,6 +35,28 @@ onMounted(async () => {
     cargando.value = false;
   }
 });
+
+async function elegirFoto(evento) {
+  const archivo = evento.target.files[0];
+  if (!archivo) {
+    return;
+  }
+  if (!archivo.type.startsWith("image/")) {
+    error.value = "Elige un archivo de imagen.";
+    return;
+  }
+
+  try {
+    foto.value = await reducirImagen(archivo);
+    error.value = "";
+  } catch (err) {
+    error.value = "No se pudo cargar la imagen.";
+  }
+}
+
+function quitarFoto() {
+  foto.value = "";
+}
 
 async function guardar() {
   guardado.value = false;
@@ -88,18 +111,26 @@ async function guardar() {
             :tamano="80"
           />
           <div class="editar__foto-campo">
-            <label for="foto">Foto de perfil (enlace)</label>
+            <label for="foto">Foto de perfil</label>
             <input
-              type="text"
+              type="file"
               id="foto"
-              v-model="foto"
-              maxlength="500"
-              placeholder="https://..."
+              accept="image/*"
+              @change="elegirFoto"
             />
             <p class="editar__ayuda">
-              Pega el enlace de una imagen. Si lo dejas vacío, se mostrará tu
-              inicial.
+              Elige una imagen de tu ordenador. Si no pones ninguna, se
+              mostrará un monigote.
             </p>
+            <button
+              v-if="foto"
+              type="button"
+              id="quitar-foto"
+              class="editar__quitar"
+              @click="quitarFoto"
+            >
+              Quitar foto
+            </button>
           </div>
         </div>
 
@@ -232,7 +263,18 @@ async function guardar() {
 .editar__ayuda {
   color: var(--color-text-muted);
   font-size: 0.8rem;
-  margin: -8px 0 8px;
+  margin: 8px 0;
+}
+
+.editar__quitar {
+  align-self: flex-start;
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-input);
+  color: var(--color-text);
+  cursor: pointer;
+  font-family: inherit;
+  padding: 6px 12px;
 }
 
 .editar__row {
