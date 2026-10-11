@@ -75,4 +75,14 @@ describe("HistorialView", () => {
 
     expect(wrapper.text()).toContain("Aún no tienes solicitudes en tu historial.");
   });
+
+  test("muestra un error si falla la carga del historial", async () => {
+    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockRejectedValue(new Error("fallo"));
+    vi.spyOn(ValoracionRepository.prototype, "getAll").mockResolvedValue([]);
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.text()).toContain("No se pudo cargar tu historial.");
+    expect(wrapper.text()).not.toContain("Aún no tienes solicitudes en tu historial.");
+  });
 });
