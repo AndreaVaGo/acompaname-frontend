@@ -78,7 +78,10 @@ test("la familia solicita, el cuidador acepta y la familia paga", async ({
   await page.screenshot({ path: "docs/screenshots/e2e-07-checkout.png" });
   await page.getByRole("button", { name: "Pagar" }).click();
 
-  // 6. Al volver a pagar, ya figura como pagado
-  await page.getByRole("link", { name: "Pagar" }).click();
-  await expect(page.getByText("Este servicio ya está pagado.")).toBeVisible();
+  // 6. Aparece la confirmación del pago
+  await expect(page.getByText("¡Pago realizado!")).toBeVisible();
+
+  // 7. En la lista de solicitudes ya figura como pagado
+  await page.getByRole("button", { name: "Ver mis solicitudes" }).click();
+  await expect(page.getByText("Pagado ✓")).toBeVisible();
 });
