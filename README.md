@@ -8,7 +8,7 @@ Este repositorio contiene la **aplicación web** del proyecto, desarrollada con 
 
 Proyecto final del bootcamp de Desarrollo Web Full Stack (850h) en **Factoría F5 — Digital Academy**.
 
-![Vue](https://img.shields.io/badge/Vue-3-42b883) ![Vite](https://img.shields.io/badge/Vite-8-646CFF) ![Pinia](https://img.shields.io/badge/Pinia-estado-yellow) ![Vitest](https://img.shields.io/badge/tests-82-success) ![Responsive](https://img.shields.io/badge/responsive-768px-blue)
+![Vue](https://img.shields.io/badge/Vue-3-42b883) ![Vite](https://img.shields.io/badge/Vite-8-646CFF) ![Pinia](https://img.shields.io/badge/Pinia-estado-yellow) ![Vitest](https://img.shields.io/badge/tests-119-success) ![Responsive](https://img.shields.io/badge/responsive-768px-blue)
 
 ---
 
@@ -41,7 +41,7 @@ Las **familias** pueden:
 - 📝 Registrarse e iniciar sesión
 - 🔎 Buscar cuidadores con filtros y consultar su perfil
 - 📋 Enviar solicitudes de servicio y seguir su estado
-- 💳 Pagar el servicio (el pago se marca como completado en el backend; los datos de la tarjeta son de prueba)
+- 💳 Pagar el servicio (el pago se marca como completado en el backend, se muestra una confirmación y la solicitud pasa a verse como pagada; los datos de la tarjeta son de prueba)
 - ⭐ Valorar el servicio una vez completado
 
 Los **cuidadores** pueden:
@@ -129,7 +129,7 @@ Esta estructura separa claramente responsabilidades: las **vistas** (<mark>views
 | 7 | ✅ **Confirmación de solicitud** | <mark>/confirmacion</mark> | Aviso de solicitud enviada |
 | 8 | 📜 **Historial de solicitudes** (Familia) | <mark>/historial</mark> | Estado final de cada acompañamiento, con acceso a valorar |
 | 9 | 📨 **Solicitudes enviadas** (Familia) | <mark>/solicitudes</mark> | Estado de las solicitudes enviadas a distintos cuidadores |
-| 10 | 💳 **Checkout** (Familia) | <mark>/pagar/:id</mark> | Pago de un servicio (tarjeta de prueba) |
+| 10 | 💳 **Checkout** (Familia) | <mark>/pagar/:id</mark> | Pago de un servicio (tarjeta de prueba) con pantalla de confirmación |
 | 11 | ⭐ **Formulario de valoración** | <mark>/valorar/:id</mark> | Puntuación de 1 a 5 estrellas y comentario |
 | 12 | 📥 **Solicitudes recibidas** (Cuidador) | <mark>/solicitudes-cuidador</mark> | Gestión de aceptar/rechazar |
 | 13 | 👤 **Mi perfil** | <mark>/mi-perfil</mark> | Datos de la cuenta |
@@ -165,7 +165,7 @@ Cada vista incluye sus correspondientes estados vacíos (por ejemplo, "Aún no t
 
 El desarrollo siguió un enfoque iterativo: primero se construyó la estructura HTML de cada vista con datos de ejemplo, después se aplicaron los estilos comparando visualmente con el prototipo de diseño, posteriormente se refactorizó el CSS a BEM con variables globales, y finalmente se sustituyeron los datos de ejemplo por llamadas reales a la API REST a través del Repository Pattern, una vez que el backend estuvo disponible.
 
-La gestión del proyecto se organizó en **JIRA** (proyecto <mark>ACOM</mark>) con 8 épicas, 19 historias de usuario redactadas con criterios de aceptación en formato Gherkin (Given/When/Then), 16 tareas técnicas y 5 sprints entre agosto y octubre de 2026. El control de versiones se llevó con commits descriptivos en inglés, agrupados por unidad funcional (una vista, un bloque de responsive, un refactor concreto, un archivo de test).
+La gestión del proyecto se organizó en **JIRA** (proyecto <mark>ACOM</mark>) con 8 épicas, 19 historias de usuario redactadas con criterios de aceptación en formato Gherkin (Given/When/Then), 35 tareas técnicas y 5 sprints entre agosto y octubre de 2026. El control de versiones se llevó con commits descriptivos en inglés, agrupados por unidad funcional (una vista, un bloque de responsive, un refactor concreto, un archivo de test).
 
 🔗 Tablero de JIRA: https://saludosalamanecer-1780468848301.atlassian.net/jira/software/projects/ACOM/boards/34/timeline?rangeMode=MONTHS
 
@@ -480,7 +480,7 @@ classDiagram
 
 ## ✅ Tests
 
-El proyecto tiene **82 tests unitarios** (Vitest + Vue Test Utils) y **9 tests e2e** (Playwright). Los unitarios mockean el repositorio correspondiente (<mark>vi.spyOn(Repository.prototype, "metodo")</mark>) para no depender de que el backend esté levantado.
+El proyecto tiene **119 tests unitarios** (Vitest + Vue Test Utils) y **9 tests e2e** (Playwright). Los unitarios mockean el repositorio correspondiente (<mark>vi.spyOn(Repository.prototype, "metodo")</mark>) para no depender de que el backend esté levantado. Los repositorios tienen además sus propios tests, que simulan <mark>fetch</mark> y comprueban la ruta, el método y los errores de cada llamada.
 
 ### Tests unitarios
 
@@ -488,12 +488,13 @@ Están en <mark>src/tests/</mark>, con la misma estructura de carpetas que <mark
 
 | Carpeta | Qué comprueba | Tests |
 |---|---|---|
-| 🧱 <mark>components/</mark> | <mark>AppFooter</mark>, <mark>NavBar</mark> (enlaces, nombre y foto), <mark>FotoCuidador</mark> y <mark>SolicitudCard</mark> | 11 |
+| 🧱 <mark>components/</mark> | <mark>AppFooter</mark>, <mark>NavBar</mark> (enlaces, nombre y foto), <mark>FotoCuidador</mark> y <mark>SolicitudCard</mark> (incluido el aviso de pagado) | 14 |
 | 🍍 <mark>stores/</mark> | <mark>AuthStore</mark> (login, logout, rol activo y foto) | 8 |
 | 🔑 <mark>views/auth/</mark> | <mark>LoginView</mark> y <mark>RegisterView</mark> | 2 |
 | 🌍 <mark>views/comun/</mark> | <mark>LandingView</mark>, <mark>HistorialView</mark> y <mark>MiPerfilView</mark> | 10 |
 | 🧑‍⚕️ <mark>views/cuidador/</mark> | <mark>EditarPerfilView</mark> y <mark>SolicitudesCuidadorView</mark> (aceptar, rechazar, errores y foto de perfil) | 19 |
-| 👨‍👩‍👧 <mark>views/familia/</mark> | <mark>BuscarView</mark>, <mark>PerfilCuidadorView</mark>, <mark>SolicitarServicioView</mark>, <mark>SolicitudesFamiliaView</mark>, <mark>ConfirmacionView</mark>, <mark>CheckoutView</mark> y <mark>ValorarView</mark> | 32 |
+| 👨‍👩‍👧 <mark>views/familia/</mark> | <mark>BuscarView</mark>, <mark>PerfilCuidadorView</mark>, <mark>SolicitarServicioView</mark>, <mark>SolicitudesFamiliaView</mark>, <mark>ConfirmacionView</mark>, <mark>CheckoutView</mark> y <mark>ValorarView</mark> | 35 |
+| 🔌 <mark>repositories/</mark> | <mark>Repository</mark> (clase base), <mark>UsuarioRepository</mark> y el resto de repositorios (rutas, métodos y errores) | 31 |
 
 ```bash
 npm run test:unit
@@ -509,7 +510,7 @@ La cobertura se mide con <mark>@vitest/coverage-v8</mark>. Se genera el informe 
 npm run test:coverage
 ```
 
-Resultado actual: **78 % de líneas**, **88 % de ramas** y **77 % de sentencias**, por encima del 70 % mínimo que se pedía.
+Resultado actual: **86 % de líneas**, **93 % de ramas** y **86 % de sentencias**, por encima del 70 % mínimo que se pedía.
 
 ![Cobertura de los tests del frontend](docs/screenshots/cobertura-frontend.png)
 
@@ -518,7 +519,7 @@ Resultado actual: **78 % de líneas**, **88 % de ramas** y **77 % de sentencias*
 Los tests e2e abren un navegador de verdad y usan la aplicación completa, así que **necesitan el backend arrancado** (con su base de datos). El frontend lo arranca Playwright si no está en marcha.
 
 - 📝 <mark>registro-login.spec.js</mark> (5): registrarse, iniciar sesión, contraseña incorrecta, email repetido y cerrar sesión.
-- 🔄 <mark>flujo-solicitud.spec.js</mark> (1): la familia solicita un servicio, el cuidador lo acepta y la familia paga.
+- 🔄 <mark>flujo-solicitud.spec.js</mark> (1): la familia solicita un servicio, el cuidador lo acepta y la familia paga y ve la confirmación y la solicitud como pagada.
 - 👀 <mark>visitante.spec.js</mark> (3): un visitante ve los cuidadores y las rutas privadas lo mandan al login.
 
 ```bash
