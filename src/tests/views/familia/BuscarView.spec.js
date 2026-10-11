@@ -13,6 +13,15 @@ vi.spyOn(CuidadorRepository.prototype, "getAll").mockResolvedValue([
     tieneVehiculo: true,
     disponibleAhora: true,
   },
+  {
+    id: 2,
+    usuarioNombre: "Ana",
+    especialidad: "Enfermería",
+    tarifaHora: 20,
+    tieneVehiculo: false,
+    disponibleAhora: false,
+    foto: "https://ejemplo.com/ana.jpg",
+  },
 ]);
 
 const router = createRouter({
@@ -29,5 +38,17 @@ describe("BuscarView", () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(wrapper.text()).toContain("Pepe");
+  });
+
+  test("muestra la foto si el cuidador la tiene", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    const fotos = wrapper.findAll("img");
+    expect(fotos.length).toBe(1);
+    expect(fotos[0].attributes("src")).toBe("https://ejemplo.com/ana.jpg");
   });
 });
