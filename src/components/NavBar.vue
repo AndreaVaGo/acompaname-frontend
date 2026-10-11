@@ -1,15 +1,20 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { RouterLink, useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "../stores/auth";
 import CuidadorRepository from "@/repositories/CuidadorRepository";
+import UsuarioRepository from "@/repositories/UsuarioRepository";
+import FotoCuidador from "@/components/FotoCuidador.vue";
 
 const authStore = useAuthStore();
 const router = useRouter();
 const route = useRoute();
 const cuidadorRepository = new CuidadorRepository();
+const usuarioRepository = new UsuarioRepository();
 
 const menuAbierto = ref(false);
+const nombre = ref("");
+const foto = ref("");
 
 const esPantallaAcceso = computed(
   () => route.path === "/login" || route.path === "/registro",
@@ -22,6 +27,30 @@ const inicial = computed(() =>
 const tipoCuenta = computed(() =>
   authStore.rol === "FAMILIA" ? "Cuenta de familia" : "Cuenta de cuidador",
 );
+
+// Carga el nombre (y la foto si es cuidador) para enseñarlos en el menú
+async function cargarDatosCuenta() {
+  if (!authStore.estaAutenticado) {
+    nombre.value = "";
+    foto.value = "";
+    return;
+  }
+
+  try {
+    const usuario = await usuarioRepository.getById(authStore.id);
+    nombre.value = usuario.nombre;
+
+    if (authStore.rol === "CUIDADOR") {
+      const perfil = await cuidadorRepository.getMiPerfil();
+      foto.value = perfil.foto || "";
+    }
+  } catch (err) {
+    console.error("No se pudieron cargar los datos de tu cuenta", err);
+  }
+}
+
+// Se vuelve a cargar al cambiar de página (por ejemplo, después de editar la foto)
+watch(() => route.path, cargarDatosCuenta, { immediate: true });
 
 function handleLogout() {
   menuAbierto.value = false;
@@ -110,14 +139,20 @@ function irAMiPerfil() {
           :title="authStore.email"
           @click="menuAbierto = !menuAbierto"
         >
-          {{ inicial }}
+          <FotoCuidador
+            v-if="authStore.rol === 'CUIDADOR'"
+            :foto="foto"
+            :nombre="nombre"
+            :tamano="40"
+          />
+          <template v-else>{{ inicial }}</template>
         </button>
 
         <template v-if="menuAbierto">
           <div class="navbar__overlay" @click="menuAbierto = false"></div>
           <div class="navbar__menu">
             <div class="navbar__menu-header">
-              {{ authStore.email }}
+              {{ nombre || authStore.email }}
               <span class="navbar__menu-role">{{ tipoCuenta }}</span>
             </div>
             <button
@@ -237,6 +272,11 @@ function irAMiPerfil() {
   font-size: 1rem;
   font-family: inherit;
   cursor: pointer;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .navbar__avatar:hover {
