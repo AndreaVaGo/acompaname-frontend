@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from "vue";
 import { RouterLink } from "vue-router";
 import CuidadorRepository from "@/repositories/CuidadorRepository";
+import FotoCuidador from "@/components/FotoCuidador.vue";
 
 const cuidadorRepository = new CuidadorRepository();
 const cuidadores = ref([]);
@@ -96,8 +97,17 @@ const cuidadoresFiltrados = computed(() => {
         v-for="cuidador in cuidadoresFiltrados"
         :key="cuidador.id"
       >
-        <h3>{{ cuidador.usuarioNombre }}</h3>
-        <p class="buscar__card-especialidad">{{ cuidador.especialidad }}</p>
+        <div class="buscar__card-cabecera">
+          <FotoCuidador
+            :foto="cuidador.foto"
+            :nombre="cuidador.usuarioNombre"
+            :tamano="56"
+          />
+          <div>
+            <h3>{{ cuidador.usuarioNombre }}</h3>
+            <p class="buscar__card-especialidad">{{ cuidador.especialidad }}</p>
+          </div>
+        </div>
 
         <div class="buscar__tags">
           <span
@@ -225,10 +235,17 @@ const cuidadoresFiltrados = computed(() => {
   }
 }
 
+.buscar__card-cabecera {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
 .buscar__card-especialidad {
   color: var(--color-text-muted);
   font-size: 0.9rem;
-  margin-bottom: 8px;
+  margin: 0;
 }
 
 .buscar__card-valoracion {
