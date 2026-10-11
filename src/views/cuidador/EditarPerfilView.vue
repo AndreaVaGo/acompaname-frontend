@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import CuidadorRepository from "@/repositories/CuidadorRepository";
+import FotoCuidador from "@/components/FotoCuidador.vue";
 
 const cuidadorRepository = new CuidadorRepository();
 
@@ -9,6 +10,7 @@ const especialidad = ref("");
 const anosExperiencia = ref(0);
 const tarifaHora = ref(0);
 const bio = ref("");
+const foto = ref("");
 const tieneVehiculo = ref(false);
 const disponibleAhora = ref(false);
 
@@ -23,6 +25,7 @@ onMounted(async () => {
     anosExperiencia.value = perfil.value.anosExperiencia;
     tarifaHora.value = perfil.value.tarifaHora;
     bio.value = perfil.value.bio;
+    foto.value = perfil.value.foto || "";
     tieneVehiculo.value = perfil.value.tieneVehiculo;
     disponibleAhora.value = perfil.value.disponibleAhora;
   } catch (err) {
@@ -58,6 +61,7 @@ async function guardar() {
       tieneVehiculo: tieneVehiculo.value,
       disponibleAhora: disponibleAhora.value,
       usuarioId: perfil.value.usuarioId,
+      foto: foto.value.trim() || null,
     });
     guardado.value = true;
   } catch (err) {
@@ -77,6 +81,28 @@ async function guardar() {
       <p v-if="cargando">Cargando tu perfil...</p>
 
       <form v-if="perfil" class="editar__form" @submit.prevent="guardar">
+        <div class="editar__foto">
+          <FotoCuidador
+            :foto="foto"
+            :nombre="perfil.usuarioNombre"
+            :tamano="80"
+          />
+          <div class="editar__foto-campo">
+            <label for="foto">Foto de perfil (enlace)</label>
+            <input
+              type="text"
+              id="foto"
+              v-model="foto"
+              maxlength="500"
+              placeholder="https://..."
+            />
+            <p class="editar__ayuda">
+              Pega el enlace de una imagen. Si lo dejas vacío, se mostrará tu
+              inicial.
+            </p>
+          </div>
+        </div>
+
         <label for="especialidad">Especialidad</label>
         <input
           type="text"
@@ -190,6 +216,25 @@ async function guardar() {
   }
 }
 
+.editar__foto {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: var(--gap-sm);
+}
+
+.editar__foto-campo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.editar__ayuda {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  margin: -8px 0 8px;
+}
+
 .editar__row {
   display: flex;
   gap: var(--gap-sm);
@@ -235,6 +280,15 @@ async function guardar() {
 
   .editar__row {
     flex-direction: column;
+  }
+
+  .editar__foto {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .editar__foto-campo {
+    width: 100%;
   }
 }
 </style>
