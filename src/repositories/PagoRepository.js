@@ -1,8 +1,8 @@
-import Repository from "./Repository";
+import Repository, { API_URL } from "./Repository";
 
 export default class PagoRepository extends Repository {
   constructor() {
-    super("http://localhost:8080/api/v1");
+    super(API_URL);
   }
 
   async getMisPagos() {
