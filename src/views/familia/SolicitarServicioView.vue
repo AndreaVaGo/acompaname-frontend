@@ -17,6 +17,7 @@ const cuidadorNombre = ref("");
 
 const tipoCuidado = ref("");
 const fechaInicio = ref("");
+const fechaFin = ref("");
 const nombrePaciente = ref("");
 const edadPaciente = ref("");
 const notas = ref("");
@@ -41,6 +42,11 @@ async function enviarSolicitud() {
     error.value = "Por favor, rellena todos los campos obligatorios.";
     return;
   }
+  // Las fechas tienen formato AAAA-MM-DD, así que se pueden comparar como texto
+  if (fechaFin.value && fechaFin.value < fechaInicio.value) {
+    error.value = "La fecha de fin no puede ser anterior a la de inicio.";
+    return;
+  }
   error.value = "";
 
   try {
@@ -50,6 +56,7 @@ async function enviarSolicitud() {
       notas: notas.value,
       edadPaciente: Number(edadPaciente.value),
       fechaCuidado: fechaInicio.value,
+      fechaFin: fechaFin.value || null,
       familiaId: authStore.id,
       cuidadorId: Number(cuidadorId),
     });
@@ -99,6 +106,14 @@ async function enviarSolicitud() {
 
         <label for="fecha">Fecha de inicio</label>
         <input type="date" id="fecha" v-model="fechaInicio" />
+
+        <label for="fecha-fin">Fecha de fin (opcional)</label>
+        <input
+          type="date"
+          id="fecha-fin"
+          v-model="fechaFin"
+          :min="fechaInicio"
+        />
 
         <label for="paciente">Nombre del paciente</label>
         <input
