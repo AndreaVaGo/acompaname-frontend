@@ -10,6 +10,7 @@ const authStore = useAuthStore();
 
 const perfil = ref(null);
 const especialidad = ref("");
+const ciudad = ref("");
 const anosExperiencia = ref(0);
 const tarifaHora = ref(0);
 const bio = ref("");
@@ -25,6 +26,7 @@ onMounted(async () => {
   try {
     perfil.value = await cuidadorRepository.getMiPerfil();
     especialidad.value = perfil.value.especialidad;
+    ciudad.value = perfil.value.ciudad || "";
     anosExperiencia.value = perfil.value.anosExperiencia;
     tarifaHora.value = perfil.value.tarifaHora;
     bio.value = perfil.value.bio;
@@ -87,6 +89,7 @@ async function guardar() {
       disponibleAhora: disponibleAhora.value,
       usuarioId: perfil.value.usuarioId,
       foto: foto.value.trim() || null,
+      ciudad: ciudad.value.trim() || null,
     });
     // Así el círculo del menú de arriba cambia al momento
     authStore.setFoto(foto.value);
@@ -145,6 +148,15 @@ async function guardar() {
           v-model="especialidad"
           maxlength="100"
           placeholder="Geriatría, acompañamiento hospitalario..."
+        />
+
+        <label for="ciudad">Ciudad</label>
+        <input
+          type="text"
+          id="ciudad"
+          v-model="ciudad"
+          maxlength="100"
+          placeholder="Oviedo, Gijón, Madrid..."
         />
 
         <div class="editar__row">
