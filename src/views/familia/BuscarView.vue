@@ -8,6 +8,8 @@ const cuidadorRepository = new CuidadorRepository();
 const cuidadores = ref([]);
 const busqueda = ref("");
 const ciudadBuscada = ref("");
+const soloDisponibles = ref(false);
+const soloVehiculo = ref(false);
 const cargando = ref(true);
 const error = ref("");
 
@@ -36,7 +38,14 @@ const cuidadoresFiltrados = computed(() => {
       .toLowerCase()
       .includes(ciudadBuscada.value.trim().toLowerCase());
 
-    return coincideTexto && coincideCiudad;
+    // Si el filtro no está activado, todos los cuidadores valen
+    const coincideDisponible =
+      !soloDisponibles.value || cuidador.disponibleAhora;
+    const coincideVehiculo = !soloVehiculo.value || cuidador.tieneVehiculo;
+
+    return (
+      coincideTexto && coincideCiudad && coincideDisponible && coincideVehiculo
+    );
   });
 });
 </script>
@@ -87,20 +96,44 @@ const cuidadoresFiltrados = computed(() => {
       <div class="buscar__filter-group">
         <label>Disponibilidad</label>
         <div class="buscar__filter-options">
-          <button class="buscar__filter-btn buscar__filter-btn--active">
+          <button
+            id="filtro-cualquier-disponibilidad"
+            class="buscar__filter-btn"
+            :class="{ 'buscar__filter-btn--active': !soloDisponibles }"
+            @click="soloDisponibles = false"
+          >
             Cualquier disponibilidad
           </button>
-          <button class="buscar__filter-btn">Disponible ahora</button>
+          <button
+            id="filtro-disponible"
+            class="buscar__filter-btn"
+            :class="{ 'buscar__filter-btn--active': soloDisponibles }"
+            @click="soloDisponibles = true"
+          >
+            Disponible ahora
+          </button>
         </div>
       </div>
 
       <div class="buscar__filter-group">
         <label>Vehículo propio</label>
         <div class="buscar__filter-options">
-          <button class="buscar__filter-btn buscar__filter-btn--active">
+          <button
+            id="filtro-indiferente"
+            class="buscar__filter-btn"
+            :class="{ 'buscar__filter-btn--active': !soloVehiculo }"
+            @click="soloVehiculo = false"
+          >
             Indiferente
           </button>
-          <button class="buscar__filter-btn">Con vehículo propio</button>
+          <button
+            id="filtro-vehiculo"
+            class="buscar__filter-btn"
+            :class="{ 'buscar__filter-btn--active': soloVehiculo }"
+            @click="soloVehiculo = true"
+          >
+            Con vehículo propio
+          </button>
         </div>
       </div>
     </div>
