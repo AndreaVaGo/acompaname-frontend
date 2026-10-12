@@ -15,6 +15,7 @@ vi.spyOn(CuidadorRepository.prototype, "getAll").mockResolvedValue([
     ciudad: "Oviedo",
     valoracionMedia: 4.7,
     numValoraciones: 3,
+    tipoCuidado: "hospitalario",
   },
   {
     id: 2,
@@ -27,6 +28,7 @@ vi.spyOn(CuidadorRepository.prototype, "getAll").mockResolvedValue([
     ciudad: "Gijón",
     valoracionMedia: null,
     numValoraciones: 0,
+    tipoCuidado: "domicilio",
   },
   {
     id: 3,
@@ -231,5 +233,65 @@ describe("BuscarView", () => {
     expect(wrapper.text()).toContain("Pepe");
     expect(wrapper.text()).toContain("Luis");
     expect(wrapper.text()).toContain("Ana");
+  });
+
+  test("muestra el tipo de cuidado en la tarjeta (sin dato cuenta como ambos)", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    const etiquetas = wrapper.findAll(".buscar__tag--tipo");
+    expect(etiquetas.length).toBe(3);
+    expect(etiquetas[0].text()).toBe("Hospitalario");
+    expect(etiquetas[1].text()).toBe("A domicilio");
+    expect(etiquetas[2].text()).toBe("Hospital y domicilio");
+  });
+
+  test("el filtro Hospitalario deja a los hospitalarios y a los que hacen ambos", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper.find("#filtro-tipo-hospitalario").trigger("click");
+
+    expect(wrapper.text()).toContain("Pepe");
+    expect(wrapper.text()).toContain("Luis");
+    expect(wrapper.text()).not.toContain("Ana");
+  });
+
+  test("el filtro A domicilio deja a los de domicilio y a los que hacen ambos", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper.find("#filtro-tipo-domicilio").trigger("click");
+
+    expect(wrapper.text()).toContain("Ana");
+    expect(wrapper.text()).toContain("Luis");
+    expect(wrapper.text()).not.toContain("Pepe");
+  });
+
+  test("volver a Todos en tipo de cuidado vuelve a mostrar a todos", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper.find("#filtro-tipo-domicilio").trigger("click");
+    await wrapper.find("#filtro-tipo-todos").trigger("click");
+
+    expect(wrapper.text()).toContain("Pepe");
+    expect(wrapper.text()).toContain("Ana");
+    expect(wrapper.text()).toContain("Luis");
+    expect(wrapper.find("#filtro-tipo-todos").classes()).toContain(
+      "buscar__filter-btn--active",
+    );
   });
 });
