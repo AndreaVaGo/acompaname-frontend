@@ -70,6 +70,11 @@ function irAEditarPerfil() {
   router.push("/editar-perfil");
 }
 
+function irACambiarPassword() {
+  menuAbierto.value = false;
+  router.push("/cambiar-password");
+}
+
 function irAMiPerfil() {
   menuAbierto.value = false;
   if (authStore.rol === "FAMILIA") {
@@ -167,6 +172,14 @@ function irAMiPerfil() {
               @click="irAEditarPerfil"
             >
               Editar mi perfil
+            </button>
+            <button
+              type="button"
+              class="navbar__menu-item"
+              id="cambiar-password"
+              @click="irACambiarPassword"
+            >
+              Cambiar contraseña
             </button>
             <button
               type="button"
