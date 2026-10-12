@@ -68,4 +68,28 @@ describe('SolicitudCard', () => {
     expect(wrapper.text()).not.toContain('Pagar')
     expect(wrapper.text()).not.toContain('Pagado')
   })
+
+  test('muestra las notas si la solicitud tiene notas', () => {
+    const wrapper = montarTarjeta('PENDIENTE', false)
+
+    expect(wrapper.text()).toContain('Ingreso previsto de 4 noches.')
+  })
+
+  test('no muestra la línea de notas si la solicitud no tiene notas', () => {
+    const solicitud = crearSolicitud('PENDIENTE')
+    solicitud.notas = ''
+
+    const wrapper = mount(SolicitudCard, {
+      props: {
+        solicitud: solicitud,
+        nombreMostrado: 'Familia Serrano',
+        mostrarAcciones: false,
+      },
+      global: {
+        stubs: { RouterLink: RouterLinkStub },
+      },
+    })
+
+    expect(wrapper.text()).not.toContain('📝')
+  })
 })
