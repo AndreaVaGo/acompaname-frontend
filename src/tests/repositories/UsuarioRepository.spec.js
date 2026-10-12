@@ -39,4 +39,36 @@ describe("UsuarioRepository", () => {
     expect(fetchFalso.mock.calls[0][1].body).toBe(JSON.stringify(datos));
     expect(usuario.nombre).toBe("Ana Pérez");
   });
+
+  test("cambiarPassword envía las dos contraseñas con PATCH", async () => {
+    const fetchFalso = prepararFetch({});
+    const repository = new UsuarioRepository();
+
+    await repository.cambiarPassword(5, "actual1234", "nueva12345");
+
+    expect(fetchFalso.mock.calls[0][0]).toBe(
+      "http://localhost:8080/api/v1/usuarios/5/password"
+    );
+    expect(fetchFalso.mock.calls[0][1].method).toBe("PATCH");
+    expect(fetchFalso.mock.calls[0][1].body).toBe(
+      JSON.stringify({
+        passwordActual: "actual1234",
+        passwordNueva: "nueva12345",
+      })
+    );
+  });
+
+  test("cambiarPassword lanza un error si el backend responde con fallo", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue({ ok: false });
+    const repository = new UsuarioRepository();
+
+    let mensaje = "";
+    try {
+      await repository.cambiarPassword(5, "mala", "nueva12345");
+    } catch (error) {
+      mensaje = error.message;
+    }
+
+    expect(mensaje).toBe("Error al cambiar la contraseña");
+  });
 });
