@@ -8,6 +8,7 @@ const cuidadorRepository = new CuidadorRepository();
 const cuidadores = ref([]);
 const busqueda = ref("");
 const ciudadBuscada = ref("");
+const tipoBuscado = ref("todos");
 const soloDisponibles = ref(false);
 const soloVehiculo = ref(false);
 const valoracionMinima = ref(0);
@@ -24,6 +25,18 @@ onMounted(async () => {
   }
 });
 
+// Un cuidador sin tipo de cuidado se trata como "ambos"
+function tipoDe(cuidador) {
+  return cuidador.tipoCuidado || "ambos";
+}
+
+function textoTipo(cuidador) {
+  const tipo = tipoDe(cuidador);
+  if (tipo === "hospitalario") return "Hospitalario";
+  if (tipo === "domicilio") return "A domicilio";
+  return "Hospital y domicilio";
+}
+
 const cuidadoresFiltrados = computed(() => {
   return cuidadores.value.filter((cuidador) => {
     const coincideTexto =
@@ -39,6 +52,12 @@ const cuidadoresFiltrados = computed(() => {
       .toLowerCase()
       .includes(ciudadBuscada.value.trim().toLowerCase());
 
+    // Quien ofrece "ambos" sirve para hospitalario y para domicilio
+    const coincideTipo =
+      tipoBuscado.value === "todos" ||
+      tipoDe(cuidador) === "ambos" ||
+      tipoDe(cuidador) === tipoBuscado.value;
+
     // Si el filtro no está activado, todos los cuidadores valen
     const coincideDisponible =
       !soloDisponibles.value || cuidador.disponibleAhora;
@@ -53,6 +72,7 @@ const cuidadoresFiltrados = computed(() => {
     return (
       coincideTexto &&
       coincideCiudad &&
+      coincideTipo &&
       coincideDisponible &&
       coincideVehiculo &&
       coincideValoracion
@@ -95,12 +115,34 @@ const cuidadoresFiltrados = computed(() => {
       <div class="buscar__filter-group">
         <label>Tipo de cuidado</label>
         <div class="buscar__filter-options">
-          <button class="buscar__filter-btn buscar__filter-btn--active">
+          <button
+            id="filtro-tipo-todos"
+            class="buscar__filter-btn"
+            :class="{ 'buscar__filter-btn--active': tipoBuscado === 'todos' }"
+            @click="tipoBuscado = 'todos'"
+          >
             Todos
           </button>
-          <button class="buscar__filter-btn">Hospitalario</button>
-          <button class="buscar__filter-btn">A domicilio</button>
-          <button class="buscar__filter-btn">Ambos</button>
+          <button
+            id="filtro-tipo-hospitalario"
+            class="buscar__filter-btn"
+            :class="{
+              'buscar__filter-btn--active': tipoBuscado === 'hospitalario',
+            }"
+            @click="tipoBuscado = 'hospitalario'"
+          >
+            Hospitalario
+          </button>
+          <button
+            id="filtro-tipo-domicilio"
+            class="buscar__filter-btn"
+            :class="{
+              'buscar__filter-btn--active': tipoBuscado === 'domicilio',
+            }"
+            @click="tipoBuscado = 'domicilio'"
+          >
+            A domicilio
+          </button>
         </div>
       </div>
 
@@ -221,6 +263,9 @@ const cuidadoresFiltrados = computed(() => {
         </p>
 
         <div class="buscar__tags">
+          <span class="buscar__tag buscar__tag--tipo">{{
+            textoTipo(cuidador)
+          }}</span>
           <span
             class="buscar__tag buscar__tag--disponible"
             v-if="cuidador.disponibleAhora"
@@ -388,6 +433,11 @@ const cuidadoresFiltrados = computed(() => {
   padding: 4px 12px;
   border-radius: var(--radius-pill);
   font-size: 0.8rem;
+}
+
+.buscar__tag--tipo {
+  background-color: var(--color-neutral-bg);
+  color: var(--color-text);
 }
 
 .buscar__tag--disponible {
