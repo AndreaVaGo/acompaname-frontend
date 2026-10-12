@@ -30,6 +30,16 @@ export const useAuthStore = defineStore("auth", () => {
     sessionStorage.setItem("credenciales", credenciales.value);
   }
 
+  // El email es el usuario con el que se inicia sesión, así que al cambiarlo
+  // hay que rehacer las credenciales (con la misma contraseña de antes)
+  function actualizarEmail(emailNuevo) {
+    const passwordActual = atob(credenciales.value).split(":").slice(1).join(":");
+    email.value = emailNuevo;
+    credenciales.value = btoa(`${emailNuevo}:${passwordActual}`);
+    sessionStorage.setItem("email", emailNuevo);
+    sessionStorage.setItem("credenciales", credenciales.value);
+  }
+
   function setFoto(nuevaFoto) {
     foto.value = nuevaFoto;
   }
@@ -57,6 +67,7 @@ export const useAuthStore = defineStore("auth", () => {
     foto,
     login,
     actualizarPassword,
+    actualizarEmail,
     setFoto,
     logout,
   };
