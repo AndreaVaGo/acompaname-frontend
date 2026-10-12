@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue";
 import { useRoute, RouterLink } from "vue-router";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
+import { formatearFecha } from "@/utils/formatearFecha";
 
 const route = useRoute();
 const solicitudRepository = new SolicitudRepository();
@@ -43,11 +44,11 @@ onMounted(async () => {
         </div>
         <div class="confirmacion__fila">
           <span>Fecha de inicio</span>
-          <strong>{{ solicitud.fechaCuidado }}</strong>
+          <strong>{{ formatearFecha(solicitud.fechaCuidado) }}</strong>
         </div>
         <div v-if="solicitud.fechaFin" class="confirmacion__fila">
           <span>Fecha de fin</span>
-          <strong>{{ solicitud.fechaFin }}</strong>
+          <strong>{{ formatearFecha(solicitud.fechaFin) }}</strong>
         </div>
         <div class="confirmacion__fila">
           <span>Paciente</span>
