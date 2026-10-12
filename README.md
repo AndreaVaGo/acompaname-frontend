@@ -8,7 +8,7 @@ Este repositorio contiene la **aplicación web** del proyecto, desarrollada con 
 
 Proyecto final del bootcamp de Desarrollo Web Full Stack (850h) en **Factoría F5 — Digital Academy**.
 
-![Vue](https://img.shields.io/badge/Vue-3-42b883) ![Vite](https://img.shields.io/badge/Vite-8-646CFF) ![Pinia](https://img.shields.io/badge/Pinia-estado-yellow) ![Vitest](https://img.shields.io/badge/tests-119-success) ![Responsive](https://img.shields.io/badge/responsive-768px-blue)
+![Vue](https://img.shields.io/badge/Vue-3-42b883) ![Vite](https://img.shields.io/badge/Vite-8-646CFF) ![Pinia](https://img.shields.io/badge/Pinia-estado-yellow) ![Vitest](https://img.shields.io/badge/tests-121-success) ![Responsive](https://img.shields.io/badge/responsive-768px-blue)
 
 ---
 
@@ -165,7 +165,7 @@ Cada vista incluye sus correspondientes estados vacíos (por ejemplo, "Aún no t
 
 El desarrollo siguió un enfoque iterativo: primero se construyó la estructura HTML de cada vista con datos de ejemplo, después se aplicaron los estilos comparando visualmente con el prototipo de diseño, posteriormente se refactorizó el CSS a BEM con variables globales, y finalmente se sustituyeron los datos de ejemplo por llamadas reales a la API REST a través del Repository Pattern, una vez que el backend estuvo disponible.
 
-La gestión del proyecto se organizó en **JIRA** (proyecto <mark>ACOM</mark>) con 8 épicas, 19 historias de usuario redactadas con criterios de aceptación en formato Gherkin (Given/When/Then), 39 tareas técnicas y 5 sprints entre agosto y octubre de 2026. El control de versiones se llevó con commits descriptivos en inglés, agrupados por unidad funcional (una vista, un bloque de responsive, un refactor concreto, un archivo de test).
+La gestión del proyecto se organizó en **JIRA** (proyecto <mark>ACOM</mark>) con 8 épicas, 19 historias de usuario redactadas con criterios de aceptación en formato Gherkin (Given/When/Then), 43 tareas técnicas y 5 sprints entre agosto y octubre de 2026. El control de versiones se llevó con commits descriptivos en inglés, agrupados por unidad funcional (una vista, un bloque de responsive, un refactor concreto, un archivo de test).
 
 🔗 Tablero de JIRA: https://saludosalamanecer-1780468848301.atlassian.net/jira/software/projects/ACOM/boards/34/timeline?rangeMode=MONTHS
 
@@ -480,7 +480,7 @@ classDiagram
 
 ## ✅ Tests
 
-El proyecto tiene **119 tests unitarios** (Vitest + Vue Test Utils) y **9 tests e2e** (Playwright). Los unitarios mockean el repositorio correspondiente (<mark>vi.spyOn(Repository.prototype, "metodo")</mark>) para no depender de que el backend esté levantado. Los repositorios tienen además sus propios tests, que simulan <mark>fetch</mark> y comprueban la ruta, el método y los errores de cada llamada.
+El proyecto tiene **121 tests unitarios** (Vitest + Vue Test Utils) y **9 tests e2e** (Playwright). Los unitarios mockean el repositorio correspondiente (<mark>vi.spyOn(Repository.prototype, "metodo")</mark>) para no depender de que el backend esté levantado. Los repositorios tienen además sus propios tests, que simulan <mark>fetch</mark> y comprueban la ruta, el método y los errores de cada llamada.
 
 ### Tests unitarios
 
@@ -510,7 +510,7 @@ La cobertura se mide con <mark>@vitest/coverage-v8</mark>. Se genera el informe 
 npm run test:coverage
 ```
 
-Resultado actual: **86 % de líneas**, **93 % de ramas** y **86 % de sentencias**, por encima del 70 % mínimo que se pedía.
+Resultado actual: **86 % de líneas**, **93 % de ramas** y **87 % de sentencias**, por encima del 70 % mínimo que se pedía.
 
 ![Cobertura de los tests del frontend](docs/screenshots/cobertura-frontend.png)
 
