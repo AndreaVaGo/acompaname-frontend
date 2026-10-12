@@ -12,4 +12,14 @@ export default class UsuarioRepository extends Repository {
   async update(id, usuarioData) {
     return this.put(`/usuarios/${id}`, usuarioData);
   }
+
+  async cambiarPassword(id, passwordActual, passwordNueva) {
+    const response = await fetch(`${this.uri}/usuarios/${id}/password`, {
+      method: "PATCH",
+      headers: this.getHeaders(),
+      body: JSON.stringify({ passwordActual, passwordNueva }),
+    });
+    // El backend responde 204 (sin cuerpo), así que no hay json que leer
+    if (!response.ok) throw new Error("Error al cambiar la contraseña");
+  }
 }
