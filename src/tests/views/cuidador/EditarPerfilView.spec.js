@@ -154,6 +154,7 @@ describe("EditarPerfilView", () => {
       usuarioId: 8,
       foto: null,
       ciudad: null,
+      tipoCuidado: "ambos",
     });
     expect(wrapper.text()).toContain("Perfil guardado correctamente.");
   });
@@ -327,5 +328,44 @@ describe("EditarPerfilView", () => {
 
     expect(wrapper.text()).toContain("No se pudo guardar tu perfil.");
     expect(wrapper.text()).not.toContain("Perfil guardado correctamente.");
+  });
+
+  test("carga el tipo de cuidado del perfil en el formulario", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue({
+      ...perfil,
+      tipoCuidado: "domicilio",
+    });
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.find("#tipo-cuidado").element.value).toBe("domicilio");
+  });
+
+  test("si el perfil no tiene tipo de cuidado se muestra Ambos", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue(
+      perfil
+    );
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.find("#tipo-cuidado").element.value).toBe("ambos");
+  });
+
+  test("guarda el tipo de cuidado elegido", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue(
+      perfil
+    );
+    const updateSpy = vi
+      .spyOn(CuidadorRepository.prototype, "update")
+      .mockResolvedValue({});
+
+    const wrapper = await montarVista();
+    await wrapper.find("#tipo-cuidado").setValue("hospitalario");
+    await enviar(wrapper);
+
+    expect(updateSpy).toHaveBeenCalledWith(
+      3,
+      expect.objectContaining({ tipoCuidado: "hospitalario" })
+    );
   });
 });
