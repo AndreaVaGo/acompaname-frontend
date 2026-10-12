@@ -3,6 +3,7 @@ import { ref, onMounted } from "vue";
 import { RouterLink } from "vue-router";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
 import ValoracionRepository from "@/repositories/ValoracionRepository";
+import { formatearFecha } from "@/utils/formatearFecha";
 
 const solicitudRepository = new SolicitudRepository();
 const valoracionRepository = new ValoracionRepository();
@@ -68,8 +69,10 @@ function textoEstado(estado) {
 
         <ul class="historial__detalles">
           <li>🏠 {{ item.tipoCuidado }}</li>
-          <li>📅 Inicio: {{ item.fechaInicio }}</li>
-          <li v-if="item.fechaFin">📅 Fin: {{ item.fechaFin }}</li>
+          <li>📅 Inicio: {{ formatearFecha(item.fechaInicio) }}</li>
+          <li v-if="item.fechaFin">
+            📅 Fin: {{ formatearFecha(item.fechaFin) }}
+          </li>
           <li>📝 {{ item.notas }}</li>
         </ul>
 
