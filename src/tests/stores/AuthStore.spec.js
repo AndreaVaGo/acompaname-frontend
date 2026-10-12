@@ -60,6 +60,29 @@ describe("auth store", () => {
     );
   });
 
+  test("actualizarEmail cambia el email y mantiene la contraseña en las credenciales", () => {
+    const store = useAuthStore();
+    store.login(5, "ana@test.com", "12345678", "FAMILIA");
+
+    store.actualizarEmail("nueva@test.com");
+
+    expect(store.email).toBe("nueva@test.com");
+    expect(store.credenciales).toBe(btoa("nueva@test.com:12345678"));
+    expect(sessionStorage.getItem("email")).toBe("nueva@test.com");
+    expect(sessionStorage.getItem("credenciales")).toBe(
+      btoa("nueva@test.com:12345678")
+    );
+  });
+
+  test("actualizarEmail mantiene la contraseña aunque contenga dos puntos", () => {
+    const store = useAuthStore();
+    store.login(5, "ana@test.com", "abc:1234:xyz", "FAMILIA");
+
+    store.actualizarEmail("nueva@test.com");
+
+    expect(store.credenciales).toBe(btoa("nueva@test.com:abc:1234:xyz"));
+  });
+
   test("logout borra el store y el sessionStorage", () => {
     const store = useAuthStore();
     store.login(5, "ana@test.com", "12345678", "FAMILIA");
