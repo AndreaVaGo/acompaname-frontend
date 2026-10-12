@@ -121,4 +121,49 @@ describe('NavBar', () => {
     expect(push).toHaveBeenCalledWith('/cambiar-password')
     expect(wrapper.find('.navbar__menu').exists()).toBe(false)
   })
+
+  test('la familia tiene la opción Editar mis datos en el menú', async () => {
+    vi.spyOn(UsuarioRepository.prototype, 'getById').mockResolvedValue({
+      nombre: 'Ana',
+    })
+    const authStore = useAuthStore()
+    authStore.login(1, 'ana@test.com', '12345678', 'FAMILIA')
+
+    const wrapper = await montarNavBar()
+    await wrapper.find('.navbar__avatar').trigger('click')
+
+    expect(wrapper.find('#editar-datos').text()).toBe('Editar mis datos')
+  })
+
+  test('el cuidador también tiene la opción Editar mis datos en el menú', async () => {
+    vi.spyOn(UsuarioRepository.prototype, 'getById').mockResolvedValue({
+      nombre: 'Pepe',
+    })
+    vi.spyOn(CuidadorRepository.prototype, 'getMiPerfil').mockResolvedValue({
+      id: 3,
+    })
+    const authStore = useAuthStore()
+    authStore.login(2, 'pepe@test.com', '12345678', 'CUIDADOR')
+
+    const wrapper = await montarNavBar()
+    await wrapper.find('.navbar__avatar').trigger('click')
+
+    expect(wrapper.find('#editar-datos').exists()).toBe(true)
+  })
+
+  test('Editar mis datos lleva a su página y cierra el menú', async () => {
+    vi.spyOn(UsuarioRepository.prototype, 'getById').mockResolvedValue({
+      nombre: 'Ana',
+    })
+    const push = vi.spyOn(router, 'push').mockResolvedValue()
+    const authStore = useAuthStore()
+    authStore.login(1, 'ana@test.com', '12345678', 'FAMILIA')
+
+    const wrapper = await montarNavBar()
+    await wrapper.find('.navbar__avatar').trigger('click')
+    await wrapper.find('#editar-datos').trigger('click')
+
+    expect(push).toHaveBeenCalledWith('/editar-datos')
+    expect(wrapper.find('.navbar__menu').exists()).toBe(false)
+  })
 })
