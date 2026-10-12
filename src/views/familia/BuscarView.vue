@@ -10,6 +10,7 @@ const busqueda = ref("");
 const ciudadBuscada = ref("");
 const soloDisponibles = ref(false);
 const soloVehiculo = ref(false);
+const valoracionMinima = ref(0);
 const cargando = ref(true);
 const error = ref("");
 
@@ -43,8 +44,18 @@ const cuidadoresFiltrados = computed(() => {
       !soloDisponibles.value || cuidador.disponibleAhora;
     const coincideVehiculo = !soloVehiculo.value || cuidador.tieneVehiculo;
 
+    // Sin valoraciones, la media es null: solo vale si no se pide mínima
+    const coincideValoracion =
+      valoracionMinima.value === 0 ||
+      (cuidador.valoracionMedia !== null &&
+        cuidador.valoracionMedia >= valoracionMinima.value);
+
     return (
-      coincideTexto && coincideCiudad && coincideDisponible && coincideVehiculo
+      coincideTexto &&
+      coincideCiudad &&
+      coincideDisponible &&
+      coincideVehiculo &&
+      coincideValoracion
     );
   });
 });
@@ -136,6 +147,44 @@ const cuidadoresFiltrados = computed(() => {
           </button>
         </div>
       </div>
+
+      <div class="buscar__filter-group">
+        <label>Valoración mínima</label>
+        <div class="buscar__filter-options">
+          <button
+            id="filtro-valoracion-0"
+            class="buscar__filter-btn"
+            :class="{ 'buscar__filter-btn--active': valoracionMinima === 0 }"
+            @click="valoracionMinima = 0"
+          >
+            Cualquiera
+          </button>
+          <button
+            id="filtro-valoracion-3"
+            class="buscar__filter-btn"
+            :class="{ 'buscar__filter-btn--active': valoracionMinima === 3 }"
+            @click="valoracionMinima = 3"
+          >
+            3 ⭐ o más
+          </button>
+          <button
+            id="filtro-valoracion-4"
+            class="buscar__filter-btn"
+            :class="{ 'buscar__filter-btn--active': valoracionMinima === 4 }"
+            @click="valoracionMinima = 4"
+          >
+            4 ⭐ o más
+          </button>
+          <button
+            id="filtro-valoracion-45"
+            class="buscar__filter-btn"
+            :class="{ 'buscar__filter-btn--active': valoracionMinima === 4.5 }"
+            @click="valoracionMinima = 4.5"
+          >
+            4.5 ⭐ o más
+          </button>
+        </div>
+      </div>
     </div>
 
     <p class="buscar__count">
@@ -163,6 +212,13 @@ const cuidadoresFiltrados = computed(() => {
             </p>
           </div>
         </div>
+
+        <p class="buscar__card-valoracion">
+          <template v-if="cuidador.valoracionMedia !== null">
+            ⭐ {{ cuidador.valoracionMedia }} ({{ cuidador.numValoraciones }})
+          </template>
+          <template v-else>Sin valoraciones todavía</template>
+        </p>
 
         <div class="buscar__tags">
           <span
@@ -317,7 +373,7 @@ const cuidadoresFiltrados = computed(() => {
 
 .buscar__card-valoracion {
   font-size: 0.9rem;
-  margin-bottom: 12px;
+  margin: 0 0 12px;
 }
 
 .buscar__tags {
