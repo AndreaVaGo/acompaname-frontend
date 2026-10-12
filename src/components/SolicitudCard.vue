@@ -36,6 +36,7 @@ defineProps([
     <ul class="solicitudes__detalles">
       <li>🏠 {{ solicitud.tipoCuidado }}</li>
       <li>📅 Inicio: {{ solicitud.fechaCuidado }}</li>
+      <li v-if="solicitud.fechaFin">📅 Fin: {{ solicitud.fechaFin }}</li>
       <li>📝 {{ solicitud.notas }}</li>
     </ul>
 
