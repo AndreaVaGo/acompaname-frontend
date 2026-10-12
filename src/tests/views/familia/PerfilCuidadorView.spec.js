@@ -150,4 +150,62 @@ describe("PerfilCuidadorView", () => {
     expect(wrapper.text()).toContain("Inicia sesión para solicitar");
     expect(wrapper.text()).not.toContain("Solicitar servicio");
   });
+
+  test("muestra la valoración media y el número de valoraciones", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
+      usuarioNombre: "Pepe",
+      especialidad: "Geriatría",
+      anosExperiencia: 4,
+      tarifaHora: 18,
+      disponibleAhora: true,
+      bio: "Cuidador con experiencia",
+      valoracionMedia: 4.7,
+      numValoraciones: 3,
+    });
+
+    const wrapper = await montarVista("FAMILIA");
+
+    expect(wrapper.find(".perfil__valoracion").text()).toContain("4.7");
+    expect(wrapper.find(".perfil__valoracion").text()).toContain(
+      "3 valoraciones"
+    );
+  });
+
+  test("con una sola valoración usa el singular", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
+      usuarioNombre: "Pepe",
+      especialidad: "Geriatría",
+      anosExperiencia: 4,
+      tarifaHora: 18,
+      disponibleAhora: true,
+      bio: "Cuidador con experiencia",
+      valoracionMedia: 5,
+      numValoraciones: 1,
+    });
+
+    const wrapper = await montarVista("FAMILIA");
+
+    expect(wrapper.find(".perfil__valoracion").text()).toContain(
+      "1 valoración)"
+    );
+  });
+
+  test("avisa si el cuidador todavía no tiene valoraciones", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
+      usuarioNombre: "Pepe",
+      especialidad: "Geriatría",
+      anosExperiencia: 4,
+      tarifaHora: 18,
+      disponibleAhora: true,
+      bio: "Cuidador con experiencia",
+      valoracionMedia: null,
+      numValoraciones: 0,
+    });
+
+    const wrapper = await montarVista("FAMILIA");
+
+    expect(wrapper.find(".perfil__valoracion").text()).toContain(
+      "Sin valoraciones todavía"
+    );
+  });
 });
