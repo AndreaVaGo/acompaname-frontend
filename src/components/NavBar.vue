@@ -70,6 +70,11 @@ function irAEditarPerfil() {
   router.push("/editar-perfil");
 }
 
+function irAEditarDatos() {
+  menuAbierto.value = false;
+  router.push("/editar-datos");
+}
+
 function irACambiarPassword() {
   menuAbierto.value = false;
   router.push("/cambiar-password");
@@ -172,6 +177,14 @@ function irAMiPerfil() {
               @click="irAEditarPerfil"
             >
               Editar mi perfil
+            </button>
+            <button
+              type="button"
+              class="navbar__menu-item"
+              id="editar-datos"
+              @click="irAEditarDatos"
+            >
+              Editar mis datos
             </button>
             <button
               type="button"
