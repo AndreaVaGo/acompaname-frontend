@@ -44,6 +44,14 @@ onMounted(async () => {
           </div>
         </div>
 
+        <p class="perfil__valoracion">
+          <template v-if="cuidador.valoracionMedia">
+            ⭐ {{ cuidador.valoracionMedia }} ({{ cuidador.numValoraciones }}
+            {{ cuidador.numValoraciones === 1 ? "valoración" : "valoraciones" }})
+          </template>
+          <template v-else>Sin valoraciones todavía</template>
+        </p>
+
         <ul class="perfil__datos">
           <li>
             <strong>Experiencia:</strong> {{ cuidador.anosExperiencia }} años
