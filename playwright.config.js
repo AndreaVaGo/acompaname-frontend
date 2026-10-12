@@ -2,7 +2,8 @@ import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./e2e",
-  timeout: 30000,
+  // El recorrido completo (registro, solicitud, aceptar y pagar) tarda cerca de 30 segundos
+  timeout: 60000,
   // Los tests comparten la misma base de datos, así que van uno detrás de otro
   workers: 1,
   reporter: [["list"], ["html", { open: "never" }]],
