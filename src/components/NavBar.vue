@@ -4,6 +4,8 @@ import { RouterLink, useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "../stores/auth";
 import CuidadorRepository from "@/repositories/CuidadorRepository";
 import UsuarioRepository from "@/repositories/UsuarioRepository";
+import SolicitudRepository from "@/repositories/SolicitudRepository";
+import PagoRepository from "@/repositories/PagoRepository";
 import FotoCuidador from "@/components/FotoCuidador.vue";
 
 const authStore = useAuthStore();
@@ -11,9 +13,12 @@ const router = useRouter();
 const route = useRoute();
 const cuidadorRepository = new CuidadorRepository();
 const usuarioRepository = new UsuarioRepository();
+const solicitudRepository = new SolicitudRepository();
+const pagoRepository = new PagoRepository();
 
 const menuAbierto = ref(false);
 const nombre = ref("");
+const avisos = ref(0);
 
 const esPantallaAcceso = computed(
   () => route.path === "/login" || route.path === "/registro",
@@ -47,8 +52,38 @@ async function cargarDatosCuenta() {
   }
 }
 
+// Cuenta las solicitudes que necesitan tu atención:
+// el cuidador, las pendientes de responder;
+// la familia, las aceptadas que todavía no ha pagado
+async function cargarAvisos() {
+  if (!authStore.estaAutenticado) {
+    avisos.value = 0;
+    return;
+  }
+
+  try {
+    const solicitudes = await solicitudRepository.getMisSolicitudes();
+
+    if (authStore.rol === "CUIDADOR") {
+      avisos.value = solicitudes.filter((s) => s.estado === "PENDIENTE").length;
+    } else {
+      const pagos = await pagoRepository.getMisPagos();
+      const idsPagados = pagos
+        .filter((pago) => pago.estado === "COMPLETADO")
+        .map((pago) => pago.solicitudId);
+      avisos.value = solicitudes.filter(
+        (s) => s.estado === "ACEPTADA" && !idsPagados.includes(s.id),
+      ).length;
+    }
+  } catch (err) {
+    avisos.value = 0;
+    console.error("No se pudieron cargar los avisos", err);
+  }
+}
+
 // Se vuelve a cargar al cambiar de página (por ejemplo, después de editar la foto)
 watch(() => route.path, cargarDatosCuenta, { immediate: true });
+watch(() => route.path, cargarAvisos, { immediate: true });
 
 function handleLogout() {
   menuAbierto.value = false;
@@ -119,14 +154,18 @@ function irAMiPerfil() {
         v-if="authStore.rol === 'FAMILIA'"
         to="/solicitudes"
         class="navbar__link"
-        >Solicitudes</RouterLink
       >
+        Solicitudes
+        <span v-if="avisos > 0" class="navbar__aviso">{{ avisos }}</span>
+      </RouterLink>
       <RouterLink
         v-if="authStore.rol === 'CUIDADOR'"
         to="/solicitudes-cuidador"
         class="navbar__link"
-        >Solicitudes</RouterLink
       >
+        Solicitudes
+        <span v-if="avisos > 0" class="navbar__aviso">{{ avisos }}</span>
+      </RouterLink>
       <RouterLink to="/historial" class="navbar__link">Historial</RouterLink>
 
       <div class="navbar__account">
@@ -242,6 +281,18 @@ function irAMiPerfil() {
 .navbar__link.router-link-exact-active {
   background-color: var(--color-secondary-bg);
   color: var(--color-text);
+}
+
+.navbar__aviso {
+  display: inline-block;
+  min-width: 20px;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-accent);
+  color: var(--color-white);
+  font-size: 0.8rem;
+  text-align: center;
 }
 
 .navbar__cta {
