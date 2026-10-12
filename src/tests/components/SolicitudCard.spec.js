@@ -69,7 +69,7 @@ describe('SolicitudCard', () => {
     expect(wrapper.text()).not.toContain('Pagado')
   })
 
-  test('muestra la fecha de fin si la solicitud la tiene', () => {
+  test('muestra las fechas de inicio y de fin en formato día-mes-año', () => {
     const wrapper = mount(SolicitudCard, {
       props: {
         solicitud: { ...crearSolicitud('PENDIENTE'), fechaFin: '2026-08-19' },
@@ -81,8 +81,9 @@ describe('SolicitudCard', () => {
       },
     })
 
-    expect(wrapper.text()).toContain('Inicio: 2026-08-12')
-    expect(wrapper.text()).toContain('Fin: 2026-08-19')
+    expect(wrapper.text()).toContain('Inicio: 12-08-2026')
+    expect(wrapper.text()).toContain('Fin: 19-08-2026')
+    expect(wrapper.text()).not.toContain('2026-08-12')
   })
 
   test('no muestra la línea de fin si la solicitud no tiene fecha de fin', () => {
