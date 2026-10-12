@@ -153,8 +153,57 @@ describe("EditarPerfilView", () => {
       disponibleAhora: true,
       usuarioId: 8,
       foto: null,
+      ciudad: null,
     });
     expect(wrapper.text()).toContain("Perfil guardado correctamente.");
+  });
+
+  test("carga la ciudad del perfil en el formulario", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue({
+      ...perfil,
+      ciudad: "Oviedo",
+    });
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.find("#ciudad").element.value).toBe("Oviedo");
+  });
+
+  test("guarda la ciudad escrita", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue(
+      perfil
+    );
+    const updateSpy = vi
+      .spyOn(CuidadorRepository.prototype, "update")
+      .mockResolvedValue({});
+
+    const wrapper = await montarVista();
+    await wrapper.find("#ciudad").setValue("  Gijón ");
+    await enviar(wrapper);
+
+    expect(updateSpy).toHaveBeenCalledWith(
+      3,
+      expect.objectContaining({ ciudad: "Gijón" })
+    );
+  });
+
+  test("si se borra la ciudad se guarda sin ciudad", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue({
+      ...perfil,
+      ciudad: "Oviedo",
+    });
+    const updateSpy = vi
+      .spyOn(CuidadorRepository.prototype, "update")
+      .mockResolvedValue({});
+
+    const wrapper = await montarVista();
+    await wrapper.find("#ciudad").setValue("");
+    await enviar(wrapper);
+
+    expect(updateSpy).toHaveBeenCalledWith(
+      3,
+      expect.objectContaining({ ciudad: null })
+    );
   });
 
   test("carga la foto del perfil en el formulario", async () => {
