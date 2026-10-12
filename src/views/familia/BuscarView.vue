@@ -7,6 +7,7 @@ import FotoCuidador from "@/components/FotoCuidador.vue";
 const cuidadorRepository = new CuidadorRepository();
 const cuidadores = ref([]);
 const busqueda = ref("");
+const ciudadBuscada = ref("");
 const cargando = ref(true);
 const error = ref("");
 
@@ -21,15 +22,22 @@ onMounted(async () => {
 });
 
 const cuidadoresFiltrados = computed(() => {
-  return cuidadores.value.filter(
-    (cuidador) =>
+  return cuidadores.value.filter((cuidador) => {
+    const coincideTexto =
       cuidador.usuarioNombre
         .toLowerCase()
         .includes(busqueda.value.toLowerCase()) ||
       cuidador.especialidad
         .toLowerCase()
-        .includes(busqueda.value.toLowerCase()),
-  );
+        .includes(busqueda.value.toLowerCase());
+
+    // Si el cuidador no tiene ciudad, lo tratamos como texto vacío
+    const coincideCiudad = (cuidador.ciudad || "")
+      .toLowerCase()
+      .includes(ciudadBuscada.value.trim().toLowerCase());
+
+    return coincideTexto && coincideCiudad;
+  });
 });
 </script>
 
@@ -53,6 +61,17 @@ const cuidadoresFiltrados = computed(() => {
     </div>
 
     <div class="buscar__filters">
+      <div class="buscar__filter-group">
+        <label for="filtro-ciudad">Ciudad</label>
+        <input
+          type="text"
+          id="filtro-ciudad"
+          v-model="ciudadBuscada"
+          placeholder="Oviedo, Gijón, Madrid..."
+          class="buscar__input buscar__input--ciudad"
+        />
+      </div>
+
       <div class="buscar__filter-group">
         <label>Tipo de cuidado</label>
         <div class="buscar__filter-options">
@@ -106,6 +125,9 @@ const cuidadoresFiltrados = computed(() => {
           <div>
             <h3>{{ cuidador.usuarioNombre }}</h3>
             <p class="buscar__card-especialidad">{{ cuidador.especialidad }}</p>
+            <p v-if="cuidador.ciudad" class="buscar__card-ciudad">
+              📍 {{ cuidador.ciudad }}
+            </p>
           </div>
         </div>
 
@@ -169,6 +191,12 @@ const cuidadoresFiltrados = computed(() => {
   border: 1px solid var(--color-border);
   font-size: 1rem;
   font-family: inherit;
+}
+
+.buscar__input--ciudad {
+  width: 100%;
+  max-width: 320px;
+  box-sizing: border-box;
 }
 
 .buscar__filters {
@@ -248,6 +276,12 @@ const cuidadoresFiltrados = computed(() => {
   margin: 0;
 }
 
+.buscar__card-ciudad {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  margin: 4px 0 0;
+}
+
 .buscar__card-valoracion {
   font-size: 0.9rem;
   margin-bottom: 12px;
@@ -295,6 +329,10 @@ const cuidadoresFiltrados = computed(() => {
 
   .buscar__grid {
     grid-template-columns: 1fr;
+  }
+
+  .buscar__input--ciudad {
+    max-width: none;
   }
 
   .buscar__filter-options {
