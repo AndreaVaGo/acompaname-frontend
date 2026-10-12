@@ -23,6 +23,13 @@ export const useAuthStore = defineStore("auth", () => {
     sessionStorage.setItem("credenciales", credenciales.value);
   }
 
+  // Tras cambiar la contraseña hay que guardar las credenciales nuevas,
+  // si no las siguientes peticiones se harían con la contraseña vieja (401)
+  function actualizarPassword(passwordNueva) {
+    credenciales.value = btoa(`${email.value}:${passwordNueva}`);
+    sessionStorage.setItem("credenciales", credenciales.value);
+  }
+
   function setFoto(nuevaFoto) {
     foto.value = nuevaFoto;
   }
@@ -49,6 +56,7 @@ export const useAuthStore = defineStore("auth", () => {
     estaAutenticado,
     foto,
     login,
+    actualizarPassword,
     setFoto,
     logout,
   };
