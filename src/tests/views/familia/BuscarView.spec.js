@@ -13,6 +13,8 @@ vi.spyOn(CuidadorRepository.prototype, "getAll").mockResolvedValue([
     tieneVehiculo: true,
     disponibleAhora: true,
     ciudad: "Oviedo",
+    valoracionMedia: 4.7,
+    numValoraciones: 3,
   },
   {
     id: 2,
@@ -23,6 +25,19 @@ vi.spyOn(CuidadorRepository.prototype, "getAll").mockResolvedValue([
     disponibleAhora: false,
     foto: "https://ejemplo.com/ana.jpg",
     ciudad: "Gijón",
+    valoracionMedia: null,
+    numValoraciones: 0,
+  },
+  {
+    id: 3,
+    usuarioNombre: "Luis",
+    especialidad: "Fisioterapia",
+    tarifaHora: 18,
+    tieneVehiculo: false,
+    disponibleAhora: false,
+    ciudad: "Avilés",
+    valoracionMedia: 3.5,
+    numValoraciones: 2,
   },
 ]);
 
@@ -152,5 +167,69 @@ describe("BuscarView", () => {
     expect(wrapper.find("#filtro-indiferente").classes()).not.toContain(
       "buscar__filter-btn--active",
     );
+  });
+
+  test("muestra la valoración media y cuántas valoraciones tiene", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(wrapper.text()).toContain("4.7 (3)");
+    expect(wrapper.text()).toContain("3.5 (2)");
+  });
+
+  test("avisa si el cuidador todavía no tiene valoraciones", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(wrapper.text()).toContain("Sin valoraciones todavía");
+  });
+
+  test("el filtro de valoración mínima 4 solo deja a los que llegan a 4", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper.find("#filtro-valoracion-4").trigger("click");
+
+    expect(wrapper.text()).toContain("Pepe");
+    expect(wrapper.text()).not.toContain("Luis");
+    expect(wrapper.text()).not.toContain("Ana");
+  });
+
+  test("el filtro de valoración mínima 3 deja fuera a los que no tienen valoraciones", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper.find("#filtro-valoracion-3").trigger("click");
+
+    expect(wrapper.text()).toContain("Pepe");
+    expect(wrapper.text()).toContain("Luis");
+    expect(wrapper.text()).not.toContain("Ana");
+  });
+
+  test("volver a Cualquiera en valoración vuelve a mostrar a todos", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper.find("#filtro-valoracion-4").trigger("click");
+    await wrapper.find("#filtro-valoracion-0").trigger("click");
+
+    expect(wrapper.text()).toContain("Pepe");
+    expect(wrapper.text()).toContain("Luis");
+    expect(wrapper.text()).toContain("Ana");
   });
 });
