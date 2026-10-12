@@ -36,7 +36,7 @@ defineProps([
     <ul class="solicitudes__detalles">
       <li>🏠 {{ solicitud.tipoCuidado }}</li>
       <li>📅 Inicio: {{ solicitud.fechaCuidado }}</li>
-      <li>📝 {{ solicitud.notas }}</li>
+      <li v-if="solicitud.notas">📝 {{ solicitud.notas }}</li>
     </ul>
 
     <div
@@ -81,6 +81,8 @@ defineProps([
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
   margin-bottom: 4px;
 
   & h3 {
