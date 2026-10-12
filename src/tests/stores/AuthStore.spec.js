@@ -48,6 +48,18 @@ describe("auth store", () => {
     );
   });
 
+  test("actualizarPassword cambia las credenciales en el store y en sessionStorage", () => {
+    const store = useAuthStore();
+    store.login(5, "ana@test.com", "12345678", "FAMILIA");
+
+    store.actualizarPassword("nueva12345");
+
+    expect(store.credenciales).toBe(btoa("ana@test.com:nueva12345"));
+    expect(sessionStorage.getItem("credenciales")).toBe(
+      btoa("ana@test.com:nueva12345")
+    );
+  });
+
   test("logout borra el store y el sessionStorage", () => {
     const store = useAuthStore();
     store.login(5, "ana@test.com", "12345678", "FAMILIA");
