@@ -246,6 +246,7 @@ const cuidadoresFiltrados = computed(() => {
 
 <style scoped>
 .buscar {
+  width: 100%;
   min-height: 100vh;
   background-color: var(--color-bg);
   font-family: var(--font-base);
