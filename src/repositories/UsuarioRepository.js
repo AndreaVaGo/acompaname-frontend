@@ -22,4 +22,14 @@ export default class UsuarioRepository extends Repository {
     // El backend responde 204 (sin cuerpo), así que no hay json que leer
     if (!response.ok) throw new Error("Error al cambiar la contraseña");
   }
+
+  async actualizarContacto(id, nombre, email, telefono) {
+    const response = await fetch(`${this.uri}/usuarios/${id}/contacto`, {
+      method: "PATCH",
+      headers: this.getHeaders(),
+      body: JSON.stringify({ nombre, email, telefono }),
+    });
+    if (!response.ok) throw new Error("Error al actualizar los datos");
+    return response.json();
+  }
 }
