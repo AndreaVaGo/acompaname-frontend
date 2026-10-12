@@ -11,6 +11,7 @@ const authStore = useAuthStore();
 const perfil = ref(null);
 const especialidad = ref("");
 const ciudad = ref("");
+const tipoCuidado = ref("ambos");
 const anosExperiencia = ref(0);
 const tarifaHora = ref(0);
 const bio = ref("");
@@ -27,6 +28,7 @@ onMounted(async () => {
     perfil.value = await cuidadorRepository.getMiPerfil();
     especialidad.value = perfil.value.especialidad;
     ciudad.value = perfil.value.ciudad || "";
+    tipoCuidado.value = perfil.value.tipoCuidado || "ambos";
     anosExperiencia.value = perfil.value.anosExperiencia;
     tarifaHora.value = perfil.value.tarifaHora;
     bio.value = perfil.value.bio;
@@ -90,6 +92,7 @@ async function guardar() {
       usuarioId: perfil.value.usuarioId,
       foto: foto.value.trim() || null,
       ciudad: ciudad.value.trim() || null,
+      tipoCuidado: tipoCuidado.value,
     });
     // Así el círculo del menú de arriba cambia al momento
     authStore.setFoto(foto.value);
@@ -158,6 +161,13 @@ async function guardar() {
           maxlength="100"
           placeholder="Oviedo, Gijón, Madrid..."
         />
+
+        <label for="tipo-cuidado">Tipo de cuidado</label>
+        <select id="tipo-cuidado" v-model="tipoCuidado">
+          <option value="hospitalario">Hospitalario</option>
+          <option value="domicilio">A domicilio</option>
+          <option value="ambos">Ambos (hospital y domicilio)</option>
+        </select>
 
         <div class="editar__row">
           <div>
@@ -248,6 +258,7 @@ async function guardar() {
 
   & input[type="text"],
   & input[type="number"],
+  & select,
   & textarea {
     padding: 12px 14px;
     border-radius: var(--radius-input);
@@ -255,6 +266,10 @@ async function guardar() {
     margin-bottom: var(--gap-md);
     font-size: 1rem;
     font-family: inherit;
+  }
+
+  & select {
+    background-color: var(--color-white);
   }
 
   & textarea {
