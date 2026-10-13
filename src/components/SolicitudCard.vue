@@ -8,6 +8,7 @@ defineProps([
   "pagado",
   "aceptar",
   "rechazar",
+  "completar",
 ]);
 </script>
 
@@ -48,6 +49,18 @@ defineProps([
       </button>
       <button class="btn btn--secondary" @click="rechazar(solicitud.id)">
         Rechazar
+      </button>
+    </div>
+
+    <div
+      class="solicitudes__acciones"
+      v-if="mostrarAcciones && solicitud.estado === 'ACEPTADA' && completar"
+    >
+      <button
+        class="btn btn--primary solicitudes__completar"
+        @click="completar(solicitud.id)"
+      >
+        Marcar como completada
       </button>
     </div>
 
