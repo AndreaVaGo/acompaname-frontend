@@ -208,4 +208,40 @@ describe("PerfilCuidadorView", () => {
       "Sin valoraciones todavía"
     );
   });
+
+  test("muestra los servicios del cuidador con su nombre", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
+      usuarioNombre: "Pepe",
+      especialidad: "Geriatría",
+      anosExperiencia: 4,
+      tarifaHora: 18,
+      disponibleAhora: true,
+      bio: "Cuidador con experiencia",
+      servicios: ["medicacion", "nocturno"],
+    });
+
+    const wrapper = await montarVista("FAMILIA");
+
+    const servicios = wrapper.findAll(".perfil__servicio");
+    expect(servicios.length).toBe(2);
+    expect(servicios[0].text()).toBe("Medicación");
+    expect(servicios[1].text()).toBe("Acompañamiento nocturno");
+  });
+
+  test("no muestra la sección de servicios si el cuidador no tiene", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
+      usuarioNombre: "Pepe",
+      especialidad: "Geriatría",
+      anosExperiencia: 4,
+      tarifaHora: 18,
+      disponibleAhora: true,
+      bio: "Cuidador con experiencia",
+      servicios: [],
+    });
+
+    const wrapper = await montarVista("FAMILIA");
+
+    expect(wrapper.find(".perfil__servicios").exists()).toBe(false);
+    expect(wrapper.text()).not.toContain("Servicios");
+  });
 });
