@@ -156,6 +156,7 @@ describe("EditarPerfilView", () => {
       ciudad: null,
       tipoCuidado: "ambos",
       servicios: [],
+      sexo: "",
     });
     expect(wrapper.text()).toContain("Perfil guardado correctamente.");
   });
@@ -418,6 +419,45 @@ describe("EditarPerfilView", () => {
     expect(updateSpy).toHaveBeenCalledWith(
       3,
       expect.objectContaining({ servicios: [] })
+    );
+  });
+
+  test("carga el sexo del perfil en el formulario", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue({
+      ...perfil,
+      sexo: "MUJER",
+    });
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.find("#sexo").element.value).toBe("MUJER");
+  });
+
+  test("si el perfil no tiene sexo se muestra Prefiero no indicarlo", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue(
+      perfil
+    );
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.find("#sexo").element.value).toBe("");
+  });
+
+  test("guarda el sexo elegido", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue(
+      perfil
+    );
+    const updateSpy = vi
+      .spyOn(CuidadorRepository.prototype, "update")
+      .mockResolvedValue({});
+
+    const wrapper = await montarVista();
+    await wrapper.find("#sexo").setValue("HOMBRE");
+    await enviar(wrapper);
+
+    expect(updateSpy).toHaveBeenCalledWith(
+      3,
+      expect.objectContaining({ sexo: "HOMBRE" })
     );
   });
 });
