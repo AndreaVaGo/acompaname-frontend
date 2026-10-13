@@ -5,6 +5,7 @@ import { useAuthStore } from "../../stores/auth";
 import { RouterLink } from "vue-router";
 import CuidadorRepository from "@/repositories/CuidadorRepository";
 import FotoCuidador from "@/components/FotoCuidador.vue";
+import { nombreServicio } from "@/utils/servicios";
 
 const route = useRoute();
 const cuidadorId = route.params.id;
@@ -69,6 +70,22 @@ onMounted(async () => {
             }}
           </li>
         </ul>
+
+        <div
+          class="perfil__servicios"
+          v-if="cuidador.servicios && cuidador.servicios.length > 0"
+        >
+          <h2>Servicios</h2>
+          <div class="perfil__servicios-lista">
+            <span
+              class="perfil__servicio"
+              v-for="codigo in cuidador.servicios"
+              :key="codigo"
+            >
+              {{ nombreServicio(codigo) }}
+            </span>
+          </div>
+        </div>
 
         <h2>Sobre mí</h2>
         <p class="perfil__bio">{{ cuidador.bio }}</p>
@@ -189,6 +206,20 @@ onMounted(async () => {
 
 .perfil__badge--activo {
   background-color: var(--color-secondary);
+}
+
+.perfil__servicios-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.perfil__servicio {
+  background-color: var(--color-accent-bg);
+  color: var(--color-accent);
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 0.85rem;
 }
 
 .perfil__bio {
