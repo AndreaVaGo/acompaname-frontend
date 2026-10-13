@@ -155,6 +155,7 @@ describe("EditarPerfilView", () => {
       foto: null,
       ciudad: null,
       tipoCuidado: "ambos",
+      servicios: [],
     });
     expect(wrapper.text()).toContain("Perfil guardado correctamente.");
   });
@@ -366,6 +367,57 @@ describe("EditarPerfilView", () => {
     expect(updateSpy).toHaveBeenCalledWith(
       3,
       expect.objectContaining({ tipoCuidado: "hospitalario" })
+    );
+  });
+
+  test("carga los servicios marcados del perfil", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue({
+      ...perfil,
+      servicios: ["medicacion", "higiene"],
+    });
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.find("#servicio-medicacion").element.checked).toBe(true);
+    expect(wrapper.find("#servicio-higiene").element.checked).toBe(true);
+    expect(wrapper.find("#servicio-nocturno").element.checked).toBe(false);
+  });
+
+  test("guarda los servicios marcados", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue(
+      perfil
+    );
+    const updateSpy = vi
+      .spyOn(CuidadorRepository.prototype, "update")
+      .mockResolvedValue({});
+
+    const wrapper = await montarVista();
+    await wrapper.find("#servicio-medicacion").setValue(true);
+    await wrapper.find("#servicio-nocturno").setValue(true);
+    await enviar(wrapper);
+
+    expect(updateSpy).toHaveBeenCalledWith(
+      3,
+      expect.objectContaining({ servicios: ["medicacion", "nocturno"] })
+    );
+  });
+
+  test("si se desmarcan todos los servicios se guarda la lista vacía", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue({
+      ...perfil,
+      servicios: ["medicacion"],
+    });
+    const updateSpy = vi
+      .spyOn(CuidadorRepository.prototype, "update")
+      .mockResolvedValue({});
+
+    const wrapper = await montarVista();
+    await wrapper.find("#servicio-medicacion").setValue(false);
+    await enviar(wrapper);
+
+    expect(updateSpy).toHaveBeenCalledWith(
+      3,
+      expect.objectContaining({ servicios: [] })
     );
   });
 });
