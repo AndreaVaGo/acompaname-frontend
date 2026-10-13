@@ -179,6 +179,9 @@ async function guardar() {
             v-for="servicio in SERVICIOS"
             :key="servicio.codigo"
             class="editar__check"
+            :class="{
+              'editar__check--marcado': servicios.includes(servicio.codigo),
+            }"
           >
             <input
               type="checkbox"
@@ -215,12 +218,18 @@ async function guardar() {
           placeholder="Cuéntales tu experiencia y cómo trabajas..."
         ></textarea>
 
-        <label class="editar__check">
+        <label
+          class="editar__check"
+          :class="{ 'editar__check--marcado': tieneVehiculo }"
+        >
           <input type="checkbox" id="vehiculo" v-model="tieneVehiculo" />
           Tengo vehículo propio
         </label>
 
-        <label class="editar__check">
+        <label
+          class="editar__check"
+          :class="{ 'editar__check--marcado': disponibleAhora }"
+        >
           <input type="checkbox" id="disponible" v-model="disponibleAhora" />
           Disponible ahora
         </label>
@@ -297,6 +306,35 @@ async function guardar() {
     min-height: 120px;
     resize: vertical;
   }
+
+  /* Dentro del formulario para ganar a la regla "label" de arriba (negrita) */
+  & .editar__check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: normal;
+    margin-bottom: var(--gap-sm);
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-input);
+    background-color: var(--color-white);
+    cursor: pointer;
+  }
+
+  & .editar__check:hover {
+    border-color: var(--color-accent);
+  }
+
+  & .editar__check--marcado {
+    border-color: var(--color-accent);
+    background-color: var(--color-accent-bg);
+  }
+
+  & .editar__check input[type="checkbox"] {
+    accent-color: var(--color-accent);
+    width: 16px;
+    height: 16px;
+  }
 }
 
 .editar__foto {
@@ -342,7 +380,7 @@ async function guardar() {
 
 .editar__titulo-grupo {
   font-weight: bold;
-  margin: 0 0 6px;
+  margin: 0 0 8px;
   font-size: 0.9rem;
 }
 
@@ -351,14 +389,6 @@ async function guardar() {
   grid-template-columns: repeat(2, 1fr);
   gap: 0 var(--gap-sm);
   margin-bottom: var(--gap-md);
-}
-
-.editar__check {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: normal;
-  margin-bottom: var(--gap-sm);
 }
 
 .editar__error {
