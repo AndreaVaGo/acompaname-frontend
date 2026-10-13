@@ -3,6 +3,7 @@ import { ref, onMounted } from "vue";
 import CuidadorRepository from "@/repositories/CuidadorRepository";
 import FotoCuidador from "@/components/FotoCuidador.vue";
 import { reducirImagen } from "@/utils/reducirImagen";
+import { SERVICIOS } from "@/utils/servicios";
 import { useAuthStore } from "@/stores/auth";
 
 const cuidadorRepository = new CuidadorRepository();
@@ -12,6 +13,7 @@ const perfil = ref(null);
 const especialidad = ref("");
 const ciudad = ref("");
 const tipoCuidado = ref("ambos");
+const servicios = ref([]);
 const anosExperiencia = ref(0);
 const tarifaHora = ref(0);
 const bio = ref("");
@@ -29,6 +31,7 @@ onMounted(async () => {
     especialidad.value = perfil.value.especialidad;
     ciudad.value = perfil.value.ciudad || "";
     tipoCuidado.value = perfil.value.tipoCuidado || "ambos";
+    servicios.value = perfil.value.servicios || [];
     anosExperiencia.value = perfil.value.anosExperiencia;
     tarifaHora.value = perfil.value.tarifaHora;
     bio.value = perfil.value.bio;
@@ -93,6 +96,7 @@ async function guardar() {
       foto: foto.value.trim() || null,
       ciudad: ciudad.value.trim() || null,
       tipoCuidado: tipoCuidado.value,
+      servicios: servicios.value,
     });
     // Así el círculo del menú de arriba cambia al momento
     authStore.setFoto(foto.value);
@@ -168,6 +172,23 @@ async function guardar() {
           <option value="domicilio">A domicilio</option>
           <option value="ambos">Ambos (hospital y domicilio)</option>
         </select>
+
+        <p class="editar__titulo-grupo">Servicios en los que tienes experiencia</p>
+        <div class="editar__servicios">
+          <label
+            v-for="servicio in SERVICIOS"
+            :key="servicio.codigo"
+            class="editar__check"
+          >
+            <input
+              type="checkbox"
+              :id="'servicio-' + servicio.codigo"
+              :value="servicio.codigo"
+              v-model="servicios"
+            />
+            {{ servicio.nombre }}
+          </label>
+        </div>
 
         <div class="editar__row">
           <div>
@@ -319,6 +340,19 @@ async function guardar() {
   }
 }
 
+.editar__titulo-grupo {
+  font-weight: bold;
+  margin: 0 0 6px;
+  font-size: 0.9rem;
+}
+
+.editar__servicios {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0 var(--gap-sm);
+  margin-bottom: var(--gap-md);
+}
+
 .editar__check {
   display: flex;
   align-items: center;
@@ -353,6 +387,10 @@ async function guardar() {
 
   .editar__row {
     flex-direction: column;
+  }
+
+  .editar__servicios {
+    grid-template-columns: 1fr;
   }
 
   .editar__foto {
