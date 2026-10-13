@@ -16,6 +16,7 @@ vi.spyOn(CuidadorRepository.prototype, "getAll").mockResolvedValue([
     valoracionMedia: 4.7,
     numValoraciones: 3,
     tipoCuidado: "hospitalario",
+    servicios: ["medicacion", "higiene"],
   },
   {
     id: 2,
@@ -29,6 +30,7 @@ vi.spyOn(CuidadorRepository.prototype, "getAll").mockResolvedValue([
     valoracionMedia: null,
     numValoraciones: 0,
     tipoCuidado: "domicilio",
+    servicios: ["medicacion"],
   },
   {
     id: 3,
@@ -293,5 +295,63 @@ describe("BuscarView", () => {
     expect(wrapper.find("#filtro-tipo-todos").classes()).toContain(
       "buscar__filter-btn--active",
     );
+  });
+
+  test("muestra los servicios del cuidador en la tarjeta", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    const etiquetas = wrapper.findAll(".buscar__tag--servicio");
+    expect(etiquetas.length).toBe(3);
+    expect(etiquetas[0].text()).toBe("Medicación");
+    expect(etiquetas[1].text()).toBe("Higiene personal");
+    expect(etiquetas[2].text()).toBe("Medicación");
+  });
+
+  test("el filtro de un servicio solo deja a los que lo ofrecen", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper.find("#filtro-servicio-medicacion").setValue(true);
+
+    expect(wrapper.text()).toContain("Pepe");
+    expect(wrapper.text()).toContain("Ana");
+    expect(wrapper.text()).not.toContain("Luis");
+  });
+
+  test("con dos servicios marcados solo salen los que ofrecen los dos", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper.find("#filtro-servicio-medicacion").setValue(true);
+    await wrapper.find("#filtro-servicio-higiene").setValue(true);
+
+    expect(wrapper.text()).toContain("Pepe");
+    expect(wrapper.text()).not.toContain("Ana");
+    expect(wrapper.text()).not.toContain("Luis");
+  });
+
+  test("al desmarcar los servicios vuelven a salir todos", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper.find("#filtro-servicio-medicacion").setValue(true);
+    await wrapper.find("#filtro-servicio-medicacion").setValue(false);
+
+    expect(wrapper.text()).toContain("Pepe");
+    expect(wrapper.text()).toContain("Ana");
+    expect(wrapper.text()).toContain("Luis");
   });
 });
