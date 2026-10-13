@@ -3,12 +3,14 @@ import { ref, computed, onMounted } from "vue";
 import { RouterLink } from "vue-router";
 import CuidadorRepository from "@/repositories/CuidadorRepository";
 import FotoCuidador from "@/components/FotoCuidador.vue";
+import { SERVICIOS, nombreServicio } from "@/utils/servicios";
 
 const cuidadorRepository = new CuidadorRepository();
 const cuidadores = ref([]);
 const busqueda = ref("");
 const ciudadBuscada = ref("");
 const tipoBuscado = ref("todos");
+const serviciosBuscados = ref([]);
 const soloDisponibles = ref(false);
 const soloVehiculo = ref(false);
 const valoracionMinima = ref(0);
@@ -37,6 +39,21 @@ function textoTipo(cuidador) {
   return "Hospital y domicilio";
 }
 
+// Un cuidador sin servicios se trata como una lista vacía
+function serviciosDe(cuidador) {
+  return cuidador.servicios || [];
+}
+
+// El cuidador tiene que ofrecer TODOS los servicios que se han marcado
+function tieneLosServicios(cuidador) {
+  for (const codigo of serviciosBuscados.value) {
+    if (!serviciosDe(cuidador).includes(codigo)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 const cuidadoresFiltrados = computed(() => {
   return cuidadores.value.filter((cuidador) => {
     const coincideTexto =
@@ -58,6 +75,8 @@ const cuidadoresFiltrados = computed(() => {
       tipoDe(cuidador) === "ambos" ||
       tipoDe(cuidador) === tipoBuscado.value;
 
+    const coincideServicios = tieneLosServicios(cuidador);
+
     // Si el filtro no está activado, todos los cuidadores valen
     const coincideDisponible =
       !soloDisponibles.value || cuidador.disponibleAhora;
@@ -73,6 +92,7 @@ const cuidadoresFiltrados = computed(() => {
       coincideTexto &&
       coincideCiudad &&
       coincideTipo &&
+      coincideServicios &&
       coincideDisponible &&
       coincideVehiculo &&
       coincideValoracion
@@ -143,6 +163,25 @@ const cuidadoresFiltrados = computed(() => {
           >
             A domicilio
           </button>
+        </div>
+      </div>
+
+      <div class="buscar__filter-group">
+        <p class="buscar__filter-titulo">Servicios que necesitas</p>
+        <div class="buscar__servicios">
+          <label
+            v-for="servicio in SERVICIOS"
+            :key="servicio.codigo"
+            class="buscar__check"
+          >
+            <input
+              type="checkbox"
+              :id="'filtro-servicio-' + servicio.codigo"
+              :value="servicio.codigo"
+              v-model="serviciosBuscados"
+            />
+            {{ servicio.nombre }}
+          </label>
         </div>
       </div>
 
@@ -278,6 +317,15 @@ const cuidadoresFiltrados = computed(() => {
           >
         </div>
 
+        <div class="buscar__tags" v-if="serviciosDe(cuidador).length > 0">
+          <span
+            class="buscar__tag buscar__tag--servicio"
+            v-for="codigo in serviciosDe(cuidador)"
+            :key="codigo"
+            >{{ nombreServicio(codigo) }}</span
+          >
+        </div>
+
         <div class="buscar__card-footer">
           <span class="buscar__precio">{{ cuidador.tarifaHora }} €/hora</span>
           <RouterLink :to="`/cuidador/${cuidador.id}`" class="btn btn--primary"
@@ -353,10 +401,32 @@ const cuidadoresFiltrados = computed(() => {
   }
 }
 
+.buscar__filter-titulo {
+  font-weight: bold;
+  font-size: 0.85rem;
+  margin: 0 0 8px;
+}
+
 .buscar__filter-options {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+.buscar__servicios {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+}
+
+.buscar__filter-group .buscar__check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: normal;
+  font-size: 0.9rem;
+  margin-bottom: 0;
+  cursor: pointer;
 }
 
 .buscar__filter-btn {
@@ -450,6 +520,11 @@ const cuidadoresFiltrados = computed(() => {
   color: var(--color-info);
 }
 
+.buscar__tag--servicio {
+  background-color: var(--color-secondary-bg);
+  color: var(--color-secondary);
+}
+
 .buscar__card-footer {
   display: flex;
   justify-content: space-between;
@@ -482,6 +557,11 @@ const cuidadoresFiltrados = computed(() => {
   .buscar__filter-btn {
     font-size: 0.85rem;
     padding: 6px 12px;
+  }
+
+  .buscar__servicios {
+    flex-direction: column;
+    gap: 8px;
   }
 }
 </style>
