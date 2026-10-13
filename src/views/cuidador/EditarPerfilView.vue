@@ -13,6 +13,7 @@ const perfil = ref(null);
 const especialidad = ref("");
 const ciudad = ref("");
 const tipoCuidado = ref("ambos");
+const sexo = ref("");
 const servicios = ref([]);
 const anosExperiencia = ref(0);
 const tarifaHora = ref(0);
@@ -31,6 +32,7 @@ onMounted(async () => {
     especialidad.value = perfil.value.especialidad;
     ciudad.value = perfil.value.ciudad || "";
     tipoCuidado.value = perfil.value.tipoCuidado || "ambos";
+    sexo.value = perfil.value.sexo || "";
     servicios.value = perfil.value.servicios || [];
     anosExperiencia.value = perfil.value.anosExperiencia;
     tarifaHora.value = perfil.value.tarifaHora;
@@ -97,6 +99,8 @@ async function guardar() {
       ciudad: ciudad.value.trim() || null,
       tipoCuidado: tipoCuidado.value,
       servicios: servicios.value,
+      // Vacío = prefiero no indicarlo (el back lo borra)
+      sexo: sexo.value,
     });
     // Así el círculo del menú de arriba cambia al momento
     authStore.setFoto(foto.value);
@@ -165,6 +169,13 @@ async function guardar() {
           maxlength="100"
           placeholder="Oviedo, Gijón, Madrid..."
         />
+
+        <label for="sexo">Sexo (opcional)</label>
+        <select id="sexo" v-model="sexo">
+          <option value="">Prefiero no indicarlo</option>
+          <option value="MUJER">Mujer</option>
+          <option value="HOMBRE">Hombre</option>
+        </select>
 
         <label for="tipo-cuidado">Tipo de cuidado</label>
         <select id="tipo-cuidado" v-model="tipoCuidado">
