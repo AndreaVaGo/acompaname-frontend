@@ -244,4 +244,52 @@ describe("PerfilCuidadorView", () => {
     expect(wrapper.find(".perfil__servicios").exists()).toBe(false);
     expect(wrapper.text()).not.toContain("Servicios");
   });
+
+  test("muestra el sexo Mujer si el cuidador lo ha indicado", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
+      usuarioNombre: "Pepa",
+      especialidad: "Geriatría",
+      anosExperiencia: 4,
+      tarifaHora: 18,
+      disponibleAhora: true,
+      bio: "Cuidadora con experiencia",
+      sexo: "MUJER",
+    });
+
+    const wrapper = await montarVista("FAMILIA");
+
+    expect(wrapper.find(".perfil__sexo").exists()).toBe(true);
+    expect(wrapper.find(".perfil__sexo").text()).toContain("Mujer");
+  });
+
+  test("muestra el sexo Hombre si el cuidador lo ha indicado", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
+      usuarioNombre: "Pepe",
+      especialidad: "Geriatría",
+      anosExperiencia: 4,
+      tarifaHora: 18,
+      disponibleAhora: true,
+      bio: "Cuidador con experiencia",
+      sexo: "HOMBRE",
+    });
+
+    const wrapper = await montarVista("FAMILIA");
+
+    expect(wrapper.find(".perfil__sexo").text()).toContain("Hombre");
+  });
+
+  test("no muestra el sexo si el cuidador no lo ha indicado", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
+      usuarioNombre: "Pepe",
+      especialidad: "Geriatría",
+      anosExperiencia: 4,
+      tarifaHora: 18,
+      disponibleAhora: true,
+      bio: "Cuidador con experiencia",
+    });
+
+    const wrapper = await montarVista("FAMILIA");
+
+    expect(wrapper.find(".perfil__sexo").exists()).toBe(false);
+  });
 });
