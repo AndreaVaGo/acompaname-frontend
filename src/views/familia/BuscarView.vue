@@ -173,6 +173,11 @@ const cuidadoresFiltrados = computed(() => {
             v-for="servicio in SERVICIOS"
             :key="servicio.codigo"
             class="buscar__check"
+            :class="{
+              'buscar__check--marcado': serviciosBuscados.includes(
+                servicio.codigo,
+              ),
+            }"
           >
             <input
               type="checkbox"
@@ -416,17 +421,36 @@ const cuidadoresFiltrados = computed(() => {
 .buscar__servicios {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 20px;
+  gap: 10px;
 }
 
 .buscar__filter-group .buscar__check {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-weight: normal;
   font-size: 0.9rem;
   margin-bottom: 0;
+  padding: 8px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-white);
   cursor: pointer;
+}
+
+.buscar__filter-group .buscar__check:hover {
+  border-color: var(--color-accent);
+}
+
+.buscar__filter-group .buscar__check--marcado {
+  border-color: var(--color-accent);
+  background-color: var(--color-accent-bg);
+}
+
+.buscar__check input[type="checkbox"] {
+  accent-color: var(--color-accent);
+  width: 16px;
+  height: 16px;
 }
 
 .buscar__filter-btn {
@@ -560,7 +584,6 @@ const cuidadoresFiltrados = computed(() => {
   }
 
   .buscar__servicios {
-    flex-direction: column;
     gap: 8px;
   }
 }
