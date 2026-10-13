@@ -10,6 +10,7 @@ const cuidadores = ref([]);
 const busqueda = ref("");
 const ciudadBuscada = ref("");
 const tipoBuscado = ref("todos");
+const sexoBuscado = ref("todos");
 const serviciosBuscados = ref([]);
 const soloDisponibles = ref(false);
 const soloVehiculo = ref(false);
@@ -75,6 +76,10 @@ const cuidadoresFiltrados = computed(() => {
       tipoDe(cuidador) === "ambos" ||
       tipoDe(cuidador) === tipoBuscado.value;
 
+    // Con "todos" vale cualquiera; si no, el cuidador tiene que haber indicado ese sexo
+    const coincideSexo =
+      sexoBuscado.value === "todos" || cuidador.sexo === sexoBuscado.value;
+
     const coincideServicios = tieneLosServicios(cuidador);
 
     // Si el filtro no está activado, todos los cuidadores valen
@@ -92,6 +97,7 @@ const cuidadoresFiltrados = computed(() => {
       coincideTexto &&
       coincideCiudad &&
       coincideTipo &&
+      coincideSexo &&
       coincideServicios &&
       coincideDisponible &&
       coincideVehiculo &&
@@ -162,6 +168,36 @@ const cuidadoresFiltrados = computed(() => {
             @click="tipoBuscado = 'domicilio'"
           >
             A domicilio
+          </button>
+        </div>
+      </div>
+
+      <div class="buscar__filter-group">
+        <label>Sexo del cuidador</label>
+        <div class="buscar__filter-options">
+          <button
+            id="filtro-sexo-todos"
+            class="buscar__filter-btn"
+            :class="{ 'buscar__filter-btn--active': sexoBuscado === 'todos' }"
+            @click="sexoBuscado = 'todos'"
+          >
+            Cualquiera
+          </button>
+          <button
+            id="filtro-sexo-mujer"
+            class="buscar__filter-btn"
+            :class="{ 'buscar__filter-btn--active': sexoBuscado === 'MUJER' }"
+            @click="sexoBuscado = 'MUJER'"
+          >
+            Mujer
+          </button>
+          <button
+            id="filtro-sexo-hombre"
+            class="buscar__filter-btn"
+            :class="{ 'buscar__filter-btn--active': sexoBuscado === 'HOMBRE' }"
+            @click="sexoBuscado = 'HOMBRE'"
+          >
+            Hombre
           </button>
         </div>
       </div>
