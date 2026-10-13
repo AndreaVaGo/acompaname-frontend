@@ -17,6 +17,7 @@ vi.spyOn(CuidadorRepository.prototype, "getAll").mockResolvedValue([
     numValoraciones: 3,
     tipoCuidado: "hospitalario",
     servicios: ["medicacion", "higiene"],
+    sexo: "HOMBRE",
   },
   {
     id: 2,
@@ -31,6 +32,7 @@ vi.spyOn(CuidadorRepository.prototype, "getAll").mockResolvedValue([
     numValoraciones: 0,
     tipoCuidado: "domicilio",
     servicios: ["medicacion"],
+    sexo: "MUJER",
   },
   {
     id: 3,
@@ -353,5 +355,65 @@ describe("BuscarView", () => {
     expect(wrapper.text()).toContain("Pepe");
     expect(wrapper.text()).toContain("Ana");
     expect(wrapper.text()).toContain("Luis");
+  });
+
+  test("el filtro Mujer solo deja a las cuidadoras que lo han indicado", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper.find("#filtro-sexo-mujer").trigger("click");
+
+    expect(wrapper.text()).toContain("Ana");
+    expect(wrapper.text()).not.toContain("Pepe");
+    expect(wrapper.text()).not.toContain("Luis");
+  });
+
+  test("el filtro Hombre solo deja a los cuidadores que lo han indicado", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper.find("#filtro-sexo-hombre").trigger("click");
+
+    expect(wrapper.text()).toContain("Pepe");
+    expect(wrapper.text()).not.toContain("Ana");
+    expect(wrapper.text()).not.toContain("Luis");
+  });
+
+  test("volver a Cualquiera en sexo vuelve a mostrar a todos, también a quien no lo indicó", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper.find("#filtro-sexo-mujer").trigger("click");
+    await wrapper.find("#filtro-sexo-todos").trigger("click");
+
+    expect(wrapper.text()).toContain("Pepe");
+    expect(wrapper.text()).toContain("Ana");
+    expect(wrapper.text()).toContain("Luis");
+    expect(wrapper.find("#filtro-sexo-todos").classes()).toContain(
+      "buscar__filter-btn--active",
+    );
+  });
+
+  test("combina el filtro de sexo con el de servicios", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper.find("#filtro-sexo-mujer").trigger("click");
+    await wrapper.find("#filtro-servicio-higiene").setValue(true);
+
+    expect(wrapper.text()).not.toContain("Ana");
+    expect(wrapper.text()).toContain("0 cuidadores");
   });
 });
