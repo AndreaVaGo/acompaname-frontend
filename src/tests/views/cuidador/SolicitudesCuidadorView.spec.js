@@ -5,8 +5,9 @@ import SolicitudesCuidadorView from "../../../views/cuidador/SolicitudesCuidador
 import SolicitudRepository from "../../../repositories/SolicitudRepository";
 
 // Cada test recibe una solicitud nueva, porque la vista cambia su estado
-vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockImplementation(
-  () =>
+const espiaMisSolicitudes = vi
+  .spyOn(SolicitudRepository.prototype, "getMisSolicitudes")
+  .mockImplementation(() =>
     Promise.resolve([
       {
         id: 1,
@@ -19,7 +20,23 @@ vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockImplementation(
         estado: "PENDIENTE",
       },
     ]),
-);
+  );
+
+// Solicitud que ya está aceptada, para probar el botón de completar
+function solicitudAceptada() {
+  return [
+    {
+      id: 1,
+      familiaNombre: "Ana",
+      nombrePaciente: "Antonio",
+      edadPaciente: 81,
+      tipoCuidado: "Hospitalario",
+      fechaCuidado: "2026-09-10",
+      notas: "test",
+      estado: "ACEPTADA",
+    },
+  ];
+}
 
 const router = createRouter({
   history: createWebHistory(),
@@ -95,5 +112,41 @@ describe("SolicitudesCuidadorView", () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(wrapper.text()).toContain("No se pudo rechazar la solicitud.");
+  });
+
+  test("al marcar una solicitud aceptada como completada pasa a estar completada", async () => {
+    espiaMisSolicitudes.mockResolvedValueOnce(solicitudAceptada());
+    const cambiarEstado = vi
+      .spyOn(SolicitudRepository.prototype, "cambiarEstado")
+      .mockResolvedValue({ estado: "COMPLETADA" });
+    const wrapper = mount(SolicitudesCuidadorView, {
+      global: { plugins: [router] },
+    });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper.find(".solicitudes__completar").trigger("click");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(cambiarEstado).toHaveBeenCalledWith(1, "COMPLETADA");
+    expect(wrapper.text()).toContain("Completada");
+    expect(wrapper.find(".solicitudes__completar").exists()).toBe(false);
+  });
+
+  test("muestra un error si no se puede marcar la solicitud como completada", async () => {
+    espiaMisSolicitudes.mockResolvedValueOnce(solicitudAceptada());
+    vi.spyOn(SolicitudRepository.prototype, "cambiarEstado").mockRejectedValue(
+      new Error("fallo"),
+    );
+    const wrapper = mount(SolicitudesCuidadorView, {
+      global: { plugins: [router] },
+    });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper.find(".solicitudes__completar").trigger("click");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(wrapper.text()).toContain(
+      "No se pudo marcar la solicitud como completada.",
+    );
   });
 });
