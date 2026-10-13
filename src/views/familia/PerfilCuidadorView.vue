@@ -1,320 +1,446 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import { useRoute } from "vue-router";
-import { useAuthStore } from "../../stores/auth";
-import { RouterLink } from "vue-router";
 import CuidadorRepository from "@/repositories/CuidadorRepository";
 import FotoCuidador from "@/components/FotoCuidador.vue";
-import { nombreServicio } from "@/utils/servicios";
+import { reducirImagen } from "@/utils/reducirImagen";
+import { SERVICIOS } from "@/utils/servicios";
+import { useAuthStore } from "@/stores/auth";
 
-const route = useRoute();
-const cuidadorId = route.params.id;
-const authStore = useAuthStore();
 const cuidadorRepository = new CuidadorRepository();
+const authStore = useAuthStore();
 
-const cuidador = ref(null);
+const perfil = ref(null);
+const especialidad = ref("");
+const ciudad = ref("");
+const tipoCuidado = ref("ambos");
+const sexo = ref("");
+const servicios = ref([]);
+const anosExperiencia = ref(0);
+const tarifaHora = ref(0);
+const bio = ref("");
+const foto = ref("");
+const tieneVehiculo = ref(false);
+const disponibleAhora = ref(false);
+
 const cargando = ref(true);
 const error = ref("");
+const guardado = ref(false);
 
 onMounted(async () => {
   try {
-    cuidador.value = await cuidadorRepository.getById(cuidadorId);
+    perfil.value = await cuidadorRepository.getMiPerfil();
+    especialidad.value = perfil.value.especialidad;
+    ciudad.value = perfil.value.ciudad || "";
+    tipoCuidado.value = perfil.value.tipoCuidado || "ambos";
+    sexo.value = perfil.value.sexo || "";
+    servicios.value = perfil.value.servicios || [];
+    anosExperiencia.value = perfil.value.anosExperiencia;
+    tarifaHora.value = perfil.value.tarifaHora;
+    bio.value = perfil.value.bio;
+    foto.value = perfil.value.foto || "";
+    tieneVehiculo.value = perfil.value.tieneVehiculo;
+    disponibleAhora.value = perfil.value.disponibleAhora;
   } catch (err) {
-    error.value = "No se pudo cargar el perfil del cuidador.";
+    error.value = "No se pudo cargar tu perfil.";
   } finally {
     cargando.value = false;
   }
 });
+
+async function elegirFoto(evento) {
+  const archivo = evento.target.files[0];
+  if (!archivo) {
+    return;
+  }
+  if (!archivo.type.startsWith("image/")) {
+    error.value = "Elige un archivo de imagen.";
+    return;
+  }
+
+  try {
+    foto.value = await reducirImagen(archivo);
+    error.value = "";
+  } catch (err) {
+    error.value = "No se pudo cargar la imagen.";
+  }
+}
+
+function quitarFoto() {
+  foto.value = "";
+}
+
+async function guardar() {
+  guardado.value = false;
+
+  if (!especialidad.value.trim() || !bio.value.trim()) {
+    error.value = "Rellena la especialidad y la descripción.";
+    return;
+  }
+  if (Number(anosExperiencia.value) < 0) {
+    error.value = "Los años de experiencia no pueden ser negativos.";
+    return;
+  }
+  if (!(Number(tarifaHora.value) > 0)) {
+    error.value = "La tarifa por hora debe ser mayor que 0.";
+    return;
+  }
+  error.value = "";
+
+  try {
+    await cuidadorRepository.update(perfil.value.id, {
+      especialidad: especialidad.value.trim(),
+      anosExperiencia: Number(anosExperiencia.value),
+      tarifaHora: Number(tarifaHora.value),
+      bio: bio.value.trim(),
+      tieneVehiculo: tieneVehiculo.value,
+      disponibleAhora: disponibleAhora.value,
+      usuarioId: perfil.value.usuarioId,
+      foto: foto.value.trim() || null,
+      ciudad: ciudad.value.trim() || null,
+      tipoCuidado: tipoCuidado.value,
+      servicios: servicios.value,
+      // Vacío = prefiero no indicarlo (el back lo borra)
+      sexo: sexo.value,
+    });
+    // Así el círculo del menú de arriba cambia al momento
+    authStore.setFoto(foto.value);
+    guardado.value = true;
+  } catch (err) {
+    error.value = "No se pudo guardar tu perfil. Revisa los datos.";
+  }
+}
 </script>
 
 <template>
-  <div class="perfil" v-if="cuidador">
-    <RouterLink to="/buscar" class="perfil__back">← Volver</RouterLink>
+  <div class="editar">
+    <div class="editar__box">
+      <h1>Mi perfil profesional</h1>
+      <p class="editar__subtitle">
+        Esto es lo que verán las familias cuando busquen cuidador.
+      </p>
 
-    <div class="perfil__main">
-      <div class="perfil__info">
-        <div class="perfil__cabecera">
+      <p v-if="cargando">Cargando tu perfil...</p>
+
+      <form v-if="perfil" class="editar__form" @submit.prevent="guardar">
+        <div class="editar__foto">
           <FotoCuidador
-            :foto="cuidador.foto"
-            :nombre="cuidador.usuarioNombre"
+            :foto="foto"
+            :nombre="perfil.usuarioNombre"
             :tamano="80"
           />
-          <div>
-            <h1>{{ cuidador.usuarioNombre }}</h1>
-            <span class="perfil__tag">{{ cuidador.especialidad }}</span>
-          </div>
-        </div>
-
-        <p class="perfil__valoracion">
-          <template v-if="cuidador.valoracionMedia">
-            ⭐ {{ cuidador.valoracionMedia }} ({{ cuidador.numValoraciones }}
-            {{ cuidador.numValoraciones === 1 ? "valoración" : "valoraciones" }})
-          </template>
-          <template v-else>Sin valoraciones todavía</template>
-        </p>
-
-        <ul class="perfil__datos">
-          <li>
-            <strong>Experiencia:</strong> {{ cuidador.anosExperiencia }} años
-          </li>
-          <li>
-            <span
-              class="perfil__badge"
-              :class="{ 'perfil__badge--activo': cuidador.disponibleAhora }"
-            ></span>
-            <strong>Disponibilidad:</strong>
-            {{
-              cuidador.disponibleAhora
-                ? "Disponible ahora"
-                : "No disponible ahora"
-            }}
-          </li>
-        </ul>
-
-        <div
-          class="perfil__servicios"
-          v-if="cuidador.servicios && cuidador.servicios.length > 0"
-        >
-          <h2>Servicios</h2>
-          <div class="perfil__servicios-lista">
-            <span
-              class="perfil__servicio"
-              v-for="codigo in cuidador.servicios"
-              :key="codigo"
+          <div class="editar__foto-campo">
+            <label for="foto">Foto de perfil</label>
+            <input
+              type="file"
+              id="foto"
+              accept="image/*"
+              @change="elegirFoto"
+            />
+            <p class="editar__ayuda">
+              Elige una imagen de tu ordenador. Si no pones ninguna, se
+              mostrará un monigote.
+            </p>
+            <button
+              v-if="foto"
+              type="button"
+              id="quitar-foto"
+              class="editar__quitar"
+              @click="quitarFoto"
             >
-              {{ nombreServicio(codigo) }}
-            </span>
+              Quitar foto
+            </button>
           </div>
         </div>
 
-        <h2>Sobre mí</h2>
-        <p class="perfil__bio">{{ cuidador.bio }}</p>
-      </div>
+        <label for="especialidad">Especialidad</label>
+        <input
+          type="text"
+          id="especialidad"
+          v-model="especialidad"
+          maxlength="100"
+          placeholder="Geriatría, acompañamiento hospitalario..."
+        />
 
-      <div class="perfil__sidebar">
-        <p class="perfil__precio">
-          {{ cuidador.tarifaHora }} €<span>/hora</span>
-        </p>
-        <RouterLink
-          v-if="authStore.rol === 'FAMILIA'"
-          :to="`/solicitar/${cuidadorId}`"
-          class="btn btn--primary perfil__solicitar"
+        <label for="ciudad">Ciudad</label>
+        <input
+          type="text"
+          id="ciudad"
+          v-model="ciudad"
+          maxlength="100"
+          placeholder="Oviedo, Gijón, Madrid..."
+        />
+
+        <label for="sexo">Sexo (opcional)</label>
+        <select id="sexo" v-model="sexo">
+          <option value="">Prefiero no indicarlo</option>
+          <option value="MUJER">Mujer</option>
+          <option value="HOMBRE">Hombre</option>
+        </select>
+
+        <label for="tipo-cuidado">Tipo de cuidado</label>
+        <select id="tipo-cuidado" v-model="tipoCuidado">
+          <option value="hospitalario">Hospitalario</option>
+          <option value="domicilio">A domicilio</option>
+          <option value="ambos">Ambos (hospital y domicilio)</option>
+        </select>
+
+        <p class="editar__titulo-grupo">Servicios en los que tienes experiencia</p>
+        <div class="editar__servicios">
+          <label
+            v-for="servicio in SERVICIOS"
+            :key="servicio.codigo"
+            class="editar__check"
+            :class="{
+              'editar__check--marcado': servicios.includes(servicio.codigo),
+            }"
+          >
+            <input
+              type="checkbox"
+              :id="'servicio-' + servicio.codigo"
+              :value="servicio.codigo"
+              v-model="servicios"
+            />
+            {{ servicio.nombre }}
+          </label>
+        </div>
+
+        <div class="editar__row">
+          <div>
+            <label for="anos">Años de experiencia</label>
+            <input type="number" id="anos" v-model="anosExperiencia" min="0" />
+          </div>
+          <div>
+            <label for="tarifa">Tarifa por hora (€)</label>
+            <input
+              type="number"
+              id="tarifa"
+              v-model="tarifaHora"
+              min="0"
+              step="0.5"
+            />
+          </div>
+        </div>
+
+        <label for="bio">Sobre ti</label>
+        <textarea
+          id="bio"
+          v-model="bio"
+          maxlength="1000"
+          placeholder="Cuéntales tu experiencia y cómo trabajas..."
+        ></textarea>
+
+        <label
+          class="editar__check"
+          :class="{ 'editar__check--marcado': tieneVehiculo }"
         >
-          Solicitar servicio
-        </RouterLink>
-        <RouterLink
-          v-if="!authStore.estaAutenticado"
-          to="/login"
-          class="btn btn--primary perfil__solicitar"
+          <input type="checkbox" id="vehiculo" v-model="tieneVehiculo" />
+          Tengo vehículo propio
+        </label>
+
+        <label
+          class="editar__check"
+          :class="{ 'editar__check--marcado': disponibleAhora }"
         >
-          Inicia sesión para solicitar
-        </RouterLink>
-        <p class="perfil__nota">
-          Sin compromiso: la solicitud se envía y el cuidador la acepta o la
-          rechaza.
-        </p>
-      </div>
+          <input type="checkbox" id="disponible" v-model="disponibleAhora" />
+          Disponible ahora
+        </label>
+
+        <p v-if="error" class="editar__error">{{ error }}</p>
+        <p v-if="guardado" class="editar__ok">Perfil guardado correctamente.</p>
+
+        <button type="submit" class="btn btn--primary">Guardar perfil</button>
+      </form>
+
+      <p v-if="error && !perfil" class="editar__error">{{ error }}</p>
     </div>
   </div>
-  <p v-else-if="error">{{ error }}</p>
-  <p v-else>Cargando...</p>
 </template>
 
 <style scoped>
-.perfil {
+.editar {
+  min-height: 100vh;
   background-color: var(--color-bg);
   font-family: var(--font-base);
   color: var(--color-text);
-  padding: var(--gap-lg) 60px 60px;
-  max-width: 1000px;
-  margin: 0 auto;
-}
-
-.perfil__back {
-  display: inline-block;
-  margin-bottom: 20px;
-  color: var(--color-text);
-  text-decoration: none;
-}
-
-.perfil__main {
   display: flex;
-  align-items: flex-start;
-  gap: var(--gap-md);
+  justify-content: center;
+  padding: var(--gap-lg) 20px;
+}
+
+.editar__box {
+  background-color: var(--color-white);
+  border-radius: var(--radius-card);
+  padding: 32px;
+  max-width: 520px;
+  width: 100%;
+  height: fit-content;
+  box-shadow: var(--shadow-card);
+}
+
+.editar h1 {
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+}
+
+.editar__subtitle {
+  color: var(--color-text-muted);
   margin-bottom: 24px;
 }
 
-.perfil__info {
-  flex: 2;
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
-  padding: 28px;
-  box-shadow: var(--shadow-card);
-
-  & h2 {
-    margin-top: 20px;
-    margin-bottom: 8px;
-    font-size: 1.1rem;
-  }
-}
-
-.perfil__cabecera {
+.editar__form {
   display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 16px;
+  flex-direction: column;
 
-  & h1 {
-    margin: 0 0 6px;
-  }
-}
-
-.perfil__tag {
-  display: inline-block;
-  background-color: var(--color-accent-bg);
-  color: var(--color-accent);
-  padding: 4px 12px;
-  border-radius: var(--radius-pill);
-  font-size: 0.85rem;
-  font-weight: bold;
-}
-
-.perfil__valoracion {
-  margin-bottom: 16px;
-}
-
-.perfil__datos {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-
-  & li {
+  & label {
+    font-weight: bold;
     margin-bottom: 6px;
+    font-size: 0.9rem;
+  }
+
+  & input[type="text"],
+  & input[type="number"],
+  & select,
+  & textarea {
+    padding: 12px 14px;
+    border-radius: var(--radius-input);
+    border: 1px solid var(--color-border);
+    margin-bottom: var(--gap-md);
+    font-size: 1rem;
+    font-family: inherit;
+  }
+
+  & select {
+    background-color: var(--color-white);
+  }
+
+  & textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  /* Dentro del formulario para ganar a la regla "label" de arriba (negrita) */
+  & .editar__check {
     display: flex;
     align-items: center;
-    gap: 6px;
-  }
-}
-
-.perfil__badge {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: #999;
-  display: inline-block;
-}
-
-.perfil__badge--activo {
-  background-color: var(--color-secondary);
-}
-
-.perfil__servicios-lista {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.perfil__servicio {
-  background-color: var(--color-accent-bg);
-  color: var(--color-accent);
-  padding: 4px 12px;
-  border-radius: var(--radius-pill);
-  font-size: 0.85rem;
-}
-
-.perfil__bio {
-  color: #444;
-  line-height: 1.5;
-  font-style: italic;
-  border-left: 3px solid var(--color-accent-bg);
-  padding-left: 14px;
-}
-
-.perfil__sidebar {
-  flex: 1;
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
-  padding: 28px;
-  box-shadow: var(--shadow-card);
-  height: fit-content;
-}
-
-.perfil__precio {
-  font-size: 1.6rem;
-  font-weight: bold;
-  margin: 0;
-
-  & span {
-    font-size: 1rem;
+    gap: 8px;
     font-weight: normal;
-    color: var(--color-text-muted);
+    margin-bottom: var(--gap-sm);
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-input);
+    background-color: var(--color-white);
+    cursor: pointer;
+  }
+
+  & .editar__check:hover {
+    border-color: var(--color-accent);
+  }
+
+  & .editar__check--marcado {
+    border-color: var(--color-accent);
+    background-color: var(--color-accent-bg);
+  }
+
+  & .editar__check input[type="checkbox"] {
+    accent-color: var(--color-accent);
+    width: 16px;
+    height: 16px;
   }
 }
 
-.perfil__disponibilidad-corta {
-  color: var(--color-text-muted);
-  font-size: 0.9rem;
-  margin-bottom: 16px;
-}
-
-.perfil__solicitar {
-  width: 100%;
-  margin-bottom: 12px;
-  display: block;
-  text-align: center;
-  text-decoration: none;
-}
-
-.perfil__nota {
-  font-size: 0.8rem;
-  color: var(--color-text-muted);
-}
-
-.perfil__resenas {
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
-  padding: 28px;
-  box-shadow: var(--shadow-card);
-
-  & h2 {
-    margin-bottom: 16px;
-  }
-}
-
-.perfil__resena {
-  background-color: var(--color-bg);
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 12px;
-}
-
-.perfil__resena-top {
+.editar__foto {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 6px;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: var(--gap-sm);
 }
 
-.perfil__resena-fecha {
+.editar__foto-campo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.editar__ayuda {
   color: var(--color-text-muted);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
+  margin: 8px 0;
 }
 
-.perfil__resena-estrellas {
-  margin: 0 0 6px;
+.editar__quitar {
+  align-self: flex-start;
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-input);
+  color: var(--color-text);
+  cursor: pointer;
+  font-family: inherit;
+  padding: 6px 12px;
+}
+
+.editar__row {
+  display: flex;
+  gap: var(--gap-sm);
+
+  & > div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.editar__titulo-grupo {
+  font-weight: bold;
+  margin: 0 0 8px;
+  font-size: 0.9rem;
+}
+
+.editar__servicios {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0 var(--gap-sm);
+  margin-bottom: var(--gap-md);
+}
+
+.editar__error {
+  background-color: #fdecea;
+  border: 1px solid #f5c6c0;
+  color: #c0392b;
+  font-size: 0.9rem;
+  padding: 10px 14px;
+  border-radius: var(--radius-input);
+  margin: 8px 0 16px;
+}
+
+.editar__ok {
+  background-color: var(--color-secondary-bg);
+  color: var(--color-secondary);
+  font-size: 0.9rem;
+  padding: 10px 14px;
+  border-radius: var(--radius-input);
+  margin: 8px 0 16px;
 }
 
 @media (max-width: 768px) {
-  .perfil {
-    padding: 24px 20px;
+  .editar__box {
+    padding: 24px;
   }
 
-  .perfil__main {
+  .editar__row {
     flex-direction: column;
   }
 
-  .perfil__info,
-  .perfil__sidebar {
-    padding: 20px;
+  .editar__servicios {
+    grid-template-columns: 1fr;
+  }
+
+  .editar__foto {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .editar__foto-campo {
+    width: 100%;
   }
 }
 </style>
