@@ -13,6 +13,7 @@ import SolicitarServicioView from "../views/familia/SolicitarServicioView.vue";
 import ConfirmacionView from "../views/familia/ConfirmacionView.vue";
 import ValorarView from "../views/familia/ValorarView.vue";
 import MiPerfilView from "../views/comun/MiPerfilView.vue";
+import CambiarPasswordView from "../views/comun/CambiarPasswordView.vue";
 import SolicitudesFamiliaView from "../views/familia/SolicitudesFamiliaView.vue";
 import CheckoutView from "../views/familia/CheckoutView.vue";
 
@@ -32,6 +33,7 @@ const router = createRouter({
     { path: "/confirmacion", name: "confirmacion", component: ConfirmacionView, meta: { requiereLogin: true } },
     { path: "/valorar/:id", name: "valorar", component: ValorarView, meta: { requiereLogin: true } },
     { path: "/mi-perfil", name: "mi-perfil", component: MiPerfilView, meta: { requiereLogin: true } },
+    { path: "/cambiar-password", name: "cambiar-password", component: CambiarPasswordView, meta: { requiereLogin: true } },
     { path: "/solicitudes", name: "solicitudes", component: SolicitudesFamiliaView, meta: { requiereLogin: true } },
     { path: "/pagar/:id", name: "pagar", component: CheckoutView, meta: { requiereLogin: true } },
   ],

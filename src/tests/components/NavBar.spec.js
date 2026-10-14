@@ -92,4 +92,33 @@ describe('NavBar', () => {
     expect(wrapper.find('.navbar__avatar img').exists()).toBe(false)
     expect(wrapper.find('.foto-cuidador--sin-foto').exists()).toBe(true)
   })
+
+  test('el menú tiene la opción Cambiar contraseña', async () => {
+    vi.spyOn(UsuarioRepository.prototype, 'getById').mockResolvedValue({
+      nombre: 'Ana',
+    })
+    const authStore = useAuthStore()
+    authStore.login(1, 'ana@test.com', '12345678', 'FAMILIA')
+
+    const wrapper = await montarNavBar()
+    await wrapper.find('.navbar__avatar').trigger('click')
+
+    expect(wrapper.find('#cambiar-password').text()).toBe('Cambiar contraseña')
+  })
+
+  test('Cambiar contraseña lleva a su página y cierra el menú', async () => {
+    vi.spyOn(UsuarioRepository.prototype, 'getById').mockResolvedValue({
+      nombre: 'Ana',
+    })
+    const push = vi.spyOn(router, 'push').mockResolvedValue()
+    const authStore = useAuthStore()
+    authStore.login(1, 'ana@test.com', '12345678', 'FAMILIA')
+
+    const wrapper = await montarNavBar()
+    await wrapper.find('.navbar__avatar').trigger('click')
+    await wrapper.find('#cambiar-password').trigger('click')
+
+    expect(push).toHaveBeenCalledWith('/cambiar-password')
+    expect(wrapper.find('.navbar__menu').exists()).toBe(false)
+  })
 })
