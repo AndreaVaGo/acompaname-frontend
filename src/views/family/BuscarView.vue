@@ -3,7 +3,7 @@ import { ref, computed, onMounted } from "vue";
 import { RouterLink } from "vue-router";
 import CuidadorRepository from "@/repositories/CuidadorRepository";
 import FotoCuidador from "@/components/FotoCuidador.vue";
-import { SERVICIOS, nombreServicio } from "@/utils/servicios";
+import { CUIDADOS, nombreCuidado } from "@/utils/catalogoCuidados";
 
 const cuidadorRepository = new CuidadorRepository();
 const cuidadores = ref([]);
@@ -206,7 +206,7 @@ const cuidadoresFiltrados = computed(() => {
         <p class="buscar__filter-titulo">Servicios que necesitas</p>
         <div class="buscar__servicios">
           <label
-            v-for="servicio in SERVICIOS"
+            v-for="servicio in CUIDADOS"
             :key="servicio.codigo"
             class="buscar__check"
             :class="{
@@ -363,7 +363,7 @@ const cuidadoresFiltrados = computed(() => {
             class="buscar__tag buscar__tag--servicio"
             v-for="codigo in serviciosDe(cuidador)"
             :key="codigo"
-            >{{ nombreServicio(codigo) }}</span
+            >{{ nombreCuidado(codigo) }}</span
           >
         </div>
 
