@@ -3,7 +3,7 @@ import { ref, onMounted } from "vue";
 import CuidadorRepository from "@/repositories/CuidadorRepository";
 import FotoCuidador from "@/components/FotoCuidador.vue";
 import { reducirImagen } from "@/utils/reducirImagen";
-import { SERVICIOS } from "@/utils/servicios";
+import { CUIDADOS } from "@/utils/catalogoCuidados";
 import { useAuthStore } from "@/stores/auth";
 
 const cuidadorRepository = new CuidadorRepository();
@@ -187,7 +187,7 @@ async function guardar() {
         <p class="editar__titulo-grupo">Servicios en los que tienes experiencia</p>
         <div class="editar__servicios">
           <label
-            v-for="servicio in SERVICIOS"
+            v-for="servicio in CUIDADOS"
             :key="servicio.codigo"
             class="editar__check"
             :class="{
