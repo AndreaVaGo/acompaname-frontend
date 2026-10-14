@@ -221,7 +221,7 @@ describe('SolicitudCard', () => {
     expect(wrapper.text()).toContain('Inicio: 12-08-2026')
     expect(wrapper.text()).not.toContain('Ingreso previsto de 4 noches.')
     expect(wrapper.find('.solicitudes__modal').exists()).toBe(false)
-    expect(wrapper.find('.solicitudes__ver').text()).toBe('Ver')
+    expect(wrapper.find('.solicitudes__ver').text()).toBe('Ver detalles')
 
     await wrapper.find('.solicitudes__ver').trigger('click')
 
@@ -263,7 +263,7 @@ describe('SolicitudCard', () => {
     expect(wrapper.find('.solicitudes__ver').exists()).toBe(false)
   })
 
-  test('el cuidador ve Aceptar, Rechazar y Ver en una solicitud pendiente', () => {
+  test('el cuidador ve Aceptar, Rechazar y el enlace Ver detalles en una solicitud pendiente', () => {
     const wrapper = montarTarjetaCuidador('PENDIENTE', vi.fn())
 
     expect(wrapper.text()).toContain('Aceptar')
@@ -308,5 +308,22 @@ describe('SolicitudCard', () => {
     await wrapper.find('.solicitudes__ver').trigger('click')
 
     expect(wrapper.text()).not.toContain('📍')
+  })
+
+  test('el cuidador puede ver los detalles de una solicitud completada aunque no tenga botones', async () => {
+    const wrapper = montarTarjetaCuidador('COMPLETADA', vi.fn())
+
+    expect(wrapper.find('.solicitudes__acciones').exists()).toBe(false)
+    expect(wrapper.find('.solicitudes__ver').exists()).toBe(true)
+
+    await wrapper.find('.solicitudes__ver').trigger('click')
+
+    expect(wrapper.find('.solicitudes__modal').exists()).toBe(true)
+  })
+
+  test('la tarjeta completada tiene su propio estilo de estado', () => {
+    const wrapper = montarTarjeta('COMPLETADA', false)
+
+    expect(wrapper.find('.solicitudes__estado--completada').exists()).toBe(true)
   })
 })
