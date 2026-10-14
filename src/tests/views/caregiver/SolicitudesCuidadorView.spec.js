@@ -1,7 +1,7 @@
 import { describe, test, expect, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createRouter, createWebHistory } from "vue-router";
-import SolicitudesCuidadorView from "../../../views/cuidador/SolicitudesCuidadorView.vue";
+import SolicitudesCuidadorView from "../../../views/caregiver/SolicitudesCuidadorView.vue";
 import SolicitudRepository from "../../../repositories/SolicitudRepository";
 
 // Cada test recibe una solicitud nueva, porque la vista cambia su estado

@@ -1,7 +1,7 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
-import EditarPerfilView from "../../../views/cuidador/EditarPerfilView.vue";
+import EditarPerfilView from "../../../views/caregiver/EditarPerfilView.vue";
 import CuidadorRepository from "../../../repositories/CuidadorRepository";
 import { reducirImagen } from "../../../utils/reducirImagen";
 import { useAuthStore } from "../../../stores/auth";
