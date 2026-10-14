@@ -56,6 +56,9 @@ const direccionVisible = computed(
     <ul class="solicitudes__detalles">
       <li>🏠 {{ solicitud.tipoCuidado }}</li>
       <li>📅 Inicio: {{ formatearFecha(solicitud.fechaCuidado) }}</li>
+      <li v-if="solicitud.fechaFin">
+        📅 Fin: {{ formatearFecha(solicitud.fechaFin) }}
+      </li>
     </ul>
 
     <button
@@ -104,13 +107,10 @@ const direccionVisible = computed(
           </span>
         </div>
 
-        <ul class="solicitudes__detalles">
-          <li v-if="mostrarAcciones">
-            📅 Inicio: {{ formatearFecha(solicitud.fechaCuidado) }}
-          </li>
-          <li v-if="solicitud.fechaFin">
-            📅 Fin: {{ formatearFecha(solicitud.fechaFin) }}
-          </li>
+        <ul
+          class="solicitudes__detalles"
+          v-if="solicitud.direccion || solicitud.notas"
+        >
           <li v-if="solicitud.direccion && direccionVisible">
             📍 {{ solicitud.direccion }}
           </li>
@@ -317,7 +317,7 @@ const direccionVisible = computed(
   }
 }
 
-/* Colores de la paleta: verde para aceptar, coral para rechazar, azul para ver */
+/* Colores de la paleta: verde para aceptar y borde coral para rechazar */
 .solicitudes__btn-aceptar {
   background-color: var(--color-secondary);
   color: var(--color-white);
@@ -373,5 +373,16 @@ const direccionVisible = computed(
   padding: 4px 12px;
   border-radius: var(--radius-pill);
   font-size: 0.8rem;
+}
+
+/* Las etiquetas alternan coral, verde y azul para distinguirse entre sí */
+.solicitudes__necesidad:nth-child(3n + 2) {
+  background-color: var(--color-secondary-bg);
+  color: var(--color-secondary);
+}
+
+.solicitudes__necesidad:nth-child(3n + 3) {
+  background-color: var(--color-info-bg);
+  color: var(--color-info);
 }
 </style>
