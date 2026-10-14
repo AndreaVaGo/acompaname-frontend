@@ -94,6 +94,7 @@ describe("SolicitarServicioView", () => {
     await opciones[0].trigger("click");
 
     await wrapper.find("#fecha").setValue("2026-10-10");
+    await wrapper.find("#direccion").setValue("Calle Uría 10, Oviedo");
     await wrapper.find("#paciente").setValue("Antonio Serrano");
     await wrapper.find("#edad").setValue("81");
     await wrapper.find("#notas").setValue("Alergia a la penicilina");
@@ -103,6 +104,7 @@ describe("SolicitarServicioView", () => {
 
     expect(createSpy).toHaveBeenCalledWith({
       tipoCuidado: "hospitalario",
+      direccion: "Calle Uría 10, Oviedo",
       nombrePaciente: "Antonio Serrano",
       notas: "Alergia a la penicilina",
       edadPaciente: 81,
@@ -131,6 +133,7 @@ describe("SolicitarServicioView", () => {
 
     await wrapper.find("#fecha").setValue("2026-10-10");
     await wrapper.find("#fecha-fin").setValue("2026-10-17");
+    await wrapper.find("#direccion").setValue("Calle Uría 10, Oviedo");
     await wrapper.find("#paciente").setValue("Antonio Serrano");
     await wrapper.find("#edad").setValue("81");
 
@@ -160,6 +163,7 @@ describe("SolicitarServicioView", () => {
 
     await wrapper.find("#fecha").setValue("2026-10-10");
     await wrapper.find("#fecha-fin").setValue("2026-10-05");
+    await wrapper.find("#direccion").setValue("Calle Uría 10, Oviedo");
     await wrapper.find("#paciente").setValue("Antonio Serrano");
     await wrapper.find("#edad").setValue("81");
 
@@ -185,6 +189,7 @@ describe("SolicitarServicioView", () => {
     await opciones[1].trigger("click");
 
     await wrapper.find("#fecha").setValue("2026-10-10");
+    await wrapper.find("#direccion").setValue("Calle Uría 10, Oviedo");
     await wrapper.find("#paciente").setValue("Antonio Serrano");
     await wrapper.find("#edad").setValue("81");
 
@@ -223,6 +228,7 @@ describe("SolicitarServicioView", () => {
     await opciones[0].trigger("click");
 
     await wrapper.find("#fecha").setValue("2026-10-10");
+    await wrapper.find("#direccion").setValue("Calle Uría 10, Oviedo");
     await wrapper.find("#paciente").setValue("Antonio Serrano");
     await wrapper.find("#edad").setValue("81");
     await wrapper.find("#necesidad-movilidad").setValue(true);
@@ -250,6 +256,7 @@ describe("SolicitarServicioView", () => {
     await opciones[0].trigger("click");
 
     await wrapper.find("#fecha").setValue("2026-10-10");
+    await wrapper.find("#direccion").setValue("Calle Uría 10, Oviedo");
     await wrapper.find("#paciente").setValue("Antonio Serrano");
     await wrapper.find("#edad").setValue("81");
     await wrapper.find("#necesidad-higiene").setValue(true);
@@ -261,5 +268,50 @@ describe("SolicitarServicioView", () => {
     expect(createSpy).toHaveBeenCalledWith(
       expect.objectContaining({ necesidades: [] })
     );
+  });
+
+  test("pide la dirección del domicilio o el hospital según el tipo de cuidado", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
+      usuarioNombre: "Pepe",
+    });
+
+    const { wrapper } = await montarVista();
+    const opciones = wrapper.findAll(".solicitar__opcion");
+
+    await opciones[1].trigger("click");
+    expect(wrapper.find('label[for="direccion"]').text()).toBe(
+      "Dirección del domicilio"
+    );
+
+    await opciones[0].trigger("click");
+    expect(wrapper.find('label[for="direccion"]').text()).toBe(
+      "Hospital, planta y habitación"
+    );
+  });
+
+  test("no envía la solicitud si falta la dirección", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
+      usuarioNombre: "Pepe",
+    });
+    const createSpy = vi
+      .spyOn(SolicitudRepository.prototype, "create")
+      .mockResolvedValue({});
+
+    const { wrapper } = await montarVista();
+
+    const opciones = wrapper.findAll(".solicitar__opcion");
+    await opciones[1].trigger("click");
+
+    await wrapper.find("#fecha").setValue("2026-10-10");
+    await wrapper.find("#direccion").setValue("   ");
+    await wrapper.find("#paciente").setValue("Antonio Serrano");
+    await wrapper.find("#edad").setValue("81");
+
+    await wrapper.find("form").trigger("submit.prevent");
+
+    expect(wrapper.text()).toContain(
+      "Por favor, rellena todos los campos obligatorios."
+    );
+    expect(createSpy).not.toHaveBeenCalled();
   });
 });
