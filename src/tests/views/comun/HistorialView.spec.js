@@ -65,7 +65,7 @@ describe("HistorialView", () => {
     expect(wrapper.text()).toContain("Dejar valoración");
   });
 
-  test("muestra la fecha de fin si la solicitud la tiene", async () => {
+  test("muestra las fechas de inicio y de fin en formato día-mes-año", async () => {
     vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
       { id: 1, cuidadorNombre: "Pepe", nombrePaciente: "Antonio", edadPaciente: 80, tipoCuidado: "domicilio", fechaCuidado: "2026-09-01", fechaFin: "2026-09-08", notas: "", estado: "COMPLETADA" },
     ]);
@@ -73,8 +73,9 @@ describe("HistorialView", () => {
 
     const wrapper = await montarVista();
 
-    expect(wrapper.text()).toContain("Inicio: 2026-09-01");
-    expect(wrapper.text()).toContain("Fin: 2026-09-08");
+    expect(wrapper.text()).toContain("01-09-2026");
+    expect(wrapper.text()).toContain("08-09-2026");
+    expect(wrapper.text()).not.toContain("2026-09-01");
   });
 
   test("no muestra la línea de fin si la solicitud no tiene fecha de fin", async () => {

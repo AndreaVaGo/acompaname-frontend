@@ -1,6 +1,7 @@
 <script setup>
 import { RouterLink } from "vue-router";
 import { nombreNecesidad } from "@/utils/necesidades";
+import { formatearFecha } from "@/utils/formatearFecha";
 
 defineProps([
   "solicitud",
@@ -50,8 +51,10 @@ defineProps([
 
     <ul class="solicitudes__detalles">
       <li>🏠 {{ solicitud.tipoCuidado }}</li>
-      <li>📅 Inicio: {{ solicitud.fechaCuidado }}</li>
-      <li v-if="solicitud.fechaFin">📅 Fin: {{ solicitud.fechaFin }}</li>
+      <li>📅 Inicio: {{ formatearFecha(solicitud.fechaCuidado) }}</li>
+      <li v-if="solicitud.fechaFin">
+        📅 Fin: {{ formatearFecha(solicitud.fechaFin) }}
+      </li>
       <li v-if="solicitud.notas">📝 {{ solicitud.notas }}</li>
     </ul>
 
