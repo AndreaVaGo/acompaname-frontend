@@ -70,10 +70,7 @@ function textoEstado(estado) {
           {{ item.paciente }} · {{ item.edad }} años
         </p>
 
-        <div
-          class="historial__necesidades"
-          v-if="item.necesidades.length > 0"
-        >
+        <div class="historial__necesidades" v-if="item.necesidades.length > 0">
           <span
             class="historial__necesidad"
             v-for="codigo in item.necesidades"
@@ -239,6 +236,17 @@ function textoEstado(estado) {
   padding: 4px 12px;
   border-radius: var(--radius-pill);
   font-size: 0.8rem;
+}
+
+/* Las etiquetas alternan coral, verde y azul para distinguirse entre sí */
+.historial__necesidad:nth-child(3n + 2) {
+  background-color: var(--color-secondary-bg);
+  color: var(--color-secondary);
+}
+
+.historial__necesidad:nth-child(3n + 3) {
+  background-color: var(--color-info-bg);
+  color: var(--color-info);
 }
 
 @media (max-width: 768px) {
