@@ -491,9 +491,9 @@ Están en <mark>src/tests/</mark>, con la misma estructura de carpetas que <mark
 | 🧱 <mark>components/</mark> | <mark>AppFooter</mark>, <mark>NavBar</mark> (enlaces, nombre y foto), <mark>FotoCuidador</mark> y <mark>SolicitudCard</mark> (incluido el aviso de pagado) | 14 |
 | 🍍 <mark>stores/</mark> | <mark>AuthStore</mark> (login, logout, rol activo y foto) | 8 |
 | 🔑 <mark>views/auth/</mark> | <mark>LoginView</mark> y <mark>RegisterView</mark> | 2 |
-| 🌍 <mark>views/comun/</mark> | <mark>LandingView</mark>, <mark>HistorialView</mark> y <mark>MiPerfilView</mark> | 10 |
-| 🧑‍⚕️ <mark>views/cuidador/</mark> | <mark>EditarPerfilView</mark> y <mark>SolicitudesCuidadorView</mark> (aceptar, rechazar, errores y foto de perfil) | 19 |
-| 👨‍👩‍👧 <mark>views/familia/</mark> | <mark>BuscarView</mark>, <mark>PerfilCuidadorView</mark>, <mark>SolicitarServicioView</mark>, <mark>SolicitudesFamiliaView</mark>, <mark>ConfirmacionView</mark>, <mark>CheckoutView</mark> y <mark>ValorarView</mark> | 35 |
+| 🌍 <mark>views/common/</mark> | <mark>LandingView</mark>, <mark>HistorialView</mark> y <mark>MiPerfilView</mark> | 10 |
+| 🧑‍⚕️ <mark>views/caregiver/</mark> | <mark>EditarPerfilView</mark> y <mark>SolicitudesCuidadorView</mark> (aceptar, rechazar, errores y foto de perfil) | 19 |
+| 👨‍👩‍👧 <mark>views/family/</mark> | <mark>BuscarView</mark>, <mark>PerfilCuidadorView</mark>, <mark>SolicitarServicioView</mark>, <mark>SolicitudesFamiliaView</mark>, <mark>ConfirmacionView</mark>, <mark>CheckoutView</mark> y <mark>ValorarView</mark> | 35 |
 | 🔌 <mark>repositories/</mark> | <mark>Repository</mark> (clase base), <mark>UsuarioRepository</mark> y el resto de repositorios (rutas, métodos y errores) | 31 |
 
 ```bash
