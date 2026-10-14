@@ -3,7 +3,7 @@ import { ref, onMounted } from "vue";
 import { RouterLink } from "vue-router";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
 import ValoracionRepository from "@/repositories/ValoracionRepository";
-import { nombreNecesidad } from "@/utils/necesidades";
+import { nombreCuidado } from "@/utils/catalogoCuidados";
 import { formatearFecha } from "@/utils/formatearFecha";
 
 const solicitudRepository = new SolicitudRepository();
@@ -76,7 +76,7 @@ function textoEstado(estado) {
             v-for="codigo in item.necesidades"
             :key="codigo"
           >
-            {{ nombreNecesidad(codigo) }}
+            {{ nombreCuidado(codigo) }}
           </span>
         </div>
 
