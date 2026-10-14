@@ -220,21 +220,47 @@ describe('SolicitudCard', () => {
     expect(wrapper.text()).toContain('Antonio Serrano')
     expect(wrapper.text()).toContain('Inicio: 12-08-2026')
     expect(wrapper.text()).not.toContain('Ingreso previsto de 4 noches.')
+    expect(wrapper.find('.solicitudes__modal').exists()).toBe(false)
     expect(wrapper.find('.solicitudes__ver').text()).toBe('Ver')
 
     await wrapper.find('.solicitudes__ver').trigger('click')
 
-    expect(wrapper.text()).toContain('Ingreso previsto de 4 noches.')
-    expect(wrapper.find('.solicitudes__ver').text()).toBe('Ocultar')
+    expect(wrapper.find('.solicitudes__modal').exists()).toBe(true)
+    expect(wrapper.find('.solicitudes__modal').text()).toContain('Ingreso previsto de 4 noches.')
   })
 
-  test('el cuidador puede volver a ocultar los detalles', async () => {
+  test('el cuidador cierra la ventana con el botón Cerrar', async () => {
     const wrapper = montarTarjetaCuidador('PENDIENTE', vi.fn())
 
     await wrapper.find('.solicitudes__ver').trigger('click')
-    await wrapper.find('.solicitudes__ver').trigger('click')
+    await wrapper.find('.solicitudes__cerrar-btn').trigger('click')
 
-    expect(wrapper.text()).not.toContain('Ingreso previsto de 4 noches.')
+    expect(wrapper.find('.solicitudes__modal').exists()).toBe(false)
+  })
+
+  test('el cuidador cierra la ventana con la cruz', async () => {
+    const wrapper = montarTarjetaCuidador('PENDIENTE', vi.fn())
+
+    await wrapper.find('.solicitudes__ver').trigger('click')
+    await wrapper.find('.solicitudes__cerrar').trigger('click')
+
+    expect(wrapper.find('.solicitudes__modal').exists()).toBe(false)
+  })
+
+  test('el cuidador cierra la ventana al pulsar fuera de ella', async () => {
+    const wrapper = montarTarjetaCuidador('PENDIENTE', vi.fn())
+
+    await wrapper.find('.solicitudes__ver').trigger('click')
+    await wrapper.find('.solicitudes__fondo').trigger('click')
+
+    expect(wrapper.find('.solicitudes__modal').exists()).toBe(false)
+  })
+
+  test('la familia no ve ventana emergente, lo ve todo en la tarjeta', () => {
+    const wrapper = montarTarjeta('PENDIENTE', false)
+
+    expect(wrapper.find('.solicitudes__modal').exists()).toBe(false)
+    expect(wrapper.find('.solicitudes__ver').exists()).toBe(false)
   })
 
   test('el cuidador ve Aceptar, Rechazar y Ver en una solicitud pendiente', () => {
