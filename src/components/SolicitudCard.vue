@@ -211,7 +211,7 @@ const direccionVisible = computed(
 
 .solicitudes__estado--pendiente {
   background-color: var(--color-accent-bg);
-  color: #c65a35;
+  color: var(--color-accent-dark);
 }
 
 .solicitudes__estado--aceptada {
@@ -226,7 +226,7 @@ const direccionVisible = computed(
 
 .solicitudes__estado--rechazada {
   background-color: var(--color-neutral-bg);
-  color: #777;
+  color: var(--color-text-muted);
 }
 
 .solicitudes__paciente {
@@ -239,7 +239,7 @@ const direccionVisible = computed(
   padding: 0;
   margin: 0 0 20px;
   font-size: 0.9rem;
-  color: #444;
+  color: var(--color-text-muted);
 
   & li {
     margin-bottom: 6px;
@@ -255,7 +255,7 @@ const direccionVisible = computed(
   position: fixed;
   inset: 0;
   z-index: 1000;
-  background-color: rgba(0, 0, 0, 0.45);
+  background-color: var(--color-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -305,7 +305,7 @@ const direccionVisible = computed(
   display: flex;
   flex-wrap: wrap;
   gap: var(--gap-sm);
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--color-border);
   padding-top: 16px;
 
   /* Cada botón pide al menos 100px; si no caben todos en una fila, el último baja */
@@ -369,7 +369,7 @@ const direccionVisible = computed(
 
 .solicitudes__necesidad {
   background-color: var(--color-accent-bg);
-  color: #c65a35;
+  color: var(--color-accent-dark);
   padding: 4px 12px;
   border-radius: var(--radius-pill);
   font-size: 0.8rem;
