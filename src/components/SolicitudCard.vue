@@ -1,7 +1,7 @@
 <script setup>
 import { computed, ref } from "vue";
 import { RouterLink } from "vue-router";
-import { nombreNecesidad } from "@/utils/necesidades";
+import { nombreCuidado } from "@/utils/catalogoCuidados";
 import { formatearFecha } from "@/utils/formatearFecha";
 
 const props = defineProps([
@@ -103,7 +103,7 @@ const direccionVisible = computed(
             v-for="codigo in solicitud.necesidades"
             :key="codigo"
           >
-            {{ nombreNecesidad(codigo) }}
+            {{ nombreCuidado(codigo) }}
           </span>
         </div>
 
