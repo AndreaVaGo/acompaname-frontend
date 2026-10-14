@@ -31,23 +31,14 @@ const router = createRouter({
     { path: "/solicitudes-cuidador", name: "solicitudes-cuidador", component: SolicitudesCuidadorView, meta: { requiereLogin: true, rol: "CUIDADOR" } },
     { path: "/editar-perfil", name: "editar-perfil", component: EditarPerfilView, meta: { requiereLogin: true, rol: "CUIDADOR" } },
     { path: "/historial", name: "historial", component: HistorialView, meta: { requiereLogin: true } },
-<<<<<<< HEAD
-    { path: "/solicitar/:id", name: "solicitar", component: SolicitarServicioView, meta: { requiereLogin: true } },
-    { path: "/confirmacion", name: "confirmacion", component: ConfirmacionView, meta: { requiereLogin: true } },
-    { path: "/valorar/:id", name: "valorar", component: ValorarView, meta: { requiereLogin: true } },
-    { path: "/mi-perfil", name: "mi-perfil", component: MiPerfilView, meta: { requiereLogin: true } },
-    { path: "/editar-datos", name: "editar-datos", component: EditarDatosView, meta: { requiereLogin: true } },
-    { path: "/cambiar-password", name: "cambiar-password", component: CambiarPasswordView, meta: { requiereLogin: true } },
-    { path: "/solicitudes", name: "solicitudes", component: SolicitudesFamiliaView, meta: { requiereLogin: true } },
-    { path: "/pagar/:id", name: "pagar", component: CheckoutView, meta: { requiereLogin: true } },
-=======
     { path: "/solicitar/:id", name: "solicitar", component: SolicitarServicioView, meta: { requiereLogin: true, rol: "FAMILIA" } },
     { path: "/confirmacion", name: "confirmacion", component: ConfirmacionView, meta: { requiereLogin: true, rol: "FAMILIA" } },
     { path: "/valorar/:id", name: "valorar", component: ValorarView, meta: { requiereLogin: true, rol: "FAMILIA" } },
     { path: "/mi-perfil", name: "mi-perfil", component: MiPerfilView, meta: { requiereLogin: true, rol: "FAMILIA" } },
+    { path: "/editar-datos", name: "editar-datos", component: EditarDatosView, meta: { requiereLogin: true } },
+    { path: "/cambiar-password", name: "cambiar-password", component: CambiarPasswordView, meta: { requiereLogin: true } },
     { path: "/solicitudes", name: "solicitudes", component: SolicitudesFamiliaView, meta: { requiereLogin: true, rol: "FAMILIA" } },
     { path: "/pagar/:id", name: "pagar", component: CheckoutView, meta: { requiereLogin: true, rol: "FAMILIA" } },
->>>>>>> feature/role-guards
   ],
 });
 
