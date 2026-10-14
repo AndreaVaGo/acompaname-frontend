@@ -308,9 +308,10 @@ const direccionVisible = computed(
   border-top: 1px solid #eee;
   padding-top: 16px;
 
-  /* Cada botón pide al menos 120px; si no caben todos en una fila, el último baja */
+  /* Cada botón pide al menos 100px; si no caben todos en una fila, el último baja */
   & .btn {
-    flex: 1 1 120px;
+    flex: 1 1 100px;
+    padding: 12px;
     text-align: center;
     text-decoration: none;
   }
@@ -324,7 +325,7 @@ const direccionVisible = computed(
 
 .solicitudes__btn-rechazar {
   background-color: var(--color-white);
-  color: #c65a35;
+  color: var(--color-text);
   border: 1px solid var(--color-accent);
 }
 
