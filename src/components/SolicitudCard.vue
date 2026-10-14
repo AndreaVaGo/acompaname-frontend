@@ -58,6 +58,14 @@ const direccionVisible = computed(
       <li>📅 Inicio: {{ formatearFecha(solicitud.fechaCuidado) }}</li>
     </ul>
 
+    <button
+      v-if="mostrarAcciones"
+      class="solicitudes__ver"
+      @click="expandido = true"
+    >
+      Ver detalles
+    </button>
+
     <!-- La familia lo ve dentro de la tarjeta; el cuidador, en una ventana encima de todo -->
     <div
       v-if="detallesVisibles"
@@ -122,27 +130,34 @@ const direccionVisible = computed(
       </div>
     </div>
 
-    <div class="solicitudes__acciones" v-if="mostrarAcciones">
+    <div
+      class="solicitudes__acciones"
+      v-if="
+        mostrarAcciones &&
+        (solicitud.estado === 'PENDIENTE' ||
+          (solicitud.estado === 'ACEPTADA' && completar))
+      "
+    >
       <template v-if="solicitud.estado === 'PENDIENTE'">
-        <button class="btn btn--primary" @click="aceptar(solicitud.id)">
+        <button
+          class="btn solicitudes__btn-aceptar"
+          @click="aceptar(solicitud.id)"
+        >
           Aceptar
         </button>
-        <button class="btn btn--secondary" @click="rechazar(solicitud.id)">
+        <button
+          class="btn solicitudes__btn-rechazar"
+          @click="rechazar(solicitud.id)"
+        >
           Rechazar
         </button>
       </template>
       <button
-        v-if="solicitud.estado === 'ACEPTADA' && completar"
-        class="btn btn--primary solicitudes__completar"
+        v-else
+        class="btn solicitudes__btn-aceptar solicitudes__completar"
         @click="completar(solicitud.id)"
       >
         Marcar como completada
-      </button>
-      <button
-        class="btn btn--secondary solicitudes__ver"
-        @click="expandido = true"
-      >
-        Ver
       </button>
     </div>
 
@@ -202,6 +217,11 @@ const direccionVisible = computed(
 .solicitudes__estado--aceptada {
   background-color: var(--color-secondary-bg);
   color: var(--color-secondary);
+}
+
+.solicitudes__estado--completada {
+  background-color: var(--color-info-bg);
+  color: var(--color-info);
 }
 
 .solicitudes__estado--rechazada {
@@ -283,15 +303,49 @@ const direccionVisible = computed(
 .solicitudes__acciones {
   margin-top: auto;
   display: flex;
+  flex-wrap: wrap;
   gap: var(--gap-sm);
   border-top: 1px solid #eee;
   padding-top: 16px;
 
+  /* Cada botón pide al menos 120px; si no caben todos en una fila, el último baja */
   & .btn {
-    flex: 1;
+    flex: 1 1 120px;
     text-align: center;
     text-decoration: none;
   }
+}
+
+/* Colores de la paleta: verde para aceptar, coral para rechazar, azul para ver */
+.solicitudes__btn-aceptar {
+  background-color: var(--color-secondary);
+  color: var(--color-white);
+}
+
+.solicitudes__btn-rechazar {
+  background-color: var(--color-white);
+  color: #c65a35;
+  border: 1px solid var(--color-accent);
+}
+
+.solicitudes__btn-aceptar:hover,
+.solicitudes__btn-rechazar:hover {
+  filter: brightness(0.95);
+}
+
+/* "Ver detalles" es un enlace de texto, igual de grande en todas las tarjetas */
+.solicitudes__ver {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0 0 20px;
+  color: var(--color-info);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .solicitudes__pagado {
