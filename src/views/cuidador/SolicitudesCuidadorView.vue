@@ -40,6 +40,19 @@ async function rechazar(id) {
     error.value = "No se pudo rechazar la solicitud.";
   }
 }
+
+async function completar(id) {
+  try {
+    const actualizada = await solicitudRepository.cambiarEstado(
+      id,
+      "COMPLETADA",
+    );
+    const solicitud = solicitudes.value.find((s) => s.id === id);
+    solicitud.estado = actualizada.estado;
+  } catch (err) {
+    error.value = "No se pudo marcar la solicitud como completada.";
+  }
+}
 </script>
 
 <template>
@@ -60,6 +73,7 @@ async function rechazar(id) {
         :mostrarAcciones="true"
         :aceptar="aceptar"
         :rechazar="rechazar"
+        :completar="completar"
       />
     </div>
   </div>
