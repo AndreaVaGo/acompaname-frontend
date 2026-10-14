@@ -4,6 +4,7 @@
   --color-text-muted: #555;
   --color-accent: #f2896b;
   --color-accent-bg: #fbe0d6;
+  --color-accent-dark: #c65a35;
   --color-secondary: #2e7d5b;
   --color-secondary-bg: #d6f0e0;
   --color-neutral-bg: #f0f0f0;
@@ -11,6 +12,12 @@
   --color-info-bg: #dbe9fb;
   --color-white: #ffffff;
   --color-border: #ddd;
+
+  /* Errores y fondo oscuro de las ventanas emergentes */
+  --color-error: #c0392b;
+  --color-error-bg: #fdecea;
+  --color-error-border: #f5c6c0;
+  --color-overlay: rgba(0, 0, 0, 0.45);
 
   --radius-pill: 999px;
   --radius-card: 16px;
