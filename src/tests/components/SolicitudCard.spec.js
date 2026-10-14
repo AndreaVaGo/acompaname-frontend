@@ -1,198 +1,202 @@
-<script setup>
-import { RouterLink } from "vue-router";
-import { nombreNecesidad } from "@/utils/necesidades";
+import { describe, test, expect, vi } from 'vitest'
+import { mount, shallowMount, RouterLinkStub } from '@vue/test-utils'
+import SolicitudCard from '../../components/SolicitudCard.vue'
 
-defineProps([
-  "solicitud",
-  "nombreMostrado",
-  "mostrarAcciones",
-  "pagado",
-  "aceptar",
-  "rechazar",
-  "completar",
-]);
-</script>
-
-<template>
-  <div class="solicitudes__card">
-    <div class="solicitudes__card-top">
-      <h3>{{ nombreMostrado }}</h3>
-      <span
-        class="solicitudes__estado"
-        :class="'solicitudes__estado--' + solicitud.estado.toLowerCase()"
-      >
-        {{
-          solicitud.estado === "PENDIENTE"
-            ? "Pendiente"
-            : solicitud.estado === "ACEPTADA"
-              ? "Aceptada"
-              : solicitud.estado === "RECHAZADA"
-                ? "Rechazada"
-                : "Completada"
-        }}
-      </span>
-    </div>
-
-    <p class="solicitudes__paciente">{{ solicitud.nombrePaciente }}</p>
-
-    <div
-      class="solicitudes__necesidades"
-      v-if="solicitud.necesidades && solicitud.necesidades.length > 0"
-    >
-      <span
-        class="solicitudes__necesidad"
-        v-for="codigo in solicitud.necesidades"
-        :key="codigo"
-      >
-        {{ nombreNecesidad(codigo) }}
-      </span>
-    </div>
-
-    <ul class="solicitudes__detalles">
-      <li>🏠 {{ solicitud.tipoCuidado }}</li>
-      <li>📅 Inicio: {{ solicitud.fechaCuidado }}</li>
-      <li v-if="solicitud.fechaFin">📅 Fin: {{ solicitud.fechaFin }}</li>
-      <li v-if="solicitud.notas">📝 {{ solicitud.notas }}</li>
-    </ul>
-
-    <div
-      class="solicitudes__acciones"
-      v-if="mostrarAcciones && solicitud.estado === 'PENDIENTE'"
-    >
-      <button class="btn btn--primary" @click="aceptar(solicitud.id)">
-        Aceptar
-      </button>
-      <button class="btn btn--secondary" @click="rechazar(solicitud.id)">
-        Rechazar
-      </button>
-    </div>
-
-    <div
-      class="solicitudes__acciones"
-      v-if="mostrarAcciones && solicitud.estado === 'ACEPTADA' && completar"
-    >
-      <button
-        class="btn btn--primary solicitudes__completar"
-        @click="completar(solicitud.id)"
-      >
-        Marcar como completada
-      </button>
-    </div>
-
-    <div
-      class="solicitudes__acciones"
-      v-if="!mostrarAcciones && solicitud.estado === 'ACEPTADA' && !pagado"
-    >
-      <RouterLink :to="`/pagar/${solicitud.id}`" class="btn btn--primary">
-        Pagar
-      </RouterLink>
-    </div>
-
-    <div
-      class="solicitudes__acciones"
-      v-if="!mostrarAcciones && solicitud.estado === 'ACEPTADA' && pagado"
-    >
-      <p class="solicitudes__pagado">Pagado ✓</p>
-    </div>
-  </div>
-</template>
-
-<style scoped>
-.solicitudes__card {
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
-  padding: 24px;
-  box-shadow: var(--shadow-card);
-}
-
-.solicitudes__card-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 4px;
-
-  & h3 {
-    margin: 0;
+function crearSolicitud(estado) {
+  return {
+    id: 1,
+    nombrePaciente: 'Antonio Serrano',
+    tipoCuidado: 'Hospitalario',
+    fechaCuidado: '2026-08-12',
+    notas: 'Ingreso previsto de 4 noches.',
+    estado: estado,
   }
 }
 
-.solicitudes__estado {
-  padding: 4px 12px;
-  border-radius: var(--radius-pill);
-  font-size: 0.8rem;
-  font-weight: bold;
+function montarTarjeta(estado, pagado) {
+  return mount(SolicitudCard, {
+    props: {
+      solicitud: crearSolicitud(estado),
+      nombreMostrado: 'Familia Serrano',
+      mostrarAcciones: false,
+      pagado: pagado,
+    },
+    global: {
+      stubs: { RouterLink: RouterLinkStub },
+    },
+  })
 }
 
-.solicitudes__estado--pendiente {
-  background-color: var(--color-accent-bg);
-  color: #c65a35;
+// Tarjeta tal y como la ve el cuidador (con acciones)
+function montarTarjetaCuidador(estado, completar) {
+  return mount(SolicitudCard, {
+    props: {
+      solicitud: crearSolicitud(estado),
+      nombreMostrado: 'Familia Serrano',
+      mostrarAcciones: true,
+      completar: completar,
+    },
+    global: {
+      stubs: { RouterLink: RouterLinkStub },
+    },
+  })
 }
 
-.solicitudes__estado--aceptada {
-  background-color: var(--color-secondary-bg);
-  color: var(--color-secondary);
-}
+describe('SolicitudCard', () => {
+  test('muestra el nombre correcto', () => {
+    const solicitud = {
+      paciente: 'Antonio Serrano',
+      tipoCuidado: 'Hospitalario',
+      fechaInicio: '12 de agosto de 2026',
+      notas: 'Ingreso previsto de 4 noches.',
+      estado: 'pendiente',
+    }
 
-.solicitudes__estado--rechazada {
-  background-color: var(--color-neutral-bg);
-  color: #777;
-}
+    const wrapper = shallowMount(SolicitudCard, {
+      props: {
+        solicitud: solicitud,
+        nombreMostrado: 'Familia Serrano',
+        mostrarAcciones: false,
+      },
+    })
 
-.solicitudes__paciente {
-  color: var(--color-text-muted);
-  margin-bottom: 12px;
-}
+    expect(wrapper.text()).toContain('Familia Serrano')
+  })
 
-.solicitudes__detalles {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 20px;
-  font-size: 0.9rem;
-  color: #444;
+  test('muestra el botón Pagar si la solicitud está aceptada y sin pagar', () => {
+    const wrapper = montarTarjeta('ACEPTADA', false)
 
-  & li {
-    margin-bottom: 6px;
-  }
-}
+    expect(wrapper.text()).toContain('Pagar')
+    expect(wrapper.text()).not.toContain('Pagado')
+  })
 
-.solicitudes__acciones {
-  display: flex;
-  gap: var(--gap-sm);
-  border-top: 1px solid #eee;
-  padding-top: 16px;
+  test('muestra Pagado en vez del botón si el pago ya está hecho', () => {
+    const wrapper = montarTarjeta('ACEPTADA', true)
 
-  & .btn {
-    flex: 1;
-    text-align: center;
-    text-decoration: none;
-  }
-}
+    expect(wrapper.text()).toContain('Pagado')
+    expect(wrapper.findComponent(RouterLinkStub).exists()).toBe(false)
+  })
 
-.solicitudes__pagado {
-  flex: 1;
-  margin: 0;
-  padding: 12px 24px;
-  border-radius: var(--radius-pill);
-  background-color: var(--color-secondary-bg);
-  color: var(--color-secondary);
-  font-weight: bold;
-  text-align: center;
-}
+  test('no muestra ni Pagar ni Pagado si la solicitud está pendiente', () => {
+    const wrapper = montarTarjeta('PENDIENTE', false)
 
-.solicitudes__necesidades {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 14px;
-}
+    expect(wrapper.text()).not.toContain('Pagar')
+    expect(wrapper.text()).not.toContain('Pagado')
+  })
 
-.solicitudes__necesidad {
-  background-color: var(--color-accent-bg);
-  color: #c65a35;
-  padding: 4px 12px;
-  border-radius: var(--radius-pill);
-  font-size: 0.8rem;
-}
-</style>
+  test('muestra las notas si la solicitud tiene notas', () => {
+    const wrapper = montarTarjeta('PENDIENTE', false)
+
+    expect(wrapper.text()).toContain('Ingreso previsto de 4 noches.')
+  })
+
+  test('no muestra la línea de notas si la solicitud no tiene notas', () => {
+    const solicitud = crearSolicitud('PENDIENTE')
+    solicitud.notas = ''
+
+    const wrapper = mount(SolicitudCard, {
+      props: {
+        solicitud: solicitud,
+        nombreMostrado: 'Familia Serrano',
+        mostrarAcciones: false,
+      },
+      global: {
+        stubs: { RouterLink: RouterLinkStub },
+      },
+    })
+
+    expect(wrapper.text()).not.toContain('📝')
+  })
+
+  test('muestra la fecha de fin si la solicitud la tiene', () => {
+    const wrapper = mount(SolicitudCard, {
+      props: {
+        solicitud: { ...crearSolicitud('PENDIENTE'), fechaFin: '2026-08-19' },
+        nombreMostrado: 'Familia Serrano',
+        mostrarAcciones: false,
+      },
+      global: {
+        stubs: { RouterLink: RouterLinkStub },
+      },
+    })
+
+    expect(wrapper.text()).toContain('Inicio: 2026-08-12')
+    expect(wrapper.text()).toContain('Fin: 2026-08-19')
+  })
+
+  test('no muestra la línea de fin si la solicitud no tiene fecha de fin', () => {
+    const wrapper = montarTarjeta('PENDIENTE', false)
+
+    expect(wrapper.text()).not.toContain('Fin:')
+  })
+
+  test('muestra las necesidades del paciente con su nombre', () => {
+    const wrapper = mount(SolicitudCard, {
+      props: {
+        solicitud: {
+          ...crearSolicitud('PENDIENTE'),
+          necesidades: ['movilidad', 'nocturno'],
+        },
+        nombreMostrado: 'Familia Serrano',
+        mostrarAcciones: false,
+      },
+      global: {
+        stubs: { RouterLink: RouterLinkStub },
+      },
+    })
+
+    const etiquetas = wrapper.findAll('.solicitudes__necesidad')
+    expect(etiquetas.length).toBe(2)
+    expect(etiquetas[0].text()).toBe('Movilidad reducida')
+    expect(etiquetas[1].text()).toBe('Acompañamiento nocturno')
+  })
+
+  test('no muestra el bloque de necesidades si no hay ninguna', () => {
+    const wrapper = mount(SolicitudCard, {
+      props: {
+        solicitud: { ...crearSolicitud('PENDIENTE'), necesidades: [] },
+        nombreMostrado: 'Familia Serrano',
+        mostrarAcciones: false,
+      },
+      global: {
+        stubs: { RouterLink: RouterLinkStub },
+      },
+    })
+
+    expect(wrapper.find('.solicitudes__necesidades').exists()).toBe(false)
+  })
+
+  test('una solicitud antigua sin necesidades se muestra sin errores', () => {
+    const wrapper = montarTarjeta('PENDIENTE', false)
+
+    expect(wrapper.find('.solicitudes__necesidades').exists()).toBe(false)
+    expect(wrapper.text()).toContain('Antonio Serrano')
+  })
+
+  test('el cuidador ve el botón Marcar como completada si la solicitud está aceptada', () => {
+    const wrapper = montarTarjetaCuidador('ACEPTADA', vi.fn())
+
+    expect(wrapper.text()).toContain('Marcar como completada')
+  })
+
+  test('el cuidador no ve el botón Marcar como completada si la solicitud está pendiente', () => {
+    const wrapper = montarTarjetaCuidador('PENDIENTE', vi.fn())
+
+    expect(wrapper.text()).not.toContain('Marcar como completada')
+  })
+
+  test('la familia no ve el botón Marcar como completada', () => {
+    const wrapper = montarTarjeta('ACEPTADA', false)
+
+    expect(wrapper.text()).not.toContain('Marcar como completada')
+  })
+
+  test('al pulsar Marcar como completada se llama a completar con el id', async () => {
+    const completar = vi.fn()
+    const wrapper = montarTarjetaCuidador('ACEPTADA', completar)
+
+    await wrapper.find('.solicitudes__completar').trigger('click')
+
+    expect(completar).toHaveBeenCalledWith(1)
+  })
+})
