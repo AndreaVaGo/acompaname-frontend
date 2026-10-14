@@ -3,11 +3,8 @@ import { ref, onMounted } from "vue";
 import { RouterLink } from "vue-router";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
 import ValoracionRepository from "@/repositories/ValoracionRepository";
-<<<<<<< HEAD
 import { nombreNecesidad } from "@/utils/necesidades";
-=======
 import { formatearFecha } from "@/utils/formatearFecha";
->>>>>>> feature/date-format
 
 const solicitudRepository = new SolicitudRepository();
 const valoracionRepository = new ValoracionRepository();
