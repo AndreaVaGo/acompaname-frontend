@@ -29,6 +29,7 @@ onMounted(async () => {
         fechaFin: s.fechaFin,
         necesidades: s.necesidades || [],
         notas: s.notas,
+        direccion: s.direccion,
         estado: s.estado.toLowerCase(),
         valorada: idsValorados.includes(s.id),
       }));
@@ -88,7 +89,10 @@ function textoEstado(estado) {
           <li v-if="item.fechaFin">
             📅 Fin: {{ formatearFecha(item.fechaFin) }}
           </li>
-          <li>📝 {{ item.notas }}</li>
+          <li v-if="item.direccion && item.estado === 'completada'">
+            📍 {{ item.direccion }}
+          </li>
+          <li v-if="item.notas">📝 {{ item.notas }}</li>
         </ul>
 
         <div class="historial__footer" v-if="item.estado === 'completada'">
@@ -141,6 +145,8 @@ function textoEstado(estado) {
 }
 
 .historial__card {
+  display: flex;
+  flex-direction: column;
   background-color: var(--color-white);
   border-radius: var(--radius-card);
   padding: 24px;
@@ -189,10 +195,12 @@ function textoEstado(estado) {
 
   & li {
     margin-bottom: 6px;
+    overflow-wrap: anywhere;
   }
 }
 
 .historial__footer {
+  margin-top: auto;
   border-top: 1px solid #eee;
   padding-top: 16px;
 }
