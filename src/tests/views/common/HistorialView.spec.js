@@ -146,4 +146,48 @@ describe("HistorialView", () => {
     expect(wrapper.find(".historial__necesidades").exists()).toBe(false);
     expect(wrapper.text()).toContain("Pepe");
   });
+
+  test("no muestra la línea de notas si la solicitud no tiene notas", async () => {
+    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
+      { id: 1, cuidadorNombre: "Pepe", nombrePaciente: "Antonio", edadPaciente: 80, tipoCuidado: "domicilio", fechaCuidado: "2026-09-01", notas: "", estado: "COMPLETADA" },
+    ]);
+    vi.spyOn(ValoracionRepository.prototype, "getAll").mockResolvedValue([]);
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.text()).not.toContain("📝");
+  });
+
+  test("muestra las notas si la solicitud las tiene", async () => {
+    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
+      { id: 1, cuidadorNombre: "Pepe", nombrePaciente: "Antonio", edadPaciente: 80, tipoCuidado: "domicilio", fechaCuidado: "2026-09-01", notas: "Alergia a la penicilina", estado: "COMPLETADA" },
+    ]);
+    vi.spyOn(ValoracionRepository.prototype, "getAll").mockResolvedValue([]);
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.text()).toContain("📝 Alergia a la penicilina");
+  });
+
+  test("muestra la dirección de una solicitud completada", async () => {
+    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
+      { id: 1, cuidadorNombre: "Pepe", nombrePaciente: "Antonio", edadPaciente: 80, tipoCuidado: "domicilio", fechaCuidado: "2026-09-01", notas: "", direccion: "Calle Uría 10, Oviedo", estado: "COMPLETADA" },
+    ]);
+    vi.spyOn(ValoracionRepository.prototype, "getAll").mockResolvedValue([]);
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.text()).toContain("Calle Uría 10, Oviedo");
+  });
+
+  test("no muestra la dirección de una solicitud rechazada", async () => {
+    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
+      { id: 1, cuidadorNombre: "Pepe", nombrePaciente: "Antonio", edadPaciente: 80, tipoCuidado: "domicilio", fechaCuidado: "2026-09-01", notas: "", direccion: "Calle Uría 10, Oviedo", estado: "RECHAZADA" },
+    ]);
+    vi.spyOn(ValoracionRepository.prototype, "getAll").mockResolvedValue([]);
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.text()).not.toContain("Calle Uría 10, Oviedo");
+  });
 });
