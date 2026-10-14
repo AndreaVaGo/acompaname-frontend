@@ -45,6 +45,10 @@ onMounted(async () => {
           <span>Fecha de inicio</span>
           <strong>{{ solicitud.fechaCuidado }}</strong>
         </div>
+        <div v-if="solicitud.fechaFin" class="confirmacion__fila">
+          <span>Fecha de fin</span>
+          <strong>{{ solicitud.fechaFin }}</strong>
+        </div>
         <div class="confirmacion__fila">
           <span>Paciente</span>
           <strong>{{ solicitud.nombrePaciente }}, {{ solicitud.edadPaciente }} años</strong>

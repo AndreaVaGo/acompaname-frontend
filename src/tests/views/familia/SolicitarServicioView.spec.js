@@ -1,4 +1,4 @@
-import { describe, test, expect, vi } from "vitest";
+import { describe, test, expect, vi, afterEach } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createRouter, createWebHistory } from "vue-router";
 import { createPinia } from "pinia";
@@ -38,6 +38,10 @@ async function montarVista() {
 }
 
 describe("SolicitarServicioView", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   test("muestra el nombre del cuidador tras cargarlo", async () => {
     vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
       usuarioNombre: "Pepe",
@@ -103,11 +107,67 @@ describe("SolicitarServicioView", () => {
       notas: "Alergia a la penicilina",
       edadPaciente: 81,
       fechaCuidado: "2026-10-10",
+      fechaFin: null,
       familiaId: 1,
       cuidadorId: 3,
     });
     expect(router.currentRoute.value.name).toBe("confirmacion");
     expect(router.currentRoute.value.query.id).toBe("9");
+  });
+
+  test("envía la fecha de fin si se rellena", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
+      usuarioNombre: "Pepe",
+    });
+    const createSpy = vi
+      .spyOn(SolicitudRepository.prototype, "create")
+      .mockResolvedValue({ id: 9 });
+
+    const { wrapper } = await montarVista();
+
+    const opciones = wrapper.findAll(".solicitar__opcion");
+    await opciones[1].trigger("click");
+
+    await wrapper.find("#fecha").setValue("2026-10-10");
+    await wrapper.find("#fecha-fin").setValue("2026-10-17");
+    await wrapper.find("#paciente").setValue("Antonio Serrano");
+    await wrapper.find("#edad").setValue("81");
+
+    await wrapper.find("form").trigger("submit.prevent");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(createSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        fechaCuidado: "2026-10-10",
+        fechaFin: "2026-10-17",
+      })
+    );
+  });
+
+  test("no envía la solicitud si la fecha de fin es anterior a la de inicio", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
+      usuarioNombre: "Pepe",
+    });
+    const createSpy = vi
+      .spyOn(SolicitudRepository.prototype, "create")
+      .mockResolvedValue({});
+
+    const { wrapper } = await montarVista();
+
+    const opciones = wrapper.findAll(".solicitar__opcion");
+    await opciones[0].trigger("click");
+
+    await wrapper.find("#fecha").setValue("2026-10-10");
+    await wrapper.find("#fecha-fin").setValue("2026-10-05");
+    await wrapper.find("#paciente").setValue("Antonio Serrano");
+    await wrapper.find("#edad").setValue("81");
+
+    await wrapper.find("form").trigger("submit.prevent");
+
+    expect(wrapper.text()).toContain(
+      "La fecha de fin no puede ser anterior a la de inicio."
+    );
+    expect(createSpy).not.toHaveBeenCalled();
   });
 
   test("muestra error si falla el envío de la solicitud", async () => {

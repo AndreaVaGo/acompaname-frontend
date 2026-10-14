@@ -68,4 +68,26 @@ describe('SolicitudCard', () => {
     expect(wrapper.text()).not.toContain('Pagar')
     expect(wrapper.text()).not.toContain('Pagado')
   })
+
+  test('muestra la fecha de fin si la solicitud la tiene', () => {
+    const wrapper = mount(SolicitudCard, {
+      props: {
+        solicitud: { ...crearSolicitud('PENDIENTE'), fechaFin: '2026-08-19' },
+        nombreMostrado: 'Familia Serrano',
+        mostrarAcciones: false,
+      },
+      global: {
+        stubs: { RouterLink: RouterLinkStub },
+      },
+    })
+
+    expect(wrapper.text()).toContain('Inicio: 2026-08-12')
+    expect(wrapper.text()).toContain('Fin: 2026-08-19')
+  })
+
+  test('no muestra la línea de fin si la solicitud no tiene fecha de fin', () => {
+    const wrapper = montarTarjeta('PENDIENTE', false)
+
+    expect(wrapper.text()).not.toContain('Fin:')
+  })
 })

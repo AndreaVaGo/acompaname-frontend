@@ -70,6 +70,36 @@ describe("ConfirmacionView", () => {
     expect(wrapper.text()).toContain("Domicilio");
   });
 
+  test("muestra la fecha de fin si la solicitud la tiene", async () => {
+    vi.spyOn(SolicitudRepository.prototype, "getById").mockResolvedValue({
+      cuidadorNombre: "Pepe",
+      tipoCuidado: "domicilio",
+      fechaCuidado: "2026-10-10",
+      fechaFin: "2026-10-17",
+      nombrePaciente: "Antonio Serrano",
+      edadPaciente: 81,
+    });
+
+    const { wrapper } = await montarVista();
+
+    expect(wrapper.text()).toContain("Fecha de fin");
+    expect(wrapper.text()).toContain("2026-10-17");
+  });
+
+  test("no muestra la fila de fecha de fin si la solicitud no la tiene", async () => {
+    vi.spyOn(SolicitudRepository.prototype, "getById").mockResolvedValue({
+      cuidadorNombre: "Pepe",
+      tipoCuidado: "domicilio",
+      fechaCuidado: "2026-10-10",
+      nombrePaciente: "Antonio Serrano",
+      edadPaciente: 81,
+    });
+
+    const { wrapper } = await montarVista();
+
+    expect(wrapper.text()).not.toContain("Fecha de fin");
+  });
+
   test("muestra error si falla la carga de la solicitud", async () => {
     vi.spyOn(SolicitudRepository.prototype, "getById").mockRejectedValue(
       new Error("fallo")

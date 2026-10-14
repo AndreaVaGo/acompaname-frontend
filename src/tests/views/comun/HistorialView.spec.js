@@ -65,6 +65,29 @@ describe("HistorialView", () => {
     expect(wrapper.text()).toContain("Dejar valoración");
   });
 
+  test("muestra la fecha de fin si la solicitud la tiene", async () => {
+    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
+      { id: 1, cuidadorNombre: "Pepe", nombrePaciente: "Antonio", edadPaciente: 80, tipoCuidado: "domicilio", fechaCuidado: "2026-09-01", fechaFin: "2026-09-08", notas: "", estado: "COMPLETADA" },
+    ]);
+    vi.spyOn(ValoracionRepository.prototype, "getAll").mockResolvedValue([]);
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.text()).toContain("Inicio: 2026-09-01");
+    expect(wrapper.text()).toContain("Fin: 2026-09-08");
+  });
+
+  test("no muestra la línea de fin si la solicitud no tiene fecha de fin", async () => {
+    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
+      { id: 1, cuidadorNombre: "Pepe", nombrePaciente: "Antonio", edadPaciente: 80, tipoCuidado: "domicilio", fechaCuidado: "2026-09-01", notas: "", estado: "COMPLETADA" },
+    ]);
+    vi.spyOn(ValoracionRepository.prototype, "getAll").mockResolvedValue([]);
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.text()).not.toContain("Fin:");
+  });
+
   test("muestra el mensaje de historial vacío si no hay solicitudes finalizadas", async () => {
     vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
       { id: 1, cuidadorNombre: "Pepe", nombrePaciente: "Antonio", edadPaciente: 80, tipoCuidado: "domicilio", fechaCuidado: "2026-09-01", notas: "", estado: "PENDIENTE" },

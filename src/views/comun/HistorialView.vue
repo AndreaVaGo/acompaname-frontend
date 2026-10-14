@@ -24,6 +24,7 @@ onMounted(async () => {
         edad: s.edadPaciente,
         tipoCuidado: s.tipoCuidado,
         fechaInicio: s.fechaCuidado,
+        fechaFin: s.fechaFin,
         notas: s.notas,
         estado: s.estado.toLowerCase(),
         valorada: idsValorados.includes(s.id),
@@ -68,6 +69,7 @@ function textoEstado(estado) {
         <ul class="historial__detalles">
           <li>🏠 {{ item.tipoCuidado }}</li>
           <li>📅 Inicio: {{ item.fechaInicio }}</li>
+          <li v-if="item.fechaFin">📅 Fin: {{ item.fechaFin }}</li>
           <li>📝 {{ item.notas }}</li>
         </ul>
 
