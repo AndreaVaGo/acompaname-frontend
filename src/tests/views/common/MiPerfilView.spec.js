@@ -2,7 +2,7 @@ import { describe, test, expect, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createRouter, createWebHistory } from "vue-router";
 import { createPinia } from "pinia";
-import MiPerfilView from "../../../views/comun/MiPerfilView.vue";
+import MiPerfilView from "../../../views/common/MiPerfilView.vue";
 import UsuarioRepository from "../../../repositories/UsuarioRepository";
 import { useAuthStore } from "../../../stores/auth";
 

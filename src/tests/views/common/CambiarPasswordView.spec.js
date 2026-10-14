@@ -1,7 +1,7 @@
 import { describe, test, expect, vi, afterEach } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createPinia } from "pinia";
-import CambiarPasswordView from "../../../views/comun/CambiarPasswordView.vue";
+import CambiarPasswordView from "../../../views/common/CambiarPasswordView.vue";
 import UsuarioRepository from "../../../repositories/UsuarioRepository";
 import { useAuthStore } from "../../../stores/auth";
 

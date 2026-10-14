@@ -1,7 +1,7 @@
 import { describe, test, expect, vi, afterEach } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
-import EditarDatosView from "../../../views/comun/EditarDatosView.vue";
+import EditarDatosView from "../../../views/common/EditarDatosView.vue";
 import UsuarioRepository from "../../../repositories/UsuarioRepository";
 import { useAuthStore } from "../../../stores/auth";
 

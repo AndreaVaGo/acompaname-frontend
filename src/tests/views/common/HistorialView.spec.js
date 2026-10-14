@@ -1,7 +1,7 @@
 import { describe, test, expect, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createRouter, createWebHistory } from "vue-router";
-import HistorialView from "../../../views/comun/HistorialView.vue";
+import HistorialView from "../../../views/common/HistorialView.vue";
 import SolicitudRepository from "../../../repositories/SolicitudRepository";
 import ValoracionRepository from "../../../repositories/ValoracionRepository";
 

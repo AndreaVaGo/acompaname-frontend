@@ -1,20 +1,20 @@
 import { createRouter, createWebHistory } from "vue-router";
 import pinia from "../pinia/pinia";
 import { useAuthStore } from "../stores/auth";
-import LandingView from "../views/comun/LandingView.vue";
+import LandingView from "../views/common/LandingView.vue";
 import LoginView from "../views/auth/LoginView.vue";
 import RegisterView from "../views/auth/RegisterView.vue";
 import BuscarView from "../views/familia/BuscarView.vue";
 import SolicitudesCuidadorView from "../views/cuidador/SolicitudesCuidadorView.vue";
 import EditarPerfilView from "../views/cuidador/EditarPerfilView.vue";
-import HistorialView from "../views/comun/HistorialView.vue";
+import HistorialView from "../views/common/HistorialView.vue";
 import PerfilCuidadorView from "../views/familia/PerfilCuidadorView.vue";
 import SolicitarServicioView from "../views/familia/SolicitarServicioView.vue";
 import ConfirmacionView from "../views/familia/ConfirmacionView.vue";
 import ValorarView from "../views/familia/ValorarView.vue";
-import MiPerfilView from "../views/comun/MiPerfilView.vue";
-import EditarDatosView from "../views/comun/EditarDatosView.vue";
-import CambiarPasswordView from "../views/comun/CambiarPasswordView.vue";
+import MiPerfilView from "../views/common/MiPerfilView.vue";
+import EditarDatosView from "../views/common/EditarDatosView.vue";
+import CambiarPasswordView from "../views/common/CambiarPasswordView.vue";
 import SolicitudesFamiliaView from "../views/familia/SolicitudesFamiliaView.vue";
 import CheckoutView from "../views/familia/CheckoutView.vue";
 

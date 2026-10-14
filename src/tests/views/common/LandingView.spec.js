@@ -1,7 +1,7 @@
 import { describe, test, expect } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createRouter, createWebHistory } from "vue-router";
-import LandingView from "../../../views/comun/LandingView.vue";
+import LandingView from "../../../views/common/LandingView.vue";
 
 function montarVista() {
   const router = createRouter({
