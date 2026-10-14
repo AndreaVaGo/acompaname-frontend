@@ -14,7 +14,7 @@ const props = defineProps([
   "completar",
 ]);
 
-// El cuidador ve la tarjeta resumida y amplía los detalles con el botón Ver
+// El cuidador ve la tarjeta resumida y abre los detalles en una ventana con el botón Ver
 const expandido = ref(false);
 
 // La familia lo ve todo; el cuidador solo cuando pulsa Ver
@@ -58,32 +58,68 @@ const direccionVisible = computed(
       <li>📅 Inicio: {{ formatearFecha(solicitud.fechaCuidado) }}</li>
     </ul>
 
-    <div class="solicitudes__extra" v-if="detallesVisibles">
+    <!-- La familia lo ve dentro de la tarjeta; el cuidador, en una ventana encima de todo -->
+    <div
+      v-if="detallesVisibles"
+      :class="{ solicitudes__fondo: mostrarAcciones }"
+      @click.self="expandido = false"
+    >
       <div
-        class="solicitudes__necesidades"
-        v-if="solicitud.necesidades && solicitud.necesidades.length > 0"
+        :class="{ solicitudes__modal: mostrarAcciones }"
+        :role="mostrarAcciones ? 'dialog' : undefined"
+        :aria-modal="mostrarAcciones ? 'true' : undefined"
       >
-        <span
-          class="solicitudes__necesidad"
-          v-for="codigo in solicitud.necesidades"
-          :key="codigo"
-        >
-          {{ nombreNecesidad(codigo) }}
-        </span>
-      </div>
+        <div class="solicitudes__modal-top" v-if="mostrarAcciones">
+          <div>
+            <h3>{{ nombreMostrado }}</h3>
+            <p class="solicitudes__paciente">{{ solicitud.nombrePaciente }}</p>
+          </div>
+          <button
+            class="solicitudes__cerrar"
+            aria-label="Cerrar"
+            @click="expandido = false"
+          >
+            ✕
+          </button>
+        </div>
 
-      <ul class="solicitudes__detalles">
-        <li v-if="solicitud.fechaFin">
-          📅 Fin: {{ formatearFecha(solicitud.fechaFin) }}
-        </li>
-        <li v-if="solicitud.direccion && direccionVisible">
-          📍 {{ solicitud.direccion }}
-        </li>
-        <li v-else-if="solicitud.direccion" class="solicitudes__aviso">
-          📍 La dirección se mostrará cuando aceptes la solicitud
-        </li>
-        <li v-if="solicitud.notas">📝 {{ solicitud.notas }}</li>
-      </ul>
+        <div
+          class="solicitudes__necesidades"
+          v-if="solicitud.necesidades && solicitud.necesidades.length > 0"
+        >
+          <span
+            class="solicitudes__necesidad"
+            v-for="codigo in solicitud.necesidades"
+            :key="codigo"
+          >
+            {{ nombreNecesidad(codigo) }}
+          </span>
+        </div>
+
+        <ul class="solicitudes__detalles">
+          <li v-if="mostrarAcciones">
+            📅 Inicio: {{ formatearFecha(solicitud.fechaCuidado) }}
+          </li>
+          <li v-if="solicitud.fechaFin">
+            📅 Fin: {{ formatearFecha(solicitud.fechaFin) }}
+          </li>
+          <li v-if="solicitud.direccion && direccionVisible">
+            📍 {{ solicitud.direccion }}
+          </li>
+          <li v-else-if="solicitud.direccion" class="solicitudes__aviso">
+            📍 La dirección se mostrará cuando aceptes la solicitud
+          </li>
+          <li v-if="solicitud.notas">📝 {{ solicitud.notas }}</li>
+        </ul>
+
+        <button
+          v-if="mostrarAcciones"
+          class="btn btn--secondary solicitudes__cerrar-btn"
+          @click="expandido = false"
+        >
+          Cerrar
+        </button>
+      </div>
     </div>
 
     <div class="solicitudes__acciones" v-if="mostrarAcciones">
@@ -104,9 +140,9 @@ const direccionVisible = computed(
       </button>
       <button
         class="btn btn--secondary solicitudes__ver"
-        @click="expandido = !expandido"
+        @click="expandido = true"
       >
-        {{ expandido ? "Ocultar" : "Ver" }}
+        Ver
       </button>
     </div>
 
@@ -130,6 +166,8 @@ const direccionVisible = computed(
 
 <style scoped>
 .solicitudes__card {
+  display: flex;
+  flex-direction: column;
   background-color: var(--color-white);
   border-radius: var(--radius-card);
   padding: 24px;
@@ -188,12 +226,62 @@ const direccionVisible = computed(
   }
 }
 
+.solicitudes__detalles li,
+.solicitudes__paciente {
+  overflow-wrap: anywhere;
+}
+
+.solicitudes__fondo {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background-color: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.solicitudes__modal {
+  background-color: var(--color-white);
+  border-radius: var(--radius-card);
+  padding: 24px;
+  width: min(480px, 100%);
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-card);
+}
+
+.solicitudes__modal-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+
+  & h3 {
+    margin: 0 0 4px;
+  }
+}
+
+.solicitudes__cerrar {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: var(--color-text-muted);
+}
+
+.solicitudes__cerrar-btn {
+  width: 100%;
+}
+
 .solicitudes__aviso {
   color: var(--color-text-muted);
   font-style: italic;
 }
 
 .solicitudes__acciones {
+  margin-top: auto;
   display: flex;
   gap: var(--gap-sm);
   border-top: 1px solid #eee;
