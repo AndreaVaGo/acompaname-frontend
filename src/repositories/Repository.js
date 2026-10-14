@@ -1,4 +1,7 @@
-export const API_URL = "http://localhost:8080/api/v1";
+// La URL de la API se puede cambiar con VITE_API_URL en un archivo .env
+// (ver .env.example). Si no existe, se usa el backend local.
+export const API_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:8080/api/v1";
 
 export default class Repository {
   constructor(uri) {
