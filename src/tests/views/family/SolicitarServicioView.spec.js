@@ -94,7 +94,8 @@ describe("SolicitarServicioView", () => {
     await opciones[0].trigger("click");
 
     await wrapper.find("#fecha").setValue("2026-10-10");
-    await wrapper.find("#direccion").setValue("Calle Uría 10, Oviedo");
+    await wrapper.find("#hospital").setValue("Hospital de Cabueñes");
+    await wrapper.find("#ubicacion").setValue("Planta 2, habitación 214");
     await wrapper.find("#paciente").setValue("Antonio Serrano");
     await wrapper.find("#edad").setValue("81");
     await wrapper.find("#notas").setValue("Alergia a la penicilina");
@@ -104,7 +105,7 @@ describe("SolicitarServicioView", () => {
 
     expect(createSpy).toHaveBeenCalledWith({
       tipoCuidado: "hospitalario",
-      direccion: "Calle Uría 10, Oviedo",
+      direccion: "Hospital de Cabueñes, Planta 2, habitación 214",
       nombrePaciente: "Antonio Serrano",
       notas: "Alergia a la penicilina",
       edadPaciente: 81,
@@ -163,7 +164,8 @@ describe("SolicitarServicioView", () => {
 
     await wrapper.find("#fecha").setValue("2026-10-10");
     await wrapper.find("#fecha-fin").setValue("2026-10-05");
-    await wrapper.find("#direccion").setValue("Calle Uría 10, Oviedo");
+    await wrapper.find("#hospital").setValue("Hospital de Cabueñes");
+    await wrapper.find("#ubicacion").setValue("Planta 2, habitación 214");
     await wrapper.find("#paciente").setValue("Antonio Serrano");
     await wrapper.find("#edad").setValue("81");
 
@@ -228,7 +230,8 @@ describe("SolicitarServicioView", () => {
     await opciones[0].trigger("click");
 
     await wrapper.find("#fecha").setValue("2026-10-10");
-    await wrapper.find("#direccion").setValue("Calle Uría 10, Oviedo");
+    await wrapper.find("#hospital").setValue("Hospital de Cabueñes");
+    await wrapper.find("#ubicacion").setValue("Planta 2, habitación 214");
     await wrapper.find("#paciente").setValue("Antonio Serrano");
     await wrapper.find("#edad").setValue("81");
     await wrapper.find("#necesidad-movilidad").setValue(true);
@@ -256,7 +259,8 @@ describe("SolicitarServicioView", () => {
     await opciones[0].trigger("click");
 
     await wrapper.find("#fecha").setValue("2026-10-10");
-    await wrapper.find("#direccion").setValue("Calle Uría 10, Oviedo");
+    await wrapper.find("#hospital").setValue("Hospital de Cabueñes");
+    await wrapper.find("#ubicacion").setValue("Planta 2, habitación 214");
     await wrapper.find("#paciente").setValue("Antonio Serrano");
     await wrapper.find("#edad").setValue("81");
     await wrapper.find("#necesidad-higiene").setValue(true);
@@ -270,7 +274,7 @@ describe("SolicitarServicioView", () => {
     );
   });
 
-  test("pide la dirección del domicilio o el hospital según el tipo de cuidado", async () => {
+  test("pide hospital y ubicación si es hospitalario, y dirección si es a domicilio", async () => {
     vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
       usuarioNombre: "Pepe",
     });
@@ -278,15 +282,43 @@ describe("SolicitarServicioView", () => {
     const { wrapper } = await montarVista();
     const opciones = wrapper.findAll(".solicitar__opcion");
 
+    expect(wrapper.find("#hospital").exists()).toBe(false);
+    expect(wrapper.find("#direccion").exists()).toBe(false);
+
     await opciones[1].trigger("click");
-    expect(wrapper.find('label[for="direccion"]').text()).toBe(
-      "Dirección del domicilio"
-    );
+    expect(wrapper.find("#direccion").exists()).toBe(true);
+    expect(wrapper.find("#hospital").exists()).toBe(false);
 
     await opciones[0].trigger("click");
-    expect(wrapper.find('label[for="direccion"]').text()).toBe(
-      "Hospital, planta y habitación"
+    expect(wrapper.find("#hospital").exists()).toBe(true);
+    expect(wrapper.find("#ubicacion").exists()).toBe(true);
+    expect(wrapper.find("#direccion").exists()).toBe(false);
+  });
+
+  test("en un hospital no envía la solicitud si falta la planta o habitación", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
+      usuarioNombre: "Pepe",
+    });
+    const createSpy = vi
+      .spyOn(SolicitudRepository.prototype, "create")
+      .mockResolvedValue({});
+
+    const { wrapper } = await montarVista();
+
+    const opciones = wrapper.findAll(".solicitar__opcion");
+    await opciones[0].trigger("click");
+
+    await wrapper.find("#fecha").setValue("2026-10-10");
+    await wrapper.find("#hospital").setValue("HUCA");
+    await wrapper.find("#paciente").setValue("Antonio Serrano");
+    await wrapper.find("#edad").setValue("81");
+
+    await wrapper.find("form").trigger("submit.prevent");
+
+    expect(wrapper.text()).toContain(
+      "Por favor, rellena todos los campos obligatorios."
     );
+    expect(createSpy).not.toHaveBeenCalled();
   });
 
   test("no envía la solicitud si falta la dirección", async () => {
