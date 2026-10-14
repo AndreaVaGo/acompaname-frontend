@@ -17,6 +17,7 @@ const cuidadorId = route.params.id;
 const cuidadorNombre = ref("");
 
 const tipoCuidado = ref("");
+const direccion = ref("");
 const fechaInicio = ref("");
 const fechaFin = ref("");
 const nombrePaciente = ref("");
@@ -37,6 +38,7 @@ onMounted(async () => {
 async function enviarSolicitud() {
   if (
     !tipoCuidado.value ||
+    !direccion.value.trim() ||
     !fechaInicio.value ||
     !nombrePaciente.value ||
     !edadPaciente.value
@@ -54,6 +56,7 @@ async function enviarSolicitud() {
   try {
     const solicitudCreada = await solicitudRepository.create({
       tipoCuidado: tipoCuidado.value,
+      direccion: direccion.value.trim(),
       nombrePaciente: nombrePaciente.value,
       notas: notas.value,
       edadPaciente: Number(edadPaciente.value),
@@ -106,6 +109,23 @@ async function enviarSolicitud() {
             A domicilio
           </button>
         </div>
+
+        <label for="direccion">{{
+          tipoCuidado === "hospitalario"
+            ? "Hospital, planta y habitación"
+            : "Dirección del domicilio"
+        }}</label>
+        <input
+          type="text"
+          id="direccion"
+          v-model="direccion"
+          maxlength="200"
+          :placeholder="
+            tipoCuidado === 'hospitalario'
+              ? 'Hospital de Cabueñes, planta 2, habitación 214'
+              : 'Calle Uría 10, 3º B, Oviedo'
+          "
+        />
 
         <label for="fecha">Fecha de inicio</label>
         <input type="date" id="fecha" v-model="fechaInicio" />
