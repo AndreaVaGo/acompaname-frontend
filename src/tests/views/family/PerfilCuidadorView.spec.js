@@ -2,7 +2,7 @@ import { describe, test, expect, vi, beforeEach } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createRouter, createWebHistory } from "vue-router";
 import { createPinia } from "pinia";
-import PerfilCuidadorView from "../../../views/familia/PerfilCuidadorView.vue";
+import PerfilCuidadorView from "../../../views/family/PerfilCuidadorView.vue";
 import CuidadorRepository from "../../../repositories/CuidadorRepository";
 import { useAuthStore } from "../../../stores/auth";
 

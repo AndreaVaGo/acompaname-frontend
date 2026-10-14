@@ -1,7 +1,7 @@
 import { describe, test, expect, vi, afterEach } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createRouter, createWebHistory } from "vue-router";
-import SolicitudesFamiliaView from "../../../views/familia/SolicitudesFamiliaView.vue";
+import SolicitudesFamiliaView from "../../../views/family/SolicitudesFamiliaView.vue";
 import SolicitudRepository from "../../../repositories/SolicitudRepository";
 import PagoRepository from "../../../repositories/PagoRepository";
 

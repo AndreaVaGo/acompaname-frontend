@@ -1,7 +1,7 @@
 import { describe, test, expect, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createRouter, createWebHistory } from "vue-router";
-import BuscarView from "../../../views/familia/BuscarView.vue";
+import BuscarView from "../../../views/family/BuscarView.vue";
 import CuidadorRepository from "../../../repositories/CuidadorRepository";
 
 vi.spyOn(CuidadorRepository.prototype, "getAll").mockResolvedValue([

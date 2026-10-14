@@ -4,19 +4,19 @@ import { useAuthStore } from "../stores/auth";
 import LandingView from "../views/common/LandingView.vue";
 import LoginView from "../views/auth/LoginView.vue";
 import RegisterView from "../views/auth/RegisterView.vue";
-import BuscarView from "../views/familia/BuscarView.vue";
+import BuscarView from "../views/family/BuscarView.vue";
 import SolicitudesCuidadorView from "../views/caregiver/SolicitudesCuidadorView.vue";
 import EditarPerfilView from "../views/caregiver/EditarPerfilView.vue";
 import HistorialView from "../views/common/HistorialView.vue";
-import PerfilCuidadorView from "../views/familia/PerfilCuidadorView.vue";
-import SolicitarServicioView from "../views/familia/SolicitarServicioView.vue";
-import ConfirmacionView from "../views/familia/ConfirmacionView.vue";
-import ValorarView from "../views/familia/ValorarView.vue";
+import PerfilCuidadorView from "../views/family/PerfilCuidadorView.vue";
+import SolicitarServicioView from "../views/family/SolicitarServicioView.vue";
+import ConfirmacionView from "../views/family/ConfirmacionView.vue";
+import ValorarView from "../views/family/ValorarView.vue";
 import MiPerfilView from "../views/common/MiPerfilView.vue";
 import EditarDatosView from "../views/common/EditarDatosView.vue";
 import CambiarPasswordView from "../views/common/CambiarPasswordView.vue";
-import SolicitudesFamiliaView from "../views/familia/SolicitudesFamiliaView.vue";
-import CheckoutView from "../views/familia/CheckoutView.vue";
+import SolicitudesFamiliaView from "../views/family/SolicitudesFamiliaView.vue";
+import CheckoutView from "../views/family/CheckoutView.vue";
 
 // Las rutas con meta.requiereLogin solo se pueden ver con la sesión iniciada
 // Las rutas con meta.rol solo las puede ver ese rol (FAMILIA o CUIDADOR)
