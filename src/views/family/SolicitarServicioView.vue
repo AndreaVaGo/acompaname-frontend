@@ -4,7 +4,7 @@ import { useRoute, useRouter } from "vue-router";
 import { RouterLink } from "vue-router";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
 import CuidadorRepository from "@/repositories/CuidadorRepository";
-import { NECESIDADES } from "@/utils/necesidades";
+import { CUIDADOS } from "@/utils/catalogoCuidados";
 import { useAuthStore } from "@/stores/auth";
 
 const route = useRoute();
@@ -190,22 +190,22 @@ async function enviarSolicitud() {
         </p>
         <div class="solicitar__necesidades">
           <label
-            v-for="necesidad in NECESIDADES"
-            :key="necesidad.codigo"
+            v-for="cuidado in CUIDADOS"
+            :key="cuidado.codigo"
             class="solicitar__check"
             :class="{
               'solicitar__check--marcado': necesidades.includes(
-                necesidad.codigo,
+                cuidado.codigo,
               ),
             }"
           >
             <input
               type="checkbox"
-              :id="'necesidad-' + necesidad.codigo"
-              :value="necesidad.codigo"
+              :id="'necesidad-' + cuidado.codigo"
+              :value="cuidado.codigo"
               v-model="necesidades"
             />
-            {{ necesidad.nombre }}
+            {{ cuidado.nombre }}
           </label>
         </div>
 
