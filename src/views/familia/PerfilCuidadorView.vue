@@ -57,10 +57,6 @@ onMounted(async () => {
           <li>
             <strong>Experiencia:</strong> {{ cuidador.anosExperiencia }} años
           </li>
-          <li v-if="cuidador.sexo" class="perfil__sexo">
-            <strong>Sexo:</strong>
-            {{ cuidador.sexo === "MUJER" ? "Mujer" : "Hombre" }}
-          </li>
           <li>
             <span
               class="perfil__badge"
