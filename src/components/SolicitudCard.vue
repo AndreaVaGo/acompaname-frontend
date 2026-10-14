@@ -51,12 +51,8 @@ defineProps([
     <ul class="solicitudes__detalles">
       <li>🏠 {{ solicitud.tipoCuidado }}</li>
       <li>📅 Inicio: {{ solicitud.fechaCuidado }}</li>
-<<<<<<< HEAD
       <li v-if="solicitud.fechaFin">📅 Fin: {{ solicitud.fechaFin }}</li>
-      <li>📝 {{ solicitud.notas }}</li>
-=======
       <li v-if="solicitud.notas">📝 {{ solicitud.notas }}</li>
->>>>>>> feature/request-card-tweaks
     </ul>
 
     <div
