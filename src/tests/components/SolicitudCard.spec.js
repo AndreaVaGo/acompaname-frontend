@@ -200,4 +200,87 @@ describe('SolicitudCard', () => {
 
     expect(completar).toHaveBeenCalledWith(1)
   })
+
+  test('la familia ve la dirección sin pulsar nada', () => {
+    const wrapper = mount(SolicitudCard, {
+      props: {
+        solicitud: { ...crearSolicitud('PENDIENTE'), direccion: 'Calle Uría 10, Oviedo' },
+        nombreMostrado: 'Cuidador Pepe',
+        mostrarAcciones: false,
+      },
+      global: { stubs: { RouterLink: RouterLinkStub } },
+    })
+
+    expect(wrapper.text()).toContain('Calle Uría 10, Oviedo')
+  })
+
+  test('el cuidador ve la tarjeta resumida hasta que pulsa Ver', async () => {
+    const wrapper = montarTarjetaCuidador('PENDIENTE', vi.fn())
+
+    expect(wrapper.text()).toContain('Antonio Serrano')
+    expect(wrapper.text()).toContain('Inicio: 12-08-2026')
+    expect(wrapper.text()).not.toContain('Ingreso previsto de 4 noches.')
+    expect(wrapper.find('.solicitudes__ver').text()).toBe('Ver')
+
+    await wrapper.find('.solicitudes__ver').trigger('click')
+
+    expect(wrapper.text()).toContain('Ingreso previsto de 4 noches.')
+    expect(wrapper.find('.solicitudes__ver').text()).toBe('Ocultar')
+  })
+
+  test('el cuidador puede volver a ocultar los detalles', async () => {
+    const wrapper = montarTarjetaCuidador('PENDIENTE', vi.fn())
+
+    await wrapper.find('.solicitudes__ver').trigger('click')
+    await wrapper.find('.solicitudes__ver').trigger('click')
+
+    expect(wrapper.text()).not.toContain('Ingreso previsto de 4 noches.')
+  })
+
+  test('el cuidador ve Aceptar, Rechazar y Ver en una solicitud pendiente', () => {
+    const wrapper = montarTarjetaCuidador('PENDIENTE', vi.fn())
+
+    expect(wrapper.text()).toContain('Aceptar')
+    expect(wrapper.text()).toContain('Rechazar')
+    expect(wrapper.find('.solicitudes__ver').exists()).toBe(true)
+  })
+
+  test('el cuidador no ve la dirección mientras la solicitud está pendiente', async () => {
+    const wrapper = mount(SolicitudCard, {
+      props: {
+        solicitud: { ...crearSolicitud('PENDIENTE'), direccion: 'Calle Uría 10, Oviedo' },
+        nombreMostrado: 'Familia Serrano',
+        mostrarAcciones: true,
+      },
+      global: { stubs: { RouterLink: RouterLinkStub } },
+    })
+
+    await wrapper.find('.solicitudes__ver').trigger('click')
+
+    expect(wrapper.text()).not.toContain('Calle Uría 10, Oviedo')
+    expect(wrapper.text()).toContain('La dirección se mostrará cuando aceptes la solicitud')
+  })
+
+  test('el cuidador ve la dirección cuando la solicitud está aceptada', async () => {
+    const wrapper = mount(SolicitudCard, {
+      props: {
+        solicitud: { ...crearSolicitud('ACEPTADA'), direccion: 'Calle Uría 10, Oviedo' },
+        nombreMostrado: 'Familia Serrano',
+        mostrarAcciones: true,
+      },
+      global: { stubs: { RouterLink: RouterLinkStub } },
+    })
+
+    await wrapper.find('.solicitudes__ver').trigger('click')
+
+    expect(wrapper.text()).toContain('Calle Uría 10, Oviedo')
+  })
+
+  test('una solicitud sin dirección no muestra ninguna línea de dirección', async () => {
+    const wrapper = montarTarjetaCuidador('ACEPTADA', vi.fn())
+
+    await wrapper.find('.solicitudes__ver').trigger('click')
+
+    expect(wrapper.text()).not.toContain('📍')
+  })
 })
