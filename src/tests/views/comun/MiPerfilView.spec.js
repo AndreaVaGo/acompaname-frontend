@@ -19,20 +19,43 @@ const router = createRouter({
   routes: [],
 });
 
+async function montarVista() {
+  const pinia = createPinia();
+  const wrapper = mount(MiPerfilView, {
+    global: {
+      plugins: [router, pinia],
+    },
+  });
+
+  const authStore = useAuthStore(pinia);
+  authStore.login(1, "ana@test.com", "12345678", "FAMILIA");
+
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  return wrapper;
+}
+
 describe("MiPerfilView", () => {
   test("muestra los datos del usuario", async () => {
-    const pinia = createPinia();
-    const wrapper = mount(MiPerfilView, {
-      global: {
-        plugins: [router, pinia],
-      },
-    });
-
-    const authStore = useAuthStore(pinia);
-    authStore.login(1, "ana@test.com", "12345678", "FAMILIA");
-
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    const wrapper = await montarVista();
 
     expect(wrapper.text()).toContain("Ana");
+  });
+
+  test("el botón Editar mis datos lleva a la página de edición", async () => {
+    const push = vi.spyOn(router, "push").mockResolvedValue();
+    const wrapper = await montarVista();
+
+    await wrapper.find("#mi-perfil-editar-datos").trigger("click");
+
+    expect(push).toHaveBeenCalledWith("/editar-datos");
+  });
+
+  test("el botón Cambiar contraseña lleva a su página", async () => {
+    const push = vi.spyOn(router, "push").mockResolvedValue();
+    const wrapper = await montarVista();
+
+    await wrapper.find("#mi-perfil-cambiar-password").trigger("click");
+
+    expect(push).toHaveBeenCalledWith("/cambiar-password");
   });
 });

@@ -22,6 +22,14 @@ onMounted(async () => {
   }
 });
 
+function irAEditarDatos() {
+  router.push("/editar-datos");
+}
+
+function irACambiarPassword() {
+  router.push("/cambiar-password");
+}
+
 function cerrarSesion() {
   authStore.logout();
   router.push("/");
@@ -51,6 +59,20 @@ function cerrarSesion() {
         <strong>{{ usuario.roles.join(", ") }}</strong>
       </div>
 
+      <button
+        id="mi-perfil-editar-datos"
+        class="btn btn--primary"
+        @click="irAEditarDatos"
+      >
+        Editar mis datos
+      </button>
+      <button
+        id="mi-perfil-cambiar-password"
+        class="btn btn--secondary"
+        @click="irACambiarPassword"
+      >
+        Cambiar contraseña
+      </button>
       <button class="btn btn--secondary" @click="cerrarSesion">
         Cerrar sesión
       </button>
@@ -101,8 +123,12 @@ function cerrarSesion() {
 }
 
 .mi-perfil__box .btn {
-  margin-top: 20px;
+  margin-top: 12px;
   width: 100%;
+}
+
+.mi-perfil__box .btn:first-of-type {
+  margin-top: 20px;
 }
 
 @media (max-width: 480px) {

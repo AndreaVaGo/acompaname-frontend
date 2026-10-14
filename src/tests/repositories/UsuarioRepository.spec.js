@@ -71,4 +71,43 @@ describe("UsuarioRepository", () => {
 
     expect(mensaje).toBe("Error al cambiar la contraseña");
   });
+
+  test("actualizarContacto envía nombre, email y teléfono con PATCH", async () => {
+    const fetchFalso = prepararFetch({ id: 5, nombre: "Ana Nueva" });
+    const repository = new UsuarioRepository();
+
+    const usuario = await repository.actualizarContacto(
+      5,
+      "Ana Nueva",
+      "nueva@test.com",
+      "699000111"
+    );
+
+    expect(fetchFalso.mock.calls[0][0]).toBe(
+      "http://localhost:8080/api/v1/usuarios/5/contacto"
+    );
+    expect(fetchFalso.mock.calls[0][1].method).toBe("PATCH");
+    expect(fetchFalso.mock.calls[0][1].body).toBe(
+      JSON.stringify({
+        nombre: "Ana Nueva",
+        email: "nueva@test.com",
+        telefono: "699000111",
+      })
+    );
+    expect(usuario.nombre).toBe("Ana Nueva");
+  });
+
+  test("actualizarContacto lanza un error si el backend responde con fallo", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue({ ok: false });
+    const repository = new UsuarioRepository();
+
+    let mensaje = "";
+    try {
+      await repository.actualizarContacto(5, "Ana", "repetido@test.com", "600");
+    } catch (error) {
+      mensaje = error.message;
+    }
+
+    expect(mensaje).toBe("Error al actualizar los datos");
+  });
 });
