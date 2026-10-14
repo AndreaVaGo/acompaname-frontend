@@ -110,6 +110,7 @@ describe("SolicitarServicioView", () => {
       fechaFin: null,
       familiaId: 1,
       cuidadorId: 3,
+      necesidades: [],
     });
     expect(router.currentRoute.value.name).toBe("confirmacion");
     expect(router.currentRoute.value.query.id).toBe("9");
@@ -192,6 +193,73 @@ describe("SolicitarServicioView", () => {
 
     expect(wrapper.text()).toContain(
       "No se pudo enviar la solicitud. Inténtalo de nuevo."
+    );
+  });
+
+  test("muestra los checkboxes de las necesidades del paciente", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
+      usuarioNombre: "Pepe",
+    });
+
+    const { wrapper } = await montarVista();
+
+    expect(wrapper.findAll(".solicitar__check").length).toBe(7);
+    expect(wrapper.text()).toContain("Movilidad reducida");
+    expect(wrapper.text()).toContain("Cuidados paliativos");
+    expect(wrapper.find("#necesidad-medicacion").element.checked).toBe(false);
+  });
+
+  test("envía las necesidades marcadas", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
+      usuarioNombre: "Pepe",
+    });
+    const createSpy = vi
+      .spyOn(SolicitudRepository.prototype, "create")
+      .mockResolvedValue({ id: 9 });
+
+    const { wrapper } = await montarVista();
+
+    const opciones = wrapper.findAll(".solicitar__opcion");
+    await opciones[0].trigger("click");
+
+    await wrapper.find("#fecha").setValue("2026-10-10");
+    await wrapper.find("#paciente").setValue("Antonio Serrano");
+    await wrapper.find("#edad").setValue("81");
+    await wrapper.find("#necesidad-movilidad").setValue(true);
+    await wrapper.find("#necesidad-nocturno").setValue(true);
+
+    await wrapper.find("form").trigger("submit.prevent");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(createSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ necesidades: ["movilidad", "nocturno"] })
+    );
+  });
+
+  test("una necesidad desmarcada no se envía", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
+      usuarioNombre: "Pepe",
+    });
+    const createSpy = vi
+      .spyOn(SolicitudRepository.prototype, "create")
+      .mockResolvedValue({ id: 9 });
+
+    const { wrapper } = await montarVista();
+
+    const opciones = wrapper.findAll(".solicitar__opcion");
+    await opciones[0].trigger("click");
+
+    await wrapper.find("#fecha").setValue("2026-10-10");
+    await wrapper.find("#paciente").setValue("Antonio Serrano");
+    await wrapper.find("#edad").setValue("81");
+    await wrapper.find("#necesidad-higiene").setValue(true);
+    await wrapper.find("#necesidad-higiene").setValue(false);
+
+    await wrapper.find("form").trigger("submit.prevent");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(createSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ necesidades: [] })
     );
   });
 });

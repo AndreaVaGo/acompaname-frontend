@@ -3,6 +3,7 @@ import { ref, onMounted } from "vue";
 import { RouterLink } from "vue-router";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
 import ValoracionRepository from "@/repositories/ValoracionRepository";
+import { nombreNecesidad } from "@/utils/necesidades";
 
 const solicitudRepository = new SolicitudRepository();
 const valoracionRepository = new ValoracionRepository();
@@ -25,6 +26,7 @@ onMounted(async () => {
         tipoCuidado: s.tipoCuidado,
         fechaInicio: s.fechaCuidado,
         fechaFin: s.fechaFin,
+        necesidades: s.necesidades || [],
         notas: s.notas,
         estado: s.estado.toLowerCase(),
         valorada: idsValorados.includes(s.id),
@@ -65,6 +67,19 @@ function textoEstado(estado) {
         <p class="historial__paciente">
           {{ item.paciente }} · {{ item.edad }} años
         </p>
+
+        <div
+          class="historial__necesidades"
+          v-if="item.necesidades.length > 0"
+        >
+          <span
+            class="historial__necesidad"
+            v-for="codigo in item.necesidades"
+            :key="codigo"
+          >
+            {{ nombreNecesidad(codigo) }}
+          </span>
+        </div>
 
         <ul class="historial__detalles">
           <li>🏠 {{ item.tipoCuidado }}</li>
@@ -198,6 +213,21 @@ function textoEstado(estado) {
   text-align: center;
   color: var(--color-text-muted);
   margin-top: 40px;
+}
+
+.historial__necesidades {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.historial__necesidad {
+  background-color: var(--color-accent-bg);
+  color: #c65a35;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 0.8rem;
 }
 
 @media (max-width: 768px) {

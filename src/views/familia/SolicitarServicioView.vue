@@ -4,6 +4,7 @@ import { useRoute, useRouter } from "vue-router";
 import { RouterLink } from "vue-router";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
 import CuidadorRepository from "@/repositories/CuidadorRepository";
+import { NECESIDADES } from "@/utils/necesidades";
 import { useAuthStore } from "@/stores/auth";
 
 const route = useRoute();
@@ -20,6 +21,7 @@ const fechaInicio = ref("");
 const fechaFin = ref("");
 const nombrePaciente = ref("");
 const edadPaciente = ref("");
+const necesidades = ref([]);
 const notas = ref("");
 const error = ref("");
 
@@ -59,6 +61,7 @@ async function enviarSolicitud() {
       fechaFin: fechaFin.value || null,
       familiaId: authStore.id,
       cuidadorId: Number(cuidadorId),
+      necesidades: necesidades.value,
     });
     router.push({ name: "confirmacion", query: { id: solicitudCreada.id } });
   } catch (err) {
@@ -130,6 +133,30 @@ async function enviarSolicitud() {
           v-model="edadPaciente"
           placeholder="81"
         />
+
+        <p class="solicitar__titulo-grupo">
+          Necesidades del paciente (opcional)
+        </p>
+        <div class="solicitar__necesidades">
+          <label
+            v-for="necesidad in NECESIDADES"
+            :key="necesidad.codigo"
+            class="solicitar__check"
+            :class="{
+              'solicitar__check--marcado': necesidades.includes(
+                necesidad.codigo,
+              ),
+            }"
+          >
+            <input
+              type="checkbox"
+              :id="'necesidad-' + necesidad.codigo"
+              :value="necesidad.codigo"
+              v-model="necesidades"
+            />
+            {{ necesidad.nombre }}
+          </label>
+        </div>
 
         <label for="notas">Información sobre el paciente</label>
         <textarea
@@ -205,6 +232,50 @@ async function enviarSolicitud() {
     min-height: 90px;
     resize: vertical;
   }
+
+  /* Dentro del formulario para ganar a las reglas "label" e "input" de arriba */
+  & .solicitar__check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: normal;
+    margin-bottom: 0;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-input);
+    background-color: var(--color-white);
+    cursor: pointer;
+  }
+
+  & .solicitar__check:hover {
+    border-color: var(--color-accent);
+  }
+
+  & .solicitar__check--marcado {
+    border-color: var(--color-accent);
+    background-color: var(--color-accent-bg);
+  }
+
+  & .solicitar__check input {
+    accent-color: var(--color-accent);
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    margin: 0;
+  }
+}
+
+.solicitar__titulo-grupo {
+  font-weight: bold;
+  font-size: 0.9rem;
+  margin: 0 0 8px;
+}
+
+.solicitar__necesidades {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: var(--gap-md);
 }
 
 .solicitar__error {
@@ -246,6 +317,10 @@ async function enviarSolicitud() {
 
   .solicitar__box {
     padding: 24px;
+  }
+
+  .solicitar__necesidades {
+    grid-template-columns: 1fr;
   }
 }
 </style>

@@ -1,5 +1,6 @@
 <script setup>
 import { RouterLink } from "vue-router";
+import { nombreNecesidad } from "@/utils/necesidades";
 
 defineProps([
   "solicitud",
@@ -32,6 +33,19 @@ defineProps([
     </div>
 
     <p class="solicitudes__paciente">{{ solicitud.nombrePaciente }}</p>
+
+    <div
+      class="solicitudes__necesidades"
+      v-if="solicitud.necesidades && solicitud.necesidades.length > 0"
+    >
+      <span
+        class="solicitudes__necesidad"
+        v-for="codigo in solicitud.necesidades"
+        :key="codigo"
+      >
+        {{ nombreNecesidad(codigo) }}
+      </span>
+    </div>
 
     <ul class="solicitudes__detalles">
       <li>🏠 {{ solicitud.tipoCuidado }}</li>
@@ -150,5 +164,20 @@ defineProps([
   color: var(--color-secondary);
   font-weight: bold;
   text-align: center;
+}
+
+.solicitudes__necesidades {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.solicitudes__necesidad {
+  background-color: var(--color-accent-bg);
+  color: #c65a35;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 0.8rem;
 }
 </style>

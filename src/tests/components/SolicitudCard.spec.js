@@ -90,4 +90,47 @@ describe('SolicitudCard', () => {
 
     expect(wrapper.text()).not.toContain('Fin:')
   })
+
+  test('muestra las necesidades del paciente con su nombre', () => {
+    const wrapper = mount(SolicitudCard, {
+      props: {
+        solicitud: {
+          ...crearSolicitud('PENDIENTE'),
+          necesidades: ['movilidad', 'nocturno'],
+        },
+        nombreMostrado: 'Familia Serrano',
+        mostrarAcciones: false,
+      },
+      global: {
+        stubs: { RouterLink: RouterLinkStub },
+      },
+    })
+
+    const etiquetas = wrapper.findAll('.solicitudes__necesidad')
+    expect(etiquetas.length).toBe(2)
+    expect(etiquetas[0].text()).toBe('Movilidad reducida')
+    expect(etiquetas[1].text()).toBe('Acompañamiento nocturno')
+  })
+
+  test('no muestra el bloque de necesidades si no hay ninguna', () => {
+    const wrapper = mount(SolicitudCard, {
+      props: {
+        solicitud: { ...crearSolicitud('PENDIENTE'), necesidades: [] },
+        nombreMostrado: 'Familia Serrano',
+        mostrarAcciones: false,
+      },
+      global: {
+        stubs: { RouterLink: RouterLinkStub },
+      },
+    })
+
+    expect(wrapper.find('.solicitudes__necesidades').exists()).toBe(false)
+  })
+
+  test('una solicitud antigua sin necesidades se muestra sin errores', () => {
+    const wrapper = montarTarjeta('PENDIENTE', false)
+
+    expect(wrapper.find('.solicitudes__necesidades').exists()).toBe(false)
+    expect(wrapper.text()).toContain('Antonio Serrano')
+  })
 })

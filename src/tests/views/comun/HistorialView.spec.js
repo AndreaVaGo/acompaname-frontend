@@ -108,4 +108,41 @@ describe("HistorialView", () => {
     expect(wrapper.text()).toContain("No se pudo cargar tu historial.");
     expect(wrapper.text()).not.toContain("Aún no tienes solicitudes en tu historial.");
   });
+
+  test("muestra las necesidades del paciente con su nombre", async () => {
+    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
+      { id: 1, cuidadorNombre: "Pepe", nombrePaciente: "Antonio", edadPaciente: 80, tipoCuidado: "domicilio", fechaCuidado: "2026-09-01", notas: "", necesidades: ["higiene", "paliativos"], estado: "COMPLETADA" },
+    ]);
+    vi.spyOn(ValoracionRepository.prototype, "getAll").mockResolvedValue([]);
+
+    const wrapper = await montarVista();
+
+    const etiquetas = wrapper.findAll(".historial__necesidad");
+    expect(etiquetas.length).toBe(2);
+    expect(etiquetas[0].text()).toBe("Higiene personal");
+    expect(etiquetas[1].text()).toBe("Cuidados paliativos");
+  });
+
+  test("no muestra el bloque de necesidades si la lista está vacía", async () => {
+    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
+      { id: 1, cuidadorNombre: "Pepe", nombrePaciente: "Antonio", edadPaciente: 80, tipoCuidado: "domicilio", fechaCuidado: "2026-09-01", notas: "", necesidades: [], estado: "COMPLETADA" },
+    ]);
+    vi.spyOn(ValoracionRepository.prototype, "getAll").mockResolvedValue([]);
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.find(".historial__necesidades").exists()).toBe(false);
+  });
+
+  test("una solicitud sin el campo necesidades se muestra sin errores", async () => {
+    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
+      { id: 1, cuidadorNombre: "Pepe", nombrePaciente: "Antonio", edadPaciente: 80, tipoCuidado: "domicilio", fechaCuidado: "2026-09-01", notas: "", estado: "COMPLETADA" },
+    ]);
+    vi.spyOn(ValoracionRepository.prototype, "getAll").mockResolvedValue([]);
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.find(".historial__necesidades").exists()).toBe(false);
+    expect(wrapper.text()).toContain("Pepe");
+  });
 });
