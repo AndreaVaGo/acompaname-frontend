@@ -63,7 +63,7 @@ describe("SolicitudesCuidadorView", () => {
     });
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    await wrapper.find("button.btn--primary").trigger("click");
+    await wrapper.find("button.solicitudes__btn-aceptar").trigger("click");
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(wrapper.text()).toContain("No se pudo aceptar la solicitud.");
@@ -78,7 +78,7 @@ describe("SolicitudesCuidadorView", () => {
     });
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    await wrapper.find("button.btn--primary").trigger("click");
+    await wrapper.find("button.solicitudes__btn-aceptar").trigger("click");
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(wrapper.text()).toContain("Aceptada");
@@ -93,7 +93,7 @@ describe("SolicitudesCuidadorView", () => {
     });
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    await wrapper.find("button.btn--secondary").trigger("click");
+    await wrapper.find("button.solicitudes__btn-rechazar").trigger("click");
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(wrapper.text()).toContain("Rechazada");
@@ -108,7 +108,7 @@ describe("SolicitudesCuidadorView", () => {
     });
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    await wrapper.find("button.btn--secondary").trigger("click");
+    await wrapper.find("button.solicitudes__btn-rechazar").trigger("click");
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(wrapper.text()).toContain("No se pudo rechazar la solicitud.");
