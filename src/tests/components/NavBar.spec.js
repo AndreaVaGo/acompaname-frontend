@@ -5,6 +5,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'
 import UsuarioRepository from '../../repositories/UsuarioRepository'
 import CuidadorRepository from '../../repositories/CuidadorRepository'
+import SolicitudRepository from '../../repositories/SolicitudRepository'
+import PagoRepository from '../../repositories/PagoRepository'
 import NavBar from '../../components/NavBar.vue'
 
 const router = createRouter({
@@ -38,6 +40,11 @@ async function montarNavBarComoCuidador() {
 describe('NavBar', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
+    // Por defecto no hay solicitudes ni pagos, así que no hay avisos
+    vi.spyOn(SolicitudRepository.prototype, 'getMisSolicitudes').mockResolvedValue(
+      []
+    )
+    vi.spyOn(PagoRepository.prototype, 'getMisPagos').mockResolvedValue([])
   })
 
   afterEach(() => {
@@ -152,5 +159,77 @@ describe('NavBar', () => {
 
     expect(wrapper.find('#editar-datos').exists()).toBe(false)
     expect(wrapper.find('#cambiar-password').exists()).toBe(false)
+  })
+
+  test('el cuidador ve cuántas solicitudes pendientes tiene', async () => {
+    vi.spyOn(UsuarioRepository.prototype, 'getById').mockResolvedValue({
+      nombre: 'Pepe',
+    })
+    vi.spyOn(CuidadorRepository.prototype, 'getMiPerfil').mockResolvedValue({
+      id: 3,
+    })
+    vi.spyOn(SolicitudRepository.prototype, 'getMisSolicitudes').mockResolvedValue(
+      [
+        { id: 1, estado: 'PENDIENTE' },
+        { id: 2, estado: 'PENDIENTE' },
+        { id: 3, estado: 'ACEPTADA' },
+      ]
+    )
+    const authStore = useAuthStore()
+    authStore.login(2, 'pepe@test.com', '12345678', 'CUIDADOR')
+
+    const wrapper = await montarNavBar()
+
+    expect(wrapper.find('.navbar__aviso').text()).toBe('2')
+  })
+
+  test('la familia ve cuántas solicitudes aceptadas le faltan por pagar', async () => {
+    vi.spyOn(UsuarioRepository.prototype, 'getById').mockResolvedValue({
+      nombre: 'Ana',
+    })
+    vi.spyOn(SolicitudRepository.prototype, 'getMisSolicitudes').mockResolvedValue(
+      [
+        { id: 1, estado: 'ACEPTADA' },
+        { id: 2, estado: 'ACEPTADA' },
+        { id: 3, estado: 'PENDIENTE' },
+      ]
+    )
+    vi.spyOn(PagoRepository.prototype, 'getMisPagos').mockResolvedValue([
+      { solicitudId: 1, estado: 'COMPLETADO' },
+    ])
+    const authStore = useAuthStore()
+    authStore.login(1, 'ana@test.com', '12345678', 'FAMILIA')
+
+    const wrapper = await montarNavBar()
+
+    expect(wrapper.find('.navbar__aviso').text()).toBe('1')
+  })
+
+  test('no muestra aviso cuando no hay nada que atender', async () => {
+    vi.spyOn(UsuarioRepository.prototype, 'getById').mockResolvedValue({
+      nombre: 'Ana',
+    })
+    const authStore = useAuthStore()
+    authStore.login(1, 'ana@test.com', '12345678', 'FAMILIA')
+
+    const wrapper = await montarNavBar()
+
+    expect(wrapper.find('.navbar__aviso').exists()).toBe(false)
+  })
+
+  test('no muestra aviso si falla la carga de solicitudes', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    vi.spyOn(UsuarioRepository.prototype, 'getById').mockResolvedValue({
+      nombre: 'Ana',
+    })
+    vi.spyOn(SolicitudRepository.prototype, 'getMisSolicitudes').mockRejectedValue(
+      new Error('fallo')
+    )
+    const authStore = useAuthStore()
+    authStore.login(1, 'ana@test.com', '12345678', 'FAMILIA')
+
+    const wrapper = await montarNavBar()
+
+    expect(wrapper.find('.navbar__aviso').exists()).toBe(false)
   })
 })
