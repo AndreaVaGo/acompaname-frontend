@@ -12,6 +12,8 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  /* Los textos muy largos sin espacios (enlaces, etc.) se parten en vez de ensanchar la página */
+  overflow-wrap: anywhere;
 }
 
 #app > div {
