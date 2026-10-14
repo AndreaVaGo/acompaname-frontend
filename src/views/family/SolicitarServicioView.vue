@@ -18,6 +18,8 @@ const cuidadorNombre = ref("");
 
 const tipoCuidado = ref("");
 const direccion = ref("");
+const hospital = ref("");
+const ubicacionHospital = ref("");
 const fechaInicio = ref("");
 const fechaFin = ref("");
 const nombrePaciente = ref("");
@@ -35,10 +37,25 @@ onMounted(async () => {
   }
 });
 
+// Para un hospital se guarda "Hospital, planta/área/habitación" en un solo texto
+function direccionCompleta() {
+  if (tipoCuidado.value === "hospitalario") {
+    return hospital.value.trim() + ", " + ubicacionHospital.value.trim();
+  }
+  return direccion.value.trim();
+}
+
+function faltaDireccion() {
+  if (tipoCuidado.value === "hospitalario") {
+    return !hospital.value.trim() || !ubicacionHospital.value.trim();
+  }
+  return !direccion.value.trim();
+}
+
 async function enviarSolicitud() {
   if (
     !tipoCuidado.value ||
-    !direccion.value.trim() ||
+    faltaDireccion() ||
     !fechaInicio.value ||
     !nombrePaciente.value ||
     !edadPaciente.value
@@ -56,7 +73,7 @@ async function enviarSolicitud() {
   try {
     const solicitudCreada = await solicitudRepository.create({
       tipoCuidado: tipoCuidado.value,
-      direccion: direccion.value.trim(),
+      direccion: direccionCompleta(),
       nombrePaciente: nombrePaciente.value,
       notas: notas.value,
       edadPaciente: Number(edadPaciente.value),
@@ -110,22 +127,36 @@ async function enviarSolicitud() {
           </button>
         </div>
 
-        <label for="direccion">{{
-          tipoCuidado === "hospitalario"
-            ? "Hospital, planta y habitación"
-            : "Dirección del domicilio"
-        }}</label>
-        <input
-          type="text"
-          id="direccion"
-          v-model="direccion"
-          maxlength="200"
-          :placeholder="
-            tipoCuidado === 'hospitalario'
-              ? 'Hospital de Cabueñes, planta 2, habitación 214'
-              : 'Calle Uría 10, 3º B, Oviedo'
-          "
-        />
+        <template v-if="tipoCuidado === 'hospitalario'">
+          <label for="hospital">Hospital</label>
+          <input
+            type="text"
+            id="hospital"
+            v-model="hospital"
+            maxlength="100"
+            placeholder="Hospital de Cabueñes"
+          />
+
+          <label for="ubicacion">Planta, área y habitación</label>
+          <input
+            type="text"
+            id="ubicacion"
+            v-model="ubicacionHospital"
+            maxlength="90"
+            placeholder="Planta 2, Medicina Interna, habitación 214"
+          />
+        </template>
+
+        <template v-if="tipoCuidado === 'domicilio'">
+          <label for="direccion">Dirección del domicilio</label>
+          <input
+            type="text"
+            id="direccion"
+            v-model="direccion"
+            maxlength="200"
+            placeholder="Calle Uría 10, 3º B, Oviedo"
+          />
+        </template>
 
         <label for="fecha">Fecha de inicio</label>
         <input type="date" id="fecha" v-model="fechaInicio" />
