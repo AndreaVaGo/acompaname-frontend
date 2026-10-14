@@ -170,12 +170,12 @@ function textoEstado(estado) {
 
 .historial__estado--completada {
   background-color: var(--color-accent-bg);
-  color: #c65a35;
+  color: var(--color-accent-dark);
 }
 
 .historial__estado--rechazada {
   background-color: var(--color-neutral-bg);
-  color: #777;
+  color: var(--color-text-muted);
 }
 
 .historial__paciente {
@@ -188,7 +188,7 @@ function textoEstado(estado) {
   padding: 0;
   margin: 0 0 16px;
   font-size: 0.9rem;
-  color: #444;
+  color: var(--color-text-muted);
 
   & li {
     margin-bottom: 6px;
@@ -198,7 +198,7 @@ function textoEstado(estado) {
 
 .historial__footer {
   margin-top: auto;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--color-border);
   padding-top: 16px;
 }
 
@@ -209,9 +209,9 @@ function textoEstado(estado) {
 }
 
 .historial__error {
-  background-color: #fdecea;
-  border: 1px solid #f5c6c0;
-  color: #c0392b;
+  background-color: var(--color-error-bg);
+  border: 1px solid var(--color-error-border);
+  color: var(--color-error);
   font-size: 0.9rem;
   padding: 10px 14px;
   border-radius: var(--radius-input);
@@ -232,7 +232,7 @@ function textoEstado(estado) {
 
 .historial__necesidad {
   background-color: var(--color-accent-bg);
-  color: #c65a35;
+  color: var(--color-accent-dark);
   padding: 4px 12px;
   border-radius: var(--radius-pill);
   font-size: 0.8rem;
