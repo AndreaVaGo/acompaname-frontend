@@ -19,6 +19,7 @@ import SolicitudesFamiliaView from "../views/familia/SolicitudesFamiliaView.vue"
 import CheckoutView from "../views/familia/CheckoutView.vue";
 
 // Las rutas con meta.requiereLogin solo se pueden ver con la sesión iniciada
+// Las rutas con meta.rol solo las puede ver ese rol (FAMILIA o CUIDADOR)
 const router = createRouter({
   history: createWebHistory(),
   routes: [
@@ -27,9 +28,10 @@ const router = createRouter({
     { path: "/registro", name: "registro", component: RegisterView },
     { path: "/buscar", name: "buscar", component: BuscarView },
     { path: "/cuidador/:id", name: "perfil-cuidador", component: PerfilCuidadorView },
-    { path: "/solicitudes-cuidador", name: "solicitudes-cuidador", component: SolicitudesCuidadorView, meta: { requiereLogin: true } },
-    { path: "/editar-perfil", name: "editar-perfil", component: EditarPerfilView, meta: { requiereLogin: true } },
+    { path: "/solicitudes-cuidador", name: "solicitudes-cuidador", component: SolicitudesCuidadorView, meta: { requiereLogin: true, rol: "CUIDADOR" } },
+    { path: "/editar-perfil", name: "editar-perfil", component: EditarPerfilView, meta: { requiereLogin: true, rol: "CUIDADOR" } },
     { path: "/historial", name: "historial", component: HistorialView, meta: { requiereLogin: true } },
+<<<<<<< HEAD
     { path: "/solicitar/:id", name: "solicitar", component: SolicitarServicioView, meta: { requiereLogin: true } },
     { path: "/confirmacion", name: "confirmacion", component: ConfirmacionView, meta: { requiereLogin: true } },
     { path: "/valorar/:id", name: "valorar", component: ValorarView, meta: { requiereLogin: true } },
@@ -38,14 +40,28 @@ const router = createRouter({
     { path: "/cambiar-password", name: "cambiar-password", component: CambiarPasswordView, meta: { requiereLogin: true } },
     { path: "/solicitudes", name: "solicitudes", component: SolicitudesFamiliaView, meta: { requiereLogin: true } },
     { path: "/pagar/:id", name: "pagar", component: CheckoutView, meta: { requiereLogin: true } },
+=======
+    { path: "/solicitar/:id", name: "solicitar", component: SolicitarServicioView, meta: { requiereLogin: true, rol: "FAMILIA" } },
+    { path: "/confirmacion", name: "confirmacion", component: ConfirmacionView, meta: { requiereLogin: true, rol: "FAMILIA" } },
+    { path: "/valorar/:id", name: "valorar", component: ValorarView, meta: { requiereLogin: true, rol: "FAMILIA" } },
+    { path: "/mi-perfil", name: "mi-perfil", component: MiPerfilView, meta: { requiereLogin: true, rol: "FAMILIA" } },
+    { path: "/solicitudes", name: "solicitudes", component: SolicitudesFamiliaView, meta: { requiereLogin: true, rol: "FAMILIA" } },
+    { path: "/pagar/:id", name: "pagar", component: CheckoutView, meta: { requiereLogin: true, rol: "FAMILIA" } },
+>>>>>>> feature/role-guards
   ],
 });
 
-// Si la ruta pide sesión y no hay, se manda al login
 router.beforeEach((to) => {
   const authStore = useAuthStore(pinia);
+
+  // Si la ruta pide sesión y no hay, se manda al login
   if (to.meta.requiereLogin && !authStore.estaAutenticado) {
     return { name: "login" };
+  }
+
+  // Si la ruta es solo para un rol y el usuario tiene otro, se manda al inicio
+  if (to.meta.rol && to.meta.rol !== authStore.rol) {
+    return { name: "landing" };
   }
 });
 
