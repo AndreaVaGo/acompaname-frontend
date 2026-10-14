@@ -5,7 +5,7 @@ import { useAuthStore } from "../../stores/auth";
 import { RouterLink } from "vue-router";
 import CuidadorRepository from "@/repositories/CuidadorRepository";
 import FotoCuidador from "@/components/FotoCuidador.vue";
-import { nombreServicio } from "@/utils/servicios";
+import { nombreCuidado } from "@/utils/catalogoCuidados";
 
 const route = useRoute();
 const cuidadorId = route.params.id;
@@ -82,7 +82,7 @@ onMounted(async () => {
               v-for="codigo in cuidador.servicios"
               :key="codigo"
             >
-              {{ nombreServicio(codigo) }}
+              {{ nombreCuidado(codigo) }}
             </span>
           </div>
         </div>
