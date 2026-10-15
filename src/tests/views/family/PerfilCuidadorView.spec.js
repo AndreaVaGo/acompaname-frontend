@@ -448,4 +448,25 @@ describe("PerfilCuidadorView", () => {
 
     expect(wrapper.find(".perfil__modal").exists()).toBe(true);
   });
+
+  test("una valoración sin comentario no pinta el párrafo del comentario", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue(
+      cuidadorConValoraciones()
+    );
+    vi.spyOn(ValoracionRepository.prototype, "getPorCuidador").mockResolvedValue([
+      { puntuacion: 5, comentario: "", fecha: "2026-10-12" },
+      { puntuacion: 4, comentario: "Puntual y amable", fecha: "2026-10-01" },
+    ]);
+
+    const wrapper = await montarVista("FAMILIA");
+    await abrirLista(wrapper);
+
+    const resenas = wrapper.findAll(".perfil__resena");
+    expect(resenas.length).toBe(2);
+    expect(resenas[0].find(".perfil__resena-estrellas").text()).toBe(
+      "⭐⭐⭐⭐⭐"
+    );
+    expect(resenas[0].find(".perfil__resena-comentario").exists()).toBe(false);
+    expect(resenas[1].find(".perfil__resena-comentario").exists()).toBe(true);
+  });
 });
