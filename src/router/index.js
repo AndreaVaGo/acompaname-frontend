@@ -17,6 +17,8 @@ import EditarDatosView from "../views/common/EditarDatosView.vue";
 import CambiarPasswordView from "../views/common/CambiarPasswordView.vue";
 import SolicitudesFamiliaView from "../views/family/SolicitudesFamiliaView.vue";
 import CheckoutView from "../views/family/CheckoutView.vue";
+import AvisoLegalView from "../views/common/AvisoLegalView.vue";
+import PrivacidadView from "../views/common/PrivacidadView.vue";
 
 // Las rutas con meta.requiereLogin solo se pueden ver con la sesión iniciada
 // Las rutas con meta.rol solo las puede ver ese rol (FAMILIA o CUIDADOR)
@@ -28,6 +30,8 @@ const router = createRouter({
     { path: "/registro", name: "registro", component: RegisterView },
     { path: "/buscar", name: "buscar", component: BuscarView },
     { path: "/cuidador/:id", name: "perfil-cuidador", component: PerfilCuidadorView },
+    { path: "/aviso-legal", name: "aviso-legal", component: AvisoLegalView },
+    { path: "/privacidad", name: "privacidad", component: PrivacidadView },
     { path: "/solicitudes-cuidador", name: "solicitudes-cuidador", component: SolicitudesCuidadorView, meta: { requiereLogin: true, rol: "CUIDADOR" } },
     { path: "/editar-perfil", name: "editar-perfil", component: EditarPerfilView, meta: { requiereLogin: true, rol: "CUIDADOR" } },
     { path: "/historial", name: "historial", component: HistorialView, meta: { requiereLogin: true } },
