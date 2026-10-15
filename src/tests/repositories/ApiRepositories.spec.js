@@ -224,4 +224,12 @@ describe("ValoracionRepository", () => {
     expect(fetchFalso.mock.calls[0][0]).toBe(`${API}/valoraciones`);
     expect(fetchFalso.mock.calls[0][1].method).toBe("POST");
   });
+
+  test("getPorCuidador pide las valoraciones de ese cuidador", async () => {
+    const fetchFalso = prepararFetch([]);
+
+    await new ValoracionRepository().getPorCuidador(3);
+
+    expect(fetchFalso.mock.calls[0][0]).toBe(`${API}/valoraciones/cuidador/3`);
+  });
 });
