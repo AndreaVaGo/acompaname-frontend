@@ -81,10 +81,13 @@ function estrellas(puntuacion) {
               class="perfil__valoracion-boton"
               @click="abrirValoraciones"
             >
-              ⭐ {{ cuidador.valoracionMedia }} ({{ cuidador.numValoraciones }}
-              {{
-                cuidador.numValoraciones === 1 ? "valoración" : "valoraciones"
-              }})
+              <span>⭐</span>
+              <span class="perfil__valoracion-texto"
+                >{{ cuidador.valoracionMedia }} ({{ cuidador.numValoraciones }}
+                {{
+                  cuidador.numValoraciones === 1 ? "valoración" : "valoraciones"
+                }})</span
+              >
             </button>
           </template>
           <template v-else>Sin valoraciones todavía</template>
@@ -282,8 +285,13 @@ function estrellas(puntuacion) {
   padding: 0;
   font: inherit;
   color: var(--color-accent);
-  text-decoration: underline;
+  text-decoration: none;
   cursor: pointer;
+}
+
+/* Solo el texto va subrayado, la estrella no */
+.perfil__valoracion-texto {
+  text-decoration: underline;
 }
 
 .perfil__datos {
