@@ -1,3 +1,7 @@
+<script setup>
+import { RouterLink } from "vue-router";
+</script>
+
 <template>
   <footer class="footer">
     <div class="footer__content">
@@ -25,6 +29,16 @@
         </span>
         <span class="footer__logo-text">Acompáñame</span>
       </div>
+
+      <nav class="footer__enlaces">
+        <RouterLink to="/aviso-legal" class="footer__enlace">
+          Aviso legal
+        </RouterLink>
+        <RouterLink to="/privacidad" class="footer__enlace">
+          Política de privacidad
+        </RouterLink>
+      </nav>
+
       <p class="footer__text">© 2026 Acompáñame — Proyecto Final Bootcamp</p>
     </div>
   </footer>
@@ -58,6 +72,22 @@
 
 .footer__logo-icon {
   display: inline-flex;
+}
+
+.footer__enlaces {
+  display: flex;
+  gap: 16px;
+}
+
+.footer__enlace {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
 }
 
 .footer__text {
