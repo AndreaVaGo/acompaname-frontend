@@ -190,7 +190,12 @@ function estrellas(puntuacion) {
                 formatearFecha(valoracion.fecha)
               }}</span>
             </div>
-            <p class="perfil__resena-comentario">{{ valoracion.comentario }}</p>
+            <p
+              class="perfil__resena-comentario"
+              v-if="valoracion.comentario"
+            >
+              {{ valoracion.comentario }}
+            </p>
           </article>
         </div>
 
@@ -427,7 +432,6 @@ function estrellas(puntuacion) {
 .perfil__resena-top {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 6px;
 }
 
 .perfil__resena-fecha {
@@ -440,7 +444,7 @@ function estrellas(puntuacion) {
 }
 
 .perfil__resena-comentario {
-  margin: 0;
+  margin: 6px 0 0;
 }
 
 @media (max-width: 768px) {
