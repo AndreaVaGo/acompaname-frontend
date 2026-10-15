@@ -4,17 +4,25 @@ import { useRoute } from "vue-router";
 import { useAuthStore } from "../../stores/auth";
 import { RouterLink } from "vue-router";
 import CuidadorRepository from "@/repositories/CuidadorRepository";
+import ValoracionRepository from "@/repositories/ValoracionRepository";
 import FotoCuidador from "@/components/FotoCuidador.vue";
 import { nombreCuidado } from "@/utils/catalogoCuidados";
+import { formatearFecha } from "@/utils/formatearFecha";
 
 const route = useRoute();
 const cuidadorId = route.params.id;
 const authStore = useAuthStore();
 const cuidadorRepository = new CuidadorRepository();
+const valoracionRepository = new ValoracionRepository();
 
 const cuidador = ref(null);
 const cargando = ref(true);
 const error = ref("");
+
+const valoraciones = ref([]);
+const mostrarValoraciones = ref(false);
+const cargandoValoraciones = ref(false);
+const errorValoraciones = ref("");
 
 onMounted(async () => {
   try {
@@ -25,6 +33,27 @@ onMounted(async () => {
     cargando.value = false;
   }
 });
+
+async function abrirValoraciones() {
+  mostrarValoraciones.value = true;
+  cargandoValoraciones.value = true;
+  errorValoraciones.value = "";
+  try {
+    valoraciones.value = await valoracionRepository.getPorCuidador(cuidadorId);
+  } catch (err) {
+    errorValoraciones.value = "No se pudieron cargar las valoraciones.";
+  } finally {
+    cargandoValoraciones.value = false;
+  }
+}
+
+function cerrarValoraciones() {
+  mostrarValoraciones.value = false;
+}
+
+function estrellas(puntuacion) {
+  return "⭐".repeat(puntuacion);
+}
 </script>
 
 <template>
@@ -47,8 +76,16 @@ onMounted(async () => {
 
         <p class="perfil__valoracion">
           <template v-if="cuidador.valoracionMedia">
-            ⭐ {{ cuidador.valoracionMedia }} ({{ cuidador.numValoraciones }}
-            {{ cuidador.numValoraciones === 1 ? "valoración" : "valoraciones" }})
+            <button
+              type="button"
+              class="perfil__valoracion-boton"
+              @click="abrirValoraciones"
+            >
+              ⭐ {{ cuidador.valoracionMedia }} ({{ cuidador.numValoraciones }}
+              {{
+                cuidador.numValoraciones === 1 ? "valoración" : "valoraciones"
+              }})
+            </button>
           </template>
           <template v-else>Sin valoraciones todavía</template>
         </p>
@@ -113,6 +150,57 @@ onMounted(async () => {
           Sin compromiso: la solicitud se envía y el cuidador la acepta o la
           rechaza.
         </p>
+      </div>
+    </div>
+
+    <div
+      class="perfil__fondo"
+      v-if="mostrarValoraciones"
+      @click.self="cerrarValoraciones"
+    >
+      <div class="perfil__modal">
+        <button
+          type="button"
+          class="perfil__cerrar"
+          aria-label="Cerrar"
+          @click="cerrarValoraciones"
+        >
+          ✕
+        </button>
+        <h2>Valoraciones de {{ cuidador.usuarioNombre }}</h2>
+
+        <p v-if="cargandoValoraciones">Cargando valoraciones...</p>
+        <p v-else-if="errorValoraciones" class="perfil__error">
+          {{ errorValoraciones }}
+        </p>
+        <p v-else-if="valoraciones.length === 0">
+          Todavía no hay valoraciones.
+        </p>
+        <div v-else class="perfil__resenas">
+          <article
+            class="perfil__resena"
+            v-for="(valoracion, indice) in valoraciones"
+            :key="indice"
+          >
+            <div class="perfil__resena-top">
+              <span class="perfil__resena-estrellas">{{
+                estrellas(valoracion.puntuacion)
+              }}</span>
+              <span class="perfil__resena-fecha">{{
+                formatearFecha(valoracion.fecha)
+              }}</span>
+            </div>
+            <p class="perfil__resena-comentario">{{ valoracion.comentario }}</p>
+          </article>
+        </div>
+
+        <button
+          type="button"
+          class="btn btn--secondary"
+          @click="cerrarValoraciones"
+        >
+          Cerrar
+        </button>
       </div>
     </div>
   </div>
@@ -183,6 +271,16 @@ onMounted(async () => {
   margin-bottom: 16px;
 }
 
+.perfil__valoracion-boton {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: var(--color-accent);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .perfil__datos {
   list-style: none;
   padding: 0;
@@ -200,7 +298,7 @@ onMounted(async () => {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: #999;
+  background-color: var(--color-text-muted);
   display: inline-block;
 }
 
@@ -223,7 +321,7 @@ onMounted(async () => {
 }
 
 .perfil__bio {
-  color: #444;
+  color: var(--color-text);
   line-height: 1.5;
   font-style: italic;
   border-left: 3px solid var(--color-accent-bg);
@@ -270,15 +368,53 @@ onMounted(async () => {
   color: var(--color-text-muted);
 }
 
-.perfil__resenas {
+/* Ventana con la lista de valoraciones */
+.perfil__fondo {
+  position: fixed;
+  inset: 0;
+  background-color: var(--color-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 100;
+}
+
+.perfil__modal {
+  position: relative;
   background-color: var(--color-white);
   border-radius: var(--radius-card);
   padding: 28px;
   box-shadow: var(--shadow-card);
+  width: 100%;
+  max-width: 560px;
+  max-height: 85vh;
+  overflow-y: auto;
 
   & h2 {
+    margin-top: 0;
     margin-bottom: 16px;
+    font-size: 1.2rem;
   }
+}
+
+.perfil__cerrar {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.perfil__error {
+  color: var(--color-error);
+}
+
+.perfil__resenas {
+  margin-bottom: 16px;
 }
 
 .perfil__resena {
@@ -300,7 +436,11 @@ onMounted(async () => {
 }
 
 .perfil__resena-estrellas {
-  margin: 0 0 6px;
+  margin: 0;
+}
+
+.perfil__resena-comentario {
+  margin: 0;
 }
 
 @media (max-width: 768px) {
