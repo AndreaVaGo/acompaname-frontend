@@ -12,4 +12,9 @@ export default class ValoracionRepository extends Repository {
   async create(valoracionData) {
     return this.post("/valoraciones", valoracionData);
   }
+
+  // Valoraciones públicas de un cuidador (no hace falta iniciar sesión)
+  async getPorCuidador(cuidadorId) {
+    return this.get(`/valoraciones/cuidador/${cuidadorId}`);
+  }
 }
