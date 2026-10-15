@@ -51,17 +51,19 @@ import { RouterLink } from "vue-router";
   background-color: var(--color-bg);
 }
 
+/* Tres columnas: los extremos miden lo mismo, así los enlaces quedan centrados */
 .footer__content {
   max-width: 1100px;
   margin: 0 auto;
   padding: 12px 20px;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 8px;
 }
 
 .footer__logo {
+  justify-self: start;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -75,6 +77,7 @@ import { RouterLink } from "vue-router";
 }
 
 .footer__enlaces {
+  justify-self: center;
   display: flex;
   gap: 16px;
 }
@@ -91,12 +94,14 @@ import { RouterLink } from "vue-router";
 }
 
 .footer__text {
+  justify-self: end;
   color: var(--color-text-muted);
   font-size: 0.8rem;
 }
 
 @media (max-width: 768px) {
   .footer__content {
+    display: flex;
     flex-direction: column;
     text-align: center;
   }
