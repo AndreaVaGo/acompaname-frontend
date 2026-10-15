@@ -4,6 +4,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import { createPinia } from "pinia";
 import PerfilCuidadorView from "../../../views/family/PerfilCuidadorView.vue";
 import CuidadorRepository from "../../../repositories/CuidadorRepository";
+import ValoracionRepository from "../../../repositories/ValoracionRepository";
 import { useAuthStore } from "../../../stores/auth";
 
 function crearRouter() {
@@ -35,6 +36,26 @@ async function montarVista(rol) {
   await new Promise((resolve) => setTimeout(resolve, 0));
 
   return wrapper;
+}
+
+// Cuidador con valoraciones, para los tests de la lista
+function cuidadorConValoraciones() {
+  return {
+    usuarioNombre: "Pepe",
+    especialidad: "Geriatría",
+    anosExperiencia: 4,
+    tarifaHora: 18,
+    disponibleAhora: true,
+    bio: "Cuidador con experiencia",
+    valoracionMedia: 4.5,
+    numValoraciones: 2,
+  };
+}
+
+// Pulsa el enlace de valoraciones y espera a que se pinte la lista
+async function abrirLista(wrapper) {
+  await wrapper.find(".perfil__valoracion-boton").trigger("click");
+  await new Promise((resolve) => setTimeout(resolve, 0));
 }
 
 describe("PerfilCuidadorView", () => {
@@ -260,5 +281,171 @@ describe("PerfilCuidadorView", () => {
 
     expect(wrapper.text()).toContain("Pepa");
     expect(wrapper.text()).not.toContain("Sexo");
+  });
+
+  test("el enlace a las valoraciones solo aparece si el cuidador tiene", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
+      usuarioNombre: "Pepe",
+      especialidad: "Geriatría",
+      anosExperiencia: 4,
+      tarifaHora: 18,
+      disponibleAhora: true,
+      bio: "Cuidador con experiencia",
+      valoracionMedia: null,
+      numValoraciones: 0,
+    });
+
+    const wrapper = await montarVista("FAMILIA");
+
+    expect(wrapper.find(".perfil__valoracion-boton").exists()).toBe(false);
+  });
+
+  test("las valoraciones no se piden hasta pulsar el enlace", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue(
+      cuidadorConValoraciones()
+    );
+    const espia = vi
+      .spyOn(ValoracionRepository.prototype, "getPorCuidador")
+      .mockResolvedValue([]);
+
+    const wrapper = await montarVista("FAMILIA");
+
+    expect(espia).not.toHaveBeenCalled();
+    expect(wrapper.find(".perfil__modal").exists()).toBe(false);
+  });
+
+  test("al pulsar el enlace pide las valoraciones del cuidador y abre la lista", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue(
+      cuidadorConValoraciones()
+    );
+    const espia = vi
+      .spyOn(ValoracionRepository.prototype, "getPorCuidador")
+      .mockResolvedValue([]);
+
+    const wrapper = await montarVista("FAMILIA");
+    await abrirLista(wrapper);
+
+    expect(espia).toHaveBeenCalledWith("3");
+    expect(wrapper.find(".perfil__modal").exists()).toBe(true);
+    expect(wrapper.find(".perfil__modal").text()).toContain(
+      "Valoraciones de Pepe"
+    );
+  });
+
+  test("la lista muestra estrellas, fecha y comentario de cada valoración", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue(
+      cuidadorConValoraciones()
+    );
+    vi.spyOn(ValoracionRepository.prototype, "getPorCuidador").mockResolvedValue([
+      { puntuacion: 5, comentario: "Muy atento con mi madre", fecha: "2026-10-12" },
+      { puntuacion: 4, comentario: "Puntual y amable", fecha: "2026-10-01" },
+    ]);
+
+    const wrapper = await montarVista("FAMILIA");
+    await abrirLista(wrapper);
+
+    const resenas = wrapper.findAll(".perfil__resena");
+    expect(resenas.length).toBe(2);
+    expect(resenas[0].text()).toContain("Muy atento con mi madre");
+    expect(resenas[0].text()).toContain("12-10-2026");
+    expect(resenas[0].find(".perfil__resena-estrellas").text()).toBe(
+      "⭐⭐⭐⭐⭐"
+    );
+    expect(resenas[1].text()).toContain("Puntual y amable");
+    expect(resenas[1].text()).toContain("01-10-2026");
+    expect(resenas[1].find(".perfil__resena-estrellas").text()).toBe("⭐⭐⭐⭐");
+  });
+
+  test("si la lista llega vacía avisa de que no hay valoraciones", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue(
+      cuidadorConValoraciones()
+    );
+    vi.spyOn(ValoracionRepository.prototype, "getPorCuidador").mockResolvedValue(
+      []
+    );
+
+    const wrapper = await montarVista("FAMILIA");
+    await abrirLista(wrapper);
+
+    expect(wrapper.find(".perfil__modal").text()).toContain(
+      "Todavía no hay valoraciones."
+    );
+    expect(wrapper.find(".perfil__resena").exists()).toBe(false);
+  });
+
+  test("si falla la carga de las valoraciones muestra un error", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue(
+      cuidadorConValoraciones()
+    );
+    vi.spyOn(ValoracionRepository.prototype, "getPorCuidador").mockRejectedValue(
+      new Error("fallo")
+    );
+
+    const wrapper = await montarVista("FAMILIA");
+    await abrirLista(wrapper);
+
+    expect(wrapper.find(".perfil__error").text()).toBe(
+      "No se pudieron cargar las valoraciones."
+    );
+  });
+
+  test("la lista se cierra con la cruz", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue(
+      cuidadorConValoraciones()
+    );
+    vi.spyOn(ValoracionRepository.prototype, "getPorCuidador").mockResolvedValue(
+      []
+    );
+
+    const wrapper = await montarVista("FAMILIA");
+    await abrirLista(wrapper);
+    await wrapper.find(".perfil__cerrar").trigger("click");
+
+    expect(wrapper.find(".perfil__modal").exists()).toBe(false);
+  });
+
+  test("la lista se cierra con el botón Cerrar", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue(
+      cuidadorConValoraciones()
+    );
+    vi.spyOn(ValoracionRepository.prototype, "getPorCuidador").mockResolvedValue(
+      []
+    );
+
+    const wrapper = await montarVista("FAMILIA");
+    await abrirLista(wrapper);
+    await wrapper.find(".perfil__modal .btn--secondary").trigger("click");
+
+    expect(wrapper.find(".perfil__modal").exists()).toBe(false);
+  });
+
+  test("la lista se cierra al pulsar fuera de la ventana", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue(
+      cuidadorConValoraciones()
+    );
+    vi.spyOn(ValoracionRepository.prototype, "getPorCuidador").mockResolvedValue(
+      []
+    );
+
+    const wrapper = await montarVista("FAMILIA");
+    await abrirLista(wrapper);
+    await wrapper.find(".perfil__fondo").trigger("click");
+
+    expect(wrapper.find(".perfil__modal").exists()).toBe(false);
+  });
+
+  test("pulsar dentro de la ventana no la cierra", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue(
+      cuidadorConValoraciones()
+    );
+    vi.spyOn(ValoracionRepository.prototype, "getPorCuidador").mockResolvedValue(
+      []
+    );
+
+    const wrapper = await montarVista("FAMILIA");
+    await abrirLista(wrapper);
+    await wrapper.find(".perfil__modal").trigger("click");
+
+    expect(wrapper.find(".perfil__modal").exists()).toBe(true);
   });
 });
