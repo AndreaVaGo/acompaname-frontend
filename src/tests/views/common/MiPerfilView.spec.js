@@ -41,21 +41,10 @@ describe("MiPerfilView", () => {
     expect(wrapper.text()).toContain("Ana");
   });
 
-  test("el botón Editar mis datos lleva a la página de edición", async () => {
-    const push = vi.spyOn(router, "push").mockResolvedValue();
+  test("no muestra los botones de editar datos ni cambiar contraseña", async () => {
     const wrapper = await montarVista();
 
-    await wrapper.find("#mi-perfil-editar-datos").trigger("click");
-
-    expect(push).toHaveBeenCalledWith("/editar-datos");
-  });
-
-  test("el botón Cambiar contraseña lleva a su página", async () => {
-    const push = vi.spyOn(router, "push").mockResolvedValue();
-    const wrapper = await montarVista();
-
-    await wrapper.find("#mi-perfil-cambiar-password").trigger("click");
-
-    expect(push).toHaveBeenCalledWith("/cambiar-password");
+    expect(wrapper.find("#mi-perfil-editar-datos").exists()).toBe(false);
+    expect(wrapper.find("#mi-perfil-cambiar-password").exists()).toBe(false);
   });
 });
