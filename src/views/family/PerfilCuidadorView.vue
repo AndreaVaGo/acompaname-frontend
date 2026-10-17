@@ -27,6 +27,10 @@ const errorValoraciones = ref("");
 onMounted(async () => {
   try {
     cuidador.value = await cuidadorRepository.getById(cuidadorId);
+    // Si llegan desde el enlace de las tarjetas (?valoraciones=1), se abre la lista
+    if (route.query.valoraciones) {
+      abrirValoraciones();
+    }
   } catch (err) {
     error.value = "No se pudo cargar el perfil del cuidador.";
   } finally {
