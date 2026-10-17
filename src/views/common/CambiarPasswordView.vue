@@ -64,7 +64,12 @@ async function handleSubmit() {
           </span>
         </div>
 
-        <form class="cambiar-password__form" @submit.prevent="handleSubmit">
+        <form
+          class="formulario cambiar-password__form"
+          @submit.prevent="handleSubmit"
+        >
+          <h2 class="titulo-seccion" data-icono="🔑">Tu contraseña</h2>
+
           <label for="password-actual">Contraseña actual</label>
           <input
             type="password"
@@ -123,7 +128,8 @@ async function handleSubmit() {
 }
 
 .cambiar-password__subtitle {
-  color: var(--color-text-muted);
+  color: var(--color-text);
+  font-size: 1.05rem;
   margin: 0 0 24px;
 }
 
@@ -160,30 +166,12 @@ async function handleSubmit() {
   font-weight: bold;
 }
 
+/* Etiquetas, campos y título de sección vienen de base.css (clases "formulario" y "titulo-seccion") */
 .cambiar-password__form {
-  display: flex;
-  flex-direction: column;
   padding: 28px 32px 32px;
 
-  & label {
-    font-weight: bold;
-    margin-bottom: 6px;
-    font-size: 0.9rem;
-  }
-
-  & input {
-    padding: 12px 16px;
-    border-radius: var(--radius-input);
-    border: 1px solid var(--color-border);
-    margin-bottom: 18px;
-    font-size: 1rem;
-    font-family: inherit;
-  }
-
-  & input:focus {
-    outline: none;
-    border-color: var(--color-accent);
-    box-shadow: 0 0 0 3px var(--color-accent-bg);
+  & .titulo-seccion {
+    margin-top: 0;
   }
 
   & .btn {
