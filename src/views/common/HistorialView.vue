@@ -43,23 +43,6 @@ function textoEstado(estado) {
   if (estado === "rechazada") return "Rechazada";
   return "Pendiente";
 }
-
-// En un hospital la dirección es "Hospital, planta, área y habitación".
-// El nombre del hospital va normal y lo que va detrás de la primera coma, en negrita
-function partesDireccion(item) {
-  const texto = item.direccion || "";
-  const posicion = texto.indexOf(", ");
-  const esHospital =
-    item.tipoCuidado && item.tipoCuidado.toLowerCase() === "hospitalario";
-
-  if (!esHospital || posicion === -1) {
-    return { principal: texto, ubicacion: "" };
-  }
-  return {
-    principal: texto.slice(0, posicion),
-    ubicacion: texto.slice(posicion + 2),
-  };
-}
 </script>
 
 <template>
@@ -111,13 +94,8 @@ function partesDireccion(item) {
             📅 <strong>Fin:</strong> {{ formatearFecha(item.fechaFin) }}
           </li>
           <li v-if="item.direccion && item.estado === 'completada'">
-            📍 {{ partesDireccion(item).principal
-            }}<template v-if="partesDireccion(item).ubicacion"
-              >,
-              <strong class="historial__ubicacion">{{
-                partesDireccion(item).ubicacion
-              }}</strong></template
-            >
+            📍
+            <strong class="historial__direccion">{{ item.direccion }}</strong>
           </li>
           <li v-if="item.notas">📝 {{ item.notas }}</li>
         </ul>
