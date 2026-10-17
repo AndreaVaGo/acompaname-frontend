@@ -62,86 +62,100 @@ function verSolicitudes() {
 
 <template>
   <div class="checkout">
-    <div class="checkout__box">
+    <div class="checkout__wrapper">
       <h1>Pago del servicio</h1>
       <p class="checkout__subtitle">
         Pago simulado — no se realiza ningún cargo real.
       </p>
 
-      <p v-if="cargando">Cargando pago...</p>
+      <div class="checkout__box">
+        <p v-if="cargando" class="checkout__cargando">Cargando pago...</p>
 
-      <p v-if="pago && !pagado" class="checkout__importe">
-        Importe: <strong>{{ pago.importe }} €</strong>
-      </p>
-
-      <p v-if="pago && pago.estado === 'COMPLETADO'" class="checkout__info">
-        Este servicio ya está pagado.
-      </p>
-
-      <div v-if="pagado" class="checkout__exito">
-        <p class="checkout__exito-icono">✓</p>
-        <h2>¡Pago realizado!</h2>
-        <p>
-          Hemos registrado tu pago de <strong>{{ pago.importe }} €</strong>.
-        </p>
-        <button type="button" class="btn btn--primary" @click="verSolicitudes">
-          Ver mis solicitudes
-        </button>
-      </div>
-
-      <form
-        v-if="pago && pago.estado !== 'COMPLETADO' && !pagado"
-        class="checkout__form"
-        @submit.prevent="pagar"
-      >
-        <label for="numero">Número de tarjeta</label>
-        <input
-          type="text"
-          id="numero"
-          v-model="numeroTarjeta"
-          placeholder="4242 4242 4242 4242"
-          maxlength="19"
-        />
-
-        <label for="nombre">Nombre del titular</label>
-        <input
-          type="text"
-          id="nombre"
-          v-model="nombreTitular"
-          placeholder="Andrea Vallina"
-        />
-
-        <div class="checkout__row">
-          <div>
-            <label for="caducidad">Caducidad</label>
-            <input
-              type="text"
-              id="caducidad"
-              v-model="caducidad"
-              placeholder="MM/AA"
-              maxlength="5"
-            />
-          </div>
-          <div>
-            <label for="cvv">CVV</label>
-            <input
-              type="text"
-              id="cvv"
-              v-model="cvv"
-              placeholder="123"
-              maxlength="3"
-            />
-          </div>
+        <!-- Franja de color con el importe a pagar -->
+        <div v-if="pago && !pagado" class="checkout__cabecera">
+          <span class="checkout__icono">💳</span>
+          <p class="checkout__importe">
+            Importe: <strong>{{ pago.importe }} €</strong>
+          </p>
         </div>
 
-        <p v-if="error" class="checkout__error">{{ error }}</p>
+        <p v-if="pago && pago.estado === 'COMPLETADO'" class="checkout__info">
+          Este servicio ya está pagado.
+        </p>
 
-        <button type="submit" class="btn btn--primary" :disabled="procesando">
-          {{ procesando ? "Procesando..." : "Pagar" }}
-        </button>
-      </form>
+        <div v-if="pagado" class="checkout__exito">
+          <p class="checkout__exito-icono">✓</p>
+          <h2>¡Pago realizado!</h2>
+          <p>
+            Hemos registrado tu pago de <strong>{{ pago.importe }} €</strong>.
+          </p>
+          <button
+            type="button"
+            class="btn btn--primary"
+            @click="verSolicitudes"
+          >
+            Ver mis solicitudes
+          </button>
+        </div>
 
-      <p v-if="error && !pago" class="checkout__error">{{ error }}</p>
+        <form
+          v-if="pago && pago.estado !== 'COMPLETADO' && !pagado"
+          class="formulario checkout__form"
+          @submit.prevent="pagar"
+        >
+          <h2 class="titulo-seccion" data-icono="🔒">Datos de la tarjeta</h2>
+
+          <label for="numero">Número de tarjeta</label>
+          <input
+            type="text"
+            id="numero"
+            v-model="numeroTarjeta"
+            placeholder="4242 4242 4242 4242"
+            maxlength="19"
+          />
+
+          <label for="nombre">Nombre del titular</label>
+          <input
+            type="text"
+            id="nombre"
+            v-model="nombreTitular"
+            placeholder="Andrea Vallina"
+          />
+
+          <div class="checkout__row">
+            <div>
+              <label for="caducidad">Caducidad</label>
+              <input
+                type="text"
+                id="caducidad"
+                v-model="caducidad"
+                placeholder="MM/AA"
+                maxlength="5"
+              />
+            </div>
+            <div>
+              <label for="cvv">CVV</label>
+              <input
+                type="text"
+                id="cvv"
+                v-model="cvv"
+                placeholder="123"
+                maxlength="3"
+              />
+            </div>
+          </div>
+
+          <p v-if="error" class="checkout__error">{{ error }}</p>
+
+          <button type="submit" class="btn btn--primary" :disabled="procesando">
+            {{ procesando ? "Procesando..." : "Pagar" }}
+          </button>
+        </form>
+
+        <p v-if="error && !pago" class="checkout__error checkout__error--suelto">
+          {{ error }}
+        </p>
+      </div>
     </div>
   </div>
 </template>
@@ -153,38 +167,74 @@ function verSolicitudes() {
   font-family: var(--font-base);
   color: var(--color-text);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 20px;
+  padding: 24px 20px 32px;
+}
+
+.checkout__wrapper {
+  max-width: 520px;
+  width: 100%;
+}
+
+.checkout h1 {
+  font-size: 1.8rem;
+  margin: 0 0 6px;
+}
+
+.checkout__subtitle {
+  color: var(--color-text);
+  font-size: 1.05rem;
+  margin: 0 0 24px;
 }
 
 .checkout__box {
   background-color: var(--color-white);
   border-radius: var(--radius-card);
-  padding: 32px;
-  max-width: 420px;
-  width: 100%;
+  border-top: 4px solid var(--color-accent);
   box-shadow: var(--shadow-card);
+  overflow: hidden;
 }
 
-.checkout h1 {
-  font-size: 1.5rem;
-  margin-bottom: 8px;
+.checkout__cargando {
+  padding: 24px 32px;
 }
 
-.checkout__subtitle {
-  color: var(--color-text-muted);
-  margin-bottom: 24px;
+/* Franja de color con el icono y el importe */
+.checkout__cabecera {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 32px;
+  background-color: var(--color-accent-bg);
+}
+
+.checkout__icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: var(--color-white);
+  font-size: 1.8rem;
 }
 
 .checkout__importe {
-  font-size: 1.1rem;
-  margin-bottom: 20px;
+  font-size: 1.2rem;
+  margin: 0;
+
+  & strong {
+    font-size: 1.6rem;
+  }
 }
 
 .checkout__info {
   color: var(--color-secondary);
   font-weight: bold;
+  padding: 20px 32px;
+  margin: 0;
 }
 
 .checkout__exito {
@@ -193,6 +243,7 @@ function verSolicitudes() {
   align-items: center;
   text-align: center;
   gap: var(--gap-sm);
+  padding: 32px;
 
   & h2 {
     font-size: 1.3rem;
@@ -221,32 +272,30 @@ function verSolicitudes() {
   justify-content: center;
 }
 
+/* Etiquetas, campos y título de sección vienen de base.css (clases "formulario" y "titulo-seccion") */
 .checkout__form {
-  display: flex;
-  flex-direction: column;
+  padding: 28px 32px 32px;
 
-  & label {
-    font-weight: bold;
-    margin-bottom: 6px;
-    font-size: 0.9rem;
+  & .titulo-seccion {
+    margin-top: 0;
   }
 
-  & input {
-    padding: 12px 14px;
-    border-radius: var(--radius-input);
-    border: 1px solid var(--color-border);
-    margin-bottom: var(--gap-md);
-    font-size: 1rem;
-    font-family: inherit;
+  & .btn {
+    padding: 14px;
+  }
+
+  & .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 }
 
 .checkout__row {
-  display: flex;
-  gap: var(--gap-sm);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 20px;
 
   & > div {
-    flex: 1;
     min-width: 0;
     display: flex;
     flex-direction: column;
@@ -263,13 +312,40 @@ function verSolicitudes() {
   margin: -4px 0 16px;
 }
 
-@media (max-width: 480px) {
-  .checkout__box {
-    padding: 24px;
+.checkout__error--suelto {
+  margin: 24px 32px;
+}
+
+@media (max-width: 768px) {
+  .checkout {
+    padding: 16px 16px 24px;
   }
 
+  .checkout__cabecera {
+    padding: 20px;
+  }
+
+  .checkout__info {
+    padding: 20px;
+  }
+
+  .checkout__exito {
+    padding: 24px 20px;
+  }
+
+  .checkout__form {
+    padding: 24px 20px 28px;
+  }
+
+  .checkout__error--suelto {
+    margin: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  
   .checkout__row {
-    flex-direction: column;
+    grid-template-columns: 1fr;
   }
 }
 </style>
