@@ -37,6 +37,16 @@ async function montarNavBarComoCuidador() {
   return montarNavBar()
 }
 
+// Monta la barra con una familia que ha iniciado sesión
+async function montarNavBarComoFamilia() {
+  vi.spyOn(UsuarioRepository.prototype, 'getById').mockResolvedValue({
+    nombre: 'Ana',
+  })
+  const authStore = useAuthStore()
+  authStore.login(1, 'ana@test.com', '12345678', 'FAMILIA')
+  return montarNavBar()
+}
+
 describe('NavBar', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
@@ -147,18 +157,38 @@ describe('NavBar', () => {
     expect(wrapper.find('.navbar__menu').exists()).toBe(false)
   })
 
-  test('el menú de la familia no repite las opciones que ya están en Mi perfil', async () => {
-    vi.spyOn(UsuarioRepository.prototype, 'getById').mockResolvedValue({
-      nombre: 'Ana',
-    })
-    const authStore = useAuthStore()
-    authStore.login(1, 'ana@test.com', '12345678', 'FAMILIA')
-
-    const wrapper = await montarNavBar()
+  test('el menú de la familia tiene la opción Editar mis datos', async () => {
+    const wrapper = await montarNavBarComoFamilia()
     await wrapper.find('.navbar__avatar').trigger('click')
 
-    expect(wrapper.find('#editar-datos').exists()).toBe(false)
-    expect(wrapper.find('#cambiar-password').exists()).toBe(false)
+    expect(wrapper.find('#editar-datos').text()).toBe('Editar mis datos')
+  })
+
+  test('el menú de la familia tiene la opción Cambiar contraseña', async () => {
+    const wrapper = await montarNavBarComoFamilia()
+    await wrapper.find('.navbar__avatar').trigger('click')
+
+    expect(wrapper.find('#cambiar-password').text()).toBe('Cambiar contraseña')
+  })
+
+  test('la familia: Editar mis datos lleva a su página y cierra el menú', async () => {
+    const push = vi.spyOn(router, 'push').mockResolvedValue()
+    const wrapper = await montarNavBarComoFamilia()
+    await wrapper.find('.navbar__avatar').trigger('click')
+    await wrapper.find('#editar-datos').trigger('click')
+
+    expect(push).toHaveBeenCalledWith('/editar-datos')
+    expect(wrapper.find('.navbar__menu').exists()).toBe(false)
+  })
+
+  test('la familia: Cambiar contraseña lleva a su página y cierra el menú', async () => {
+    const push = vi.spyOn(router, 'push').mockResolvedValue()
+    const wrapper = await montarNavBarComoFamilia()
+    await wrapper.find('.navbar__avatar').trigger('click')
+    await wrapper.find('#cambiar-password').trigger('click')
+
+    expect(push).toHaveBeenCalledWith('/cambiar-password')
+    expect(wrapper.find('.navbar__menu').exists()).toBe(false)
   })
 
   test('el cuidador ve cuántas solicitudes pendientes tiene', async () => {
