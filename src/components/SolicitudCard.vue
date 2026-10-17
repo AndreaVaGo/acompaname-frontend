@@ -9,6 +9,7 @@ const props = defineProps([
   "nombreMostrado",
   "mostrarAcciones",
   "pagado",
+  "valorada",
   "aceptar",
   "rechazar",
   "completar",
@@ -29,10 +30,31 @@ const direccionVisible = computed(
     props.solicitud.estado === "ACEPTADA" ||
     props.solicitud.estado === "COMPLETADA",
 );
+
+// En un hospital la dirección es "Hospital, planta, área y habitación".
+// El nombre del hospital va normal y lo que va detrás de la primera coma, en negrita
+const partesDireccion = computed(() => {
+  const texto = props.solicitud.direccion || "";
+  const posicion = texto.indexOf(", ");
+  const esHospital =
+    props.solicitud.tipoCuidado &&
+    props.solicitud.tipoCuidado.toLowerCase() === "hospitalario";
+
+  if (!esHospital || posicion === -1) {
+    return { principal: texto, ubicacion: "" };
+  }
+  return {
+    principal: texto.slice(0, posicion),
+    ubicacion: texto.slice(posicion + 2),
+  };
+});
 </script>
 
 <template>
-  <div class="solicitudes__card">
+  <div
+    class="solicitudes__card"
+    :class="'solicitudes__card--' + solicitud.estado.toLowerCase()"
+  >
     <div class="solicitudes__card-top">
       <h3>{{ nombreMostrado }}</h3>
       <span
@@ -54,10 +76,12 @@ const direccionVisible = computed(
     <p class="solicitudes__paciente">{{ solicitud.nombrePaciente }}</p>
 
     <ul class="solicitudes__detalles">
-      <li>🏠 {{ solicitud.tipoCuidado }}</li>
-      <li>📅 Inicio: {{ formatearFecha(solicitud.fechaCuidado) }}</li>
+      <li class="solicitudes__tipo">🏠 {{ solicitud.tipoCuidado }}</li>
+      <li>
+        📅 <strong>Inicio:</strong> {{ formatearFecha(solicitud.fechaCuidado) }}
+      </li>
       <li v-if="solicitud.fechaFin">
-        📅 Fin: {{ formatearFecha(solicitud.fechaFin) }}
+        📅 <strong>Fin:</strong> {{ formatearFecha(solicitud.fechaFin) }}
       </li>
     </ul>
 
@@ -112,7 +136,13 @@ const direccionVisible = computed(
           v-if="solicitud.direccion || solicitud.notas"
         >
           <li v-if="solicitud.direccion && direccionVisible">
-            📍 {{ solicitud.direccion }}
+            📍 {{ partesDireccion.principal
+            }}<template v-if="partesDireccion.ubicacion"
+              >,
+              <strong class="solicitudes__ubicacion">{{
+                partesDireccion.ubicacion
+              }}</strong></template
+            >
           </li>
           <li v-else-if="solicitud.direccion" class="solicitudes__aviso">
             📍 La dirección se mostrará cuando aceptes la solicitud
@@ -176,6 +206,21 @@ const direccionVisible = computed(
     >
       <p class="solicitudes__pagado">Pagado ✓</p>
     </div>
+
+    <!-- La familia valora al cuidador desde la tarjeta cuando la solicitud está completada -->
+    <div
+      class="solicitudes__acciones"
+      v-if="!mostrarAcciones && solicitud.estado === 'COMPLETADA'"
+    >
+      <p v-if="valorada" class="solicitudes__pagado">Valoración enviada ✓</p>
+      <RouterLink
+        v-else
+        :to="`/valorar/${solicitud.id}`"
+        class="btn btn--primary"
+      >
+        Dejar valoración
+      </RouterLink>
+    </div>
   </div>
 </template>
 
@@ -185,8 +230,33 @@ const direccionVisible = computed(
   flex-direction: column;
   background-color: var(--color-white);
   border-radius: var(--radius-card);
-  padding: 24px;
+  border-left: 6px solid var(--color-border);
+  padding: 24px 24px 24px 22px;
   box-shadow: var(--shadow-card);
+  transition: transform 0.15s;
+}
+
+/* El color del borde lateral cambia según el estado de la solicitud */
+.solicitudes__card--pendiente {
+  border-left-color: var(--color-accent);
+}
+
+.solicitudes__card--aceptada {
+  border-left-color: var(--color-secondary);
+}
+
+.solicitudes__card--completada {
+  border-left-color: var(--color-info);
+}
+
+.solicitudes__card--rechazada {
+  border-left-color: var(--color-border);
+}
+
+@media (hover: hover) {
+  .solicitudes__card:hover {
+    transform: translateY(-3px);
+  }
 }
 
 .solicitudes__card-top {
@@ -199,6 +269,7 @@ const direccionVisible = computed(
 
   & h3 {
     margin: 0;
+    font-size: 1.25rem;
   }
 }
 
@@ -230,20 +301,46 @@ const direccionVisible = computed(
 }
 
 .solicitudes__paciente {
-  color: var(--color-text-muted);
-  margin-bottom: 12px;
+  color: var(--color-text);
+  font-weight: bold;
+  margin-bottom: 14px;
 }
 
+/* Los datos van dentro de un recuadro; su color depende del estado */
 .solicitudes__detalles {
   list-style: none;
-  padding: 0;
+  padding: 12px 14px;
   margin: 0 0 20px;
   font-size: 0.9rem;
-  color: var(--color-text-muted);
+  color: var(--color-text);
+  background-color: var(--color-neutral-bg);
+  border-radius: var(--radius-input);
 
   & li {
     margin-bottom: 6px;
   }
+
+  & li:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.solicitudes__card--pendiente .solicitudes__detalles {
+  background-color: var(--color-accent-bg);
+}
+
+.solicitudes__card--aceptada .solicitudes__detalles {
+  background-color: var(--color-secondary-bg);
+}
+
+.solicitudes__card--completada .solicitudes__detalles {
+  background-color: var(--color-info-bg);
+}
+
+/* El tipo de cuidado llega en minúsculas del servidor; así sale con la primera en mayúscula */
+.solicitudes__tipo {
+  font-weight: bold;
+  text-transform: capitalize;
 }
 
 .solicitudes__detalles li,
