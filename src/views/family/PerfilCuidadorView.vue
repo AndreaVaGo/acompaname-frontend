@@ -65,16 +65,26 @@ function estrellas(puntuacion) {
     <RouterLink to="/buscar" class="perfil__back">← Volver</RouterLink>
 
     <div class="perfil__main">
-      <div class="perfil__info">
+      <div
+        class="perfil__info"
+        :class="
+          cuidador.disponibleAhora
+            ? 'perfil__info--disponible'
+            : 'perfil__info--ocupado'
+        "
+      >
         <div class="perfil__cabecera">
           <FotoCuidador
             :foto="cuidador.foto"
             :nombre="cuidador.usuarioNombre"
-            :tamano="80"
+            :tamano="96"
           />
           <div>
             <h1>{{ cuidador.usuarioNombre }}</h1>
             <span class="perfil__tag">{{ cuidador.especialidad }}</span>
+            <p v-if="cuidador.ciudad" class="perfil__ciudad">
+              📍 {{ cuidador.ciudad }}
+            </p>
           </div>
         </div>
 
@@ -248,31 +258,51 @@ function estrellas(puntuacion) {
   flex: 2;
   background-color: var(--color-white);
   border-radius: var(--radius-card);
+  border-top: 4px solid var(--color-border);
   padding: 28px;
   box-shadow: var(--shadow-card);
+  overflow: hidden;
 
   & h2 {
-    margin-top: 20px;
-    margin-bottom: 8px;
+    margin-top: 24px;
+    margin-bottom: 10px;
     font-size: 1.1rem;
   }
 }
 
+/* La línea de arriba indica la disponibilidad: verde si está disponible, roja si no */
+.perfil__info--disponible {
+  border-top-color: var(--color-secondary);
+}
+
+.perfil__info--ocupado {
+  border-top-color: var(--color-error);
+}
+
+/* Franja de color con la foto y el nombre, hasta los bordes de la tarjeta */
 .perfil__cabecera {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 16px;
+  gap: 20px;
+  margin: -28px -28px 20px;
+  padding: 28px;
+  background-color: var(--color-accent-bg);
 
   & h1 {
-    margin: 0 0 6px;
+    margin: 0 0 8px;
+    font-size: 2rem;
   }
+}
+
+.perfil__ciudad {
+  color: var(--color-text-muted);
+  margin: 8px 0 0;
 }
 
 .perfil__tag {
   display: inline-block;
-  background-color: var(--color-accent-bg);
-  color: var(--color-accent);
+  background-color: var(--color-white);
+  color: var(--color-accent-dark);
   padding: 4px 12px;
   border-radius: var(--radius-pill);
   font-size: 0.85rem;
@@ -280,7 +310,9 @@ function estrellas(puntuacion) {
 }
 
 .perfil__valoracion {
-  margin-bottom: 16px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 20px;
 }
 
 .perfil__valoracion-boton {
@@ -302,12 +334,18 @@ function estrellas(puntuacion) {
   list-style: none;
   padding: 0;
   margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
 
+  /* Cada dato va en su propio recuadro */
   & li {
-    margin-bottom: 6px;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
+    padding: 14px 16px;
+    background-color: var(--color-bg);
+    border-radius: var(--radius-input);
   }
 }
 
@@ -331,33 +369,49 @@ function estrellas(puntuacion) {
 
 .perfil__servicio {
   background-color: var(--color-accent-bg);
-  color: var(--color-accent);
-  padding: 4px 12px;
+  color: var(--color-accent-dark);
+  padding: 6px 14px;
   border-radius: var(--radius-pill);
   font-size: 0.85rem;
 }
 
+/* Las etiquetas alternan coral, verde y azul, igual que en las solicitudes */
+.perfil__servicio:nth-child(3n + 2) {
+  background-color: var(--color-secondary-bg);
+  color: var(--color-secondary);
+}
+
+.perfil__servicio:nth-child(3n + 3) {
+  background-color: var(--color-info-bg);
+  color: var(--color-info);
+}
+
 .perfil__bio {
   color: var(--color-text);
-  line-height: 1.5;
+  line-height: 1.6;
   font-style: italic;
-  border-left: 3px solid var(--color-accent-bg);
-  padding-left: 14px;
+  background-color: var(--color-bg);
+  border-left: 4px solid var(--color-accent);
+  border-radius: var(--radius-input);
+  padding: 14px 16px;
 }
 
 .perfil__sidebar {
   flex: 1;
+  position: sticky;
+  top: 20px;
   background-color: var(--color-white);
   border-radius: var(--radius-card);
+  border-top: 4px solid var(--color-accent);
   padding: 28px;
   box-shadow: var(--shadow-card);
   height: fit-content;
 }
 
 .perfil__precio {
-  font-size: 1.6rem;
+  font-size: 2.2rem;
   font-weight: bold;
-  margin: 0;
+  margin: 0 0 16px;
 
   & span {
     font-size: 1rem;
@@ -471,6 +525,19 @@ function estrellas(puntuacion) {
   .perfil__info,
   .perfil__sidebar {
     padding: 20px;
+  }
+
+  .perfil__cabecera {
+    margin: -20px -20px 20px;
+    padding: 20px;
+  }
+
+  .perfil__datos {
+    grid-template-columns: 1fr;
+  }
+
+  .perfil__sidebar {
+    position: static;
   }
 }
 </style>
