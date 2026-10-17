@@ -80,4 +80,29 @@ describe('SolicitudCard dirección en negrita', () => {
       'HUCA, planta 2, sección B',
     )
   })
+
+  test('si el servidor no envía la dirección de una solicitud pendiente, se avisa igual', async () => {
+    const wrapper = montarTarjeta('domicilio', null, 'PENDIENTE', true)
+
+    await wrapper.find('.solicitudes__ver').trigger('click')
+
+    expect(wrapper.find('.solicitudes__direccion').exists()).toBe(false)
+    expect(wrapper.text()).toContain(
+      'La dirección se mostrará cuando aceptes la solicitud',
+    )
+  })
+
+  test('en una solicitud rechazada no se avisa de que la dirección se mostrará', async () => {
+    const wrapper = montarTarjeta(
+      'domicilio',
+      'Calle Uría 12, 3º B, Oviedo',
+      'RECHAZADA',
+      true,
+    )
+
+    await wrapper.find('.solicitudes__ver').trigger('click')
+
+    expect(wrapper.find('.solicitudes__direccion').exists()).toBe(false)
+    expect(wrapper.text()).not.toContain('La dirección se mostrará')
+  })
 })
