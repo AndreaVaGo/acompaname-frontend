@@ -115,7 +115,7 @@ async function guardar() {
 
 <template>
   <div class="editar">
-    <div class="editar__box">
+    <div class="editar__wrapper">
       <h1>Mi perfil profesional</h1>
       <p class="editar__subtitle">
         Esto es lo que verán las familias cuando busquen cuidador.
@@ -123,138 +123,176 @@ async function guardar() {
 
       <p v-if="guardado" class="editar__ok">Perfil guardado correctamente.</p>
 
-      <p v-if="cargando">Cargando tu perfil...</p>
+      <div class="editar__box">
+        <p v-if="cargando" class="editar__cargando">Cargando tu perfil...</p>
 
-      <form v-if="perfil" class="editar__form" @submit.prevent="guardar">
-        <div class="editar__foto">
-          <FotoCuidador
-            :foto="foto"
-            :nombre="perfil.usuarioNombre"
-            :tamano="80"
-          />
-          <div class="editar__foto-campo">
-            <label for="foto">Foto de perfil</label>
-            <input
-              type="file"
-              id="foto"
-              accept="image/*"
-              @change="elegirFoto"
+        <form v-if="perfil" class="editar__form" @submit.prevent="guardar">
+          <!-- Franja de color con la foto y los botones para cambiarla -->
+          <div class="editar__foto">
+            <FotoCuidador
+              :foto="foto"
+              :nombre="perfil.usuarioNombre"
+              :tamano="96"
             />
-            <p class="editar__ayuda">
-              Elige una imagen de tu ordenador. Si no pones ninguna, se
-              mostrará un monigote.
-            </p>
-            <button
-              v-if="foto"
-              type="button"
-              id="quitar-foto"
-              class="editar__quitar"
-              @click="quitarFoto"
-            >
-              Quitar foto
+            <div class="editar__foto-campo">
+              <label for="foto">Foto de perfil</label>
+              <input
+                type="file"
+                id="foto"
+                accept="image/*"
+                @change="elegirFoto"
+              />
+              <p class="editar__ayuda">
+                Elige una imagen de tu ordenador. Si no pones ninguna, se
+                mostrará un monigote.
+              </p>
+              <button
+                v-if="foto"
+                type="button"
+                id="quitar-foto"
+                class="editar__quitar"
+                @click="quitarFoto"
+              >
+                Quitar foto
+              </button>
+            </div>
+          </div>
+
+          <div class="editar__cuerpo">
+            <h2 class="editar__seccion">Datos profesionales</h2>
+
+            <div class="editar__row">
+              <div>
+                <label for="especialidad">Especialidad</label>
+                <input
+                  type="text"
+                  id="especialidad"
+                  v-model="especialidad"
+                  maxlength="100"
+                  placeholder="Geriatría, acompañamiento hospitalario..."
+                />
+              </div>
+              <div>
+                <label for="ciudad">Ciudad</label>
+                <input
+                  type="text"
+                  id="ciudad"
+                  v-model="ciudad"
+                  maxlength="100"
+                  placeholder="Oviedo, Gijón, Madrid..."
+                />
+              </div>
+            </div>
+
+            <div class="editar__row">
+              <div>
+                <label for="sexo">Sexo (opcional)</label>
+                <select id="sexo" v-model="sexo">
+                  <option value="">Prefiero no indicarlo</option>
+                  <option value="MUJER">Mujer</option>
+                  <option value="HOMBRE">Hombre</option>
+                </select>
+              </div>
+              <div>
+                <label for="tipo-cuidado">Tipo de cuidado</label>
+                <select id="tipo-cuidado" v-model="tipoCuidado">
+                  <option value="hospitalario">Hospitalario</option>
+                  <option value="domicilio">A domicilio</option>
+                  <option value="ambos">Ambos (hospital y domicilio)</option>
+                </select>
+              </div>
+            </div>
+
+            <h2 class="editar__seccion">
+              Servicios en los que tienes experiencia
+            </h2>
+            <div class="editar__servicios">
+              <label
+                v-for="servicio in CUIDADOS"
+                :key="servicio.codigo"
+                class="editar__check"
+                :class="{
+                  'editar__check--marcado': servicios.includes(
+                    servicio.codigo,
+                  ),
+                }"
+              >
+                <input
+                  type="checkbox"
+                  :id="'servicio-' + servicio.codigo"
+                  :value="servicio.codigo"
+                  v-model="servicios"
+                />
+                {{ servicio.nombre }}
+              </label>
+            </div>
+
+            <h2 class="editar__seccion">Experiencia y tarifa</h2>
+            <div class="editar__row">
+              <div>
+                <label for="anos">Años de experiencia</label>
+                <input
+                  type="number"
+                  id="anos"
+                  v-model="anosExperiencia"
+                  min="0"
+                />
+              </div>
+              <div>
+                <label for="tarifa">Tarifa por hora (€)</label>
+                <input
+                  type="number"
+                  id="tarifa"
+                  v-model="tarifaHora"
+                  min="0"
+                  step="0.5"
+                />
+              </div>
+            </div>
+
+            <label for="bio">Sobre ti</label>
+            <textarea
+              id="bio"
+              v-model="bio"
+              maxlength="1000"
+              placeholder="Cuéntales tu experiencia y cómo trabajas..."
+            ></textarea>
+
+            <h2 class="editar__seccion">Disponibilidad</h2>
+            <div class="editar__opciones">
+              <label
+                class="editar__check"
+                :class="{ 'editar__check--marcado': tieneVehiculo }"
+              >
+                <input type="checkbox" id="vehiculo" v-model="tieneVehiculo" />
+                Tengo vehículo propio
+              </label>
+
+              <label
+                class="editar__check"
+                :class="{ 'editar__check--marcado': disponibleAhora }"
+              >
+                <input
+                  type="checkbox"
+                  id="disponible"
+                  v-model="disponibleAhora"
+                />
+                Disponible ahora
+              </label>
+            </div>
+
+            <p v-if="error" class="editar__error">{{ error }}</p>
+
+            <button type="submit" class="btn btn--primary">
+              Guardar perfil
             </button>
           </div>
-        </div>
+        </form>
 
-        <label for="especialidad">Especialidad</label>
-        <input
-          type="text"
-          id="especialidad"
-          v-model="especialidad"
-          maxlength="100"
-          placeholder="Geriatría, acompañamiento hospitalario..."
-        />
-
-        <label for="ciudad">Ciudad</label>
-        <input
-          type="text"
-          id="ciudad"
-          v-model="ciudad"
-          maxlength="100"
-          placeholder="Oviedo, Gijón, Madrid..."
-        />
-
-        <label for="sexo">Sexo (opcional)</label>
-        <select id="sexo" v-model="sexo">
-          <option value="">Prefiero no indicarlo</option>
-          <option value="MUJER">Mujer</option>
-          <option value="HOMBRE">Hombre</option>
-        </select>
-
-        <label for="tipo-cuidado">Tipo de cuidado</label>
-        <select id="tipo-cuidado" v-model="tipoCuidado">
-          <option value="hospitalario">Hospitalario</option>
-          <option value="domicilio">A domicilio</option>
-          <option value="ambos">Ambos (hospital y domicilio)</option>
-        </select>
-
-        <p class="editar__titulo-grupo">Servicios en los que tienes experiencia</p>
-        <div class="editar__servicios">
-          <label
-            v-for="servicio in CUIDADOS"
-            :key="servicio.codigo"
-            class="editar__check"
-            :class="{
-              'editar__check--marcado': servicios.includes(servicio.codigo),
-            }"
-          >
-            <input
-              type="checkbox"
-              :id="'servicio-' + servicio.codigo"
-              :value="servicio.codigo"
-              v-model="servicios"
-            />
-            {{ servicio.nombre }}
-          </label>
-        </div>
-
-        <div class="editar__row">
-          <div>
-            <label for="anos">Años de experiencia</label>
-            <input type="number" id="anos" v-model="anosExperiencia" min="0" />
-          </div>
-          <div>
-            <label for="tarifa">Tarifa por hora (€)</label>
-            <input
-              type="number"
-              id="tarifa"
-              v-model="tarifaHora"
-              min="0"
-              step="0.5"
-            />
-          </div>
-        </div>
-
-        <label for="bio">Sobre ti</label>
-        <textarea
-          id="bio"
-          v-model="bio"
-          maxlength="1000"
-          placeholder="Cuéntales tu experiencia y cómo trabajas..."
-        ></textarea>
-
-        <label
-          class="editar__check"
-          :class="{ 'editar__check--marcado': tieneVehiculo }"
-        >
-          <input type="checkbox" id="vehiculo" v-model="tieneVehiculo" />
-          Tengo vehículo propio
-        </label>
-
-        <label
-          class="editar__check"
-          :class="{ 'editar__check--marcado': disponibleAhora }"
-        >
-          <input type="checkbox" id="disponible" v-model="disponibleAhora" />
-          Disponible ahora
-        </label>
-
-        <p v-if="error" class="editar__error">{{ error }}</p>
-
-        <button type="submit" class="btn btn--primary">Guardar perfil</button>
-      </form>
-
-      <p v-if="error && !perfil" class="editar__error">{{ error }}</p>
+        <p v-if="error && !perfil" class="editar__error editar__error--suelto">
+          {{ error }}
+        </p>
+      </div>
     </div>
   </div>
 </template>
@@ -270,24 +308,32 @@ async function guardar() {
   padding: var(--gap-lg) 20px;
 }
 
-.editar__box {
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
-  padding: 32px;
-  max-width: 520px;
+.editar__wrapper {
+  max-width: 760px;
   width: 100%;
-  height: fit-content;
-  box-shadow: var(--shadow-card);
 }
 
 .editar h1 {
-  font-size: 1.5rem;
-  margin-bottom: 8px;
+  font-size: 1.8rem;
+  margin: 0 0 6px;
 }
 
 .editar__subtitle {
-  color: var(--color-text-muted);
-  margin-bottom: 24px;
+  color: var(--color-text);
+  font-size: 1.05rem;
+  margin: 0 0 24px;
+}
+
+.editar__box {
+  background-color: var(--color-white);
+  border-radius: var(--radius-card);
+  border-top: 4px solid var(--color-accent);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.editar__cargando {
+  padding: 24px 32px;
 }
 
 .editar__form {
@@ -297,7 +343,8 @@ async function guardar() {
   & label {
     font-weight: bold;
     margin-bottom: 6px;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    color: var(--color-text);
   }
 
   & input[type="text"],
@@ -310,6 +357,22 @@ async function guardar() {
     margin-bottom: var(--gap-md);
     font-size: 1rem;
     font-family: inherit;
+  }
+
+  & input[type="text"]:focus,
+  & input[type="number"]:focus,
+  & select:focus,
+  & textarea:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-bg);
+  }
+
+  /* Los textos de ejemplo van en cursiva para distinguirlos de lo escrito */
+  & input::placeholder,
+  & textarea::placeholder {
+    color: var(--color-text-muted);
+    font-style: italic;
   }
 
   & select {
@@ -327,6 +390,7 @@ async function guardar() {
     align-items: center;
     gap: 8px;
     font-weight: normal;
+    font-size: 0.95rem;
     margin-bottom: var(--gap-sm);
     padding: 10px 12px;
     border: 1px solid var(--color-border);
@@ -342,6 +406,7 @@ async function guardar() {
   & .editar__check--marcado {
     border-color: var(--color-accent);
     background-color: var(--color-accent-bg);
+    font-weight: bold;
   }
 
   & .editar__check input[type="checkbox"] {
@@ -349,13 +414,19 @@ async function guardar() {
     width: 16px;
     height: 16px;
   }
+
+  & .btn {
+    padding: 14px;
+  }
 }
 
+/* Franja de color con la foto, hasta los bordes de la tarjeta */
 .editar__foto {
   display: flex;
-  gap: 16px;
-  align-items: flex-start;
-  margin-bottom: var(--gap-sm);
+  gap: 20px;
+  align-items: center;
+  padding: 28px 32px;
+  background-color: var(--color-accent-bg);
 }
 
 .editar__foto-campo {
@@ -364,15 +435,20 @@ async function guardar() {
   flex-direction: column;
 }
 
+/* El texto de ayuda va sencillo, en gris suave y con una bombilla delante */
 .editar__ayuda {
   color: var(--color-text-muted);
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   margin: 8px 0;
+
+  &::before {
+    content: "💡 ";
+  }
 }
 
 .editar__quitar {
   align-self: flex-start;
-  background: none;
+  background-color: var(--color-white);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-input);
   color: var(--color-text);
@@ -381,21 +457,54 @@ async function guardar() {
   padding: 6px 12px;
 }
 
-.editar__row {
+.editar__cuerpo {
   display: flex;
-  gap: var(--gap-sm);
+  flex-direction: column;
+  padding: 28px 32px 32px;
+}
 
-  & > div {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
+/* Cada bloque del formulario lleva su título en coral, con un icono y una línea debajo */
+.editar__seccion {
+  font-size: 1.15rem;
+  color: var(--color-accent-dark);
+  margin: 12px 0 18px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--color-accent-bg);
+
+  &::before {
+    margin-right: 8px;
   }
 }
 
-.editar__titulo-grupo {
-  font-weight: bold;
-  margin: 0 0 8px;
-  font-size: 0.9rem;
+.editar__seccion:nth-of-type(1)::before {
+  content: "📋";
+}
+
+.editar__seccion:nth-of-type(2)::before {
+  content: "🩺";
+}
+
+.editar__seccion:nth-of-type(3)::before {
+  content: "⭐";
+}
+
+.editar__seccion:nth-of-type(4)::before {
+  content: "📅";
+}
+
+.editar__cuerpo > .editar__seccion:first-child {
+  margin-top: 0;
+}
+
+.editar__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 20px;
+
+  & > div {
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 .editar__servicios {
@@ -405,45 +514,62 @@ async function guardar() {
   margin-bottom: var(--gap-md);
 }
 
+.editar__opciones {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0 var(--gap-sm);
+  margin-bottom: var(--gap-sm);
+}
+
 .editar__error {
-  background-color: #fdecea;
-  border: 1px solid #f5c6c0;
-  color: #c0392b;
+  background-color: var(--color-error-bg);
+  border: 1px solid var(--color-error-border);
+  color: var(--color-error);
   font-size: 0.9rem;
   padding: 10px 14px;
   border-radius: var(--radius-input);
   margin: 8px 0 16px;
+}
+
+.editar__error--suelto {
+  margin: 24px 32px;
 }
 
 .editar__ok {
   background-color: var(--color-secondary-bg);
+  border: 1px solid var(--color-secondary);
   color: var(--color-secondary);
   font-size: 0.9rem;
   padding: 10px 14px;
   border-radius: var(--radius-input);
-  margin: 8px 0 16px;
+  margin: 0 0 16px;
 }
 
 @media (max-width: 768px) {
-  .editar__box {
-    padding: 24px;
-  }
-
-  .editar__row {
-    flex-direction: column;
-  }
-
-  .editar__servicios {
-    grid-template-columns: 1fr;
-  }
-
   .editar__foto {
     flex-direction: column;
-    align-items: center;
+    padding: 20px;
   }
 
   .editar__foto-campo {
     width: 100%;
+  }
+
+  .editar__cuerpo {
+    padding: 20px;
+  }
+
+  .editar__row {
+    grid-template-columns: 1fr;
+  }
+
+  .editar__servicios,
+  .editar__opciones {
+    grid-template-columns: 1fr;
+  }
+
+  .editar__error--suelto {
+    margin: 20px;
   }
 }
 </style>
