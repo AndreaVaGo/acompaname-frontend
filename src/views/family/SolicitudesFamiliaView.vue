@@ -3,11 +3,14 @@ import { ref, onMounted } from "vue";
 import SolicitudCard from "../../components/SolicitudCard.vue";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
 import PagoRepository from "@/repositories/PagoRepository";
+import ValoracionRepository from "@/repositories/ValoracionRepository";
 
 const solicitudRepository = new SolicitudRepository();
 const pagoRepository = new PagoRepository();
+const valoracionRepository = new ValoracionRepository();
 const solicitudes = ref([]);
 const idsPagados = ref([]);
+const idsValoradas = ref([]);
 const cargando = ref(true);
 const error = ref("");
 
@@ -29,6 +32,14 @@ onMounted(async () => {
   } catch (err) {
     idsPagados.value = [];
   }
+
+  // Si falla la carga de valoraciones, la lista se ve igual y no marca ninguna como valorada
+  try {
+    const valoraciones = await valoracionRepository.getAll();
+    idsValoradas.value = valoraciones.map((valoracion) => valoracion.solicitudId);
+  } catch (err) {
+    idsValoradas.value = [];
+  }
 });
 </script>
 
@@ -49,6 +60,7 @@ onMounted(async () => {
         :nombreMostrado="solicitud.cuidadorNombre"
         :mostrarAcciones="false"
         :pagado="idsPagados.includes(solicitud.id)"
+        :valorada="idsValoradas.includes(solicitud.id)"
       />
     </div>
   </div>
