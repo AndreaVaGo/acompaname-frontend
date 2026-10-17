@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { RouterLink } from "vue-router";
 import UsuarioRepository from "@/repositories/UsuarioRepository";
 import { useAuthStore } from "@/stores/auth";
@@ -13,6 +13,14 @@ const exito = ref("");
 
 const usuarioRepository = new UsuarioRepository();
 const authStore = useAuthStore();
+
+// La inicial del nombre, para el círculo de arriba
+const inicial = computed(() => {
+  if (!nombre.value) {
+    return "";
+  }
+  return nombre.value.charAt(0).toUpperCase();
+});
 
 onMounted(async () => {
   try {
@@ -68,23 +76,32 @@ async function handleSubmit() {
       </p>
 
       <div class="editar-datos__box">
-        <p v-if="cargando">Cargando...</p>
+        <p v-if="cargando" class="editar-datos__cargando">Cargando...</p>
 
-        <form v-else class="editar-datos__form" @submit.prevent="handleSubmit">
-          <label for="nombre">Nombre</label>
-          <input type="text" id="nombre" v-model="nombre" />
+        <template v-else>
+          <div class="editar-datos__cabecera">
+            <span class="editar-datos__avatar">{{ inicial }}</span>
+            <span class="editar-datos__nombre">{{ nombre }}</span>
+          </div>
 
-          <label for="email">Email</label>
-          <input type="email" id="email" v-model="email" />
+          <form class="editar-datos__form" @submit.prevent="handleSubmit">
+            <label for="nombre">Nombre</label>
+            <input type="text" id="nombre" v-model="nombre" />
 
-          <label for="telefono">Teléfono</label>
-          <input type="tel" id="telefono" v-model="telefono" />
+            <label for="email">Email</label>
+            <input type="email" id="email" v-model="email" />
 
-          <p v-if="error" class="editar-datos__error">{{ error }}</p>
-          <p v-if="exito" class="editar-datos__exito">{{ exito }}</p>
+            <label for="telefono">Teléfono</label>
+            <input type="tel" id="telefono" v-model="telefono" />
 
-          <button type="submit" class="btn btn--primary">Guardar cambios</button>
-        </form>
+            <p v-if="error" class="editar-datos__error">{{ error }}</p>
+            <p v-if="exito" class="editar-datos__exito">{{ exito }}</p>
+
+            <button type="submit" class="btn btn--primary">
+              Guardar cambios
+            </button>
+          </form>
+        </template>
 
         <RouterLink to="/cambiar-password" class="editar-datos__enlace">
           Cambiar contraseña
@@ -106,7 +123,7 @@ async function handleSubmit() {
 }
 
 .editar-datos__wrapper {
-  max-width: 420px;
+  max-width: 560px;
   width: 100%;
 }
 
@@ -117,19 +134,54 @@ async function handleSubmit() {
 
 .editar-datos__subtitle {
   color: var(--color-text-muted);
-  margin: 0 0 20px;
+  margin: 0 0 24px;
 }
 
 .editar-datos__box {
   background-color: var(--color-white);
   border-radius: var(--radius-card);
-  padding: 24px;
+  border-top: 4px solid var(--color-accent);
   box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.editar-datos__cargando {
+  padding: 24px;
+}
+
+/* Franja de color con la inicial y el nombre */
+.editar-datos__cabecera {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 32px;
+  background-color: var(--color-accent-bg);
+}
+
+.editar-datos__avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: var(--color-accent);
+  color: var(--color-white);
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.editar-datos__nombre {
+  font-size: 1.3rem;
+  font-weight: bold;
+  overflow-wrap: anywhere;
 }
 
 .editar-datos__form {
   display: flex;
   flex-direction: column;
+  padding: 28px 32px 8px;
 
   & label {
     font-weight: bold;
@@ -138,12 +190,22 @@ async function handleSubmit() {
   }
 
   & input {
-    padding: 10px 14px;
+    padding: 12px 16px;
     border-radius: var(--radius-input);
     border: 1px solid var(--color-border);
-    margin-bottom: 14px;
+    margin-bottom: 18px;
     font-size: 1rem;
     font-family: inherit;
+  }
+
+  & input:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-bg);
+  }
+
+  & .btn {
+    padding: 14px;
   }
 }
 
@@ -169,20 +231,36 @@ async function handleSubmit() {
 
 .editar-datos__enlace {
   display: block;
-  margin-top: 16px;
+  margin: 12px 32px 0;
+  padding: 18px 0 24px;
+  border-top: 1px solid var(--color-border);
   text-align: center;
-  color: var(--color-accent);
+  color: var(--color-accent-dark);
   font-weight: 600;
   text-decoration: none;
 }
 
-@media (max-width: 480px) {
+@media (hover: hover) {
+  .editar-datos__enlace:hover {
+    text-decoration: underline;
+  }
+}
+
+@media (max-width: 768px) {
   .editar-datos {
     padding: 16px 16px 24px;
   }
 
-  .editar-datos__box {
-    padding: 18px;
+  .editar-datos__cabecera {
+    padding: 20px;
+  }
+
+  .editar-datos__form {
+    padding: 24px 20px 8px;
+  }
+
+  .editar-datos__enlace {
+    margin: 12px 20px 0;
   }
 }
 </style>
