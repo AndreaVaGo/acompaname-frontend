@@ -30,6 +30,11 @@ const direccionVisible = computed(
     props.solicitud.estado === "ACEPTADA" ||
     props.solicitud.estado === "COMPLETADA",
 );
+
+// Al cuidador con una solicitud pendiente se le avisa de que la dirección llegará al aceptar
+const avisoDireccion = computed(
+  () => props.mostrarAcciones && props.solicitud.estado === "PENDIENTE",
+);
 </script>
 
 <template>
@@ -115,7 +120,7 @@ const direccionVisible = computed(
 
         <ul
           class="solicitudes__detalles"
-          v-if="solicitud.direccion || solicitud.notas"
+          v-if="solicitud.direccion || solicitud.notas || avisoDireccion"
         >
           <li v-if="solicitud.direccion && direccionVisible">
             📍
@@ -123,7 +128,7 @@ const direccionVisible = computed(
               solicitud.direccion
             }}</strong>
           </li>
-          <li v-else-if="solicitud.direccion" class="solicitudes__aviso">
+          <li v-else-if="avisoDireccion" class="solicitudes__aviso">
             📍 La dirección se mostrará cuando aceptes la solicitud
           </li>
           <li v-if="solicitud.notas">📝 {{ solicitud.notas }}</li>
