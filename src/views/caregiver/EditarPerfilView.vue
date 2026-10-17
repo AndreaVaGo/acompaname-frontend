@@ -105,6 +105,8 @@ async function guardar() {
     // Así el círculo del menú de arriba cambia al momento
     authStore.setFoto(foto.value);
     guardado.value = true;
+    // Subimos arriba para que se vea el mensaje de guardado
+    window.scrollTo(0, 0);
   } catch (err) {
     error.value = "No se pudo guardar tu perfil. Revisa los datos.";
   }
@@ -118,6 +120,8 @@ async function guardar() {
       <p class="editar__subtitle">
         Esto es lo que verán las familias cuando busquen cuidador.
       </p>
+
+      <p v-if="guardado" class="editar__ok">Perfil guardado correctamente.</p>
 
       <p v-if="cargando">Cargando tu perfil...</p>
 
@@ -246,7 +250,6 @@ async function guardar() {
         </label>
 
         <p v-if="error" class="editar__error">{{ error }}</p>
-        <p v-if="guardado" class="editar__ok">Perfil guardado correctamente.</p>
 
         <button type="submit" class="btn btn--primary">Guardar perfil</button>
       </form>
