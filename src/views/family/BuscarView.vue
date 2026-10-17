@@ -633,9 +633,11 @@ const cuidadoresFiltrados = computed(() => {
   margin: 0;
 }
 
+/* La ciudad va en negrita y con el color de texto normal para que se lea bien */
 .buscar__card-ciudad {
-  color: var(--color-text-muted);
-  font-size: 0.85rem;
+  color: var(--color-text);
+  font-size: 0.9rem;
+  font-weight: bold;
   margin: 4px 0 0;
 }
 
