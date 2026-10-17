@@ -217,9 +217,7 @@ function irAMiPerfil() {
             >
               Editar mi perfil
             </button>
-            <!-- La familia tiene estas dos opciones dentro de Mi perfil -->
             <button
-              v-if="authStore.rol === 'CUIDADOR'"
               type="button"
               class="navbar__menu-item"
               id="editar-datos"
@@ -228,7 +226,6 @@ function irAMiPerfil() {
               Editar mis datos
             </button>
             <button
-              v-if="authStore.rol === 'CUIDADOR'"
               type="button"
               class="navbar__menu-item"
               id="cambiar-password"
