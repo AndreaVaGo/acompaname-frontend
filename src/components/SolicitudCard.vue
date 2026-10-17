@@ -30,24 +30,6 @@ const direccionVisible = computed(
     props.solicitud.estado === "ACEPTADA" ||
     props.solicitud.estado === "COMPLETADA",
 );
-
-// En un hospital la dirección es "Hospital, planta, área y habitación".
-// El nombre del hospital va normal y lo que va detrás de la primera coma, en negrita
-const partesDireccion = computed(() => {
-  const texto = props.solicitud.direccion || "";
-  const posicion = texto.indexOf(", ");
-  const esHospital =
-    props.solicitud.tipoCuidado &&
-    props.solicitud.tipoCuidado.toLowerCase() === "hospitalario";
-
-  if (!esHospital || posicion === -1) {
-    return { principal: texto, ubicacion: "" };
-  }
-  return {
-    principal: texto.slice(0, posicion),
-    ubicacion: texto.slice(posicion + 2),
-  };
-});
 </script>
 
 <template>
@@ -136,13 +118,10 @@ const partesDireccion = computed(() => {
           v-if="solicitud.direccion || solicitud.notas"
         >
           <li v-if="solicitud.direccion && direccionVisible">
-            📍 {{ partesDireccion.principal
-            }}<template v-if="partesDireccion.ubicacion"
-              >,
-              <strong class="solicitudes__ubicacion">{{
-                partesDireccion.ubicacion
-              }}</strong></template
-            >
+            📍
+            <strong class="solicitudes__direccion">{{
+              solicitud.direccion
+            }}</strong>
           </li>
           <li v-else-if="solicitud.direccion" class="solicitudes__aviso">
             📍 La dirección se mostrará cuando aceptes la solicitud
