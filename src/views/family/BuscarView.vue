@@ -348,8 +348,9 @@ const cuidadoresFiltrados = computed(() => {
             >
               <span>⭐</span>
               <span class="buscar__card-valoracion-texto"
-                >{{ cuidador.valoracionMedia }} ({{
-                  cuidador.numValoraciones
+                >{{ cuidador.valoracionMedia }} ({{ cuidador.numValoraciones }}
+                {{
+                  cuidador.numValoraciones === 1 ? "valoración" : "valoraciones"
                 }})</span
               >
             </RouterLink>
