@@ -310,15 +310,17 @@ describe('SolicitudCard', () => {
     expect(wrapper.text()).not.toContain('📍')
   })
 
-  test('el cuidador puede ver los detalles de una solicitud completada aunque no tenga botones', async () => {
+  test('el cuidador no ve el enlace Ver detalles en una solicitud completada', () => {
     const wrapper = montarTarjetaCuidador('COMPLETADA', vi.fn())
 
     expect(wrapper.find('.solicitudes__acciones').exists()).toBe(false)
-    expect(wrapper.find('.solicitudes__ver').exists()).toBe(true)
+    expect(wrapper.find('.solicitudes__ver').exists()).toBe(false)
+  })
 
-    await wrapper.find('.solicitudes__ver').trigger('click')
+  test('el cuidador no ve el enlace Ver detalles en una solicitud rechazada', () => {
+    const wrapper = montarTarjetaCuidador('RECHAZADA', vi.fn())
 
-    expect(wrapper.find('.solicitudes__modal').exists()).toBe(true)
+    expect(wrapper.find('.solicitudes__ver').exists()).toBe(false)
   })
 
   test('la tarjeta completada tiene su propio estilo de estado', () => {
