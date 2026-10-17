@@ -294,8 +294,10 @@ function estrellas(puntuacion) {
   }
 }
 
+/* La ciudad va en negrita y con el color de texto normal para que se lea bien */
 .perfil__ciudad {
-  color: var(--color-text-muted);
+  color: var(--color-text);
+  font-weight: bold;
   margin: 8px 0 0;
 }
 
