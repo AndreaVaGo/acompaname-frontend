@@ -335,10 +335,10 @@ function estrellas(puntuacion) {
   padding: 0;
   margin: 0;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr;
   gap: 12px;
 
-  /* Cada dato va en su propio recuadro */
+  /* Cada dato va en su propio recuadro, uno debajo de otro */
   & li {
     display: flex;
     align-items: center;
@@ -346,6 +346,10 @@ function estrellas(puntuacion) {
     padding: 14px 16px;
     background-color: var(--color-bg);
     border-radius: var(--radius-input);
+  }
+
+  & strong {
+    white-space: nowrap;
   }
 }
 
@@ -531,10 +535,7 @@ function estrellas(puntuacion) {
     margin: -20px -20px 20px;
     padding: 20px;
   }
-
-  .perfil__datos {
-    grid-template-columns: 1fr;
-  }
+  
 
   .perfil__sidebar {
     position: static;
