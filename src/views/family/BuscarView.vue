@@ -203,30 +203,6 @@ const cuidadoresFiltrados = computed(() => {
       </div>
 
       <div class="buscar__filter-group">
-        <p class="buscar__filter-titulo">Servicios que necesitas</p>
-        <div class="buscar__servicios">
-          <label
-            v-for="servicio in CUIDADOS"
-            :key="servicio.codigo"
-            class="buscar__check"
-            :class="{
-              'buscar__check--marcado': serviciosBuscados.includes(
-                servicio.codigo,
-              ),
-            }"
-          >
-            <input
-              type="checkbox"
-              :id="'filtro-servicio-' + servicio.codigo"
-              :value="servicio.codigo"
-              v-model="serviciosBuscados"
-            />
-            {{ servicio.nombre }}
-          </label>
-        </div>
-      </div>
-
-      <div class="buscar__filter-group">
         <label>Disponibilidad</label>
         <div class="buscar__filter-options">
           <button
@@ -305,6 +281,31 @@ const cuidadoresFiltrados = computed(() => {
           >
             4.5 ⭐ o más
           </button>
+        </div>
+      </div>
+
+      <!-- Los servicios van al final, en un bloque propio de ancho completo -->
+      <div class="buscar__filter-group buscar__filter-group--ancho">
+        <p class="buscar__filter-titulo">Servicios que necesitas</p>
+        <div class="buscar__servicios">
+          <label
+            v-for="servicio in CUIDADOS"
+            :key="servicio.codigo"
+            class="buscar__check"
+            :class="{
+              'buscar__check--marcado': serviciosBuscados.includes(
+                servicio.codigo,
+              ),
+            }"
+          >
+            <input
+              type="checkbox"
+              :id="'filtro-servicio-' + servicio.codigo"
+              :value="servicio.codigo"
+              v-model="serviciosBuscados"
+            />
+            {{ servicio.nombre }}
+          </label>
         </div>
       </div>
     </div>
@@ -422,6 +423,10 @@ const cuidadoresFiltrados = computed(() => {
   display: flex;
   gap: 10px;
   margin-bottom: 20px;
+
+  & .btn {
+    padding: 12px 32px;
+  }
 }
 
 .buscar__input {
@@ -433,35 +438,65 @@ const cuidadoresFiltrados = computed(() => {
   font-family: inherit;
 }
 
+.buscar__input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-bg);
+}
+
+/* El buscador principal es redondeado y lleva sombra */
+.buscar__search .buscar__input {
+  border-radius: var(--radius-pill);
+  padding: 14px 22px;
+  box-shadow: var(--shadow-card);
+}
+
 .buscar__input--ciudad {
   width: 100%;
   max-width: 320px;
   box-sizing: border-box;
 }
 
+/* Los filtros van por parejas en dos columnas */
 .buscar__filters {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 22px 40px;
   background-color: var(--color-white);
   border-radius: var(--radius-card);
-  padding: 24px;
+  border-top: 4px solid var(--color-accent);
+  padding: 28px;
   margin-bottom: 24px;
   box-shadow: var(--shadow-card);
 }
 
-.buscar__filter-group {
-  margin-bottom: 16px;
+/* Los servicios ocupan una fila entera, separada del resto por una línea */
+.buscar__filter-group--ancho {
+  grid-column: 1 / -1;
+  border-top: 1px solid var(--color-neutral-bg);
+  padding-top: 22px;
+}
 
-  & label {
+.buscar__filter-group {
+  /* Títulos de cada filtro: pequeños, en mayúsculas y en gris */
+  & > label {
     display: block;
     font-weight: bold;
-    font-size: 0.85rem;
-    margin-bottom: 8px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-text-muted);
+    margin-bottom: 10px;
   }
 }
 
 .buscar__filter-titulo {
   font-weight: bold;
-  font-size: 0.85rem;
-  margin: 0 0 8px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  margin: 0 0 10px;
 }
 
 .buscar__filter-options {
@@ -516,14 +551,26 @@ const cuidadoresFiltrados = computed(() => {
   font-family: inherit;
 }
 
+/* Solo en pantallas con ratón: el botón se tiñe un poco al pasar por encima */
+@media (hover: hover) {
+  .buscar__filter-btn:hover {
+    border-color: var(--color-accent);
+    background-color: var(--color-accent-bg);
+  }
+}
+
+/* El filtro activo va en coral suave; el coral sólido se queda para el botón Buscar */
 .buscar__filter-btn--active {
-  background-color: var(--color-accent);
-  color: var(--color-white);
+  background-color: var(--color-accent-bg);
+  color: var(--color-accent-dark);
   border-color: var(--color-accent);
+  font-weight: bold;
 }
 
 .buscar__count {
-  color: var(--color-text-muted);
+  color: var(--color-text);
+  font-size: 1.1rem;
+  font-weight: bold;
   margin-bottom: 16px;
 }
 
@@ -678,6 +725,15 @@ const cuidadoresFiltrados = computed(() => {
 
   .buscar__grid {
     grid-template-columns: 1fr;
+  }
+
+  .buscar__filters {
+    grid-template-columns: 1fr;
+    padding: 20px;
+  }
+
+  .buscar__filter-group--ancho {
+    grid-column: auto;
   }
 
   .buscar__input--ciudad {
