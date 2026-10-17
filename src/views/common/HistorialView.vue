@@ -43,6 +43,23 @@ function textoEstado(estado) {
   if (estado === "rechazada") return "Rechazada";
   return "Pendiente";
 }
+
+// En un hospital la dirección es "Hospital, planta, área y habitación".
+// El nombre del hospital va normal y lo que va detrás de la primera coma, en negrita
+function partesDireccion(item) {
+  const texto = item.direccion || "";
+  const posicion = texto.indexOf(", ");
+  const esHospital =
+    item.tipoCuidado && item.tipoCuidado.toLowerCase() === "hospitalario";
+
+  if (!esHospital || posicion === -1) {
+    return { principal: texto, ubicacion: "" };
+  }
+  return {
+    principal: texto.slice(0, posicion),
+    ubicacion: texto.slice(posicion + 2),
+  };
+}
 </script>
 
 <template>
@@ -55,7 +72,12 @@ function textoEstado(estado) {
     <p v-if="error" class="historial__error">{{ error }}</p>
 
     <div class="historial__grid" v-if="historial.length">
-      <div class="historial__card" v-for="item in historial" :key="item.id">
+      <div
+        class="historial__card"
+        :class="'historial__card--' + item.estado"
+        v-for="item in historial"
+        :key="item.id"
+      >
         <div class="historial__card-top">
           <h3>{{ item.nombre }}</h3>
           <span
@@ -81,13 +103,21 @@ function textoEstado(estado) {
         </div>
 
         <ul class="historial__detalles">
-          <li>🏠 {{ item.tipoCuidado }}</li>
-          <li>📅 Inicio: {{ formatearFecha(item.fechaInicio) }}</li>
+          <li class="historial__tipo">🏠 {{ item.tipoCuidado }}</li>
+          <li>
+            📅 <strong>Inicio:</strong> {{ formatearFecha(item.fechaInicio) }}
+          </li>
           <li v-if="item.fechaFin">
-            📅 Fin: {{ formatearFecha(item.fechaFin) }}
+            📅 <strong>Fin:</strong> {{ formatearFecha(item.fechaFin) }}
           </li>
           <li v-if="item.direccion && item.estado === 'completada'">
-            📍 {{ item.direccion }}
+            📍 {{ partesDireccion(item).principal
+            }}<template v-if="partesDireccion(item).ubicacion"
+              >,
+              <strong class="historial__ubicacion">{{
+                partesDireccion(item).ubicacion
+              }}</strong></template
+            >
           </li>
           <li v-if="item.notas">📝 {{ item.notas }}</li>
         </ul>
@@ -146,8 +176,25 @@ function textoEstado(estado) {
   flex-direction: column;
   background-color: var(--color-white);
   border-radius: var(--radius-card);
-  padding: 24px;
+  border-left: 6px solid var(--color-border);
+  padding: 24px 24px 24px 22px;
   box-shadow: var(--shadow-card);
+  transition: transform 0.15s;
+}
+
+/* El color del borde lateral cambia según el estado de la solicitud */
+.historial__card--completada {
+  border-left-color: var(--color-info);
+}
+
+.historial__card--rechazada {
+  border-left-color: var(--color-border);
+}
+
+@media (hover: hover) {
+  .historial__card:hover {
+    transform: translateY(-3px);
+  }
 }
 
 .historial__card-top {
@@ -158,6 +205,7 @@ function textoEstado(estado) {
 
   & h3 {
     margin: 0;
+    font-size: 1.25rem;
   }
 }
 
@@ -169,8 +217,8 @@ function textoEstado(estado) {
 }
 
 .historial__estado--completada {
-  background-color: var(--color-accent-bg);
-  color: var(--color-accent-dark);
+  background-color: var(--color-info-bg);
+  color: var(--color-info);
 }
 
 .historial__estado--rechazada {
@@ -179,21 +227,39 @@ function textoEstado(estado) {
 }
 
 .historial__paciente {
-  color: var(--color-text-muted);
-  margin-bottom: 12px;
+  color: var(--color-text);
+  font-weight: bold;
+  margin-bottom: 14px;
 }
 
+/* Los datos van dentro de un recuadro; su color depende del estado */
 .historial__detalles {
   list-style: none;
-  padding: 0;
-  margin: 0 0 16px;
+  padding: 12px 14px;
+  margin: 0 0 20px;
   font-size: 0.9rem;
-  color: var(--color-text-muted);
+  color: var(--color-text);
+  background-color: var(--color-neutral-bg);
+  border-radius: var(--radius-input);
 
   & li {
     margin-bottom: 6px;
     overflow-wrap: anywhere;
   }
+
+  & li:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.historial__card--completada .historial__detalles {
+  background-color: var(--color-info-bg);
+}
+
+/* El tipo de cuidado llega en minúsculas del servidor; así sale con la primera en mayúscula */
+.historial__tipo {
+  font-weight: bold;
+  text-transform: capitalize;
 }
 
 .historial__footer {
