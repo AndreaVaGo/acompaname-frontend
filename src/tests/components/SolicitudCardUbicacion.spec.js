@@ -2,7 +2,7 @@ import { describe, test, expect } from 'vitest'
 import { mount, RouterLinkStub } from '@vue/test-utils'
 import SolicitudCard from '../../components/SolicitudCard.vue'
 
-function montarTarjeta(tipoCuidado, direccion) {
+function montarTarjeta(tipoCuidado, direccion, estado, mostrarAcciones) {
   return mount(SolicitudCard, {
     props: {
       solicitud: {
@@ -11,10 +11,10 @@ function montarTarjeta(tipoCuidado, direccion) {
         tipoCuidado: tipoCuidado,
         direccion: direccion,
         fechaCuidado: '2026-08-12',
-        estado: 'ACEPTADA',
+        estado: estado,
       },
       nombreMostrado: 'cuidador demo',
-      mostrarAcciones: false,
+      mostrarAcciones: mostrarAcciones,
     },
     global: {
       stubs: { RouterLink: RouterLinkStub },
@@ -22,49 +22,62 @@ function montarTarjeta(tipoCuidado, direccion) {
   })
 }
 
-describe('SolicitudCard ubicación del hospital', () => {
-  test('en un hospital pone en negrita lo que va detrás del nombre', () => {
+describe('SolicitudCard dirección en negrita', () => {
+  test('en un hospital toda la dirección va en negrita', () => {
     const wrapper = montarTarjeta(
       'hospitalario',
       'Hospital de Cabueñes, Planta 2, Medicina Interna, habitación 214',
+      'ACEPTADA',
+      false,
     )
 
-    expect(wrapper.find('.solicitudes__ubicacion').text()).toBe(
-      'Planta 2, Medicina Interna, habitación 214',
-    )
-    expect(wrapper.text()).toContain('Hospital de Cabueñes')
-  })
-
-  test('el nombre del hospital no va en negrita', () => {
-    const wrapper = montarTarjeta(
-      'hospitalario',
+    expect(wrapper.find('.solicitudes__direccion').text()).toBe(
       'Hospital de Cabueñes, Planta 2, Medicina Interna, habitación 214',
     )
+  })
 
-    expect(wrapper.find('.solicitudes__ubicacion').text()).not.toContain(
-      'Hospital de Cabueñes',
+  test('en un domicilio toda la dirección va en negrita', () => {
+    const wrapper = montarTarjeta(
+      'domicilio',
+      'Calle Uría 12, 3º B, Oviedo',
+      'ACEPTADA',
+      false,
+    )
+
+    expect(wrapper.find('.solicitudes__direccion').text()).toBe(
+      'Calle Uría 12, 3º B, Oviedo',
     )
   })
 
-  test('en un domicilio no pone nada en negrita', () => {
-    const wrapper = montarTarjeta('domicilio', 'Calle Uría 12, 3º B, Oviedo')
+  test('el cuidador no ve la dirección hasta que acepta la solicitud', async () => {
+    const wrapper = montarTarjeta(
+      'domicilio',
+      'Calle Uría 12, 3º B, Oviedo',
+      'PENDIENTE',
+      true,
+    )
 
-    expect(wrapper.find('.solicitudes__ubicacion').exists()).toBe(false)
-    expect(wrapper.text()).toContain('Calle Uría 12, 3º B, Oviedo')
+    await wrapper.find('.solicitudes__ver').trigger('click')
+
+    expect(wrapper.find('.solicitudes__direccion').exists()).toBe(false)
+    expect(wrapper.text()).toContain(
+      'La dirección se mostrará cuando aceptes la solicitud',
+    )
+    expect(wrapper.text()).not.toContain('Calle Uría 12')
   })
 
-  test('si el hospital no tiene coma no pone nada en negrita', () => {
-    const wrapper = montarTarjeta('hospitalario', 'Hospital de Cabueñes')
+  test('el cuidador ve la dirección en negrita cuando ya ha aceptado', async () => {
+    const wrapper = montarTarjeta(
+      'hospitalario',
+      'HUCA, planta 2, sección B',
+      'ACEPTADA',
+      true,
+    )
 
-    expect(wrapper.find('.solicitudes__ubicacion').exists()).toBe(false)
-    expect(wrapper.text()).toContain('Hospital de Cabueñes')
-  })
+    await wrapper.find('.solicitudes__ver').trigger('click')
 
-  test('también funciona si el tipo llega con la primera letra en mayúscula', () => {
-    const wrapper = montarTarjeta('Hospitalario', 'HUCA, planta 2, sección B')
-
-    expect(wrapper.find('.solicitudes__ubicacion').text()).toBe(
-      'planta 2, sección B',
+    expect(wrapper.find('.solicitudes__direccion').text()).toBe(
+      'HUCA, planta 2, sección B',
     )
   })
 })
