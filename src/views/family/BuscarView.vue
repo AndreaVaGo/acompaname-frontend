@@ -317,6 +317,11 @@ const cuidadoresFiltrados = computed(() => {
     <div class="buscar__grid">
       <div
         class="buscar__card"
+        :class="
+          cuidador.disponibleAhora
+            ? 'buscar__card--disponible'
+            : 'buscar__card--ocupado'
+        "
         v-for="cuidador in cuidadoresFiltrados"
         :key="cuidador.id"
       >
@@ -533,12 +538,13 @@ const cuidadoresFiltrados = computed(() => {
   background-color: var(--color-white);
   border-radius: var(--radius-card);
   border: 1px solid transparent;
+  border-top: 4px solid var(--color-border);
   padding: 22px;
   box-shadow: var(--shadow-card);
+  overflow: hidden;
   transition:
     transform 0.2s,
-    box-shadow 0.2s,
-    border-color 0.2s;
+    box-shadow 0.2s;
 
   & h3 {
     margin: 0 0 4px;
@@ -551,15 +557,26 @@ const cuidadoresFiltrados = computed(() => {
   .buscar__card:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    border-color: var(--color-accent-bg);
   }
+}
+
+/* La línea de arriba indica la disponibilidad: verde si está disponible, roja si no */
+.buscar__card--disponible {
+  border-top-color: var(--color-secondary);
+}
+
+.buscar__card--ocupado {
+  border-top-color: var(--color-error);
 }
 
 .buscar__card-cabecera {
   display: flex;
   align-items: center;
   gap: 14px;
-  margin-bottom: 12px;
+  /* La franja de color llega hasta los bordes de la tarjeta */
+  margin: -22px -22px 16px;
+  padding: 22px;
+  background-color: var(--color-accent-bg);
 }
 
 .buscar__card-especialidad {
