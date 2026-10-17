@@ -38,12 +38,12 @@ async function montarVista(solicitud) {
   return wrapper;
 }
 
-describe("HistorialView ubicación del hospital", () => {
+describe("HistorialView dirección en negrita", () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  test("en un hospital pone en negrita lo que va detrás del nombre", async () => {
+  test("en un hospital toda la dirección va en negrita", async () => {
     const wrapper = await montarVista(
       crearSolicitud(
         "hospitalario",
@@ -52,28 +52,19 @@ describe("HistorialView ubicación del hospital", () => {
       )
     );
 
-    expect(wrapper.find(".historial__ubicacion").text()).toBe(
-      "Planta 2, Medicina Interna, habitación 214"
+    expect(wrapper.find(".historial__direccion").text()).toBe(
+      "Hospital de Cabueñes, Planta 2, Medicina Interna, habitación 214"
     );
-    expect(wrapper.text()).toContain("Hospital de Cabueñes");
   });
 
-  test("en un domicilio no pone nada en negrita", async () => {
+  test("en un domicilio toda la dirección va en negrita", async () => {
     const wrapper = await montarVista(
       crearSolicitud("domicilio", "Calle Uría 12, 3º B, Oviedo", "COMPLETADA")
     );
 
-    expect(wrapper.find(".historial__ubicacion").exists()).toBe(false);
-    expect(wrapper.text()).toContain("Calle Uría 12, 3º B, Oviedo");
-  });
-
-  test("si el hospital no tiene coma no pone nada en negrita", async () => {
-    const wrapper = await montarVista(
-      crearSolicitud("hospitalario", "Hospital de Cabueñes", "COMPLETADA")
+    expect(wrapper.find(".historial__direccion").text()).toBe(
+      "Calle Uría 12, 3º B, Oviedo"
     );
-
-    expect(wrapper.find(".historial__ubicacion").exists()).toBe(false);
-    expect(wrapper.text()).toContain("Hospital de Cabueñes");
   });
 
   test("en una solicitud rechazada no se muestra la dirección", async () => {
@@ -85,7 +76,16 @@ describe("HistorialView ubicación del hospital", () => {
       )
     );
 
-    expect(wrapper.find(".historial__ubicacion").exists()).toBe(false);
+    expect(wrapper.find(".historial__direccion").exists()).toBe(false);
     expect(wrapper.text()).not.toContain("Hospital de Cabueñes");
+  });
+
+  test("si la solicitud no tiene dirección no se muestra esa línea", async () => {
+    const wrapper = await montarVista(
+      crearSolicitud("domicilio", "", "COMPLETADA")
+    );
+
+    expect(wrapper.find(".historial__direccion").exists()).toBe(false);
+    expect(wrapper.text()).not.toContain("📍");
   });
 });
