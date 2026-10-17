@@ -324,7 +324,7 @@ const cuidadoresFiltrados = computed(() => {
           <FotoCuidador
             :foto="cuidador.foto"
             :nombre="cuidador.usuarioNombre"
-            :tamano="56"
+            :tamano="64"
           />
           <div>
             <h3>{{ cuidador.usuarioNombre }}</h3>
@@ -528,13 +528,30 @@ const cuidadoresFiltrados = computed(() => {
 }
 
 .buscar__card {
+  display: flex;
+  flex-direction: column;
   background-color: var(--color-white);
   border-radius: var(--radius-card);
-  padding: 20px;
+  border: 1px solid transparent;
+  padding: 22px;
   box-shadow: var(--shadow-card);
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s,
+    border-color 0.2s;
 
   & h3 {
     margin: 0 0 4px;
+    font-size: 1.2rem;
+  }
+}
+
+/* Solo en pantallas con ratón: la tarjeta se eleva un poco */
+@media (hover: hover) {
+  .buscar__card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    border-color: var(--color-accent-bg);
   }
 }
 
@@ -558,8 +575,9 @@ const cuidadoresFiltrados = computed(() => {
 }
 
 .buscar__card-valoracion {
-  font-size: 0.9rem;
-  margin: 0 0 12px;
+  font-size: 1rem;
+  font-weight: bold;
+  margin: 0 0 14px;
 }
 
 .buscar__card-valoracion-enlace {
@@ -576,7 +594,7 @@ const cuidadoresFiltrados = computed(() => {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .buscar__tag {
@@ -591,8 +609,20 @@ const cuidadoresFiltrados = computed(() => {
 }
 
 .buscar__tag--disponible {
-  background-color: var(--color-accent-bg);
-  color: #c65a35;
+  background-color: var(--color-secondary-bg);
+  color: var(--color-secondary);
+  font-weight: bold;
+
+  /* Círculo verde delante, igual que en el perfil del cuidador */
+  &::before {
+    content: "";
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-right: 6px;
+    border-radius: 50%;
+    background-color: var(--color-secondary);
+  }
 }
 
 .buscar__tag--vehiculo {
@@ -609,11 +639,17 @@ const cuidadoresFiltrados = computed(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-top: 1px solid #eee;
-  padding-top: 14px;
+  margin-top: auto;
+  border-top: 1px solid var(--color-neutral-bg);
+  padding-top: 16px;
+
+  & .btn {
+    text-decoration: none;
+  }
 }
 
 .buscar__precio {
+  font-size: 1.25rem;
   font-weight: bold;
 }
 
