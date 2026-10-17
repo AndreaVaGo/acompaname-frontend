@@ -16,9 +16,9 @@ function crearRouter() {
   });
 }
 
-async function montarVista(rol) {
+async function montarVista(rol, ruta = "/cuidador/3") {
   const router = crearRouter();
-  await router.push("/cuidador/3");
+  await router.push(ruta);
   await router.isReady();
 
   const pinia = createPinia();
@@ -311,6 +311,33 @@ describe("PerfilCuidadorView", () => {
     const wrapper = await montarVista("FAMILIA");
 
     expect(espia).not.toHaveBeenCalled();
+    expect(wrapper.find(".perfil__modal").exists()).toBe(false);
+  });
+
+  test("si la dirección lleva ?valoraciones=1 abre la lista directamente", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue(
+      cuidadorConValoraciones()
+    );
+    const espia = vi
+      .spyOn(ValoracionRepository.prototype, "getPorCuidador")
+      .mockResolvedValue([]);
+
+    const wrapper = await montarVista("FAMILIA", "/cuidador/3?valoraciones=1");
+
+    expect(espia).toHaveBeenCalledWith("3");
+    expect(wrapper.find(".perfil__modal").exists()).toBe(true);
+  });
+
+  test("sin ?valoraciones=1 la lista empieza cerrada", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue(
+      cuidadorConValoraciones()
+    );
+    vi.spyOn(ValoracionRepository.prototype, "getPorCuidador").mockResolvedValue(
+      []
+    );
+
+    const wrapper = await montarVista("FAMILIA", "/cuidador/3");
+
     expect(wrapper.find(".perfil__modal").exists()).toBe(false);
   });
 
