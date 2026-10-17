@@ -151,6 +151,7 @@ import { RouterLink } from "vue-router";
 .landing__hint {
   color: var(--color-text-muted);
   font-size: 1.2rem;
+  font-weight: bold;
   margin: 0;
 }
 
@@ -210,7 +211,7 @@ import { RouterLink } from "vue-router";
 .landing__hero-actions {
   display: flex;
   gap: var(--gap-sm);
-  margin-bottom: 12px;
+  margin-bottom: 32px;
 }
 
 .landing__hero-image img {
