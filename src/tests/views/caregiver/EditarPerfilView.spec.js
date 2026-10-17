@@ -46,6 +46,8 @@ async function enviar(wrapper) {
 describe("EditarPerfilView", () => {
   beforeEach(() => {
     setActivePinia(createPinia());
+    // jsdom no sabe hacer scroll: lo sustituimos por una función vacía
+    vi.spyOn(window, "scrollTo").mockImplementation(() => {});
   });
 
   afterEach(() => {
@@ -159,6 +161,7 @@ describe("EditarPerfilView", () => {
       sexo: "",
     });
     expect(wrapper.text()).toContain("Perfil guardado correctamente.");
+    expect(window.scrollTo).toHaveBeenCalledWith(0, 0);
   });
 
   test("carga la ciudad del perfil en el formulario", async () => {
