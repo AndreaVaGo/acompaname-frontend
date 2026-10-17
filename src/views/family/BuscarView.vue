@@ -337,7 +337,17 @@ const cuidadoresFiltrados = computed(() => {
 
         <p class="buscar__card-valoracion">
           <template v-if="cuidador.valoracionMedia !== null">
-            ⭐ {{ cuidador.valoracionMedia }} ({{ cuidador.numValoraciones }})
+            <RouterLink
+              :to="{ path: `/cuidador/${cuidador.id}`, query: { valoraciones: 1 } }"
+              class="buscar__card-valoracion-enlace"
+            >
+              <span>⭐</span>
+              <span class="buscar__card-valoracion-texto"
+                >{{ cuidador.valoracionMedia }} ({{
+                  cuidador.numValoraciones
+                }})</span
+              >
+            </RouterLink>
           </template>
           <template v-else>Sin valoraciones todavía</template>
         </p>
@@ -550,6 +560,16 @@ const cuidadoresFiltrados = computed(() => {
 .buscar__card-valoracion {
   font-size: 0.9rem;
   margin: 0 0 12px;
+}
+
+.buscar__card-valoracion-enlace {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+/* Solo el texto va subrayado, la estrella no */
+.buscar__card-valoracion-texto {
+  text-decoration: underline;
 }
 
 .buscar__tags {
