@@ -38,7 +38,16 @@ async function handleSubmit() {
       </p>
 
       <div class="login__box">
-        <form class="login__form" @submit.prevent="handleSubmit">
+        <div class="login__cabecera">
+          <span class="login__icono">👋</span>
+          <span class="login__aviso">
+            Entra con tu email y tu contraseña.
+          </span>
+        </div>
+
+        <form class="formulario login__form" @submit.prevent="handleSubmit">
+          <h2 class="titulo-seccion" data-icono="🔑">Tus datos de acceso</h2>
+
           <label for="email">Email</label>
           <input
             type="email"
@@ -81,7 +90,7 @@ async function handleSubmit() {
 }
 
 .login__wrapper {
-  max-width: 420px;
+  max-width: 480px;
   width: 100%;
 }
 
@@ -91,34 +100,54 @@ async function handleSubmit() {
 }
 
 .login__subtitle {
-  color: var(--color-text-muted);
-  margin: 0 0 20px;
+  color: var(--color-text);
+  font-size: 1.05rem;
+  margin: 0 0 24px;
 }
 
 .login__box {
   background-color: var(--color-white);
   border-radius: var(--radius-card);
-  padding: 24px;
+  border-top: 4px solid var(--color-accent);
   box-shadow: var(--shadow-card);
+  overflow: hidden;
 }
 
-.login__form {
+/* Franja de color con un saludo y un aviso corto */
+.login__cabecera {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 32px;
+  background-color: var(--color-accent-bg);
+}
 
-  & label {
-    font-weight: bold;
-    margin-bottom: 6px;
-    font-size: 0.9rem;
+.login__icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: var(--color-white);
+  font-size: 1.8rem;
+}
+
+.login__aviso {
+  font-weight: bold;
+}
+
+/* Etiquetas, campos y título de sección vienen de base.css (clases "formulario" y "titulo-seccion") */
+.login__form {
+  padding: 28px 32px 32px;
+
+  & .titulo-seccion {
+    margin-top: 0;
   }
 
-  & input {
-    padding: 10px 14px;
-    border-radius: var(--radius-input);
-    border: 1px solid var(--color-border);
-    margin-bottom: 14px;
-    font-size: 1rem;
-    font-family: inherit;
+  & .btn {
+    padding: 14px;
   }
 }
 
@@ -135,22 +164,32 @@ async function handleSubmit() {
 .login__switch {
   text-align: center;
   margin-top: 20px;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
 
   & a {
-    color: var(--color-accent);
+    color: var(--color-accent-dark);
     font-weight: bold;
     text-decoration: none;
   }
 }
 
-@media (max-width: 480px) {
+@media (hover: hover) {
+  .login__switch a:hover {
+    text-decoration: underline;
+  }
+}
+
+@media (max-width: 768px) {
   .login {
     padding: 16px 16px 24px;
   }
 
-  .login__box {
-    padding: 18px;
+  .login__cabecera {
+    padding: 20px;
+  }
+
+  .login__form {
+    padding: 24px 20px 28px;
   }
 }
 </style>
