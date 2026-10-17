@@ -76,8 +76,10 @@ function cerrarSesion() {
   background-color: var(--color-bg);
   font-family: var(--font-base);
   color: var(--color-text);
-  padding: var(--gap-lg) 60px;
-  max-width: 640px;
+  padding: var(--gap-lg) 20px;
+  /* width: 100% hace falta porque, con margin auto, la caja se encoge al contenido */
+  width: 100%;
+  max-width: 680px;
   margin: 0 auto;
 
   & h1 {
