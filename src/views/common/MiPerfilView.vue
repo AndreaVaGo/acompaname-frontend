@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../../stores/auth";
 import UsuarioRepository from "@/repositories/UsuarioRepository";
@@ -11,6 +11,14 @@ const usuarioRepository = new UsuarioRepository();
 const usuario = ref(null);
 const cargando = ref(true);
 const error = ref("");
+
+// La inicial del nombre, para el círculo de arriba
+const inicial = computed(() => {
+  if (!usuario.value || !usuario.value.nombre) {
+    return "";
+  }
+  return usuario.value.nombre.charAt(0).toUpperCase();
+});
 
 onMounted(async () => {
   try {
@@ -34,26 +42,28 @@ function cerrarSesion() {
     <p class="mi-perfil__subtitle">Los datos de contacto de tu familia.</p>
 
     <div class="mi-perfil__box">
-      <div class="mi-perfil__fila">
-        <span>Nombre</span>
-        <strong>{{ usuario.nombre }}</strong>
-      </div>
-      <div class="mi-perfil__fila">
-        <span>Email</span>
-        <strong>{{ usuario.email }}</strong>
-      </div>
-      <div class="mi-perfil__fila">
-        <span>Teléfono</span>
-        <strong>{{ usuario.telefono }}</strong>
-      </div>
-      <div class="mi-perfil__fila">
-        <span>Tipo de cuenta</span>
-        <strong>{{ usuario.roles.join(", ") }}</strong>
+      <div class="mi-perfil__cabecera">
+        <span class="mi-perfil__avatar">{{ inicial }}</span>
+        <h2>{{ usuario.nombre }}</h2>
+        <span class="mi-perfil__tipo">{{ usuario.roles.join(", ") }}</span>
       </div>
 
-      <button class="btn btn--secondary" @click="cerrarSesion">
-        Cerrar sesión
-      </button>
+      <div class="mi-perfil__datos">
+        <div class="mi-perfil__fila">
+          <span>✉️ Email</span>
+          <strong>{{ usuario.email }}</strong>
+        </div>
+        <div class="mi-perfil__fila">
+          <span>📞 Teléfono</span>
+          <strong>{{ usuario.telefono }}</strong>
+        </div>
+      </div>
+
+      <div class="mi-perfil__acciones">
+        <button class="btn btn--secondary" @click="cerrarSesion">
+          Cerrar sesión
+        </button>
+      </div>
     </div>
   </div>
   <p v-else-if="error">{{ error }}</p>
@@ -67,12 +77,12 @@ function cerrarSesion() {
   font-family: var(--font-base);
   color: var(--color-text);
   padding: var(--gap-lg) 60px;
-  max-width: 500px;
+  max-width: 640px;
   margin: 0 auto;
 
   & h1 {
-    font-size: 1.5rem;
-    margin-bottom: 4px;
+    font-size: 1.8rem;
+    margin-bottom: 6px;
   }
 }
 
@@ -84,38 +94,102 @@ function cerrarSesion() {
 .mi-perfil__box {
   background-color: var(--color-white);
   border-radius: var(--radius-card);
-  padding: 28px;
+  border-top: 4px solid var(--color-accent);
   box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+/* Franja de color con la inicial, el nombre y el tipo de cuenta */
+.mi-perfil__cabecera {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 32px 24px;
+  background-color: var(--color-accent-bg);
+
+  & h2 {
+    margin: 0;
+    font-size: 1.6rem;
+  }
+}
+
+.mi-perfil__avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background-color: var(--color-accent);
+  color: var(--color-white);
+  font-size: 2.4rem;
+  font-weight: bold;
+}
+
+.mi-perfil__tipo {
+  background-color: var(--color-white);
+  color: var(--color-accent-dark);
+  padding: 4px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+.mi-perfil__datos {
+  padding: 12px 32px;
 }
 
 .mi-perfil__fila {
   display: flex;
   justify-content: space-between;
-  padding: 12px 0;
-  border-bottom: 1px solid #eee;
-  font-size: 0.95rem;
+  gap: 16px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--color-neutral-bg);
+  font-size: 1rem;
 
   & span {
     color: var(--color-text-muted);
   }
+
+  & strong {
+    overflow-wrap: anywhere;
+    text-align: right;
+  }
 }
 
-.mi-perfil__box .btn {
-  margin-top: 12px;
-  width: 100%;
+.mi-perfil__fila:last-child {
+  border-bottom: none;
 }
 
-.mi-perfil__box .btn:first-of-type {
-  margin-top: 20px;
+.mi-perfil__acciones {
+  padding: 8px 32px 32px;
+
+  & .btn {
+    width: 100%;
+  }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .mi-perfil {
     padding: 24px 20px;
   }
 
-  .mi-perfil__box {
-    padding: 20px;
+  .mi-perfil__datos {
+    padding: 8px 20px;
+  }
+
+  .mi-perfil__acciones {
+    padding: 8px 20px 24px;
+  }
+
+  .mi-perfil__fila {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .mi-perfil__fila strong {
+    text-align: left;
   }
 }
 </style>
