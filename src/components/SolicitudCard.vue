@@ -40,7 +40,10 @@ const avisoDireccion = computed(
 <template>
   <div
     class="solicitudes__card"
-    :class="'solicitudes__card--' + solicitud.estado.toLowerCase()"
+    :class="[
+      'solicitudes__card--' + solicitud.estado.toLowerCase(),
+      { 'solicitudes__card--abierta': mostrarAcciones && expandido },
+    ]"
   >
     <div class="solicitudes__card-top">
       <h3>{{ nombreMostrado }}</h3>
@@ -237,8 +240,15 @@ const avisoDireccion = computed(
   border-left-color: var(--color-border);
 }
 
+/* Una tarjeta con "transform" hace que la ventana de dentro (position: fixed) se coloque
+   respecto a la tarjeta y no respecto a la pantalla, y parpadea. Con la ventana abierta
+   la tarjeta no se mueve y no tiene transición. */
+.solicitudes__card--abierta {
+  transition: none;
+}
+
 @media (hover: hover) {
-  .solicitudes__card:hover {
+  .solicitudes__card:not(.solicitudes__card--abierta):hover {
     transform: translateY(-3px);
   }
 }
