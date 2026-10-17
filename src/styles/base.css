@@ -17,3 +17,67 @@
   color: var(--color-text);
   border: 1px solid var(--color-border);
 }
+
+/* Título de un bloque de formulario: coral, con icono y una línea debajo.
+   El icono se escribe en la etiqueta: <h2 class="titulo-seccion" data-icono="📇"> */
+.titulo-seccion {
+  font-size: 1.15rem;
+  color: var(--color-accent-dark);
+  margin: 12px 0 18px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--color-accent-bg);
+
+  &::before {
+    content: attr(data-icono);
+    margin-right: 8px;
+  }
+}
+
+/* Estilo común de los formularios: etiquetas, campos, foco y textos de ejemplo.
+   Se pone la clase "formulario" en la etiqueta <form> */
+.formulario {
+  display: flex;
+  flex-direction: column;
+
+  & label {
+    font-weight: bold;
+    margin-bottom: 6px;
+    font-size: 0.95rem;
+    color: var(--color-text);
+  }
+
+  & input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+  & select,
+  & textarea {
+    padding: 12px 14px;
+    border-radius: var(--radius-input);
+    border: 1px solid var(--color-border);
+    margin-bottom: var(--gap-md);
+    font-size: 1rem;
+    font-family: inherit;
+  }
+
+  & input:focus,
+  & select:focus,
+  & textarea:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-bg);
+  }
+
+  /* Los textos de ejemplo van en cursiva para distinguirlos de lo escrito */
+  & input::placeholder,
+  & textarea::placeholder {
+    color: var(--color-text-muted);
+    font-style: italic;
+  }
+
+  & select {
+    background-color: var(--color-white);
+  }
+
+  & textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+}
