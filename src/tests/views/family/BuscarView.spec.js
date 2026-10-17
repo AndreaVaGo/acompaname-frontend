@@ -186,6 +186,29 @@ describe("BuscarView", () => {
     expect(wrapper.text()).toContain("3.5 (2)");
   });
 
+  test("la valoración lleva al perfil con la lista de valoraciones abierta", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    const enlaces = wrapper.findAll(".buscar__card-valoracion-enlace");
+    expect(enlaces[0].attributes("href")).toBe("/cuidador/1?valoraciones=1");
+    expect(enlaces[0].text()).toContain("4.7");
+  });
+
+  test("sin valoraciones no hay enlace a la lista", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    // Pepe y Luis tienen valoraciones; Ana no
+    expect(wrapper.findAll(".buscar__card-valoracion-enlace").length).toBe(2);
+  });
+
   test("avisa si el cuidador todavía no tiene valoraciones", async () => {
     const wrapper = mount(BuscarView, {
       global: { plugins: [router] },
