@@ -96,14 +96,21 @@ async function enviarSolicitud() {
       >← Volver al perfil</RouterLink
     >
 
-    <div class="solicitar__box">
-      <h1>Solicitar a {{ cuidadorNombre }}</h1>
-      <p class="solicitar__subtitle">
-        Cinco datos y listo. Puedes cambiarlos después hablando con el cuidador.
-      </p>
+    <h1>Solicitar a {{ cuidadorNombre }}</h1>
+    <p class="solicitar__subtitle">
+      Cinco datos y listo. Puedes cambiarlos después hablando con el cuidador.
+    </p>
 
-      <form class="solicitar__form" @submit.prevent="enviarSolicitud">
-        <label>Tipo de cuidado</label>
+    <div class="solicitar__box">
+      <div class="solicitar__cabecera">
+        <span class="solicitar__icono">📝</span>
+        <span class="solicitar__aviso">
+          Cuanto más detalle des, mejor podrá prepararse el cuidador.
+        </span>
+      </div>
+
+      <form class="formulario solicitar__form" @submit.prevent="enviarSolicitud">
+        <h2 class="titulo-seccion" data-icono="🩺">Tipo de cuidado</h2>
         <div class="solicitar__opciones">
           <button
             type="button"
@@ -113,7 +120,7 @@ async function enviarSolicitud() {
             }"
             @click="tipoCuidado = 'hospitalario'"
           >
-            Hospitalario
+            🏥 Hospitalario
           </button>
           <button
             type="button"
@@ -123,9 +130,11 @@ async function enviarSolicitud() {
             }"
             @click="tipoCuidado = 'domicilio'"
           >
-            A domicilio
+            🏠 A domicilio
           </button>
         </div>
+
+        <h2 class="titulo-seccion" data-icono="📍">¿Dónde y cuándo?</h2>
 
         <template v-if="tipoCuidado === 'hospitalario'">
           <label for="hospital">Hospital</label>
@@ -158,32 +167,44 @@ async function enviarSolicitud() {
           />
         </template>
 
-        <label for="fecha">Fecha de inicio</label>
-        <input type="date" id="fecha" v-model="fechaInicio" />
+        <div class="solicitar__row">
+          <div>
+            <label for="fecha">Fecha de inicio</label>
+            <input type="date" id="fecha" v-model="fechaInicio" />
+          </div>
+          <div>
+            <label for="fecha-fin">Fecha de fin (opcional)</label>
+            <input
+              type="date"
+              id="fecha-fin"
+              v-model="fechaFin"
+              :min="fechaInicio"
+            />
+          </div>
+        </div>
 
-        <label for="fecha-fin">Fecha de fin (opcional)</label>
-        <input
-          type="date"
-          id="fecha-fin"
-          v-model="fechaFin"
-          :min="fechaInicio"
-        />
+        <h2 class="titulo-seccion" data-icono="👤">El paciente</h2>
 
-        <label for="paciente">Nombre del paciente</label>
-        <input
-          type="text"
-          id="paciente"
-          v-model="nombrePaciente"
-          placeholder="Antonio Serrano"
-        />
-
-        <label for="edad">Edad del paciente</label>
-        <input
-          type="number"
-          id="edad"
-          v-model="edadPaciente"
-          placeholder="81"
-        />
+        <div class="solicitar__row">
+          <div>
+            <label for="paciente">Nombre del paciente</label>
+            <input
+              type="text"
+              id="paciente"
+              v-model="nombrePaciente"
+              placeholder="Antonio Serrano"
+            />
+          </div>
+          <div>
+            <label for="edad">Edad del paciente</label>
+            <input
+              type="number"
+              id="edad"
+              v-model="edadPaciente"
+              placeholder="81"
+            />
+          </div>
+        </div>
 
         <p class="solicitar__titulo-grupo">
           Necesidades del paciente (opcional)
@@ -230,8 +251,10 @@ async function enviarSolicitud() {
   background-color: var(--color-bg);
   font-family: var(--font-base);
   color: var(--color-text);
-  padding: var(--gap-lg) 60px;
-  max-width: 600px;
+  padding: var(--gap-lg) 20px;
+  /* width: 100% hace falta porque, con margin auto, la caja se encoge al contenido */
+  width: 100%;
+  max-width: 720px;
   margin: 0 auto;
 }
 
@@ -242,54 +265,65 @@ async function enviarSolicitud() {
   text-decoration: none;
 }
 
-.solicitar__box {
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
-  padding: 32px;
-  box-shadow: var(--shadow-card);
-}
-
 .solicitar h1 {
-  font-size: 1.5rem;
-  margin-bottom: 8px;
+  font-size: 1.8rem;
+  margin: 0 0 6px;
 }
 
 .solicitar__subtitle {
-  color: var(--color-text-muted);
-  margin-bottom: 24px;
+  color: var(--color-text);
+  font-size: 1.05rem;
+  margin: 0 0 24px;
 }
 
-.solicitar__form {
+.solicitar__box {
+  background-color: var(--color-white);
+  border-radius: var(--radius-card);
+  border-top: 4px solid var(--color-accent);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+/* Franja de color con un icono y un aviso corto */
+.solicitar__cabecera {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 32px;
+  background-color: var(--color-accent-bg);
+}
 
-  & label {
-    font-weight: bold;
-    margin-bottom: 6px;
-    font-size: 0.9rem;
+.solicitar__icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: var(--color-white);
+  font-size: 1.8rem;
+}
+
+.solicitar__aviso {
+  font-weight: bold;
+}
+
+/* Etiquetas, campos y títulos de sección vienen de base.css (clases "formulario" y "titulo-seccion") */
+.solicitar__form {
+  padding: 28px 32px 32px;
+
+  & .titulo-seccion:first-child {
+    margin-top: 0;
   }
 
-  & input,
-  & textarea {
-    padding: 12px 14px;
-    border-radius: var(--radius-input);
-    border: 1px solid var(--color-border);
-    margin-bottom: var(--gap-md);
-    font-size: 1rem;
-    font-family: inherit;
-  }
-
-  & textarea {
-    min-height: 90px;
-    resize: vertical;
-  }
-
-  /* Dentro del formulario para ganar a las reglas "label" e "input" de arriba */
+  /* Dentro del formulario para ganar a la regla "label" de base.css (negrita) */
   & .solicitar__check {
     display: flex;
     align-items: center;
     gap: 8px;
     font-weight: normal;
+    font-size: 0.95rem;
     margin-bottom: 0;
     padding: 10px 12px;
     border: 1px solid var(--color-border);
@@ -298,13 +332,10 @@ async function enviarSolicitud() {
     cursor: pointer;
   }
 
-  & .solicitar__check:hover {
-    border-color: var(--color-accent);
-  }
-
   & .solicitar__check--marcado {
     border-color: var(--color-accent);
     background-color: var(--color-accent-bg);
+    font-weight: bold;
   }
 
   & .solicitar__check input {
@@ -314,11 +345,26 @@ async function enviarSolicitud() {
     padding: 0;
     margin: 0;
   }
+
+  & .btn {
+    padding: 14px;
+  }
+}
+
+.solicitar__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 20px;
+
+  & > div {
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 .solicitar__titulo-grupo {
   font-weight: bold;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   margin: 0 0 8px;
 }
 
@@ -347,10 +393,12 @@ async function enviarSolicitud() {
 
 .solicitar__opcion {
   flex: 1;
-  padding: 10px;
+  padding: 14px 10px;
   border-radius: var(--radius-input);
-  border: 1px solid var(--color-border);
+  border: 2px solid var(--color-border);
   background-color: var(--color-white);
+  color: var(--color-text);
+  font-size: 1rem;
   cursor: pointer;
   font-family: inherit;
 }
@@ -361,13 +409,28 @@ async function enviarSolicitud() {
   font-weight: bold;
 }
 
-@media (max-width: 480px) {
+@media (hover: hover) {
+  .solicitar__form .solicitar__check:hover,
+  .solicitar__opcion:hover {
+    border-color: var(--color-accent);
+  }
+}
+
+@media (max-width: 768px) {
   .solicitar {
     padding: 24px 16px;
   }
 
-  .solicitar__box {
-    padding: 24px;
+  .solicitar__cabecera {
+    padding: 20px;
+  }
+
+  .solicitar__form {
+    padding: 24px 20px 28px;
+  }
+
+  .solicitar__row {
+    grid-template-columns: 1fr;
   }
 
   .solicitar__necesidades {
