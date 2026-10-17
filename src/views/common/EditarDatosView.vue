@@ -84,7 +84,12 @@ async function handleSubmit() {
             <span class="editar-datos__nombre">{{ nombre }}</span>
           </div>
 
-          <form class="editar-datos__form" @submit.prevent="handleSubmit">
+          <form
+            class="formulario editar-datos__form"
+            @submit.prevent="handleSubmit"
+          >
+            <h2 class="titulo-seccion" data-icono="📇">Datos de contacto</h2>
+
             <label for="nombre">Nombre</label>
             <input type="text" id="nombre" v-model="nombre" />
 
@@ -133,7 +138,8 @@ async function handleSubmit() {
 }
 
 .editar-datos__subtitle {
-  color: var(--color-text-muted);
+  color: var(--color-text);
+  font-size: 1.05rem;
   margin: 0 0 24px;
 }
 
@@ -178,30 +184,12 @@ async function handleSubmit() {
   overflow-wrap: anywhere;
 }
 
+/* Etiquetas, campos y título de sección vienen de base.css (clases "formulario" y "titulo-seccion") */
 .editar-datos__form {
-  display: flex;
-  flex-direction: column;
   padding: 28px 32px 8px;
 
-  & label {
-    font-weight: bold;
-    margin-bottom: 6px;
-    font-size: 0.9rem;
-  }
-
-  & input {
-    padding: 12px 16px;
-    border-radius: var(--radius-input);
-    border: 1px solid var(--color-border);
-    margin-bottom: 18px;
-    font-size: 1rem;
-    font-family: inherit;
-  }
-
-  & input:focus {
-    outline: none;
-    border-color: var(--color-accent);
-    box-shadow: 0 0 0 3px var(--color-accent-bg);
+  & .titulo-seccion {
+    margin-top: 0;
   }
 
   & .btn {
