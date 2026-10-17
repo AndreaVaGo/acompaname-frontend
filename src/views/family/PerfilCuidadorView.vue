@@ -27,10 +27,6 @@ const errorValoraciones = ref("");
 onMounted(async () => {
   try {
     cuidador.value = await cuidadorRepository.getById(cuidadorId);
-    // Si venimos de Buscar pulsando en las valoraciones, se abren directamente
-    if (route.query.valoraciones) {
-      abrirValoraciones();
-    }
   } catch (err) {
     error.value = "No se pudo cargar el perfil del cuidador.";
   } finally {
@@ -312,10 +308,10 @@ function estrellas(puntuacion) {
 }
 
 .perfil__badge {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background-color: var(--color-text-muted);
+  background-color: var(--color-error);
   display: inline-block;
 }
 
