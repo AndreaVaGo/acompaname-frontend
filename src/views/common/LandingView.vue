@@ -150,12 +150,16 @@ import { RouterLink } from "vue-router";
 
 .landing__hint {
   color: var(--color-text-muted);
-  font-size: 0.9rem;
+  font-size: 1.2rem;
   margin: 0;
 }
 
+/* El enlace va en su propia línea, debajo de la pregunta */
 .landing__link {
+  display: block;
+  margin-top: 6px;
   color: var(--color-secondary);
+  font-size: 1.3rem;
   font-weight: bold;
   text-decoration: underline;
 }
