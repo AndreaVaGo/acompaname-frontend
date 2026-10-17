@@ -57,6 +57,13 @@ async function handleSubmit() {
       </p>
 
       <div class="cambiar-password__box">
+        <div class="cambiar-password__cabecera">
+          <span class="cambiar-password__icono">🔒</span>
+          <span class="cambiar-password__aviso">
+            Elige una contraseña que no hayas usado antes.
+          </span>
+        </div>
+
         <form class="cambiar-password__form" @submit.prevent="handleSubmit">
           <label for="password-actual">Contraseña actual</label>
           <input
@@ -106,7 +113,7 @@ async function handleSubmit() {
 }
 
 .cambiar-password__wrapper {
-  max-width: 420px;
+  max-width: 560px;
   width: 100%;
 }
 
@@ -117,19 +124,46 @@ async function handleSubmit() {
 
 .cambiar-password__subtitle {
   color: var(--color-text-muted);
-  margin: 0 0 20px;
+  margin: 0 0 24px;
 }
 
 .cambiar-password__box {
   background-color: var(--color-white);
   border-radius: var(--radius-card);
-  padding: 24px;
+  border-top: 4px solid var(--color-accent);
   box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+/* Franja de color con el candado y un aviso corto */
+.cambiar-password__cabecera {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 32px;
+  background-color: var(--color-accent-bg);
+}
+
+.cambiar-password__icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: var(--color-white);
+  font-size: 1.8rem;
+}
+
+.cambiar-password__aviso {
+  font-weight: bold;
 }
 
 .cambiar-password__form {
   display: flex;
   flex-direction: column;
+  padding: 28px 32px 32px;
 
   & label {
     font-weight: bold;
@@ -138,19 +172,29 @@ async function handleSubmit() {
   }
 
   & input {
-    padding: 10px 14px;
+    padding: 12px 16px;
     border-radius: var(--radius-input);
     border: 1px solid var(--color-border);
-    margin-bottom: 14px;
+    margin-bottom: 18px;
     font-size: 1rem;
     font-family: inherit;
+  }
+
+  & input:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-bg);
+  }
+
+  & .btn {
+    padding: 14px;
   }
 }
 
 .cambiar-password__error {
-  background-color: #fdecea;
-  border: 1px solid #f5c6c0;
-  color: #c0392b;
+  background-color: var(--color-error-bg);
+  border: 1px solid var(--color-error-border);
+  color: var(--color-error);
   font-size: 0.9rem;
   padding: 10px 14px;
   border-radius: var(--radius-input);
@@ -158,22 +202,26 @@ async function handleSubmit() {
 }
 
 .cambiar-password__exito {
-  background-color: #e8f5e9;
-  border: 1px solid #b7dfb9;
-  color: #2e7d32;
+  background-color: var(--color-secondary-bg);
+  border: 1px solid var(--color-secondary);
+  color: var(--color-secondary);
   font-size: 0.9rem;
   padding: 10px 14px;
   border-radius: var(--radius-input);
   margin: -4px 0 16px;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .cambiar-password {
     padding: 16px 16px 24px;
   }
 
-  .cambiar-password__box {
-    padding: 18px;
+  .cambiar-password__cabecera {
+    padding: 20px;
+  }
+
+  .cambiar-password__form {
+    padding: 24px 20px 28px;
   }
 }
 </style>
