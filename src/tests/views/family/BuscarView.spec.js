@@ -182,8 +182,8 @@ describe("BuscarView", () => {
 
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    expect(wrapper.text()).toContain("4.7 (3)");
-    expect(wrapper.text()).toContain("3.5 (2)");
+    expect(wrapper.text()).toContain("4.7 (3 valoraciones)");
+    expect(wrapper.text()).toContain("3.5 (2 valoraciones)");
   });
 
   test("la valoración lleva al perfil con la lista de valoraciones abierta", async () => {
