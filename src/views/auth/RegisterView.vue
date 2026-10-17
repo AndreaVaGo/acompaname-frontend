@@ -55,7 +55,19 @@ async function handleSubmit() {
       </p>
 
       <div class="register__box">
-        <form class="register__form" @submit.prevent="handleSubmit">
+        <div class="register__cabecera">
+          <span class="register__icono">🌱</span>
+          <span class="register__aviso">
+            Crea tu cuenta en un minuto.
+          </span>
+        </div>
+
+        <form
+          class="formulario register__form"
+          @submit.prevent="handleSubmit"
+        >
+          <h2 class="titulo-seccion" data-icono="👤">Tus datos</h2>
+
           <label for="nombre">Nombre completo</label>
           <input
             type="text"
@@ -88,7 +100,9 @@ async function handleSubmit() {
             v-model="telefono"
           />
 
-          <label>¿Cómo vas a usar Acompáñame?</label>
+          <h2 class="titulo-seccion" data-icono="🧭">
+            ¿Cómo vas a usar Acompáñame?
+          </h2>
           <div class="register__roles">
             <button
               type="button"
@@ -179,7 +193,7 @@ async function handleSubmit() {
 }
 
 .register__wrapper {
-  max-width: 420px;
+  max-width: 520px;
   width: 100%;
 }
 
@@ -189,34 +203,58 @@ async function handleSubmit() {
 }
 
 .register__subtitle {
-  color: var(--color-text-muted);
-  margin: 0 0 20px;
+  color: var(--color-text);
+  font-size: 1.05rem;
+  margin: 0 0 24px;
 }
 
 .register__box {
   background-color: var(--color-white);
   border-radius: var(--radius-card);
-  padding: 24px;
+  border-top: 4px solid var(--color-accent);
   box-shadow: var(--shadow-card);
+  overflow: hidden;
 }
 
-.register__form {
+/* Franja de color con un icono y un aviso corto */
+.register__cabecera {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 32px;
+  background-color: var(--color-accent-bg);
+}
 
-  & label {
-    font-weight: bold;
-    margin-bottom: 6px;
-    font-size: 0.9rem;
+.register__icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: var(--color-white);
+  font-size: 1.8rem;
+}
+
+.register__aviso {
+  font-weight: bold;
+}
+
+/* Etiquetas, campos y títulos de sección vienen de base.css (clases "formulario" y "titulo-seccion") */
+.register__form {
+  padding: 28px 32px 32px;
+
+  & .titulo-seccion {
+    margin-top: 0;
   }
 
-  & input {
-    padding: 10px 14px;
-    border-radius: var(--radius-input);
-    border: 1px solid var(--color-border);
-    margin-bottom: 14px;
-    font-size: 1rem;
-    font-family: inherit;
+  & .titulo-seccion:nth-of-type(2) {
+    margin-top: 12px;
+  }
+
+  & .btn {
+    padding: 14px;
   }
 }
 
@@ -239,19 +277,22 @@ async function handleSubmit() {
 .register__role {
   flex: 1;
   background-color: var(--color-white);
-  border: 1px solid var(--color-border);
+  border: 2px solid var(--color-border);
   border-radius: 12px;
-  padding: 14px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   cursor: pointer;
   font-family: inherit;
+  font-size: 1rem;
+  color: var(--color-text);
+  text-align: left;
   position: relative;
 }
 
 .register__role--active {
-  border: 2px solid var(--color-accent);
+  border-color: var(--color-accent);
   background-color: var(--color-accent-bg);
 }
 
@@ -269,27 +310,43 @@ async function handleSubmit() {
   color: var(--color-text-muted);
 }
 
+@media (hover: hover) {
+  .register__role:hover {
+    border-color: var(--color-accent);
+  }
+
+  .register__switch a:hover {
+    text-decoration: underline;
+  }
+}
+
 .register__switch {
   text-align: center;
   margin-top: 20px;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
 
   & a {
-    color: var(--color-accent);
+    color: var(--color-accent-dark);
     font-weight: bold;
     text-decoration: none;
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .register {
     padding: 16px 16px 24px;
   }
 
-  .register__box {
-    padding: 18px;
+  .register__cabecera {
+    padding: 20px;
   }
 
+  .register__form {
+    padding: 24px 20px 28px;
+  }
+}
+
+@media (max-width: 480px) {
   .register__roles {
     flex-direction: column;
   }
