@@ -92,7 +92,7 @@ describe('SolicitudCard dirección en negrita', () => {
     )
   })
 
-  test('en una solicitud rechazada no se avisa de que la dirección se mostrará', async () => {
+  test('en una solicitud rechazada el cuidador no puede abrir los detalles ni ve la dirección', () => {
     const wrapper = montarTarjeta(
       'domicilio',
       'Calle Uría 12, 3º B, Oviedo',
@@ -100,9 +100,8 @@ describe('SolicitudCard dirección en negrita', () => {
       true,
     )
 
-    await wrapper.find('.solicitudes__ver').trigger('click')
-
+    expect(wrapper.find('.solicitudes__ver').exists()).toBe(false)
     expect(wrapper.find('.solicitudes__direccion').exists()).toBe(false)
-    expect(wrapper.text()).not.toContain('La dirección se mostrará')
+    expect(wrapper.text()).not.toContain('Calle Uría 12')
   })
 })
