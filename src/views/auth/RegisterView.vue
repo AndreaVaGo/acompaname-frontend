@@ -221,9 +221,9 @@ async function handleSubmit() {
 }
 
 .register__error {
-  background-color: #fdecea;
-  border: 1px solid #f5c6c0;
-  color: #c0392b;
+  background-color: var(--color-error-bg);
+  border: 1px solid var(--color-error-border);
+  color: var(--color-error);
   font-size: 0.9rem;
   padding: 10px 14px;
   border-radius: var(--radius-input);
@@ -266,7 +266,7 @@ async function handleSubmit() {
 
 .register__role-desc {
   font-size: 0.85rem;
-  color: #666;
+  color: var(--color-text-muted);
 }
 
 .register__switch {
