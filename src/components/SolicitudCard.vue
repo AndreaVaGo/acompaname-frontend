@@ -23,12 +23,18 @@ const detallesVisibles = computed(
   () => !props.mostrarAcciones || expandido.value,
 );
 
+// El cuidador solo puede abrir los detalles cuando tiene que decidir o actuar:
+// en una solicitud pendiente o aceptada. En las cerradas no hay nada más que hacer
+const puedeVerDetalles = computed(
+  () =>
+    props.mostrarAcciones &&
+    (props.solicitud.estado === "PENDIENTE" ||
+      props.solicitud.estado === "ACEPTADA"),
+);
+
 // El cuidador solo ve la dirección cuando ya ha aceptado la solicitud
 const direccionVisible = computed(
-  () =>
-    !props.mostrarAcciones ||
-    props.solicitud.estado === "ACEPTADA" ||
-    props.solicitud.estado === "COMPLETADA",
+  () => !props.mostrarAcciones || props.solicitud.estado === "ACEPTADA",
 );
 
 // Al cuidador con una solicitud pendiente se le avisa de que la dirección llegará al aceptar
@@ -76,7 +82,7 @@ const avisoDireccion = computed(
     </ul>
 
     <button
-      v-if="mostrarAcciones"
+      v-if="puedeVerDetalles"
       class="solicitudes__ver"
       @click="expandido = true"
     >
