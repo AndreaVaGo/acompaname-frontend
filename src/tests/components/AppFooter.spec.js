@@ -49,13 +49,20 @@ describe("AppFooter", () => {
     expect(enlaces[1].attributes("href")).toBe("/privacidad");
   });
 
-  test("tiene un enlace a GitHub que se abre en otra pestaña", () => {
+  test("tiene un enlace a mi perfil de GitHub con su icono", () => {
     const wrapper = montarFooter();
 
-    const enlaces = wrapper.findAll(".footer__enlace");
-    expect(enlaces[2].text()).toBe("GitHub");
-    expect(enlaces[2].attributes("href")).toBe("https://github.com/AndreaVaGo");
-    expect(enlaces[2].attributes("target")).toBe("_blank");
-    expect(enlaces[2].attributes("rel")).toContain("noopener");
+    const enlace = wrapper.find(".footer__github");
+    expect(enlace.text()).toBe("AndreaVaGo");
+    expect(enlace.attributes("href")).toBe("https://github.com/AndreaVaGo");
+    expect(enlace.find("svg").exists()).toBe(true);
+  });
+
+  test("el enlace de GitHub se abre en otra pestaña de forma segura", () => {
+    const wrapper = montarFooter();
+
+    const enlace = wrapper.find(".footer__github");
+    expect(enlace.attributes("target")).toBe("_blank");
+    expect(enlace.attributes("rel")).toContain("noopener");
   });
 });
