@@ -37,6 +37,15 @@ import { RouterLink } from "vue-router";
         <RouterLink to="/privacidad" class="footer__enlace">
           Política de privacidad
         </RouterLink>
+        <!-- Enlace externo: se abre en otra pestaña -->
+        <a
+          href="https://github.com/AndreaVaGo"
+          class="footer__enlace"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          GitHub
+        </a>
       </nav>
 
       <p class="footer__text">© 2026 Acompáñame — Proyecto Final Bootcamp</p>
