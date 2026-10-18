@@ -104,4 +104,22 @@ describe('RegisterView', () => {
     )
     expect(push).not.toHaveBeenCalled()
   })
+
+  test('si la dirección trae rol=cuidador, el rol cuidador ya viene marcado', async () => {
+    await router.push('/registro?rol=cuidador')
+    const registrar = vi
+      .spyOn(AuthRepository.prototype, 'register')
+      .mockResolvedValue({})
+    vi.spyOn(router, 'push').mockResolvedValue()
+    const wrapper = await montarVista()
+
+    await rellenarFormulario(wrapper)
+    await wrapper.find('form').trigger('submit')
+    await esperar()
+
+    expect(registrar.mock.calls[0][0].rolesIds).toEqual([5])
+    expect(
+      wrapper.findAll('button[type="button"]')[1].classes()
+    ).toContain('register__role--active')
+  })
 })
