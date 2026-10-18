@@ -105,7 +105,7 @@ import { RouterLink } from "vue-router";
         Publica tu perfil, recibe solicitudes de familias cercanas y gestiona tu
         agenda desde un único sitio.
       </p>
-      <RouterLink to="/registro" class="btn btn--primary"
+      <RouterLink to="/registro?rol=cuidador" class="btn btn--primary"
         >Crear mi perfil de cuidador</RouterLink
       >
     </section>
