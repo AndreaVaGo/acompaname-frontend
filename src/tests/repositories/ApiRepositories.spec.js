@@ -11,7 +11,19 @@ const API = "http://localhost:8080/api/v1";
 function prepararFetch(respuesta, ok = true) {
   return vi.spyOn(globalThis, "fetch").mockResolvedValue({
     ok: ok,
+    status: ok ? 200 : 500,
     json: async () => respuesta,
+    text: async () => "",
+  });
+}
+
+// Una respuesta de error del servidor, con su código y su mensaje en texto
+function prepararFetchConError(status, texto) {
+  return vi.spyOn(globalThis, "fetch").mockResolvedValue({
+    ok: false,
+    status: status,
+    json: async () => ({}),
+    text: async () => texto,
   });
 }
 
@@ -177,6 +189,35 @@ describe("SolicitudRepository", () => {
 
   test("cambiarEstado lanza un error si falla", async () => {
     prepararFetch({}, false);
+
+    let mensaje = "";
+    try {
+      await new SolicitudRepository().cambiarEstado(7, "ACEPTADA");
+    } catch (error) {
+      mensaje = error.message;
+    }
+
+    expect(mensaje).toBe("Error al cambiar el estado");
+  });
+
+  test("cambiarEstado lanza el mensaje y el código del servidor si responde con error", async () => {
+    prepararFetchConError(409, "Ya tienes otro servicio aceptado en esas fechas");
+
+    let mensaje = "";
+    let codigo = 0;
+    try {
+      await new SolicitudRepository().cambiarEstado(7, "ACEPTADA");
+    } catch (error) {
+      mensaje = error.message;
+      codigo = error.status;
+    }
+
+    expect(mensaje).toBe("Ya tienes otro servicio aceptado en esas fechas");
+    expect(codigo).toBe(409);
+  });
+
+  test("cambiarEstado usa el mensaje genérico si el servidor no envía texto", async () => {
+    prepararFetchConError(500, "");
 
     let mensaje = "";
     try {
