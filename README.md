@@ -8,7 +8,7 @@ Este repositorio contiene la **aplicación web** del proyecto, desarrollada con 
 
 Proyecto final del bootcamp de Desarrollo Web Full Stack (850h) en **Factoría F5 — Digital Academy**.
 
-![Vue](https://img.shields.io/badge/Vue-3-42b883) ![Vite](https://img.shields.io/badge/Vite-8-646CFF) ![Pinia](https://img.shields.io/badge/Pinia-estado-yellow) ![Vitest](https://img.shields.io/badge/tests-272-success) ![Responsive](https://img.shields.io/badge/responsive-768px-blue)
+![Vue](https://img.shields.io/badge/Vue-3-42b883) ![Vite](https://img.shields.io/badge/Vite-8-646CFF) ![Pinia](https://img.shields.io/badge/Pinia-estado-yellow) ![Vitest](https://img.shields.io/badge/tests-324-success) ![Responsive](https://img.shields.io/badge/responsive-768px-blue)
 
 ---
 
@@ -500,7 +500,7 @@ classDiagram
 
 ## ✅ Tests
 
-El proyecto tiene **272 tests unitarios** en 28 archivos (Vitest + Vue Test Utils) y **9 tests e2e** (Playwright). Los unitarios mockean el repositorio correspondiente (<mark>vi.spyOn(Repository.prototype, "metodo")</mark>) para no depender de que el backend esté levantado. Los repositorios tienen además sus propios tests, que simulan <mark>fetch</mark> y comprueban la ruta, el método y los errores de cada llamada.
+El proyecto tiene **324 tests unitarios** en 32 archivos (Vitest + Vue Test Utils) y **9 tests e2e** (Playwright). Los unitarios mockean el repositorio correspondiente (<mark>vi.spyOn(Repository.prototype, "metodo")</mark>) para no depender de que el backend esté levantado. Los repositorios tienen además sus propios tests, que simulan <mark>fetch</mark> y comprueban la ruta, el método y los errores de cada llamada.
 
 ### Tests unitarios
 
@@ -508,14 +508,14 @@ Están en <mark>src/tests/</mark>, con la misma estructura de carpetas que <mark
 
 | Carpeta | Qué comprueba | Tests |
 |---|---|---|
-| 🧱 <mark>components/</mark> | <mark>AppFooter</mark>, <mark>NavBar</mark> (enlaces, nombre y foto), <mark>FotoCuidador</mark> y <mark>SolicitudCard</mark> (incluido el aviso de pagado) | 48 |
+| 🧱 <mark>components/</mark> | <mark>AppFooter</mark>, <mark>NavBar</mark> (enlaces, avisos, menú de la cuenta, cerrar sesión y visitante), <mark>FotoCuidador</mark> y <mark>SolicitudCard</mark> (incluido el aviso de pagado) | 78 |
 | 🍍 <mark>stores/</mark> | <mark>AuthStore</mark> (login, logout, rol activo y foto) | 11 |
 | 🧭 <mark>router/</mark> | Rutas privadas, roles y redirecciones | 7 |
-| 🛠️ <mark>utils/</mark> | <mark>formatearFecha</mark> | 3 |
-| 🔑 <mark>views/auth/</mark> | <mark>LoginView</mark> y <mark>RegisterView</mark> | 2 |
-| 🌍 <mark>views/common/</mark> | <mark>LandingView</mark>, <mark>HistorialView</mark>, <mark>MiPerfilView</mark>, <mark>EditarDatosView</mark>, <mark>CambiarPasswordView</mark> y las páginas legales | 45 |
+| 🛠️ <mark>utils/</mark> | <mark>formatearFecha</mark> y <mark>reducirImagen</mark> | 8 |
+| 🔑 <mark>views/auth/</mark> | <mark>LoginView</mark> y <mark>RegisterView</mark> (campos vacíos, acceso correcto y errores del servidor) | 7 |
+| 🌍 <mark>views/common/</mark> | <mark>LandingView</mark>, <mark>HistorialView</mark>, <mark>MiPerfilView</mark>, <mark>EditarDatosView</mark>, <mark>CambiarPasswordView</mark> y las páginas legales | 48 |
 | 🧑‍⚕️ <mark>views/caregiver/</mark> | <mark>EditarPerfilView</mark> y <mark>SolicitudesCuidadorView</mark> (aceptar, rechazar, errores y foto de perfil) | 33 |
-| 👨‍👩‍👧 <mark>views/family/</mark> | <mark>BuscarView</mark> (filtros), <mark>PerfilCuidadorView</mark> (reseñas), <mark>SolicitarServicioView</mark>, <mark>SolicitudesFamiliaView</mark>, <mark>ConfirmacionView</mark>, <mark>CheckoutView</mark> y <mark>ValorarView</mark> | 87 |
+| 👨‍👩‍👧 <mark>views/family/</mark> | <mark>BuscarView</mark> (filtros), <mark>PerfilCuidadorView</mark> (reseñas), <mark>SolicitarServicioView</mark>, <mark>SolicitudesFamiliaView</mark>, <mark>ConfirmacionView</mark>, <mark>CheckoutView</mark> y <mark>ValorarView</mark> | 96 |
 | 🔌 <mark>repositories/</mark> | <mark>Repository</mark> (clase base), <mark>UsuarioRepository</mark> y el resto de repositorios (rutas, métodos y errores) | 36 |
 
 ```bash
@@ -532,7 +532,7 @@ La cobertura se mide con <mark>@vitest/coverage-v8</mark>. Se genera el informe 
 npm run test:coverage
 ```
 
-Resultado actual: **91 % de líneas**, **96 % de ramas** y **91 % de sentencias**, por encima del 70 % mínimo que se pedía.
+Resultado actual: **98 % de líneas**, **98 % de ramas**, **98 % de sentencias** y **97 % de funciones**, por encima del 70 % mínimo que se pedía.
 
 ![Cobertura de los tests del frontend](docs/screenshots/cobertura-frontend.png)
 
@@ -589,7 +589,6 @@ npm run test:e2e
 - 💳 El checkout (<mark>/pagar/:id</mark>) llama al endpoint <mark>PATCH /pagos/{id}/pagar</mark> del backend y el pago queda como completado, pero los datos de la tarjeta son de prueba: no se cobra nada ni hay pasarela de pago real.
 - 🔑 La autenticación es Basic Auth: las credenciales viajan en cada petición.
 - 🎨 Algunas vistas todavía tienen colores escritos a mano en el CSS en vez de usar las variables de la paleta (pendiente de <mark>refactorizar</mark>).
-- 📷 La función que reduce las fotos (<mark>reducirImagen.js</mark>) y los formularios de login y registro tienen menos cobertura de tests que el resto.
 
 ---
 
@@ -609,5 +608,3 @@ npm run test:e2e
 
 - GitHub: [@AndreaVaGo](https://github.com/AndreaVaGo)
 - LinkedIn: [Andrea Vallina González](https://www.linkedin.com/in/andrea-vallina-gonzalez/)
-
----
