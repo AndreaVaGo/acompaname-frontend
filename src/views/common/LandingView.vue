@@ -150,7 +150,7 @@ import { RouterLink } from "vue-router";
 
 .landing__hint {
   color: var(--color-text-muted);
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: bold;
   margin: 0;
 }
@@ -160,15 +160,16 @@ import { RouterLink } from "vue-router";
   display: block;
   margin-top: 6px;
   color: var(--color-secondary);
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   font-weight: bold;
   text-decoration: underline;
 }
 
+/* El texto a la izquierda y la foto a la derecha, centrada en vertical */
 .landing__hero {
   display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
+  justify-content: space-between;
+  align-items: center;
   gap: 50px;
   padding: 40px 60px;
   max-width: 1200px;
@@ -177,7 +178,6 @@ import { RouterLink } from "vue-router";
 
 .landing__hero-content {
   max-width: 650px;
-  flex-shrink: 0;
 }
 
 .landing__badge {
@@ -214,7 +214,12 @@ import { RouterLink } from "vue-router";
   margin-bottom: 32px;
 }
 
+.landing__hero-image {
+  flex-shrink: 0;
+}
+
 .landing__hero-image img {
+  display: block;
   max-width: 480px;
   width: 100%;
   border-radius: var(--radius-card);
@@ -296,6 +301,7 @@ import { RouterLink } from "vue-router";
 @media (max-width: 768px) {
   .landing__hero {
     flex-direction: column;
+    align-items: stretch;
     padding: 24px 20px;
     gap: 24px;
   }
