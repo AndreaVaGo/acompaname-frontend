@@ -82,13 +82,13 @@ import { RouterLink } from "vue-router";
 
 /* Tres columnas: los extremos miden lo mismo, así los enlaces quedan centrados */
 .footer__content {
-  max-width: 1100px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 12px 20px;
+  padding: 14px 40px;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  gap: 8px;
+  gap: 8px 32px;
 }
 
 .footer__logo {
@@ -107,7 +107,7 @@ import { RouterLink } from "vue-router";
 .footer__enlaces {
   justify-self: center;
   display: flex;
-  gap: 16px;
+  gap: 20px;
 }
 
 .footer__enlace {
@@ -128,7 +128,7 @@ import { RouterLink } from "vue-router";
   flex-wrap: wrap;
   align-items: center;
   justify-content: flex-end;
-  gap: 4px 12px;
+  gap: 4px 20px;
 }
 
 .footer__text {
@@ -155,6 +155,7 @@ import { RouterLink } from "vue-router";
     display: flex;
     flex-direction: column;
     text-align: center;
+    padding: 12px 20px;
   }
 
   .footer__derecha {
