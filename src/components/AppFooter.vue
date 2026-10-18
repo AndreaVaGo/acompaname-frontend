@@ -72,12 +72,10 @@ import { RouterLink } from "vue-router";
 </template>
 
 <style scoped>
-/* Todo el texto del footer va en negrita; los enlaces y los párrafos la heredan */
 .footer {
   margin-top: auto;
   border-top: 1px solid var(--color-border);
   background-color: var(--color-bg);
-  font-weight: bold;
 }
 
 /* Tres columnas: los extremos miden lo mismo, así los enlaces quedan centrados */
@@ -91,11 +89,13 @@ import { RouterLink } from "vue-router";
   gap: 8px 32px;
 }
 
+/* Solo la marca y el enlace a GitHub destacan; el resto del footer va en peso normal */
 .footer__logo {
   justify-self: start;
   display: flex;
   align-items: center;
   gap: 6px;
+  font-weight: bold;
   font-size: 0.9rem;
   color: var(--color-text);
 }
@@ -112,7 +112,7 @@ import { RouterLink } from "vue-router";
 
 .footer__enlace {
   color: var(--color-text-muted);
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   text-decoration: none;
 
   &:hover {
@@ -133,15 +133,16 @@ import { RouterLink } from "vue-router";
 
 .footer__text {
   color: var(--color-text-muted);
-  font-size: 0.8rem;
+  font-size: 0.85rem;
 }
 
 .footer__github {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: var(--color-text-muted);
-  font-size: 0.8rem;
+  color: var(--color-text);
+  font-size: 0.85rem;
+  font-weight: 600;
   text-decoration: none;
 
   &:hover {
