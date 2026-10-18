@@ -73,18 +73,22 @@ import { RouterLink } from "vue-router";
 
 <style scoped>
 .footer {
+  width: 100%;
   margin-top: auto;
   border-top: 1px solid var(--color-border);
   background-color: var(--color-bg);
 }
 
-/* Tres columnas: los extremos miden lo mismo, así los enlaces quedan centrados */
+/* Tres columnas: los extremos miden siempre lo mismo (minmax(0, 1fr)),
+   así los enlaces del centro quedan centrados */
 .footer__content {
+  width: 100%;
   max-width: 1400px;
   margin: 0 auto;
   padding: 14px 40px;
+  box-sizing: border-box;
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   gap: 8px 32px;
 }
@@ -114,11 +118,6 @@ import { RouterLink } from "vue-router";
   color: var(--color-text-muted);
   font-size: 0.85rem;
   text-decoration: none;
-
-  &:hover {
-    color: var(--color-accent);
-    text-decoration: underline;
-  }
 }
 
 /* A la derecha: el texto y, a continuación, el enlace a GitHub; si no caben, saltan de línea */
@@ -136,7 +135,8 @@ import { RouterLink } from "vue-router";
   font-size: 0.85rem;
 }
 
-.footer__github {
+.footer__github,
+.footer__github:visited {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -144,10 +144,12 @@ import { RouterLink } from "vue-router";
   font-size: 0.85rem;
   font-weight: 600;
   text-decoration: none;
+}
 
-  &:hover {
+@media (hover: hover) {
+  .footer__enlace:hover,
+  .footer__github:hover {
     color: var(--color-accent);
-    text-decoration: underline;
   }
 }
 
