@@ -19,7 +19,13 @@ export default class SolicitudRepository extends Repository {
       headers: this.getHeaders(),
       body: JSON.stringify({ estado: nuevoEstado }),
     });
-    if (!response.ok) throw new Error("Error al cambiar el estado");
+    if (!response.ok) {
+      // El servidor explica el motivo en el cuerpo de la respuesta (por ejemplo, un 409)
+      const textoServidor = await response.text();
+      const error = new Error(textoServidor || "Error al cambiar el estado");
+      error.status = response.status;
+      throw error;
+    }
     return await response.json();
   }
 
