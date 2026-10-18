@@ -24,7 +24,12 @@ async function aceptar(id) {
     const solicitud = solicitudes.value.find((s) => s.id === id);
     solicitud.estado = actualizada.estado;
   } catch (err) {
-    error.value = "No se pudo aceptar la solicitud.";
+    // 409: el servidor explica el motivo (por ejemplo, otro servicio aceptado en esas fechas)
+    if (err.status === 409) {
+      error.value = err.message;
+    } else {
+      error.value = "No se pudo aceptar la solicitud.";
+    }
   }
 }
 
