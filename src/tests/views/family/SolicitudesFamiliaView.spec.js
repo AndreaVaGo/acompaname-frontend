@@ -50,6 +50,40 @@ describe("SolicitudesFamiliaView", () => {
     expect(wrapper.text()).toContain("Pepe");
   });
 
+  test("mientras carga muestra Cargando solicitudes y no las tarjetas", async () => {
+    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
+      crearSolicitud(1, "ACEPTADA"),
+    ]);
+    vi.spyOn(PagoRepository.prototype, "getMisPagos").mockResolvedValue([]);
+    vi.spyOn(ValoracionRepository.prototype, "getAll").mockResolvedValue([]);
+
+    // No esperamos: miramos justo después de montar
+    const wrapper = mount(SolicitudesFamiliaView, {
+      global: { plugins: [router] },
+    });
+
+    expect(wrapper.text()).toContain("Cargando solicitudes");
+    expect(wrapper.text()).not.toContain("Pepe");
+    expect(wrapper.text()).not.toContain("Pagar");
+
+    // Dejamos que termine la carga para no dejar tareas pendientes
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  });
+
+  test("al terminar de cargar quita el mensaje de carga y muestra las tarjetas", async () => {
+    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
+      crearSolicitud(1, "ACEPTADA"),
+    ]);
+    vi.spyOn(PagoRepository.prototype, "getMisPagos").mockResolvedValue([]);
+    vi.spyOn(ValoracionRepository.prototype, "getAll").mockResolvedValue([]);
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.text()).not.toContain("Cargando solicitudes");
+    expect(wrapper.text()).toContain("Pepe");
+    expect(wrapper.text()).toContain("Pagar");
+  });
+
   test("marca como pagada solo la solicitud con el pago completado", async () => {
     vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
       crearSolicitud(1, "ACEPTADA"),
