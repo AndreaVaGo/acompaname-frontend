@@ -408,8 +408,17 @@ function irAMiPerfil() {
   cursor: pointer;
 }
 
-.navbar__menu-item:hover {
-  background-color: var(--color-neutral-bg);
+/* Al pasar el ratón (o al llegar con el teclado) la opción se pone en naranja suave */
+.navbar__menu-item:focus-visible {
+  background-color: var(--color-accent-bg);
+  color: var(--color-accent-dark);
+}
+
+@media (hover: hover) {
+  .navbar__menu-item:hover {
+    background-color: var(--color-accent-bg);
+    color: var(--color-accent-dark);
+  }
 }
 
 @media (max-width: 768px) {
