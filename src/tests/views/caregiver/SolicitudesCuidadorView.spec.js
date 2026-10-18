@@ -69,6 +69,27 @@ describe("SolicitudesCuidadorView", () => {
     expect(wrapper.text()).toContain("No se pudo aceptar la solicitud.");
   });
 
+  test("muestra el mensaje del servidor si al aceptar hay otro servicio en esas fechas", async () => {
+    const errorSolapamiento = new Error(
+      "Ya tienes otro servicio aceptado en esas fechas",
+    );
+    errorSolapamiento.status = 409;
+    vi.spyOn(SolicitudRepository.prototype, "cambiarEstado").mockRejectedValue(
+      errorSolapamiento,
+    );
+    const wrapper = mount(SolicitudesCuidadorView, {
+      global: { plugins: [router] },
+    });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper.find("button.solicitudes__btn-aceptar").trigger("click");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(wrapper.text()).toContain(
+      "Ya tienes otro servicio aceptado en esas fechas",
+    );
+  });
+
   test("al aceptar una solicitud pasa a estar aceptada", async () => {
     vi.spyOn(SolicitudRepository.prototype, "cambiarEstado").mockResolvedValue({
       estado: "ACEPTADA",
