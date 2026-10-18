@@ -1,8 +1,9 @@
-import { describe, test, expect, vi } from "vitest";
+import { describe, test, expect, vi, beforeEach } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createRouter, createWebHistory } from "vue-router";
 import BuscarView from "../../../views/family/BuscarView.vue";
 import CuidadorRepository from "../../../repositories/CuidadorRepository";
+import SolicitudRepository from "../../../repositories/SolicitudRepository";
 
 vi.spyOn(CuidadorRepository.prototype, "getAll").mockResolvedValue([
   {
@@ -46,6 +47,15 @@ vi.spyOn(CuidadorRepository.prototype, "getAll").mockResolvedValue([
     numValoraciones: 2,
   },
 ]);
+
+// Ana (id 2) es la cuidadora que tiene un servicio aceptado en esas fechas
+const ocupadosFalso = vi
+  .spyOn(SolicitudRepository.prototype, "getCuidadoresOcupados")
+  .mockResolvedValue([2]);
+
+beforeEach(() => {
+  ocupadosFalso.mockClear();
+});
 
 const router = createRouter({
   history: createWebHistory(),
@@ -438,5 +448,98 @@ describe("BuscarView", () => {
 
     expect(wrapper.text()).not.toContain("Ana");
     expect(wrapper.text()).toContain("0 cuidadores");
+  });
+
+  test("sin fechas no se consulta qué cuidadores están ocupados", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(ocupadosFalso).not.toHaveBeenCalled();
+    expect(wrapper.text()).toContain("Ana");
+  });
+
+  test("al elegir la fecha de inicio se ocultan los cuidadores ocupados", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper.find("#filtro-fecha-desde").setValue("2026-11-01");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(ocupadosFalso).toHaveBeenCalledWith("2026-11-01", "");
+    expect(wrapper.text()).toContain("Pepe");
+    expect(wrapper.text()).toContain("Luis");
+    expect(wrapper.text()).not.toContain("Ana");
+  });
+
+  test("con fecha de inicio y de fin se consultan las dos fechas", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper.find("#filtro-fecha-desde").setValue("2026-11-01");
+    await wrapper.find("#filtro-fecha-hasta").setValue("2026-11-05");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(ocupadosFalso).toHaveBeenLastCalledWith("2026-11-01", "2026-11-05");
+  });
+
+  test("al borrar la fecha de inicio vuelven a salir todos", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper.find("#filtro-fecha-desde").setValue("2026-11-01");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    await wrapper.find("#filtro-fecha-desde").setValue("");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(wrapper.text()).toContain("Pepe");
+    expect(wrapper.text()).toContain("Ana");
+    expect(wrapper.text()).toContain("Luis");
+  });
+
+  test("si la fecha de fin es anterior a la de inicio avisa y no consulta", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper.find("#filtro-fecha-hasta").setValue("2026-11-01");
+    await wrapper.find("#filtro-fecha-desde").setValue("2026-11-05");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(ocupadosFalso).not.toHaveBeenCalled();
+    expect(wrapper.text()).toContain(
+      "La fecha de fin no puede ser anterior a la de inicio",
+    );
+    expect(wrapper.text()).toContain("Ana");
+  });
+
+  test("si falla la consulta de fechas avisa y muestra a todos", async () => {
+    ocupadosFalso.mockRejectedValueOnce(new Error("fallo"));
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper.find("#filtro-fecha-desde").setValue("2026-11-01");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(wrapper.text()).toContain(
+      "No se pudo comprobar la disponibilidad por fechas",
+    );
+    expect(wrapper.text()).toContain("Ana");
   });
 });
