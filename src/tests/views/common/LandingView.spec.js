@@ -49,4 +49,11 @@ describe("LandingView", () => {
 
     expect(wrapper.text()).toContain("Crear mi perfil de cuidador");
   });
+
+  test("el botón de cuidadores abre el registro con el rol cuidador", () => {
+    const wrapper = montarVista();
+
+    const enlaces = wrapper.findAll("a").map((a) => a.attributes("href"));
+    expect(enlaces).toContain("/registro?rol=cuidador");
+  });
 });
