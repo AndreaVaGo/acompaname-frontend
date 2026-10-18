@@ -14,13 +14,17 @@ const router = createRouter({
   routes: [],
 })
 
+async function esperar() {
+  await new Promise((resolve) => setTimeout(resolve, 0))
+}
+
 async function montarNavBar() {
   const wrapper = mount(NavBar, {
     global: {
       plugins: [router],
     },
   })
-  await new Promise((resolve) => setTimeout(resolve, 0))
+  await esperar()
   return wrapper
 }
 
@@ -47,9 +51,20 @@ async function montarNavBarComoFamilia() {
   return montarNavBar()
 }
 
+// Pulsa una opción del menú de la cuenta por su texto
+async function pulsarOpcion(wrapper, texto) {
+  const opcion = wrapper
+    .findAll('.navbar__menu-item')
+    .find((boton) => boton.text() === texto)
+  await opcion.trigger('click')
+  await esperar()
+}
+
 describe('NavBar', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    sessionStorage.clear()
     setActivePinia(createPinia())
+    await router.push('/')
     // Por defecto no hay solicitudes ni pagos, así que no hay avisos
     vi.spyOn(SolicitudRepository.prototype, 'getMisSolicitudes').mockResolvedValue(
       []
@@ -261,5 +276,119 @@ describe('NavBar', () => {
     const wrapper = await montarNavBar()
 
     expect(wrapper.find('.navbar__aviso').exists()).toBe(false)
+  })
+
+  test('sin sesión muestra Iniciar sesión y Registrarme', async () => {
+    const wrapper = await montarNavBar()
+
+    expect(wrapper.text()).toContain('Iniciar sesión')
+    expect(wrapper.text()).toContain('Registrarme')
+    expect(wrapper.find('.navbar__avatar').exists()).toBe(false)
+  })
+
+  test('en la pantalla de login no muestra los enlaces de acceso', async () => {
+    await router.push('/login')
+
+    const wrapper = await montarNavBar()
+
+    expect(wrapper.text()).not.toContain('Iniciar sesión')
+    expect(wrapper.text()).not.toContain('Registrarme')
+  })
+
+  test('el cuidador no ve el enlace Buscar y su Solicitudes va a su página', async () => {
+    const wrapper = await montarNavBarComoCuidador()
+
+    expect(wrapper.text()).not.toContain('Buscar')
+    expect(wrapper.html()).toContain('href="/solicitudes-cuidador"')
+  })
+
+  test('Cerrar sesión cierra la sesión y lleva al login', async () => {
+    const push = vi.spyOn(router, 'push').mockResolvedValue()
+    const wrapper = await montarNavBarComoFamilia()
+    await wrapper.find('.navbar__avatar').trigger('click')
+
+    await pulsarOpcion(wrapper, 'Cerrar sesión')
+
+    expect(useAuthStore().estaAutenticado).toBe(false)
+    expect(push).toHaveBeenCalledWith('/login')
+    expect(wrapper.find('.navbar__menu').exists()).toBe(false)
+  })
+
+  test('la familia: Mi perfil lleva a su perfil', async () => {
+    const push = vi.spyOn(router, 'push').mockResolvedValue()
+    const wrapper = await montarNavBarComoFamilia()
+    await wrapper.find('.navbar__avatar').trigger('click')
+
+    await pulsarOpcion(wrapper, 'Mi perfil')
+
+    expect(push).toHaveBeenCalledWith('/mi-perfil')
+  })
+
+  test('el cuidador: Mi perfil lleva a su perfil público', async () => {
+    const push = vi.spyOn(router, 'push').mockResolvedValue()
+    const wrapper = await montarNavBarComoCuidador()
+    await wrapper.find('.navbar__avatar').trigger('click')
+
+    await pulsarOpcion(wrapper, 'Mi perfil')
+
+    expect(push).toHaveBeenCalledWith('/cuidador/3')
+  })
+
+  test('el cuidador: si falla la carga de su perfil, no cambia de página', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    const push = vi.spyOn(router, 'push').mockResolvedValue()
+    const wrapper = await montarNavBarComoCuidador()
+    CuidadorRepository.prototype.getMiPerfil.mockRejectedValue(
+      new Error('fallo')
+    )
+    await wrapper.find('.navbar__avatar').trigger('click')
+
+    await pulsarOpcion(wrapper, 'Mi perfil')
+
+    expect(push).not.toHaveBeenCalled()
+  })
+
+  test('el cuidador: Editar mi perfil lleva a su página y cierra el menú', async () => {
+    const push = vi.spyOn(router, 'push').mockResolvedValue()
+    const wrapper = await montarNavBarComoCuidador()
+    await wrapper.find('.navbar__avatar').trigger('click')
+
+    await pulsarOpcion(wrapper, 'Editar mi perfil')
+
+    expect(push).toHaveBeenCalledWith('/editar-perfil')
+    expect(wrapper.find('.navbar__menu').exists()).toBe(false)
+  })
+
+  test('la familia no ve la opción Editar mi perfil', async () => {
+    const wrapper = await montarNavBarComoFamilia()
+    await wrapper.find('.navbar__avatar').trigger('click')
+
+    expect(wrapper.text()).not.toContain('Editar mi perfil')
+  })
+
+  test('el menú se cierra al pulsar fuera de él', async () => {
+    const wrapper = await montarNavBarComoFamilia()
+    await wrapper.find('.navbar__avatar').trigger('click')
+    expect(wrapper.find('.navbar__menu').exists()).toBe(true)
+
+    await wrapper.find('.navbar__overlay').trigger('click')
+
+    expect(wrapper.find('.navbar__menu').exists()).toBe(false)
+  })
+
+  test('si falla la carga del nombre, el menú enseña el correo', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    vi.spyOn(UsuarioRepository.prototype, 'getById').mockRejectedValue(
+      new Error('fallo')
+    )
+    const authStore = useAuthStore()
+    authStore.login(1, 'ana@test.com', '12345678', 'FAMILIA')
+
+    const wrapper = await montarNavBar()
+    await wrapper.find('.navbar__avatar').trigger('click')
+
+    expect(wrapper.find('.navbar__menu-header').text()).toContain(
+      'ana@test.com'
+    )
   })
 })
