@@ -19,8 +19,6 @@ onMounted(async () => {
     solicitudes.value = await solicitudRepository.getMisSolicitudes();
   } catch (err) {
     error.value = "No se pudieron cargar tus solicitudes.";
-  } finally {
-    cargando.value = false;
   }
 
   // Si falla la carga de pagos, la lista se ve igual y solo no marca ninguno como pagado
@@ -40,6 +38,10 @@ onMounted(async () => {
   } catch (err) {
     idsValoradas.value = [];
   }
+
+  // Las tarjetas se pintan al final, cuando ya se sabe qué está pagado y qué está valorado.
+  // Si se pintaran antes, saldría un momento "Pagar" o "Dejar valoración" y luego cambiaría
+  cargando.value = false;
 });
 </script>
 
@@ -52,7 +54,9 @@ onMounted(async () => {
 
     <p v-if="error" class="solicitudes__error">{{ error }}</p>
 
-    <div class="solicitudes__grid">
+    <p v-if="cargando" class="solicitudes__cargando">Cargando solicitudes…</p>
+
+    <div v-else class="solicitudes__grid">
       <SolicitudCard
         v-for="solicitud in solicitudes"
         :key="solicitud.id"
@@ -96,6 +100,10 @@ onMounted(async () => {
   font-size: 0.9rem;
   padding: 10px 14px;
   border-radius: var(--radius-input);
+}
+
+.solicitudes__cargando {
+  color: var(--color-text-muted);
 }
 
 .solicitudes__grid {
