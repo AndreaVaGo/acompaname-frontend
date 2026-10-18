@@ -542,4 +542,17 @@ describe("BuscarView", () => {
     );
     expect(wrapper.text()).toContain("Ana");
   });
+
+  test("si falla la carga de cuidadores avisa en la pantalla", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getAll").mockRejectedValueOnce(
+      new Error("fallo"),
+    );
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(wrapper.text()).toContain("No se pudieron cargar los cuidadores.");
+  });
 });
