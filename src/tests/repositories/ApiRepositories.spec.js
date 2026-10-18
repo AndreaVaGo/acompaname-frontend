@@ -229,6 +229,30 @@ describe("SolicitudRepository", () => {
     expect(mensaje).toBe("Error al cambiar el estado");
   });
 
+  test("getCuidadoresOcupados pide los ids ocupados entre dos fechas", async () => {
+    const fetchFalso = prepararFetch([3, 5]);
+
+    const resultado = await new SolicitudRepository().getCuidadoresOcupados(
+      "2026-11-01",
+      "2026-11-05"
+    );
+
+    expect(fetchFalso.mock.calls[0][0]).toBe(
+      `${API}/solicitudes/cuidadores-ocupados?inicio=2026-11-01&fin=2026-11-05`
+    );
+    expect(resultado).toEqual([3, 5]);
+  });
+
+  test("getCuidadoresOcupados no envía fin si solo hay fecha de inicio", async () => {
+    const fetchFalso = prepararFetch([]);
+
+    await new SolicitudRepository().getCuidadoresOcupados("2026-11-01", "");
+
+    expect(fetchFalso.mock.calls[0][0]).toBe(
+      `${API}/solicitudes/cuidadores-ocupados?inicio=2026-11-01`
+    );
+  });
+
   test("getAll pide todas las solicitudes", async () => {
     const fetchFalso = prepararFetch([]);
 
