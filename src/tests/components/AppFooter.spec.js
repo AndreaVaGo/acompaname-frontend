@@ -48,4 +48,14 @@ describe("AppFooter", () => {
     expect(enlaces[1].text()).toBe("Política de privacidad");
     expect(enlaces[1].attributes("href")).toBe("/privacidad");
   });
+
+  test("tiene un enlace a GitHub que se abre en otra pestaña", () => {
+    const wrapper = montarFooter();
+
+    const enlaces = wrapper.findAll(".footer__enlace");
+    expect(enlaces[2].text()).toBe("GitHub");
+    expect(enlaces[2].attributes("href")).toBe("https://github.com/AndreaVaGo");
+    expect(enlaces[2].attributes("target")).toBe("_blank");
+    expect(enlaces[2].attributes("rel")).toContain("noopener");
+  });
 });
