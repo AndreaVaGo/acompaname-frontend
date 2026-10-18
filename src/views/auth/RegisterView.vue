@@ -1,10 +1,14 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import { RouterLink, useRouter } from "vue-router";
+import { RouterLink, useRouter, useRoute } from "vue-router";
 import AuthRepository from "@/repositories/AuthRepository";
 import RoleRepository from "../../repositories/RoleRepository";
 
-const rolSeleccionado = ref("familia");
+const route = useRoute();
+// Si la dirección trae ?rol=cuidador, ese rol ya viene marcado
+const rolInicial = route.query.rol === "cuidador" ? "cuidador" : "familia";
+
+const rolSeleccionado = ref(rolInicial);
 const nombre = ref("");
 const email = ref("");
 const password = ref("");
