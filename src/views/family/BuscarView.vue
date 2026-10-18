@@ -1,11 +1,13 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { RouterLink } from "vue-router";
 import CuidadorRepository from "@/repositories/CuidadorRepository";
+import SolicitudRepository from "@/repositories/SolicitudRepository";
 import FotoCuidador from "@/components/FotoCuidador.vue";
 import { CUIDADOS, nombreCuidado } from "@/utils/catalogoCuidados";
 
 const cuidadorRepository = new CuidadorRepository();
+const solicitudRepository = new SolicitudRepository();
 const cuidadores = ref([]);
 const busqueda = ref("");
 const ciudadBuscada = ref("");
@@ -15,6 +17,10 @@ const serviciosBuscados = ref([]);
 const soloDisponibles = ref(false);
 const soloVehiculo = ref(false);
 const valoracionMinima = ref(0);
+const fechaDesde = ref("");
+const fechaHasta = ref("");
+const idsOcupados = ref([]);
+const errorFechas = ref("");
 const cargando = ref(true);
 const error = ref("");
 
@@ -27,6 +33,35 @@ onMounted(async () => {
     cargando.value = false;
   }
 });
+
+// Cada vez que cambia una fecha se vuelve a preguntar al servidor
+// qué cuidadores tienen un servicio aceptado en esos días
+async function comprobarFechas() {
+  errorFechas.value = "";
+  idsOcupados.value = [];
+
+  // Sin fecha de inicio no hay nada que comprobar
+  if (!fechaDesde.value) {
+    return;
+  }
+
+  // Las fechas vienen como "2026-11-01", así que se pueden comparar como texto
+  if (fechaHasta.value && fechaHasta.value < fechaDesde.value) {
+    errorFechas.value = "La fecha de fin no puede ser anterior a la de inicio";
+    return;
+  }
+
+  try {
+    idsOcupados.value = await solicitudRepository.getCuidadoresOcupados(
+      fechaDesde.value,
+      fechaHasta.value,
+    );
+  } catch (err) {
+    errorFechas.value = "No se pudo comprobar la disponibilidad por fechas.";
+  }
+}
+
+watch([fechaDesde, fechaHasta], comprobarFechas);
 
 // Un cuidador sin tipo de cuidado se trata como "ambos"
 function tipoDe(cuidador) {
@@ -93,6 +128,9 @@ const cuidadoresFiltrados = computed(() => {
       (cuidador.valoracionMedia !== null &&
         cuidador.valoracionMedia >= valoracionMinima.value);
 
+    // Se quita a quien ya tiene un servicio aceptado en las fechas elegidas
+    const coincideFechas = !idsOcupados.value.includes(cuidador.id);
+
     return (
       coincideTexto &&
       coincideCiudad &&
@@ -101,7 +139,8 @@ const cuidadoresFiltrados = computed(() => {
       coincideServicios &&
       coincideDisponible &&
       coincideVehiculo &&
-      coincideValoracion
+      coincideValoracion &&
+      coincideFechas
     );
   });
 });
@@ -136,6 +175,31 @@ const cuidadoresFiltrados = computed(() => {
           placeholder="Oviedo, Gijón, Madrid..."
           class="buscar__input buscar__input--ciudad"
         />
+      </div>
+
+      <div class="buscar__filter-group">
+        <p class="buscar__filter-titulo">Fechas del servicio</p>
+        <div class="buscar__fechas">
+          <div class="buscar__fecha">
+            <label for="filtro-fecha-desde">Desde</label>
+            <input
+              type="date"
+              id="filtro-fecha-desde"
+              v-model="fechaDesde"
+              class="buscar__input buscar__input--fecha"
+            />
+          </div>
+          <div class="buscar__fecha">
+            <label for="filtro-fecha-hasta">Hasta</label>
+            <input
+              type="date"
+              id="filtro-fecha-hasta"
+              v-model="fechaHasta"
+              class="buscar__input buscar__input--fecha"
+            />
+          </div>
+        </div>
+        <p v-if="errorFechas" class="buscar__error">{{ errorFechas }}</p>
       </div>
 
       <div class="buscar__filter-group">
@@ -455,6 +519,33 @@ const cuidadoresFiltrados = computed(() => {
   width: 100%;
   max-width: 320px;
   box-sizing: border-box;
+}
+
+/* Las dos fechas van una al lado de la otra */
+.buscar__fechas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.buscar__fecha {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.buscar__input--fecha {
+  flex: none;
+  padding: 8px 12px;
+}
+
+/* Aviso de las fechas: en rojo, como los demás errores */
+.buscar__error {
+  color: var(--color-error);
+  font-size: 0.9rem;
+  margin: 8px 0 0;
 }
 
 /* Los filtros van por parejas en dos columnas */
