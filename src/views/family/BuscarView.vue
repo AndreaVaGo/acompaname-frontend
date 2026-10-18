@@ -374,6 +374,8 @@ const cuidadoresFiltrados = computed(() => {
       </div>
     </div>
 
+    <p v-if="error" class="buscar__error">{{ error }}</p>
+
     <p class="buscar__count">
       {{ cuidadoresFiltrados.length }}
       {{ cuidadoresFiltrados.length === 1 ? "cuidador" : "cuidadores" }} para ti
@@ -541,7 +543,7 @@ const cuidadoresFiltrados = computed(() => {
   padding: 8px 12px;
 }
 
-/* Aviso de las fechas: en rojo, como los demás errores */
+/* Avisos de error: en rojo, como los demás errores */
 .buscar__error {
   color: var(--color-error);
   font-size: 0.9rem;
