@@ -604,7 +604,7 @@ const cuidadoresFiltrados = computed(() => {
 @media (hover: hover) {
   .buscar__card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-card-hover);
   }
 }
 
