@@ -273,6 +273,10 @@ Capturas de la aplicación en funcionamiento (vista de escritorio, salvo la últ
 ### Arquitectura del frontend
 
 ```mermaid
+---
+config:
+  layout: dagre
+---
 flowchart TD
     subgraph UI["🖼️ Vistas (Vue)"]
         Login[LoginView]
@@ -281,7 +285,12 @@ flowchart TD
         Perfil[PerfilCuidadorView]
         Solicitar[SolicitarServicioView]
         SolFam[SolicitudesFamiliaView]
+        Checkout[CheckoutView]
+        Valorar[ValorarView]
+        Historial[HistorialView]
         SolCui[SolicitudesCuidadorView]
+        EditPerfil[EditarPerfilView]
+        Cuenta[MiPerfil / EditarDatos / CambiarPassword]
     end
 
     subgraph STATE["🗂️ Estado global (Pinia)"]
@@ -290,8 +299,12 @@ flowchart TD
 
     subgraph REPO["🔌 Repositories"]
         AuthRepo[AuthRepository]
+        RoleRepo[RoleRepository]
+        UsuarioRepo[UsuarioRepository]
         CuidadorRepo[CuidadorRepository]
         SolicitudRepo[SolicitudRepository]
+        PagoRepo[PagoRepository]
+        ValoracionRepo[ValoracionRepository]
     end
 
     subgraph API["☁️ Backend API"]
@@ -300,70 +313,261 @@ flowchart TD
 
     Login --> AuthRepo
     Register --> AuthRepo
+    Register --> RoleRepo
     Buscar --> CuidadorRepo
     Buscar --> SolicitudRepo
     Perfil --> CuidadorRepo
+    Perfil --> ValoracionRepo
+    Solicitar --> CuidadorRepo
     Solicitar --> SolicitudRepo
     SolFam --> SolicitudRepo
+    SolFam --> PagoRepo
+    SolFam --> ValoracionRepo
+    Checkout --> PagoRepo
+    Valorar --> SolicitudRepo
+    Valorar --> ValoracionRepo
+    Historial --> SolicitudRepo
+    Historial --> ValoracionRepo
     SolCui --> SolicitudRepo
+    EditPerfil --> CuidadorRepo
+    Cuenta --> UsuarioRepo
 
     AuthRepo --> AuthStore
     AuthStore --> UI
 
     AuthRepo --> Spring
+    RoleRepo --> Spring
+    UsuarioRepo --> Spring
     CuidadorRepo --> Spring
     SolicitudRepo --> Spring
+    PagoRepo --> Spring
+    ValoracionRepo --> Spring
 
     classDef ui fill:#fff0eb,stroke:#e8734a,stroke-width:2px,color:#333;
     classDef state fill:#eaf4ff,stroke:#3a7bd5,stroke-width:2px,color:#333;
     classDef repo fill:#eafbea,stroke:#2ecc71,stroke-width:2px,color:#333;
     classDef api fill:#f5eaff,stroke:#8e44ad,stroke-width:2px,color:#333;
 
-    class Login,Register,Buscar,Perfil,Solicitar,SolFam,SolCui ui;
+    class Login,Register,Buscar,Perfil,Solicitar,SolFam,Checkout,Valorar,Historial,SolCui,EditPerfil,Cuenta ui;
     class AuthStore state;
-    class AuthRepo,CuidadorRepo,SolicitudRepo repo;
+    class AuthRepo,RoleRepo,UsuarioRepo,CuidadorRepo,SolicitudRepo,PagoRepo,ValoracionRepo repo;
     class Spring api;
 ```
 
 ### Flujo de navegación
 
 ```mermaid
+---
+config:
+  layout: dagre
+---
 flowchart LR
-    Start([Usuario entra]) --> Login[LoginView]
-    Login -- "no tiene cuenta" --> Register[RegisterView]
+    Start([Usuario entra]) --> Landing[Landing]
+    Landing --> Login[LoginView]
+    Landing --> Register[RegisterView]
+    Login -- "no tiene cuenta" --> Register
     Register --> Login
     Login -- "autenticado" --> Nav[NavBar]
 
-    Nav --> Buscar[BuscarView]
-    Nav --> SolFam[SolicitudesFamiliaView]
-    Nav --> SolCui[SolicitudesCuidadorView]
+    Nav -- "Familia" --> Buscar[BuscarView]
+    Nav -- "Familia" --> SolFam[SolicitudesFamiliaView]
+    Nav -- "Cuidador" --> SolCui[SolicitudesCuidadorView]
+    Nav -- "Cuidador" --> EditPerfil[EditarPerfilView]
+    Nav --> Historial[HistorialView]
+    Nav --> Cuenta[MiPerfil y datos de la cuenta]
 
     Buscar --> Perfil[PerfilCuidadorView]
     Perfil --> Solicitar[SolicitarServicioView]
-    Solicitar --> SolFam
+    Solicitar --> Confirm[ConfirmacionView]
+    Confirm --> SolFam
+    SolFam -- "solicitud aceptada" --> Checkout[CheckoutView]
+    Checkout --> SolFam
+    SolFam -- "servicio completado" --> Valorar[ValorarView]
+    Historial --> Valorar
+    Valorar --> Historial
 
     classDef entry fill:#fff0eb,stroke:#e8734a,stroke-width:2px;
     classDef nav fill:#eaf4ff,stroke:#3a7bd5,stroke-width:2px;
     classDef view fill:#eafbea,stroke:#2ecc71,stroke-width:2px;
 
-    class Start,Login,Register entry;
+    class Start,Landing,Login,Register entry;
     class Nav nav;
-    class Buscar,SolFam,SolCui,Perfil,Solicitar view;
+    class Buscar,SolFam,SolCui,EditPerfil,Historial,Cuenta,Perfil,Solicitar,Confirm,Checkout,Valorar view;
 ```
 
 ### Casos de uso
 
-| <ins>Visitante</ins> | <ins>Familia</ins> | <ins>Cuidador</ins> |
-|---|---|---|
-| ![Visitante](docs/diagrams/casos-visitante.png) | ![Familia](docs/diagrams/casos-familia.png) | ![Cuidador](docs/diagrams/casos-cuidador.png) |
+**<ins>Visitante</ins>**
+
+```mermaid
+flowchart LR
+    V([Visitante])
+    subgraph SIS[Acompáñame]
+        direction TB
+        U1([Registrarse como Familia o Cuidador])
+        U2([Iniciar sesión])
+        U3([Ver cuidadores disponibles])
+        U4([Filtrar cuidadores])
+        U5([Ver perfil de un cuidador])
+        U6([Ver reseñas del cuidador])
+        U7([Consultar aviso legal y privacidad])
+    end
+    V --- U1
+    V --- U2
+    V --- U3
+    V --- U5
+    V --- U7
+    U3 -.->|include| U4
+    U5 -.->|include| U6
+```
+
+**<ins>Familia</ins>**
+
+```mermaid
+flowchart LR
+    F([Familia])
+    subgraph SIS[Acompáñame]
+        direction TB
+        U1([Iniciar sesión])
+        U2([Cerrar sesión])
+        U3([Ver cuidadores disponibles])
+        U4([Filtrar cuidadores, también por fechas libres])
+        U5([Ver perfil de un cuidador])
+        U6([Ver reseñas del cuidador])
+        U7([Solicitar servicio])
+        U8([Ver mis solicitudes])
+        U9([Pagar solicitud aceptada])
+        U10([Ver historial])
+        U11([Valorar al cuidador])
+        U12([Editar mis datos de contacto])
+        U13([Cambiar contraseña])
+    end
+    F --- U1
+    F --- U2
+    F --- U3
+    F --- U5
+    F --- U7
+    F --- U8
+    F --- U10
+    F --- U12
+    F --- U13
+    U3 -.->|include| U4
+    U5 -.->|include| U6
+    U7 -.->|include| U5
+    U9 -.->|extend| U8
+    U11 -.->|extend| U10
+```
+
+**<ins>Cuidador</ins>**
+
+```mermaid
+flowchart LR
+    C([Cuidador])
+    subgraph SIS[Acompáñame]
+        direction TB
+        U1([Iniciar sesión])
+        U2([Cerrar sesión])
+        U3([Editar mi perfil profesional])
+        U4([Ver mi perfil público y mis reseñas])
+        U5([Ver solicitudes recibidas])
+        U6([Aceptar o rechazar solicitud])
+        U7([Ver historial])
+        U8([Editar mis datos de contacto])
+        U9([Cambiar contraseña])
+        U10([Marcar servicio como completado])
+    end
+    C --- U1
+    C --- U2
+    C --- U3
+    C --- U5
+    C --- U7
+    C --- U8
+    C --- U9
+    U3 -.->|include| U4
+    U6 -.->|extend| U5
+    U10 -.->|extend| U5
+```
 
 ### Secuencia: registro y login
 
-![Secuencia registro y login](docs/diagrams/sec1.png)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as Usuario
+    participant F as Frontend Vue
+    participant C as UsuarioController / AuthController
+    participant S as UsuarioServiceImpl
+    participant D as MySQL (Docker)
+
+    U->>F: Rellena el formulario de registro
+    F->>C: GET /api/v1/roles
+    C-->>F: Lista de roles (FAMILIA, CUIDADOR)
+    F->>C: POST /api/v1/usuarios {nombre, email, telefono, password, roles}
+    C->>S: storeEntity(dto)
+    S->>S: Cifra la contraseña (BCrypt)
+    S->>D: INSERT usuarios y roles_usuarios
+    opt El rol es CUIDADOR
+        S->>D: INSERT perfilcuidadores (perfil vacío)
+    end
+    S-->>C: UsuarioDTOResponse
+    C-->>F: 201 Created
+    U->>F: Inicia sesión
+    F->>C: GET /api/v1/login (cabecera Basic Auth)
+    C-->>F: 200 OK {id, email, rol}
+    F->>F: Pinia guarda la sesión en sessionStorage
+```
 
 ### Secuencia: solicitar un servicio
 
-![Secuencia solicitud](docs/diagrams/sec2.png)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Fam as Familia
+    actor Cui as Cuidador
+    participant F as Frontend Vue
+    participant A as API REST (Spring Security)
+    participant S as SolicitudServiceImpl
+    participant D as MySQL
+
+    Fam->>F: Abre el perfil de un cuidador y pulsa "Solicitar servicio"
+    F->>A: GET /api/v1/cuidadores/{id}
+    A-->>F: Datos del perfil
+    Fam->>F: Rellena fechas, dirección y necesidades, y lo envía
+    F->>A: POST /api/v1/solicitudes (Basic Auth, rol FAMILIA)
+    A->>S: storeEntity(dto)
+    S->>D: INSERT solicitudes (estado PENDIENTE)
+    A-->>F: 201 Created
+
+    Cui->>F: Abre "Solicitudes recibidas"
+    F->>A: GET /api/v1/solicitudes/mis-solicitudes
+    A->>S: getMisSolicitudes()
+    S-->>F: Solo las suyas (la dirección va vacía mientras no acepte)
+
+    Cui->>F: Pulsa Aceptar
+    F->>A: PATCH /api/v1/solicitudes/{id}/estado {ACEPTADA}
+    A->>S: cambiarEstado(id, ACEPTADA)
+    S->>S: verificarCuidador() y verificarSolapamiento()
+    alt Las fechas se cruzan con otro servicio ya aceptado
+        S-->>F: 409 Conflict
+    else Sin solapamiento
+        S->>D: UPDATE estado = ACEPTADA
+        S->>D: INSERT pagos (PENDIENTE, tarifa del cuidador)
+        S-->>F: 200 OK (la dirección ya se muestra)
+    end
+
+    Fam->>F: Ve la solicitud ACEPTADA y pulsa "Pagar"
+    F->>A: PATCH /api/v1/pagos/{id}/pagar
+    A->>D: UPDATE pagos COMPLETADO (solo la familia y solo si está PENDIENTE)
+
+    Cui->>F: Tras el servicio, lo marca como completado
+    F->>A: PATCH /api/v1/solicitudes/{id}/estado {COMPLETADA}
+    A->>S: cambiarEstado(id, COMPLETADA)
+    S->>D: UPDATE estado = COMPLETADA
+
+    Fam->>F: Ya completado, deja una valoración
+    F->>A: POST /api/v1/valoraciones {puntuacion, comentario}
+    A->>D: INSERT valoraciones
+```
 
 ### Diagrama Entidad-Relación
 
