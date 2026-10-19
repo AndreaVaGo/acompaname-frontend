@@ -369,23 +369,19 @@ flowchart LR
 
 ```mermaid
 erDiagram
-    USUARIO }o--o{ ROLE : tiene
-    USUARIO ||--o| PERFILCUIDADOR : "es (si es cuidador)"
-    USUARIO ||--o{ SOLICITUD : "crea (como familia)"
-    PERFILCUIDADOR ||--o{ SOLICITUD : "recibe (como cuidador)"
-    SOLICITUD ||--o| VALORACION : "recibe"
-    SOLICITUD ||--o| PAGO : "genera"
+    SOLICITUD ||--o| PAGO : solicitud
+    USUARIO ||--o| PERFILCUIDADOR : usuario
+    USUARIO ||--o{ SOLICITUD : familia
+    PERFILCUIDADOR ||--o{ SOLICITUD : cuidador
+    USUARIO }o--o{ ROLE : roles
+    SOLICITUD ||--o| VALORACION : solicitud
 
-    USUARIO {
+    PAGO {
         Long id PK
-        String nombre
-        String email
-        String telefono
-        String password
-    }
-    ROLE {
-        Long id PK
-        String name
+        BigDecimal importe
+        String estado
+        LocalDate fecha
+        Long solicitud_id FK
     }
     PERFILCUIDADOR {
         Long id PK
@@ -396,6 +392,15 @@ erDiagram
         boolean tieneVehiculo
         boolean disponibleAhora
         Long usuario_id FK
+        String foto
+        String tipoCuidado
+        String servicios
+        String sexo
+        String ciudad
+    }
+    ROLE {
+        Long id PK
+        String name
     }
     SOLICITUD {
         Long id PK
@@ -404,21 +409,24 @@ erDiagram
         String notas
         Integer edadPaciente
         LocalDate fechaCuidado
+        LocalDate fechaFin
         String estado
         Long familia_id FK
         Long cuidador_id FK
+        String necesidades
+        String direccion
+    }
+    USUARIO {
+        Long id PK
+        String nombre
+        String email
+        String telefono
+        String password
     }
     VALORACION {
         Long id PK
         String comentario
         Integer puntuacion
-        LocalDate fecha
-        Long solicitud_id FK
-    }
-    PAGO {
-        Long id PK
-        BigDecimal importe
-        String estado
         LocalDate fecha
         Long solicitud_id FK
     }
@@ -428,17 +436,12 @@ erDiagram
 
 ```mermaid
 classDiagram
-    class UsuarioEntity {
+    class PagoEntity {
         -Long id
-        -String nombre
-        -String email
-        -String telefono
-        -String password
-        -Set~RoleEntity~ roles
-    }
-    class RoleEntity {
-        -Long id
-        -String name
+        -BigDecimal importe
+        -EstadoPago estado
+        -LocalDate fecha
+        -SolicitudEntity solicitud
     }
     class PerfilCuidadorEntity {
         -Long id
@@ -449,6 +452,16 @@ classDiagram
         -boolean tieneVehiculo
         -boolean disponibleAhora
         -UsuarioEntity usuario
+        -String foto
+        -String tipoCuidado
+        -String servicios
+        -String sexo
+        -String ciudad
+    }
+    class RoleEntity {
+        -Long id
+        -String name
+        -Set~UsuarioEntity~ users
     }
     class SolicitudEntity {
         -Long id
@@ -457,9 +470,20 @@ classDiagram
         -String notas
         -Integer edadPaciente
         -LocalDate fechaCuidado
+        -LocalDate fechaFin
         -EstadoSolicitud estado
         -UsuarioEntity familia
         -PerfilCuidadorEntity cuidador
+        -String necesidades
+        -String direccion
+    }
+    class UsuarioEntity {
+        -Long id
+        -String nombre
+        -String email
+        -String telefono
+        -String password
+        -Set~RoleEntity~ roles
     }
     class ValoracionEntity {
         -Long id
@@ -468,12 +492,11 @@ classDiagram
         -LocalDate fecha
         -SolicitudEntity solicitud
     }
-    class PagoEntity {
-        -Long id
-        -BigDecimal importe
-        -EstadoPago estado
-        -LocalDate fecha
-        -SolicitudEntity solicitud
+    class EstadoPago {
+        <<enumeration>>
+        PENDIENTE
+        COMPLETADO
+        CANCELADO
     }
     class EstadoSolicitud {
         <<enumeration>>
@@ -482,21 +505,15 @@ classDiagram
         RECHAZADA
         COMPLETADA
     }
-    class EstadoPago {
-        <<enumeration>>
-        PENDIENTE
-        COMPLETADO
-        CANCELADO
-    }
 
-    UsuarioEntity "0..*" -- "0..*" RoleEntity : roles
+    PagoEntity --> EstadoPago
+    SolicitudEntity "1" -- "0..1" PagoEntity : solicitud
     UsuarioEntity "1" -- "0..1" PerfilCuidadorEntity : usuario
+    SolicitudEntity --> EstadoSolicitud
     UsuarioEntity "1" -- "0..*" SolicitudEntity : familia
     PerfilCuidadorEntity "1" -- "0..*" SolicitudEntity : cuidador
+    UsuarioEntity "0..*" -- "0..*" RoleEntity : roles
     SolicitudEntity "1" -- "0..1" ValoracionEntity : solicitud
-    SolicitudEntity "1" -- "0..1" PagoEntity : solicitud
-    SolicitudEntity --> EstadoSolicitud
-    PagoEntity --> EstadoPago
 ```
 
 ---
