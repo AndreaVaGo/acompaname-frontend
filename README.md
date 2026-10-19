@@ -8,7 +8,7 @@ Este repositorio contiene la **aplicación web** del proyecto, desarrollada con 
 
 Proyecto final del bootcamp de Desarrollo Web Full Stack (850h) en **Factoría F5 — Digital Academy**.
 
-![Vue](https://img.shields.io/badge/Vue-3-42b883) ![Vite](https://img.shields.io/badge/Vite-8-646CFF) ![Pinia](https://img.shields.io/badge/Pinia-estado-yellow) ![Vitest](https://img.shields.io/badge/tests-324-success) ![Responsive](https://img.shields.io/badge/responsive-768px-blue)
+![Vue](https://img.shields.io/badge/Vue-3-42b883) ![Vite](https://img.shields.io/badge/Vite-8-646CFF) ![Pinia](https://img.shields.io/badge/Pinia-estado-yellow) ![Vitest](https://img.shields.io/badge/tests-338-success) ![Responsive](https://img.shields.io/badge/responsive-768px-blue)
 
 ---
 
@@ -39,7 +39,7 @@ Proyecto final del bootcamp de Desarrollo Web Full Stack (850h) en **Factoría F
 
 Las **familias** pueden:
 - 📝 Registrarse e iniciar sesión
-- 🔎 Buscar cuidadores con filtros (ciudad, tipo de cuidado, sexo, servicios, disponibilidad, vehículo y valoración mínima) y consultar su perfil y sus reseñas
+- 🔎 Buscar cuidadores con filtros (ciudad, tipo de cuidado, sexo, servicios, disponibilidad, vehículo, valoración mínima y fechas libres) y consultar su perfil y sus reseñas
 - 📋 Enviar solicitudes de servicio y seguir su estado
 - 💳 Pagar el servicio (el pago se marca como completado en el backend, se muestra una confirmación y la solicitud pasa a verse como pagada; los datos de la tarjeta son de prueba)
 - ⭐ Valorar el servicio una vez completado y ver en el historial qué servicios ya están valorados
@@ -127,7 +127,7 @@ Esta estructura separa claramente responsabilidades: las **vistas** (<mark>views
 | 1 | 🏠 **Landing** | <mark>/</mark> | Página pública de bienvenida, con propuesta de valor y accesos a registro/login |
 | 2 | ✍️ **Registro** | <mark>/registro</mark> | Formulario con selección de rol (Familia / Cuidador), cargado dinámicamente desde la API |
 | 3 | 🔑 **Inicio de sesión** | <mark>/login</mark> | Acceso con email y contraseña |
-| 4 | 🔍 **Búsqueda de cuidadores** | <mark>/buscar</mark> | Listado con filtros por ciudad, tipo de cuidado, sexo, servicios, disponibilidad, vehículo propio y valoración mínima |
+| 4 | 🔍 **Búsqueda de cuidadores** | <mark>/buscar</mark> | Listado con filtros por ciudad, tipo de cuidado, sexo, servicios, disponibilidad, vehículo propio, valoración mínima y fechas (oculta a los cuidadores que ya tienen un servicio aceptado esos días) |
 | 5 | 🧑‍⚕️ **Perfil de cuidador** (público) | <mark>/cuidador/:id</mark> | Datos profesionales, valoración media y ventana con las reseñas de las familias |
 | 6 | 📝 **Solicitud de servicio** | <mark>/solicitar/:id</mark> | Formulario para pedir el acompañamiento a un cuidador concreto (tipo de cuidado, dirección u hospital, fechas, paciente y necesidades) |
 | 7 | ✅ **Confirmación de solicitud** | <mark>/confirmacion</mark> | Aviso de solicitud enviada |
@@ -168,6 +168,8 @@ Cada vista incluye sus correspondientes estados vacíos (por ejemplo, "Aún no t
 ⚡ **Vistas interactivas.** Varias vistas incluyen lógica funcional más allá de la maqueta visual: el cambio de estado de una solicitud (Aceptar/Rechazar) actualiza la interfaz al instante gracias a <mark>ref()</mark>, el selector de rol en el registro usa _class binding_ dinámico (<mark>:class</mark>), y el selector de estrellas en la valoración es completamente interactivo.
 
 🔎 **Filtros de búsqueda en el navegador.** La lista de cuidadores se carga una vez y los filtros (ciudad, tipo de cuidado, sexo, servicios, disponibilidad, vehículo y valoración mínima) se aplican con una propiedad <mark>computed</mark>. Así la lista se actualiza al instante y sin pedir nada más al servidor, algo razonable con el volumen de datos de este proyecto.
+
+📅 **Filtro por fechas con ayuda del backend.** Saber si un cuidador está libre depende de las solicitudes de todas las familias, y eso solo lo sabe el servidor. Por eso, al elegir las fechas, un <mark>watch</mark> llama a <mark>GET /solicitudes/cuidadores-ocupados</mark> y guarda los ids de los cuidadores ocupados; la propiedad <mark>computed</mark> de los filtros los oculta. Si la fecha de fin es anterior a la de inicio se avisa sin llamar al servidor, y si la llamada falla se muestra un mensaje en vez de dejar la lista rota.
 
 🗂️ **Catálogo de cuidados en un solo archivo.** <mark>catalogoCuidados.js</mark> guarda cada servicio con su código (lo que se guarda en la base de datos) y su nombre (lo que se ve en pantalla). Lo usan el perfil del cuidador y el formulario de solicitud, y así no se repiten las listas ni los textos.
 
@@ -299,6 +301,7 @@ flowchart TD
     Login --> AuthRepo
     Register --> AuthRepo
     Buscar --> CuidadorRepo
+    Buscar --> SolicitudRepo
     Perfil --> CuidadorRepo
     Solicitar --> SolicitudRepo
     SolFam --> SolicitudRepo
@@ -500,7 +503,7 @@ classDiagram
 
 ## ✅ Tests
 
-El proyecto tiene **324 tests unitarios** en 32 archivos (Vitest + Vue Test Utils) y **9 tests e2e** (Playwright). Los unitarios mockean el repositorio correspondiente (<mark>vi.spyOn(Repository.prototype, "metodo")</mark>) para no depender de que el backend esté levantado. Los repositorios tienen además sus propios tests, que simulan <mark>fetch</mark> y comprueban la ruta, el método y los errores de cada llamada.
+El proyecto tiene **338 tests unitarios** en 32 archivos (Vitest + Vue Test Utils) y **9 tests e2e** (Playwright). Los unitarios mockean el repositorio correspondiente (<mark>vi.spyOn(Repository.prototype, "metodo")</mark>) para no depender de que el backend esté levantado. Los repositorios tienen además sus propios tests, que simulan <mark>fetch</mark> y comprueban la ruta, el método y los errores de cada llamada.
 
 ### Tests unitarios
 
@@ -512,11 +515,11 @@ Están en <mark>src/tests/</mark>, con la misma estructura de carpetas que <mark
 | 🍍 <mark>stores/</mark> | <mark>AuthStore</mark> (login, logout, rol activo y foto) | 11 |
 | 🧭 <mark>router/</mark> | Rutas privadas, roles y redirecciones | 7 |
 | 🛠️ <mark>utils/</mark> | <mark>formatearFecha</mark> y <mark>reducirImagen</mark> | 8 |
-| 🔑 <mark>views/auth/</mark> | <mark>LoginView</mark> y <mark>RegisterView</mark> (campos vacíos, acceso correcto y errores del servidor) | 7 |
-| 🌍 <mark>views/common/</mark> | <mark>LandingView</mark>, <mark>HistorialView</mark>, <mark>MiPerfilView</mark>, <mark>EditarDatosView</mark>, <mark>CambiarPasswordView</mark> y las páginas legales | 48 |
-| 🧑‍⚕️ <mark>views/caregiver/</mark> | <mark>EditarPerfilView</mark> y <mark>SolicitudesCuidadorView</mark> (aceptar, rechazar, errores y foto de perfil) | 33 |
-| 👨‍👩‍👧 <mark>views/family/</mark> | <mark>BuscarView</mark> (filtros), <mark>PerfilCuidadorView</mark> (reseñas), <mark>SolicitarServicioView</mark>, <mark>SolicitudesFamiliaView</mark>, <mark>ConfirmacionView</mark>, <mark>CheckoutView</mark> y <mark>ValorarView</mark> | 96 |
-| 🔌 <mark>repositories/</mark> | <mark>Repository</mark> (clase base), <mark>UsuarioRepository</mark> y el resto de repositorios (rutas, métodos y errores) | 36 |
+| 🔑 <mark>views/auth/</mark> | <mark>LoginView</mark> y <mark>RegisterView</mark> (campos vacíos, acceso correcto y errores del servidor) | 8 |
+| 🌍 <mark>views/common/</mark> | <mark>LandingView</mark>, <mark>HistorialView</mark>, <mark>MiPerfilView</mark>, <mark>EditarDatosView</mark>, <mark>CambiarPasswordView</mark> y las páginas legales | 49 |
+| 🧑‍⚕️ <mark>views/caregiver/</mark> | <mark>EditarPerfilView</mark> y <mark>SolicitudesCuidadorView</mark> (aceptar, rechazar, errores y foto de perfil) | 34 |
+| 👨‍👩‍👧 <mark>views/family/</mark> | <mark>BuscarView</mark> (filtros, incluido el de fechas), <mark>PerfilCuidadorView</mark> (reseñas), <mark>SolicitarServicioView</mark>, <mark>SolicitudesFamiliaView</mark>, <mark>ConfirmacionView</mark>, <mark>CheckoutView</mark> y <mark>ValorarView</mark> | 103 |
+| 🔌 <mark>repositories/</mark> | <mark>Repository</mark> (clase base), <mark>UsuarioRepository</mark> y el resto de repositorios (rutas, métodos y errores) | 40 |
 
 ```bash
 npm run test:unit
