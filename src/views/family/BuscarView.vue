@@ -5,6 +5,7 @@ import CuidadorRepository from "@/repositories/CuidadorRepository";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
 import FotoCuidador from "@/components/FotoCuidador.vue";
 import { CUIDADOS, nombreCuidado } from "@/utils/catalogoCuidados";
+import { mensajeDeError } from "@/utils/mensajeDeError";
 
 const cuidadorRepository = new CuidadorRepository();
 const solicitudRepository = new SolicitudRepository();
@@ -28,7 +29,7 @@ onMounted(async () => {
   try {
     cuidadores.value = await cuidadorRepository.getAll();
   } catch (err) {
-    error.value = "No se pudieron cargar los cuidadores.";
+    error.value = mensajeDeError(err, "No se pudieron cargar los cuidadores.");
   } finally {
     cargando.value = false;
   }
@@ -57,7 +58,7 @@ async function comprobarFechas() {
       fechaHasta.value,
     );
   } catch (err) {
-    errorFechas.value = "No se pudo comprobar la disponibilidad por fechas.";
+    errorFechas.value = mensajeDeError(err, "No se pudo comprobar la disponibilidad por fechas.");
   }
 }
 
