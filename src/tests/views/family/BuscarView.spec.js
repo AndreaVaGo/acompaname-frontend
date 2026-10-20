@@ -555,4 +555,39 @@ describe("BuscarView", () => {
 
     expect(wrapper.text()).toContain("No se pudieron cargar los cuidadores.");
   });
+
+  test("muestra el motivo si el servidor responde con un error al cargar los cuidadores", async () => {
+    const errorNoEncontrado = new Error("fallo");
+    errorNoEncontrado.status = 404;
+    vi.spyOn(CuidadorRepository.prototype, "getAll").mockRejectedValueOnce(
+      errorNoEncontrado,
+    );
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(wrapper.text()).toContain(
+      "No se pudieron cargar los cuidadores. No se ha encontrado lo que buscas.",
+    );
+  });
+
+  test("muestra el motivo si el servidor responde con un error al comprobar las fechas", async () => {
+    const errorNoEncontrado = new Error("fallo");
+    errorNoEncontrado.status = 404;
+    ocupadosFalso.mockRejectedValueOnce(errorNoEncontrado);
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper.find("#filtro-fecha-desde").setValue("2026-11-01");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(wrapper.text()).toContain(
+      "No se pudo comprobar la disponibilidad por fechas. No se ha encontrado lo que buscas.",
+    );
+  });
 });
