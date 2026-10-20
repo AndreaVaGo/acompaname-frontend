@@ -1,0 +1,169 @@
+<script setup>
+// Tabla de usuarios: avisa a la vista cuando se pulsa Bloquear o Desbloquear
+defineProps({
+  usuarios: { type: Array, required: true },
+  idPropio: { type: [Number, String], default: null },
+});
+
+const emit = defineEmits(["cambiarActivo"]);
+
+// Nombre del rol tal como se enseña en la tabla
+function nombreRol(rol) {
+  if (rol === "FAMILIA") {
+    return "Familia";
+  }
+  if (rol === "CUIDADOR") {
+    return "Cuidador";
+  }
+  if (rol === "ADMIN") {
+    return "Administrador";
+  }
+  return rol;
+}
+
+// Clase de color de la píldora del rol
+function claseRol(rol) {
+  if (rol === "FAMILIA") {
+    return "admin-usuarios__pildora--familia";
+  }
+  if (rol === "CUIDADOR") {
+    return "admin-usuarios__pildora--cuidador";
+  }
+  return "admin-usuarios__pildora--admin";
+}
+
+// El id propio puede llegar como texto (sessionStorage) y el del usuario como número
+function esMiCuenta(usuario, idPropio) {
+  return String(usuario.id) === String(idPropio);
+}
+</script>
+
+<template>
+  <section class="admin-usuarios" id="usuarios">
+    <h2 class="titulo-seccion">Usuarios</h2>
+
+    <div class="admin-usuarios__tabla">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Rol</th>
+            <th>Estado</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="usuario in usuarios" :key="usuario.id">
+            <td>{{ usuario.nombre }}</td>
+            <td>{{ usuario.email }}</td>
+            <td>
+              <span class="admin-usuarios__pildora" :class="claseRol(usuario.rol)">
+                {{ nombreRol(usuario.rol) }}
+              </span>
+            </td>
+            <td>
+              <span
+                v-if="!usuario.activo"
+                class="admin-usuarios__pildora admin-usuarios__pildora--bloqueado"
+              >
+                Bloqueado
+              </span>
+              <span v-else>Activo</span>
+            </td>
+            <td>
+              <span v-if="esMiCuenta(usuario, idPropio)" class="admin-usuarios__tu">Tú</span>
+              <button
+                v-else
+                type="button"
+                class="btn btn--secondary admin-usuarios__boton"
+                @click="emit('cambiarActivo', usuario)"
+              >
+                {{ usuario.activo ? "Bloquear" : "Desbloquear" }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+.admin-usuarios {
+  background-color: var(--color-white);
+  border-radius: var(--radius-card);
+  padding: 24px;
+  box-shadow: var(--shadow-card);
+}
+
+.admin-usuarios .titulo-seccion {
+  margin-top: 0;
+}
+
+/* En el móvil la tabla se desliza hacia los lados en vez de desbordar la página */
+.admin-usuarios__tabla {
+  overflow-x: auto;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th {
+  text-align: left;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--color-accent-bg);
+}
+
+td {
+  padding: 12px;
+  border-bottom: 1px solid var(--color-neutral-bg);
+  font-size: 0.9rem;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-usuarios__pildora {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.admin-usuarios__pildora--familia {
+  background-color: var(--color-secondary-bg);
+  color: var(--color-secondary);
+}
+
+.admin-usuarios__pildora--cuidador {
+  background-color: var(--color-accent-bg);
+  color: var(--color-accent-dark);
+}
+
+.admin-usuarios__pildora--admin {
+  background-color: var(--color-info-bg);
+  color: var(--color-info);
+}
+
+.admin-usuarios__pildora--bloqueado {
+  background-color: var(--color-neutral-bg);
+  color: var(--color-text-muted);
+}
+
+.admin-usuarios__tu {
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.admin-usuarios__boton {
+  padding: 8px 16px;
+  font-size: 0.85rem;
+}
+</style>
