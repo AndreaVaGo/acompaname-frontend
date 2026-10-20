@@ -19,9 +19,10 @@ import SolicitudesFamiliaView from "../views/family/SolicitudesFamiliaView.vue";
 import CheckoutView from "../views/family/CheckoutView.vue";
 import AvisoLegalView from "../views/common/AvisoLegalView.vue";
 import PrivacidadView from "../views/common/PrivacidadView.vue";
+import AdminView from "../views/admin/AdminView.vue";
 
 // Las rutas con meta.requiereLogin solo se pueden ver con la sesión iniciada
-// Las rutas con meta.rol solo las puede ver ese rol (FAMILIA o CUIDADOR)
+// Las rutas con meta.rol solo las puede ver ese rol (FAMILIA, CUIDADOR o ADMIN)
 const router = createRouter({
   history: createWebHistory(),
   routes: [
@@ -43,6 +44,7 @@ const router = createRouter({
     { path: "/cambiar-password", name: "cambiar-password", component: CambiarPasswordView, meta: { requiereLogin: true } },
     { path: "/solicitudes", name: "solicitudes", component: SolicitudesFamiliaView, meta: { requiereLogin: true, rol: "FAMILIA" } },
     { path: "/pagar/:id", name: "pagar", component: CheckoutView, meta: { requiereLogin: true, rol: "FAMILIA" } },
+    { path: "/admin", name: "admin", component: AdminView, meta: { requiereLogin: true, rol: "ADMIN" } },
   ],
 });
 
