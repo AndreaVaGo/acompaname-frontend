@@ -61,6 +61,21 @@ describe('LoginView', () => {
     expect(push).toHaveBeenCalledWith('/')
   })
 
+  test('el administrador inicia sesión y va a su panel', async () => {
+    vi.spyOn(AuthRepository.prototype, 'login').mockResolvedValue({
+      id: 9,
+      username: 'admin@test.com',
+      roles: 'ADMIN',
+    })
+    const push = vi.spyOn(router, 'push').mockResolvedValue()
+    const { wrapper, pinia } = montarVista()
+
+    await rellenarYEnviar(wrapper, 'admin@test.com', '12345678')
+
+    expect(useAuthStore(pinia).rol).toBe('ADMIN')
+    expect(push).toHaveBeenCalledWith('/admin')
+  })
+
   test('si el login falla, muestra el error y no cambia de página', async () => {
     const errorCredenciales = new Error('fallo')
     errorCredenciales.status = 401
@@ -72,7 +87,9 @@ describe('LoginView', () => {
 
     await rellenarYEnviar(wrapper, 'ana@test.com', 'mal')
 
-    expect(wrapper.text()).toContain('Email o contraseña incorrectos.')
+    expect(wrapper.text()).toContain(
+      'Email o contraseña incorrectos, o tu cuenta está bloqueada.'
+    )
     expect(useAuthStore(pinia).estaAutenticado).toBe(false)
     expect(push).not.toHaveBeenCalled()
   })
@@ -89,7 +106,7 @@ describe('LoginView', () => {
     expect(wrapper.text()).toContain(
       'No se pudo iniciar sesión. Ha ocurrido un error en el servidor. Inténtalo más tarde.'
     )
-    expect(wrapper.text()).not.toContain('Email o contraseña incorrectos.')
+    expect(wrapper.text()).not.toContain('Email o contraseña incorrectos')
     expect(push).not.toHaveBeenCalled()
   })
 
@@ -104,7 +121,7 @@ describe('LoginView', () => {
     expect(wrapper.text()).toContain(
       'No se pudo iniciar sesión. No se pudo conectar con el servidor.'
     )
-    expect(wrapper.text()).not.toContain('Email o contraseña incorrectos.')
+    expect(wrapper.text()).not.toContain('Email o contraseña incorrectos')
   })
 
   test('si falla sin código de error, muestra solo que no se pudo iniciar sesión', async () => {
@@ -116,6 +133,6 @@ describe('LoginView', () => {
     await rellenarYEnviar(wrapper, 'ana@test.com', '12345678')
 
     expect(wrapper.text()).toContain('No se pudo iniciar sesión.')
-    expect(wrapper.text()).not.toContain('Email o contraseña incorrectos.')
+    expect(wrapper.text()).not.toContain('Email o contraseña incorrectos')
   })
 })
