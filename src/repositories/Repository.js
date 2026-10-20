@@ -9,11 +9,9 @@ export const API_URL =
 export async function lanzarError(response, mensaje) {
   const error = new Error(mensaje);
   error.status = response.status;
-  try {
+  error.detalle = "";
+  if (response.text) {
     error.detalle = await response.text();
-  } catch {
-    // Sin cuerpo en la respuesta: el error se queda sin detalle
-    error.detalle = "";
   }
   throw error;
 }
