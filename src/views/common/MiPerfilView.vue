@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../../stores/auth";
 import UsuarioRepository from "@/repositories/UsuarioRepository";
+import { mensajeDeError } from "@/utils/mensajeDeError";
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -24,7 +25,7 @@ onMounted(async () => {
   try {
     usuario.value = await usuarioRepository.getById(authStore.id);
   } catch (err) {
-    error.value = "No se pudieron cargar tus datos.";
+    error.value = mensajeDeError(err, "No se pudieron cargar tus datos.");
   } finally {
     cargando.value = false;
   }
