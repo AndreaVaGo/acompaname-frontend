@@ -96,4 +96,37 @@ describe("CambiarPasswordView", () => {
     expect(wrapper.text()).toContain("No se pudo cambiar la contraseña");
     expect(authStore.credenciales).toBe(btoa("ana@test.com:actual1234"));
   });
+
+  test("si el servidor responde 400 pide revisar la contraseña actual y la nueva", async () => {
+    const errorPassword = new Error("fallo");
+    errorPassword.status = 400;
+    vi.spyOn(UsuarioRepository.prototype, "cambiarPassword").mockRejectedValue(
+      errorPassword
+    );
+    const { wrapper, authStore } = montarVista();
+
+    await rellenarFormulario(wrapper, "mala12345", "nueva12345", "nueva12345");
+
+    expect(wrapper.text()).toContain(
+      "No se pudo cambiar la contraseña. Revisa que la actual sea correcta y que la nueva sea distinta."
+    );
+    expect(authStore.credenciales).toBe(btoa("ana@test.com:actual1234"));
+  });
+
+  test("si el servidor falla no habla de la contraseña actual", async () => {
+    const errorServidor = new Error("fallo");
+    errorServidor.status = 500;
+    vi.spyOn(UsuarioRepository.prototype, "cambiarPassword").mockRejectedValue(
+      errorServidor
+    );
+    const { wrapper, authStore } = montarVista();
+
+    await rellenarFormulario(wrapper, "actual1234", "nueva12345", "nueva12345");
+
+    expect(wrapper.text()).toContain(
+      "No se pudo cambiar la contraseña. Ha ocurrido un error en el servidor. Inténtalo más tarde."
+    );
+    expect(wrapper.text()).not.toContain("Revisa que la actual sea correcta");
+    expect(authStore.credenciales).toBe(btoa("ana@test.com:actual1234"));
+  });
 });
