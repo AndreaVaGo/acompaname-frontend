@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from "vue";
 import { RouterLink } from "vue-router";
 import UsuarioRepository from "@/repositories/UsuarioRepository";
 import { useAuthStore } from "@/stores/auth";
+import { mensajeDeError } from "@/utils/mensajeDeError";
 
 const nombre = ref("");
 const email = ref("");
@@ -29,7 +30,7 @@ onMounted(async () => {
     email.value = usuario.email;
     telefono.value = usuario.telefono;
   } catch (err) {
-    error.value = "No se pudieron cargar tus datos.";
+    error.value = mensajeDeError(err, "No se pudieron cargar tus datos.");
   } finally {
     cargando.value = false;
   }
@@ -61,8 +62,7 @@ async function handleSubmit() {
     }
     exito.value = "Datos actualizados correctamente.";
   } catch (err) {
-    error.value =
-      "No se pudieron guardar los datos. Puede que ese email ya esté en uso.";
+    error.value = mensajeDeError(err, "No se pudieron guardar los datos.");
   }
 }
 </script>
