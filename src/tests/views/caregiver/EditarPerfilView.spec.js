@@ -81,6 +81,20 @@ describe("EditarPerfilView", () => {
     expect(wrapper.find("form").exists()).toBe(false);
   });
 
+  test("muestra el motivo si el servidor responde con un error al cargar el perfil", async () => {
+    const errorNoEncontrado = new Error("fallo");
+    errorNoEncontrado.status = 404;
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockRejectedValue(
+      errorNoEncontrado
+    );
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.text()).toContain(
+      "No se pudo cargar tu perfil. No se ha encontrado lo que buscas."
+    );
+  });
+
   test("no guarda si falta la especialidad", async () => {
     vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue(
       perfil
@@ -332,6 +346,25 @@ describe("EditarPerfilView", () => {
     await enviar(wrapper);
 
     expect(wrapper.text()).toContain("No se pudo guardar tu perfil.");
+    expect(wrapper.text()).not.toContain("Perfil guardado correctamente.");
+  });
+
+  test("muestra el motivo si el servidor rechaza los datos al guardar", async () => {
+    const errorDatos = new Error("fallo");
+    errorDatos.status = 400;
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue(
+      perfil
+    );
+    vi.spyOn(CuidadorRepository.prototype, "update").mockRejectedValue(
+      errorDatos
+    );
+
+    const wrapper = await montarVista();
+    await enviar(wrapper);
+
+    expect(wrapper.text()).toContain(
+      "No se pudo guardar tu perfil. Los datos enviados no son correctos."
+    );
     expect(wrapper.text()).not.toContain("Perfil guardado correctamente.");
   });
 
