@@ -60,6 +60,17 @@ export default class Repository {
     return await response.json();
   }
 
+  // PATCH cambia solo una parte del recurso (por ejemplo, bloquear a un usuario)
+  async patch(path, data) {
+    const response = await fetch(`${this.uri}${path}`, {
+      method: "PATCH",
+      headers: this.getHeaders(),
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) await lanzarError(response, "Error en la petición PATCH");
+    return await response.json();
+  }
+
   async delete(path) {
     const response = await fetch(`${this.uri}${path}`, {
       method: "DELETE",
