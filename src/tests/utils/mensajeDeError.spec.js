@@ -12,24 +12,13 @@ function errorHttp(status, detalle = "") {
 }
 
 describe("mensajeDeError", () => {
-  test("400 sin explicación del servidor dice que los datos no son correctos", () => {
+  test("400 dice que los datos no son correctos", () => {
     expect(mensajeDeError(errorHttp(400), CONTEXTO)).toBe(
       "No se pudo enviar la solicitud. Los datos enviados no son correctos.",
     );
   });
 
-  test("400 con un texto del servidor lo enseña", () => {
-    const error = errorHttp(
-      400,
-      "La fecha de fin no puede ser anterior a la fecha de inicio",
-    );
-
-    expect(mensajeDeError(error, CONTEXTO)).toBe(
-      "No se pudo enviar la solicitud. La fecha de fin no puede ser anterior a la fecha de inicio.",
-    );
-  });
-
-  test("400 con un JSON de validación no lo enseña tal cual", () => {
+  test("400 dice lo mismo aunque el servidor envíe un texto", () => {
     const error = errorHttp(400, '{"email":"Email no válido"}');
 
     expect(mensajeDeError(error, CONTEXTO)).toBe(
