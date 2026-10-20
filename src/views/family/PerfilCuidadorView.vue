@@ -8,6 +8,7 @@ import ValoracionRepository from "@/repositories/ValoracionRepository";
 import FotoCuidador from "@/components/FotoCuidador.vue";
 import { nombreCuidado } from "@/utils/catalogoCuidados";
 import { formatearFecha } from "@/utils/formatearFecha";
+import { mensajeDeError } from "@/utils/mensajeDeError";
 
 const route = useRoute();
 const cuidadorId = route.params.id;
@@ -32,7 +33,7 @@ onMounted(async () => {
       abrirValoraciones();
     }
   } catch (err) {
-    error.value = "No se pudo cargar el perfil del cuidador.";
+    error.value = mensajeDeError(err, "No se pudo cargar el perfil del cuidador.");
   } finally {
     cargando.value = false;
   }
@@ -45,7 +46,7 @@ async function abrirValoraciones() {
   try {
     valoraciones.value = await valoracionRepository.getPorCuidador(cuidadorId);
   } catch (err) {
-    errorValoraciones.value = "No se pudieron cargar las valoraciones.";
+    errorValoraciones.value = mensajeDeError(err, "No se pudieron cargar las valoraciones.");
   } finally {
     cargandoValoraciones.value = false;
   }
