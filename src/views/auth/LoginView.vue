@@ -3,6 +3,7 @@ import { ref } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 import AuthRepository from "@/repositories/AuthRepository";
 import { useAuthStore } from "@/stores/auth";
+import { mensajeDeError } from "@/utils/mensajeDeError";
 
 const email = ref("");
 const password = ref("");
@@ -24,7 +25,12 @@ async function handleSubmit() {
     authStore.login(data.id, data.username, password.value, data.roles);
     router.push("/");
   } catch (err) {
-    error.value = "Email o contraseña incorrectos.";
+    // 401: el servidor no reconoce el email o la contraseña
+    if (err.status === 401) {
+      error.value = "Email o contraseña incorrectos.";
+    } else {
+      error.value = mensajeDeError(err, "No se pudo iniciar sesión.");
+    }
   }
 }
 </script>
