@@ -61,6 +61,20 @@ describe("AuthRepository", () => {
     expect(mensaje).toBe("Credenciales incorrectas");
   });
 
+  test("login lanza un error con el código 401 si las credenciales no valen", async () => {
+    prepararFetchConError(401, "");
+    const repository = new AuthRepository();
+
+    let codigo = 0;
+    try {
+      await repository.login("ana@test.com", "mal");
+    } catch (error) {
+      codigo = error.status;
+    }
+
+    expect(codigo).toBe(401);
+  });
+
   test("register envía el usuario con POST a /usuarios", async () => {
     const fetchFalso = prepararFetch({ id: 9 });
     const repository = new AuthRepository();
@@ -140,6 +154,22 @@ describe("PagoRepository", () => {
 
     expect(mensaje).toBe("Error al realizar el pago");
   });
+
+  test("marcarComoPagado lanza el código y el mensaje del servidor si responde con error", async () => {
+    prepararFetchConError(409, "El pago ya está realizado");
+
+    let codigo = 0;
+    let detalle = "";
+    try {
+      await new PagoRepository().marcarComoPagado(3);
+    } catch (error) {
+      codigo = error.status;
+      detalle = error.detalle;
+    }
+
+    expect(codigo).toBe(409);
+    expect(detalle).toBe("El pago ya está realizado");
+  });
 });
 
 describe("RoleRepository", () => {
@@ -200,33 +230,39 @@ describe("SolicitudRepository", () => {
     expect(mensaje).toBe("Error al cambiar el estado");
   });
 
-  test("cambiarEstado lanza el mensaje y el código del servidor si responde con error", async () => {
+  test("cambiarEstado lanza el código y el mensaje del servidor si responde con error", async () => {
     prepararFetchConError(409, "Ya tienes otro servicio aceptado en esas fechas");
 
     let mensaje = "";
     let codigo = 0;
+    let detalle = "";
     try {
       await new SolicitudRepository().cambiarEstado(7, "ACEPTADA");
     } catch (error) {
       mensaje = error.message;
       codigo = error.status;
+      detalle = error.detalle;
     }
 
-    expect(mensaje).toBe("Ya tienes otro servicio aceptado en esas fechas");
+    expect(mensaje).toBe("Error al cambiar el estado");
     expect(codigo).toBe(409);
+    expect(detalle).toBe("Ya tienes otro servicio aceptado en esas fechas");
   });
 
-  test("cambiarEstado usa el mensaje genérico si el servidor no envía texto", async () => {
+  test("cambiarEstado deja el detalle vacío si el servidor no envía texto", async () => {
     prepararFetchConError(500, "");
 
     let mensaje = "";
+    let detalle = "no se ha lanzado";
     try {
       await new SolicitudRepository().cambiarEstado(7, "ACEPTADA");
     } catch (error) {
       mensaje = error.message;
+      detalle = error.detalle;
     }
 
     expect(mensaje).toBe("Error al cambiar el estado");
+    expect(detalle).toBe("");
   });
 
   test("getCuidadoresOcupados pide los ids ocupados entre dos fechas", async () => {
