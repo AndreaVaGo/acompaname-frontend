@@ -113,6 +113,20 @@ describe("ConfirmacionView", () => {
     expect(wrapper.text()).not.toContain("Lucía Ferrer");
   });
 
+  test("muestra el motivo si la solicitud no existe", async () => {
+    const errorNoEncontrado = new Error("fallo");
+    errorNoEncontrado.status = 404;
+    vi.spyOn(SolicitudRepository.prototype, "getById").mockRejectedValue(
+      errorNoEncontrado
+    );
+
+    const { wrapper } = await montarVista();
+
+    expect(wrapper.text()).toContain(
+      "No se pudieron cargar los datos de la solicitud. No se ha encontrado lo que buscas."
+    );
+  });
+
   test("tiene enlaces a Mis solicitudes y a seguir buscando", async () => {
     vi.spyOn(SolicitudRepository.prototype, "getById").mockResolvedValue({
       cuidadorNombre: "Pepe",
