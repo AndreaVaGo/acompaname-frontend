@@ -6,6 +6,7 @@ import SolicitudRepository from "@/repositories/SolicitudRepository";
 import CuidadorRepository from "@/repositories/CuidadorRepository";
 import { CUIDADOS } from "@/utils/catalogoCuidados";
 import { useAuthStore } from "@/stores/auth";
+import { mensajeDeError } from "@/utils/mensajeDeError";
 
 const route = useRoute();
 const router = useRouter();
@@ -33,7 +34,7 @@ onMounted(async () => {
     const cuidador = await cuidadorRepository.getById(cuidadorId);
     cuidadorNombre.value = cuidador.usuarioNombre;
   } catch (err) {
-    error.value = "No se pudo cargar el cuidador.";
+    error.value = mensajeDeError(err, "No se pudo cargar el cuidador.");
   }
 });
 
@@ -85,7 +86,7 @@ async function enviarSolicitud() {
     });
     router.push({ name: "confirmacion", query: { id: solicitudCreada.id } });
   } catch (err) {
-    error.value = "No se pudo enviar la solicitud. Inténtalo de nuevo.";
+    error.value = mensajeDeError(err, "No se pudo enviar la solicitud.");
   }
 }
 </script>
