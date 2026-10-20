@@ -3,6 +3,7 @@ import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
 import ValoracionRepository from "@/repositories/ValoracionRepository";
+import { mensajeDeError } from "@/utils/mensajeDeError";
 
 const route = useRoute();
 const router = useRouter();
@@ -23,7 +24,7 @@ onMounted(async () => {
     const solicitud = await solicitudRepository.getById(solicitudId);
     cuidadorNombre.value = solicitud.cuidadorNombre;
   } catch (err) {
-    error.value = "No se pudo cargar la solicitud.";
+    error.value = mensajeDeError(err, "No se pudo cargar la solicitud.");
   }
 });
 
@@ -42,7 +43,7 @@ async function enviarValoracion() {
     });
     router.push({ name: "historial" });
   } catch (err) {
-    error.value = "No se pudo enviar la valoración.";
+    error.value = mensajeDeError(err, "No se pudo enviar la valoración.");
   }
 }
 </script>
