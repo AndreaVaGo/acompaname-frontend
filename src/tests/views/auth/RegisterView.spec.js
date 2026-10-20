@@ -99,10 +99,41 @@ describe('RegisterView', () => {
     await wrapper.find('form').trigger('submit')
     await esperar()
 
+    expect(wrapper.text()).toContain('No se pudo completar el registro.')
+    expect(push).not.toHaveBeenCalled()
+  })
+
+  test('si el email ya está registrado, muestra el motivo que da el servidor', async () => {
+    const errorEmail = new Error('fallo')
+    errorEmail.status = 409
+    errorEmail.detalle = 'Ya existe un usuario con ese email'
+    vi.spyOn(AuthRepository.prototype, 'register').mockRejectedValue(errorEmail)
+    const push = vi.spyOn(router, 'push').mockResolvedValue()
+    const wrapper = await montarVista()
+
+    await rellenarFormulario(wrapper)
+    await wrapper.find('form').trigger('submit')
+    await esperar()
+
     expect(wrapper.text()).toContain(
-      'No se pudo completar el registro. Revisa los datos.'
+      'No se pudo completar el registro. Ya existe un usuario con ese email.'
     )
     expect(push).not.toHaveBeenCalled()
+  })
+
+  test('si el servidor rechaza los datos, avisa de que no son correctos', async () => {
+    const errorDatos = new Error('fallo')
+    errorDatos.status = 400
+    vi.spyOn(AuthRepository.prototype, 'register').mockRejectedValue(errorDatos)
+    const wrapper = await montarVista()
+
+    await rellenarFormulario(wrapper)
+    await wrapper.find('form').trigger('submit')
+    await esperar()
+
+    expect(wrapper.text()).toContain(
+      'No se pudo completar el registro. Los datos enviados no son correctos.'
+    )
   })
 
   test('si la dirección trae rol=cuidador, el rol cuidador ya viene marcado', async () => {
