@@ -23,11 +23,16 @@ async function handleSubmit() {
   try {
     const data = await authRepository.login(email.value, password.value);
     authStore.login(data.id, data.username, password.value, data.roles);
-    router.push("/");
+    // El administrador entra directamente en su panel
+    if (data.roles === "ADMIN") {
+      router.push("/admin");
+    } else {
+      router.push("/");
+    }
   } catch (err) {
-    // 401: el servidor no reconoce el email o la contraseña
+    // 401: el servidor no reconoce el email o la contraseña, o la cuenta está bloqueada
     if (err.status === 401) {
-      error.value = "Email o contraseña incorrectos.";
+      error.value = "Email o contraseña incorrectos, o tu cuenta está bloqueada.";
     } else {
       error.value = mensajeDeError(err, "No se pudo iniciar sesión.");
     }
