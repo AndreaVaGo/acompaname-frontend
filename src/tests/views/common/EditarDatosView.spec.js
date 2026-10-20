@@ -69,6 +69,20 @@ describe("EditarDatosView", () => {
     expect(wrapper.text()).toContain("No se pudieron cargar tus datos.");
   });
 
+  test("muestra el motivo si el servidor responde con un error al cargar los datos", async () => {
+    const errorNoEncontrado = new Error("fallo");
+    errorNoEncontrado.status = 404;
+    vi.spyOn(UsuarioRepository.prototype, "getById").mockRejectedValue(
+      errorNoEncontrado
+    );
+
+    const { wrapper } = await montarVista();
+
+    expect(wrapper.text()).toContain(
+      "No se pudieron cargar tus datos. No se ha encontrado lo que buscas."
+    );
+  });
+
   test("muestra error si hay algún campo vacío", async () => {
     vi.spyOn(UsuarioRepository.prototype, "getById").mockResolvedValue(
       usuarioInicial
@@ -160,6 +174,26 @@ describe("EditarDatosView", () => {
     await enviarFormulario(wrapper, "Ana", "repetido@test.com", "600111222");
 
     expect(wrapper.text()).toContain("No se pudieron guardar los datos.");
+    expect(authStore.email).toBe("ana@test.com");
+  });
+
+  test("si el email ya está en uso muestra el motivo que da el servidor", async () => {
+    const errorEmail = new Error("fallo");
+    errorEmail.status = 409;
+    errorEmail.detalle = "Ya existe un usuario con ese email";
+    vi.spyOn(UsuarioRepository.prototype, "getById").mockResolvedValue(
+      usuarioInicial
+    );
+    vi.spyOn(UsuarioRepository.prototype, "actualizarContacto").mockRejectedValue(
+      errorEmail
+    );
+    const { wrapper, authStore } = await montarVista();
+
+    await enviarFormulario(wrapper, "Ana", "repetido@test.com", "600111222");
+
+    expect(wrapper.text()).toContain(
+      "No se pudieron guardar los datos. Ya existe un usuario con ese email."
+    );
     expect(authStore.email).toBe("ana@test.com");
   });
 });
