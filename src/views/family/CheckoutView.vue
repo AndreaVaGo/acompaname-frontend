@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import PagoRepository from "@/repositories/PagoRepository";
+import { mensajeDeError } from "@/utils/mensajeDeError";
 
 const route = useRoute();
 const router = useRouter();
@@ -26,7 +27,7 @@ onMounted(async () => {
       error.value = "No se ha encontrado el pago de esta solicitud.";
     }
   } catch (err) {
-    error.value = "No se pudo cargar el pago.";
+    error.value = mensajeDeError(err, "No se pudo cargar el pago.");
   } finally {
     cargando.value = false;
   }
@@ -49,7 +50,7 @@ async function pagar() {
     await pagoRepository.marcarComoPagado(pago.value.id);
     pagado.value = true;
   } catch (err) {
-    error.value = "No se pudo realizar el pago.";
+    error.value = mensajeDeError(err, "No se pudo realizar el pago.");
   } finally {
     procesando.value = false;
   }
