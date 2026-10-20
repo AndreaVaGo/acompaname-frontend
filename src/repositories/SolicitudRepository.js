@@ -1,4 +1,4 @@
-import Repository, { API_URL } from "./Repository";
+import Repository, { API_URL, lanzarError } from "./Repository";
 
 export default class SolicitudRepository extends Repository {
   constructor() {
@@ -19,13 +19,8 @@ export default class SolicitudRepository extends Repository {
       headers: this.getHeaders(),
       body: JSON.stringify({ estado: nuevoEstado }),
     });
-    if (!response.ok) {
-      // El servidor explica el motivo en el cuerpo de la respuesta (por ejemplo, un 409)
-      const textoServidor = await response.text();
-      const error = new Error(textoServidor || "Error al cambiar el estado");
-      error.status = response.status;
-      throw error;
-    }
+    // El servidor explica el motivo en el cuerpo de la respuesta (por ejemplo, un 409)
+    if (!response.ok) await lanzarError(response, "Error al cambiar el estado");
     return await response.json();
   }
 
