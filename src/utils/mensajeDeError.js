@@ -21,7 +21,7 @@ function textoDelServidor(error) {
 }
 
 function motivoDe(error) {
-  const status = error?.status;
+  const status = error.status;
 
   if (status === 400) {
     return textoDelServidor(error) || "Los datos enviados no son correctos.";
@@ -51,8 +51,11 @@ function motivoDe(error) {
   return "";
 }
 
-export function mensajeDeError(error, contexto = "") {
-  const motivo = motivoDe(error);
+export function mensajeDeError(error, contexto) {
+  let motivo = "";
+  if (error) {
+    motivo = motivoDe(error);
+  }
   if (!contexto) {
     return motivo;
   }
