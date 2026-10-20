@@ -4,6 +4,7 @@ import SolicitudCard from "../../components/SolicitudCard.vue";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
 import PagoRepository from "@/repositories/PagoRepository";
 import ValoracionRepository from "@/repositories/ValoracionRepository";
+import { mensajeDeError } from "@/utils/mensajeDeError";
 
 const solicitudRepository = new SolicitudRepository();
 const pagoRepository = new PagoRepository();
@@ -18,7 +19,7 @@ onMounted(async () => {
   try {
     solicitudes.value = await solicitudRepository.getMisSolicitudes();
   } catch (err) {
-    error.value = "No se pudieron cargar tus solicitudes.";
+    error.value = mensajeDeError(err, "No se pudieron cargar tus solicitudes.");
   }
 
   // Si falla la carga de pagos, la lista se ve igual y solo no marca ninguno como pagado
