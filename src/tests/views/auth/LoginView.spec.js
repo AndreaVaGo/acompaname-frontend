@@ -62,8 +62,10 @@ describe('LoginView', () => {
   })
 
   test('si el login falla, muestra el error y no cambia de página', async () => {
+    const errorCredenciales = new Error('fallo')
+    errorCredenciales.status = 401
     vi.spyOn(AuthRepository.prototype, 'login').mockRejectedValue(
-      new Error('fallo')
+      errorCredenciales
     )
     const push = vi.spyOn(router, 'push').mockResolvedValue()
     const { wrapper, pinia } = montarVista()
@@ -73,5 +75,47 @@ describe('LoginView', () => {
     expect(wrapper.text()).toContain('Email o contraseña incorrectos.')
     expect(useAuthStore(pinia).estaAutenticado).toBe(false)
     expect(push).not.toHaveBeenCalled()
+  })
+
+  test('si el servidor falla, lo dice y no habla de contraseña incorrecta', async () => {
+    const errorServidor = new Error('fallo')
+    errorServidor.status = 500
+    vi.spyOn(AuthRepository.prototype, 'login').mockRejectedValue(errorServidor)
+    const push = vi.spyOn(router, 'push').mockResolvedValue()
+    const { wrapper } = montarVista()
+
+    await rellenarYEnviar(wrapper, 'ana@test.com', '12345678')
+
+    expect(wrapper.text()).toContain(
+      'No se pudo iniciar sesión. Ha ocurrido un error en el servidor. Inténtalo más tarde.'
+    )
+    expect(wrapper.text()).not.toContain('Email o contraseña incorrectos.')
+    expect(push).not.toHaveBeenCalled()
+  })
+
+  test('si no hay conexión con el servidor, lo dice', async () => {
+    vi.spyOn(AuthRepository.prototype, 'login').mockRejectedValue(
+      new TypeError('Failed to fetch')
+    )
+    const { wrapper } = montarVista()
+
+    await rellenarYEnviar(wrapper, 'ana@test.com', '12345678')
+
+    expect(wrapper.text()).toContain(
+      'No se pudo iniciar sesión. No se pudo conectar con el servidor.'
+    )
+    expect(wrapper.text()).not.toContain('Email o contraseña incorrectos.')
+  })
+
+  test('si falla sin código de error, muestra solo que no se pudo iniciar sesión', async () => {
+    vi.spyOn(AuthRepository.prototype, 'login').mockRejectedValue(
+      new Error('fallo')
+    )
+    const { wrapper } = montarVista()
+
+    await rellenarYEnviar(wrapper, 'ana@test.com', '12345678')
+
+    expect(wrapper.text()).toContain('No se pudo iniciar sesión.')
+    expect(wrapper.text()).not.toContain('Email o contraseña incorrectos.')
   })
 })
