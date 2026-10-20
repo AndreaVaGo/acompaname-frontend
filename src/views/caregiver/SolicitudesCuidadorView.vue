@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue";
 import SolicitudCard from "../../components/SolicitudCard.vue";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
+import { mensajeDeError } from "@/utils/mensajeDeError";
 
 const solicitudRepository = new SolicitudRepository();
 const solicitudes = ref([]);
@@ -12,7 +13,7 @@ onMounted(async () => {
   try {
     solicitudes.value = await solicitudRepository.getMisSolicitudes();
   } catch (err) {
-    error.value = "No se pudieron cargar tus solicitudes.";
+    error.value = mensajeDeError(err, "No se pudieron cargar tus solicitudes.");
   } finally {
     cargando.value = false;
   }
@@ -24,12 +25,7 @@ async function aceptar(id) {
     const solicitud = solicitudes.value.find((s) => s.id === id);
     solicitud.estado = actualizada.estado;
   } catch (err) {
-    // 409: el servidor explica el motivo (por ejemplo, otro servicio aceptado en esas fechas)
-    if (err.status === 409) {
-      error.value = err.message;
-    } else {
-      error.value = "No se pudo aceptar la solicitud.";
-    }
+    error.value = mensajeDeError(err, "No se pudo aceptar la solicitud.");
   }
 }
 
@@ -42,7 +38,7 @@ async function rechazar(id) {
     const solicitud = solicitudes.value.find((s) => s.id === id);
     solicitud.estado = actualizada.estado;
   } catch (err) {
-    error.value = "No se pudo rechazar la solicitud.";
+    error.value = mensajeDeError(err, "No se pudo rechazar la solicitud.");
   }
 }
 
@@ -55,7 +51,7 @@ async function completar(id) {
     const solicitud = solicitudes.value.find((s) => s.id === id);
     solicitud.estado = actualizada.estado;
   } catch (err) {
-    error.value = "No se pudo marcar la solicitud como completada.";
+    error.value = mensajeDeError(err, "No se pudo marcar la solicitud como completada.");
   }
 }
 </script>
