@@ -5,6 +5,7 @@ import FotoCuidador from "@/components/FotoCuidador.vue";
 import { reducirImagen } from "@/utils/reducirImagen";
 import { CUIDADOS } from "@/utils/catalogoCuidados";
 import { useAuthStore } from "@/stores/auth";
+import { mensajeDeError } from "@/utils/mensajeDeError";
 
 const cuidadorRepository = new CuidadorRepository();
 const authStore = useAuthStore();
@@ -41,7 +42,7 @@ onMounted(async () => {
     tieneVehiculo.value = perfil.value.tieneVehiculo;
     disponibleAhora.value = perfil.value.disponibleAhora;
   } catch (err) {
-    error.value = "No se pudo cargar tu perfil.";
+    error.value = mensajeDeError(err, "No se pudo cargar tu perfil.");
   } finally {
     cargando.value = false;
   }
@@ -108,7 +109,7 @@ async function guardar() {
     // Subimos arriba para que se vea el mensaje de guardado
     window.scrollTo(0, 0);
   } catch (err) {
-    error.value = "No se pudo guardar tu perfil. Revisa los datos.";
+    error.value = mensajeDeError(err, "No se pudo guardar tu perfil.");
   }
 }
 </script>
