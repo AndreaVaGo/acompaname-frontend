@@ -9,10 +9,6 @@ export default class UsuarioRepository extends Repository {
     return this.get(`/usuarios/${id}`);
   }
 
-  async update(id, usuarioData) {
-    return this.put(`/usuarios/${id}`, usuarioData);
-  }
-
   async cambiarPassword(id, passwordActual, passwordNueva) {
     const response = await fetch(`${this.uri}/usuarios/${id}/password`, {
       method: "PATCH",
