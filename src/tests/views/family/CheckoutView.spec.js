@@ -84,6 +84,20 @@ describe("CheckoutView", () => {
     expect(wrapper.text()).toContain("No se pudo cargar el pago.");
   });
 
+  test("muestra el motivo si el servidor responde con un error al cargar el pago", async () => {
+    const errorNoEncontrado = new Error("fallo");
+    errorNoEncontrado.status = 404;
+    vi.spyOn(PagoRepository.prototype, "getMisPagos").mockRejectedValue(
+      errorNoEncontrado
+    );
+
+    const { wrapper } = await montarVista();
+
+    expect(wrapper.text()).toContain(
+      "No se pudo cargar el pago. No se ha encontrado lo que buscas."
+    );
+  });
+
   test("si el pago ya está completado no muestra el formulario", async () => {
     vi.spyOn(PagoRepository.prototype, "getMisPagos").mockResolvedValue([
       { ...pagoPendiente, estado: "COMPLETADO" },
@@ -169,5 +183,27 @@ describe("CheckoutView", () => {
 
     expect(wrapper.text()).toContain("No se pudo realizar el pago.");
     expect(router.currentRoute.value.name).toBe("pagar");
+  });
+
+  test("muestra el motivo si el pago ya estaba realizado", async () => {
+    const errorConflicto = new Error("fallo");
+    errorConflicto.status = 409;
+    errorConflicto.detalle = "El pago ya está completado";
+    vi.spyOn(PagoRepository.prototype, "getMisPagos").mockResolvedValue([
+      pagoPendiente,
+    ]);
+    vi.spyOn(PagoRepository.prototype, "marcarComoPagado").mockRejectedValue(
+      errorConflicto
+    );
+
+    const { wrapper } = await montarVista();
+
+    await rellenarTarjeta(wrapper);
+    await wrapper.find("form").trigger("submit.prevent");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(wrapper.text()).toContain(
+      "No se pudo realizar el pago. El pago ya está completado."
+    );
   });
 });
