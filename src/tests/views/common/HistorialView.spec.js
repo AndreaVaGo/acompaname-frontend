@@ -110,6 +110,17 @@ describe("HistorialView", () => {
     expect(wrapper.text()).not.toContain("Aún no tienes solicitudes en tu historial.");
   });
 
+  test("muestra el motivo si el servidor responde con un error al cargar el historial", async () => {
+    const errorNoEncontrado = new Error("fallo");
+    errorNoEncontrado.status = 404;
+    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockRejectedValue(errorNoEncontrado);
+    vi.spyOn(ValoracionRepository.prototype, "getAll").mockResolvedValue([]);
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.text()).toContain("No se pudo cargar tu historial. No se ha encontrado lo que buscas.");
+  });
+
   test("muestra las necesidades del paciente con su nombre", async () => {
     vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
       { id: 1, cuidadorNombre: "Pepe", nombrePaciente: "Antonio", edadPaciente: 80, tipoCuidado: "domicilio", fechaCuidado: "2026-09-01", notas: "", necesidades: ["higiene", "paliativos"], estado: "COMPLETADA" },
