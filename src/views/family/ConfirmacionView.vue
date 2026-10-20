@@ -3,6 +3,7 @@ import { ref, onMounted } from "vue";
 import { useRoute, RouterLink } from "vue-router";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
 import { formatearFecha } from "@/utils/formatearFecha";
+import { mensajeDeError } from "@/utils/mensajeDeError";
 
 const route = useRoute();
 const solicitudRepository = new SolicitudRepository();
@@ -19,7 +20,7 @@ onMounted(async () => {
   try {
     solicitud.value = await solicitudRepository.getById(route.query.id);
   } catch (err) {
-    error.value = "No se pudieron cargar los datos de la solicitud.";
+    error.value = mensajeDeError(err, "No se pudieron cargar los datos de la solicitud.");
   }
 });
 </script>
