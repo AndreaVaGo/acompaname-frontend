@@ -54,6 +54,21 @@ describe("SolicitudesCuidadorView", () => {
     expect(wrapper.text()).toContain("Ana");
   });
 
+  test("muestra el motivo si el servidor responde con un error al cargar las solicitudes", async () => {
+    const errorNoEncontrado = new Error("fallo");
+    errorNoEncontrado.status = 404;
+    espiaMisSolicitudes.mockRejectedValueOnce(errorNoEncontrado);
+    const wrapper = mount(SolicitudesCuidadorView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(wrapper.text()).toContain(
+      "No se pudieron cargar tus solicitudes. No se ha encontrado lo que buscas.",
+    );
+  });
+
   test("muestra un error si no se puede aceptar la solicitud", async () => {
     vi.spyOn(SolicitudRepository.prototype, "cambiarEstado").mockRejectedValue(
       new Error("fallo"),
@@ -69,11 +84,11 @@ describe("SolicitudesCuidadorView", () => {
     expect(wrapper.text()).toContain("No se pudo aceptar la solicitud.");
   });
 
-  test("muestra el mensaje del servidor si al aceptar hay otro servicio en esas fechas", async () => {
-    const errorSolapamiento = new Error(
-      "Ya tienes otro servicio aceptado en esas fechas",
-    );
+  test("muestra el motivo del servidor si al aceptar hay otro servicio en esas fechas", async () => {
+    const errorSolapamiento = new Error("fallo");
     errorSolapamiento.status = 409;
+    errorSolapamiento.detalle =
+      "Ya tienes otro servicio aceptado en esas fechas";
     vi.spyOn(SolicitudRepository.prototype, "cambiarEstado").mockRejectedValue(
       errorSolapamiento,
     );
@@ -86,7 +101,7 @@ describe("SolicitudesCuidadorView", () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(wrapper.text()).toContain(
-      "Ya tienes otro servicio aceptado en esas fechas",
+      "No se pudo aceptar la solicitud. Ya tienes otro servicio aceptado en esas fechas.",
     );
   });
 
@@ -135,6 +150,25 @@ describe("SolicitudesCuidadorView", () => {
     expect(wrapper.text()).toContain("No se pudo rechazar la solicitud.");
   });
 
+  test("muestra el motivo si el servidor responde con un error al rechazar", async () => {
+    const errorNoEncontrado = new Error("fallo");
+    errorNoEncontrado.status = 404;
+    vi.spyOn(SolicitudRepository.prototype, "cambiarEstado").mockRejectedValue(
+      errorNoEncontrado,
+    );
+    const wrapper = mount(SolicitudesCuidadorView, {
+      global: { plugins: [router] },
+    });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper.find("button.solicitudes__btn-rechazar").trigger("click");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(wrapper.text()).toContain(
+      "No se pudo rechazar la solicitud. No se ha encontrado lo que buscas.",
+    );
+  });
+
   test("al marcar una solicitud aceptada como completada pasa a estar completada", async () => {
     espiaMisSolicitudes.mockResolvedValueOnce(solicitudAceptada());
     const cambiarEstado = vi
@@ -168,6 +202,26 @@ describe("SolicitudesCuidadorView", () => {
 
     expect(wrapper.text()).toContain(
       "No se pudo marcar la solicitud como completada.",
+    );
+  });
+
+  test("muestra el motivo si el servidor responde con un error al completar", async () => {
+    const errorNoEncontrado = new Error("fallo");
+    errorNoEncontrado.status = 404;
+    espiaMisSolicitudes.mockResolvedValueOnce(solicitudAceptada());
+    vi.spyOn(SolicitudRepository.prototype, "cambiarEstado").mockRejectedValue(
+      errorNoEncontrado,
+    );
+    const wrapper = mount(SolicitudesCuidadorView, {
+      global: { plugins: [router] },
+    });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper.find(".solicitudes__completar").trigger("click");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(wrapper.text()).toContain(
+      "No se pudo marcar la solicitud como completada. No se ha encontrado lo que buscas.",
     );
   });
 });
