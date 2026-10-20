@@ -28,9 +28,15 @@ const inicial = computed(() =>
   authStore.email ? authStore.email.charAt(0).toUpperCase() : "?",
 );
 
-const tipoCuenta = computed(() =>
-  authStore.rol === "FAMILIA" ? "Cuenta de familia" : "Cuenta de cuidador",
-);
+const tipoCuenta = computed(() => {
+  if (authStore.rol === "FAMILIA") {
+    return "Cuenta de familia";
+  }
+  if (authStore.rol === "ADMIN") {
+    return "Cuenta de administración";
+  }
+  return "Cuenta de cuidador";
+});
 
 // Carga el nombre (y la foto si es cuidador) para enseñarlos en el menú
 async function cargarDatosCuenta() {
@@ -54,9 +60,15 @@ async function cargarDatosCuenta() {
 
 // Cuenta las solicitudes que necesitan tu atención:
 // el cuidador, las pendientes de responder;
-// la familia, las aceptadas que todavía no ha pagado
+// la familia, las aceptadas que todavía no ha pagado;
+// el administrador no tiene solicitudes propias (sus avisos están en el panel)
 async function cargarAvisos() {
   if (!authStore.estaAutenticado) {
+    avisos.value = 0;
+    return;
+  }
+
+  if (authStore.rol === "ADMIN") {
     avisos.value = 0;
     return;
   }
@@ -176,7 +188,18 @@ function irAMiPerfil() {
         Solicitudes
         <span v-if="avisos > 0" class="navbar__aviso">{{ avisos }}</span>
       </RouterLink>
-      <RouterLink to="/historial" class="navbar__link">Historial</RouterLink>
+      <RouterLink
+        v-if="authStore.rol === 'ADMIN'"
+        to="/admin"
+        class="navbar__link"
+        >Panel</RouterLink
+      >
+      <RouterLink
+        v-if="authStore.rol !== 'ADMIN'"
+        to="/historial"
+        class="navbar__link"
+        >Historial</RouterLink
+      >
 
       <div class="navbar__account">
         <button
@@ -203,6 +226,7 @@ function irAMiPerfil() {
               <span class="navbar__menu-role">{{ tipoCuenta }}</span>
             </div>
             <button
+              v-if="authStore.rol !== 'ADMIN'"
               type="button"
               class="navbar__menu-item"
               @click="irAMiPerfil"
@@ -218,6 +242,7 @@ function irAMiPerfil() {
               Editar mi perfil
             </button>
             <button
+              v-if="authStore.rol !== 'ADMIN'"
               type="button"
               class="navbar__menu-item"
               id="editar-datos"
