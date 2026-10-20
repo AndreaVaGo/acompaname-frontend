@@ -8,6 +8,16 @@ function prepararFetch(respuesta, ok = true) {
   });
 }
 
+// Una respuesta de error del servidor, con su código y su mensaje en texto
+function prepararFetchConError(status, texto) {
+  return vi.spyOn(globalThis, "fetch").mockResolvedValue({
+    ok: false,
+    status: status,
+    json: async () => ({}),
+    text: async () => texto,
+  });
+}
+
 describe("Repository", () => {
   afterEach(() => {
     vi.restoreAllMocks();
@@ -130,5 +140,82 @@ describe("Repository", () => {
     }
 
     expect(mensaje).toBe("Error en la petición DELETE");
+  });
+
+  test("get lanza un error con el código y el mensaje que explica el servidor", async () => {
+    prepararFetchConError(404, "Solicitud no encontrada. Id 9 no existe.");
+    const repository = new Repository("http://prueba");
+
+    let error = null;
+    try {
+      await repository.get("/cosas/9");
+    } catch (e) {
+      error = e;
+    }
+
+    expect(error.message).toBe("Error en la petición GET");
+    expect(error.status).toBe(404);
+    expect(error.detalle).toBe("Solicitud no encontrada. Id 9 no existe.");
+  });
+
+  test("post lanza un error con el código y el mensaje que explica el servidor", async () => {
+    prepararFetchConError(409, "El email ya está registrado");
+    const repository = new Repository("http://prueba");
+
+    let error = null;
+    try {
+      await repository.post("/cosas", {});
+    } catch (e) {
+      error = e;
+    }
+
+    expect(error.status).toBe(409);
+    expect(error.detalle).toBe("El email ya está registrado");
+  });
+
+  test("put lanza un error con el código y el mensaje que explica el servidor", async () => {
+    prepararFetchConError(403, "No tiene permiso para acceder a esta cosa");
+    const repository = new Repository("http://prueba");
+
+    let error = null;
+    try {
+      await repository.put("/cosas/3", {});
+    } catch (e) {
+      error = e;
+    }
+
+    expect(error.status).toBe(403);
+    expect(error.detalle).toBe("No tiene permiso para acceder a esta cosa");
+  });
+
+  test("delete lanza un error con el código y el mensaje que explica el servidor", async () => {
+    prepararFetchConError(500, "Error interno del servidor");
+    const repository = new Repository("http://prueba");
+
+    let error = null;
+    try {
+      await repository.delete("/cosas/3");
+    } catch (e) {
+      error = e;
+    }
+
+    expect(error.status).toBe(500);
+    expect(error.detalle).toBe("Error interno del servidor");
+  });
+
+  test("si la respuesta de error no tiene cuerpo, el error se queda sin detalle", async () => {
+    // prepararFetch no define text(), como una respuesta sin cuerpo que se pueda leer
+    prepararFetch({}, false);
+    const repository = new Repository("http://prueba");
+
+    let error = null;
+    try {
+      await repository.get("/cosas");
+    } catch (e) {
+      error = e;
+    }
+
+    expect(error.message).toBe("Error en la petición GET");
+    expect(error.detalle).toBe("");
   });
 });
