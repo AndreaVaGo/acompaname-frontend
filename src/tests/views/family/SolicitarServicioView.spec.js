@@ -62,6 +62,20 @@ describe("SolicitarServicioView", () => {
     expect(wrapper.text()).toContain("No se pudo cargar el cuidador.");
   });
 
+  test("muestra el motivo si el cuidador no existe", async () => {
+    const errorNoEncontrado = new Error("fallo");
+    errorNoEncontrado.status = 404;
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockRejectedValue(
+      errorNoEncontrado
+    );
+
+    const { wrapper } = await montarVista();
+
+    expect(wrapper.text()).toContain(
+      "No se pudo cargar el cuidador. No se ha encontrado lo que buscas."
+    );
+  });
+
   test("no envía la solicitud si faltan campos obligatorios", async () => {
     vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
       usuarioNombre: "Pepe",
@@ -198,8 +212,34 @@ describe("SolicitarServicioView", () => {
     await wrapper.find("form").trigger("submit.prevent");
     await new Promise((resolve) => setTimeout(resolve, 0));
 
+    expect(wrapper.text()).toContain("No se pudo enviar la solicitud.");
+  });
+
+  test("muestra el motivo si el servidor no deja enviar la solicitud", async () => {
+    const errorPermiso = new Error("fallo");
+    errorPermiso.status = 403;
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
+      usuarioNombre: "Pepe",
+    });
+    vi.spyOn(SolicitudRepository.prototype, "create").mockRejectedValue(
+      errorPermiso
+    );
+
+    const { wrapper } = await montarVista();
+
+    const opciones = wrapper.findAll(".solicitar__opcion");
+    await opciones[1].trigger("click");
+
+    await wrapper.find("#fecha").setValue("2026-10-10");
+    await wrapper.find("#direccion").setValue("Calle Uría 10, Oviedo");
+    await wrapper.find("#paciente").setValue("Antonio Serrano");
+    await wrapper.find("#edad").setValue("81");
+
+    await wrapper.find("form").trigger("submit.prevent");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
     expect(wrapper.text()).toContain(
-      "No se pudo enviar la solicitud. Inténtalo de nuevo."
+      "No se pudo enviar la solicitud. No tienes permiso para hacer esto."
     );
   });
 
