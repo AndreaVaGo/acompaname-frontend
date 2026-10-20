@@ -128,6 +128,22 @@ describe("SolicitudesFamiliaView", () => {
     expect(wrapper.text()).toContain("No se pudieron cargar tus solicitudes.");
   });
 
+  test("muestra el motivo si el servidor responde con un error al cargar las solicitudes", async () => {
+    const errorNoEncontrado = new Error("fallo");
+    errorNoEncontrado.status = 404;
+    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockRejectedValue(
+      errorNoEncontrado
+    );
+    vi.spyOn(PagoRepository.prototype, "getMisPagos").mockResolvedValue([]);
+    vi.spyOn(ValoracionRepository.prototype, "getAll").mockResolvedValue([]);
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.text()).toContain(
+      "No se pudieron cargar tus solicitudes. No se ha encontrado lo que buscas."
+    );
+  });
+
   test("muestra Dejar valoración en una solicitud completada sin valorar", async () => {
     vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
       crearSolicitud(1, "COMPLETADA"),
