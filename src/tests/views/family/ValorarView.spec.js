@@ -52,6 +52,20 @@ describe("ValorarView", () => {
     expect(wrapper.text()).toContain("No se pudo cargar la solicitud.");
   });
 
+  test("muestra el motivo si la solicitud no existe", async () => {
+    const errorNoEncontrado = new Error("fallo");
+    errorNoEncontrado.status = 404;
+    vi.spyOn(SolicitudRepository.prototype, "getById").mockRejectedValue(
+      errorNoEncontrado
+    );
+
+    const { wrapper } = await montarVista();
+
+    expect(wrapper.text()).toContain(
+      "No se pudo cargar la solicitud. No se ha encontrado lo que buscas."
+    );
+  });
+
   test("el botón de enviar está deshabilitado si no se ha elegido puntuación", async () => {
     vi.spyOn(SolicitudRepository.prototype, "getById").mockResolvedValue({
       cuidadorNombre: "Pepe",
@@ -119,5 +133,29 @@ describe("ValorarView", () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(wrapper.text()).toContain("No se pudo enviar la valoración.");
+  });
+
+  test("muestra el motivo si la solicitud ya tiene una valoración", async () => {
+    const errorConflicto = new Error("fallo");
+    errorConflicto.status = 409;
+    errorConflicto.detalle = "Esta solicitud ya tiene una valoración";
+    vi.spyOn(SolicitudRepository.prototype, "getById").mockResolvedValue({
+      cuidadorNombre: "Pepe",
+    });
+    vi.spyOn(ValoracionRepository.prototype, "create").mockRejectedValue(
+      errorConflicto
+    );
+
+    const { wrapper } = await montarVista();
+
+    const estrellas = wrapper.findAll(".valorar__estrella");
+    await estrellas[0].trigger("click");
+
+    await wrapper.find("form").trigger("submit.prevent");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(wrapper.text()).toContain(
+      "No se pudo enviar la valoración. Esta solicitud ya tiene una valoración."
+    );
   });
 });
