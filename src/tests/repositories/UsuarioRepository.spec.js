@@ -57,6 +57,25 @@ describe("UsuarioRepository", () => {
     expect(mensaje).toBe("Error al cambiar la contraseña");
   });
 
+  test("cambiarPassword guarda en el error el código y el motivo del servidor", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: false,
+      status: 400,
+      text: async () => "La contraseña actual no es correcta",
+    });
+    const repository = new UsuarioRepository();
+
+    let fallo = null;
+    try {
+      await repository.cambiarPassword(5, "mala", "nueva12345");
+    } catch (error) {
+      fallo = error;
+    }
+
+    expect(fallo.status).toBe(400);
+    expect(fallo.detalle).toBe("La contraseña actual no es correcta");
+  });
+
   test("actualizarContacto envía nombre, email y teléfono con PATCH", async () => {
     const fetchFalso = prepararFetch({ id: 5, nombre: "Ana Nueva" });
     const repository = new UsuarioRepository();
@@ -94,5 +113,24 @@ describe("UsuarioRepository", () => {
     }
 
     expect(mensaje).toBe("Error al actualizar los datos");
+  });
+
+  test("actualizarContacto guarda en el error el código y el motivo del servidor", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: false,
+      status: 409,
+      text: async () => "Ya existe un usuario con ese email",
+    });
+    const repository = new UsuarioRepository();
+
+    let fallo = null;
+    try {
+      await repository.actualizarContacto(5, "Ana", "repetido@test.com", "600");
+    } catch (error) {
+      fallo = error;
+    }
+
+    expect(fallo.status).toBe(409);
+    expect(fallo.detalle).toBe("Ya existe un usuario con ese email");
   });
 });
