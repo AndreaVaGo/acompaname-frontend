@@ -126,6 +126,20 @@ describe("PerfilCuidadorView", () => {
     );
   });
 
+  test("muestra el motivo si el cuidador no existe", async () => {
+    const errorNoEncontrado = new Error("fallo");
+    errorNoEncontrado.status = 404;
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockRejectedValue(
+      errorNoEncontrado
+    );
+
+    const wrapper = await montarVista("FAMILIA");
+
+    expect(wrapper.text()).toContain(
+      "No se pudo cargar el perfil del cuidador. No se ha encontrado lo que buscas."
+    );
+  });
+
   test("muestra el botón de solicitar si el usuario es FAMILIA", async () => {
     vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
       usuarioNombre: "Pepe",
@@ -413,6 +427,26 @@ describe("PerfilCuidadorView", () => {
 
     expect(wrapper.find(".perfil__error").text()).toBe(
       "No se pudieron cargar las valoraciones."
+    );
+  });
+
+  test("muestra el motivo si el servidor falla al cargar las valoraciones", async () => {
+    const errorServidor = new Error("fallo");
+    errorServidor.status = 500;
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue(
+      cuidadorConValoraciones()
+    );
+    vi.spyOn(ValoracionRepository.prototype, "getPorCuidador").mockRejectedValue(
+      errorServidor
+    );
+
+    const wrapper = await montarVista("FAMILIA");
+    await abrirLista(wrapper);
+
+    const texto = wrapper.find(".perfil__error").text();
+    expect(texto).toContain("No se pudieron cargar las valoraciones.");
+    expect(texto.length).toBeGreaterThan(
+      "No se pudieron cargar las valoraciones.".length
     );
   });
 
