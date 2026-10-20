@@ -5,7 +5,7 @@
 body {
   margin: 0;
   font-family: 'Segoe UI', Roboto, sans-serif;
-  background-color: #eaf6ef;
+  background-color: var(--color-bg);
 }
 
 #app {
