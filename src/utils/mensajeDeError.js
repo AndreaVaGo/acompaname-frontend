@@ -10,21 +10,11 @@ function conPunto(texto) {
   return texto + ".";
 }
 
-// Algunos errores los explica el servidor con un texto (por ejemplo, un solapamiento de fechas).
-// Si el cuerpo es un JSON (errores de validación por campo) no sirve para enseñarlo tal cual.
-function textoDelServidor(error) {
-  const detalle = error.detalle;
-  if (!detalle || detalle.trim().startsWith("{")) {
-    return "";
-  }
-  return conPunto(detalle.trim());
-}
-
 function motivoDe(error) {
   const status = error.status;
 
   if (status === 400) {
-    return textoDelServidor(error) || "Los datos enviados no son correctos.";
+    return "Los datos enviados no son correctos.";
   }
   if (status === 401) {
     return "Tu sesión ha caducado. Vuelve a iniciar sesión.";
@@ -36,10 +26,11 @@ function motivoDe(error) {
     return "No se ha encontrado lo que buscas.";
   }
   if (status === 409) {
-    return (
-      textoDelServidor(error) ||
-      "Esta acción entra en conflicto con otra ya existente."
-    );
+    // El servidor explica el conflicto (por ejemplo, otro servicio aceptado en esas fechas)
+    if (error.detalle) {
+      return conPunto(error.detalle);
+    }
+    return "Esta acción entra en conflicto con otra ya existente.";
   }
   if (status >= 500) {
     return "Ha ocurrido un error en el servidor. Inténtalo más tarde.";
