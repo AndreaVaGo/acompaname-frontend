@@ -1,4 +1,4 @@
-import Repository, { API_URL } from "./Repository";
+import Repository, { API_URL, lanzarError } from "./Repository";
 
 export default class AuthRepository extends Repository {
   constructor() {
@@ -12,7 +12,7 @@ export default class AuthRepository extends Repository {
         Authorization: `Basic ${credenciales}`,
       },
     });
-    if (!response.ok) throw new Error("Credenciales incorrectas");
+    if (!response.ok) await lanzarError(response, "Credenciales incorrectas");
     const data = await response.json();
     return { ...data, credenciales };
   }
