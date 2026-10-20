@@ -1,4 +1,4 @@
-import Repository, { API_URL } from "./Repository";
+import Repository, { API_URL, lanzarError } from "./Repository";
 
 export default class PagoRepository extends Repository {
   constructor() {
@@ -14,7 +14,7 @@ export default class PagoRepository extends Repository {
       method: "PATCH",
       headers: this.getHeaders(),
     });
-    if (!response.ok) throw new Error("Error al realizar el pago");
+    if (!response.ok) await lanzarError(response, "Error al realizar el pago");
     return await response.json();
   }
 }
