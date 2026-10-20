@@ -5,6 +5,7 @@ import SolicitudRepository from "@/repositories/SolicitudRepository";
 import ValoracionRepository from "@/repositories/ValoracionRepository";
 import { nombreCuidado } from "@/utils/catalogoCuidados";
 import { formatearFecha } from "@/utils/formatearFecha";
+import { mensajeDeError } from "@/utils/mensajeDeError";
 
 const solicitudRepository = new SolicitudRepository();
 const valoracionRepository = new ValoracionRepository();
@@ -34,7 +35,7 @@ onMounted(async () => {
         valorada: idsValorados.includes(s.id),
       }));
   } catch (err) {
-    error.value = "No se pudo cargar tu historial.";
+    error.value = mensajeDeError(err, "No se pudo cargar tu historial.");
   }
 });
 
