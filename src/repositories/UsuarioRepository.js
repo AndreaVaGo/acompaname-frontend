@@ -1,4 +1,4 @@
-import Repository, { API_URL } from "./Repository";
+import Repository, { API_URL, lanzarError } from "./Repository";
 
 export default class UsuarioRepository extends Repository {
   constructor() {
@@ -16,7 +16,7 @@ export default class UsuarioRepository extends Repository {
       body: JSON.stringify({ passwordActual, passwordNueva }),
     });
     // El backend responde 204 (sin cuerpo), así que no hay json que leer
-    if (!response.ok) throw new Error("Error al cambiar la contraseña");
+    if (!response.ok) await lanzarError(response, "Error al cambiar la contraseña");
   }
 
   async actualizarContacto(id, nombre, email, telefono) {
@@ -25,7 +25,7 @@ export default class UsuarioRepository extends Repository {
       headers: this.getHeaders(),
       body: JSON.stringify({ nombre, email, telefono }),
     });
-    if (!response.ok) throw new Error("Error al actualizar los datos");
+    if (!response.ok) await lanzarError(response, "Error al actualizar los datos");
     return response.json();
   }
 }
