@@ -70,4 +70,34 @@ describe('guard del router', () => {
     await router.push('/historial')
     expect(router.currentRoute.value.name).toBe('historial')
   })
+
+  test('un visitante que entra en el panel de administración va al login', async () => {
+    await router.push('/admin')
+
+    expect(router.currentRoute.value.name).toBe('login')
+  })
+
+  test('el administrador puede entrar en el panel de administración', async () => {
+    useAuthStore(pinia).login(9, 'admin@test.com', '12345678', 'ADMIN')
+
+    await router.push('/admin')
+
+    expect(router.currentRoute.value.name).toBe('admin')
+  })
+
+  test('una familia no puede entrar en el panel de administración', async () => {
+    useAuthStore(pinia).login(1, 'ana@test.com', '12345678', 'FAMILIA')
+
+    await router.push('/admin')
+
+    expect(router.currentRoute.value.name).toBe('landing')
+  })
+
+  test('el administrador no puede entrar en las páginas de la familia', async () => {
+    useAuthStore(pinia).login(9, 'admin@test.com', '12345678', 'ADMIN')
+
+    await router.push('/solicitudes')
+
+    expect(router.currentRoute.value.name).toBe('landing')
+  })
 })
