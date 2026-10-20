@@ -3,6 +3,7 @@ import { ref, onMounted } from "vue";
 import { RouterLink, useRouter, useRoute } from "vue-router";
 import AuthRepository from "@/repositories/AuthRepository";
 import RoleRepository from "../../repositories/RoleRepository";
+import { mensajeDeError } from "@/utils/mensajeDeError";
 
 const route = useRoute();
 // Si la dirección trae ?rol=cuidador, ese rol ya viene marcado
@@ -45,7 +46,7 @@ async function handleSubmit() {
     });
     router.push("/login");
   } catch (err) {
-    error.value = "No se pudo completar el registro. Revisa los datos.";
+    error.value = mensajeDeError(err, "No se pudo completar el registro.");
   }
 }
 </script>
