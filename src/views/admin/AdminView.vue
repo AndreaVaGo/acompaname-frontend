@@ -189,6 +189,8 @@ async function eliminarValoracion(id) {
 
 <style scoped>
 .admin {
+  /* Ocupa todo el ancho disponible: sin esto, con margin auto se ensancha según su contenido */
+  width: 100%;
   max-width: 1152px;
   margin: 0 auto;
   padding: 24px 24px 48px;
