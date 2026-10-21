@@ -43,6 +43,9 @@ test("la familia solicita, el cuidador acepta y la familia paga", async ({
   await page.getByRole("link", { name: "Ver perfil" }).click();
   await page.getByRole("link", { name: "Solicitar servicio" }).click();
   await page.getByRole("button", { name: "Hospitalario" }).click();
+  // El cuidado hospitalario exige indicar el hospital y la ubicación
+  await page.fill("#hospital", "Hospital de Cabueñes");
+  await page.fill("#ubicacion", "Planta 2, Medicina Interna, habitación 214");
   await page.fill("#fecha", "2030-01-15");
   await page.fill("#paciente", "Antonio Serrano");
   await page.fill("#edad", "81");
