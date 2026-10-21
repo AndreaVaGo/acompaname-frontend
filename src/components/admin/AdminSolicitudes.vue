@@ -70,11 +70,11 @@ function nombreEstado(estado) {
         </thead>
         <tbody>
           <tr v-for="solicitud in solicitudes" :key="solicitud.id">
-            <td>{{ nombreTipo(solicitud.tipoCuidado) }}</td>
-            <td>{{ solicitud.nombreFamilia }}</td>
-            <td>{{ solicitud.nombreCuidador }}</td>
-            <td>{{ formatearFecha(solicitud.fechaCuidado) }}</td>
-            <td>
+            <td data-label="Tipo">{{ nombreTipo(solicitud.tipoCuidado) }}</td>
+            <td data-label="Familia">{{ solicitud.nombreFamilia }}</td>
+            <td data-label="Cuidador">{{ solicitud.nombreCuidador }}</td>
+            <td data-label="Fecha">{{ formatearFecha(solicitud.fechaCuidado) }}</td>
+            <td data-label="Estado">
               <span
                 class="admin-solicitudes__pildora"
                 :class="'admin-solicitudes__pildora--' + solicitud.estado.toLowerCase()"
@@ -136,7 +136,7 @@ function nombreEstado(estado) {
   color: var(--color-text-muted);
 }
 
-/* En el móvil la tabla se desliza hacia los lados en vez de desbordar la página */
+/* En pantallas medianas la tabla se desliza hacia los lados en vez de desbordar la página */
 .admin-solicitudes__tabla {
   overflow-x: auto;
 }
@@ -194,5 +194,58 @@ tr:last-child td {
 .admin-solicitudes__pildora--rechazada {
   background-color: var(--color-neutral-bg);
   color: var(--color-text-muted);
+}
+
+/* En el móvil cada solicitud se ve como una tarjeta: etiqueta a la izquierda y valor a la derecha */
+@media (max-width: 640px) {
+  .admin-solicitudes__tabla {
+    overflow-x: visible;
+  }
+
+  table,
+  tbody,
+  tr,
+  td {
+    display: block;
+  }
+
+  thead {
+    display: none;
+  }
+
+  tr {
+    border: 1px solid var(--color-neutral-bg);
+    border-radius: var(--radius-input);
+    margin-bottom: 12px;
+    padding: 4px 12px;
+  }
+
+  td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    text-align: right;
+    white-space: normal;
+  }
+
+  td::before {
+    content: attr(data-label);
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: var(--color-text-muted);
+    text-align: left;
+    /* La etiqueta no se encoge ni se parte aunque el valor sea largo */
+    flex-shrink: 0;
+  }
+
+  tr:last-child td {
+    border-bottom: 1px solid var(--color-neutral-bg);
+  }
+
+  tr td:last-child {
+    border-bottom: none;
+  }
 }
 </style>
