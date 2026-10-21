@@ -8,7 +8,7 @@ Este repositorio contiene la **aplicación web** del proyecto, desarrollada con 
 
 Proyecto final del bootcamp de Desarrollo Web Full Stack (850h) en **Factoría F5 — Digital Academy**.
 
-![Vue](https://img.shields.io/badge/Vue-3-42b883) ![Vite](https://img.shields.io/badge/Vite-8-646CFF) ![Pinia](https://img.shields.io/badge/Pinia-estado-yellow) ![Vitest](https://img.shields.io/badge/tests-338-success) ![Responsive](https://img.shields.io/badge/responsive-768px-blue)
+![Vue](https://img.shields.io/badge/Vue-3-42b883) ![Vite](https://img.shields.io/badge/Vite-8-646CFF) ![Pinia](https://img.shields.io/badge/Pinia-estado-yellow) ![Vitest](https://img.shields.io/badge/tests-470-success) ![Responsive](https://img.shields.io/badge/responsive-768px-blue)
 
 > [!TIP]
 > 📚 **Documentación completa en la [wiki del proyecto](https://github.com/AndreaVaGo/acompaname-frontend/wiki).** Aquí está lo imprescindible para entender, arrancar y probar el frontend; el detalle (decisiones, diseño, diagramas y tests) está en la wiki.
@@ -22,6 +22,7 @@ Proyecto final del bootcamp de Desarrollo Web Full Stack (850h) en **Factoría F
 - [Instalación y uso](#-instalación-y-uso)
 - [Estructura del proyecto](#-estructura-del-proyecto)
 - [Pantallas y rutas](#-pantallas-y-rutas)
+- [Panel de administración](#-panel-de-administración)
 - [Decisiones técnicas](#-decisiones-técnicas)
 - [Diseño y capturas](#-diseño-y-capturas)
 - [Diagramas técnicos](#-diagramas-técnicos)
@@ -50,6 +51,12 @@ Los **cuidadores** pueden:
 - 🧑‍⚕️ Registrarse y gestionar su perfil profesional
 - 📥 Recibir solicitudes y aceptarlas o rechazarlas
 - 👤 Editar sus datos de contacto y cambiar la contraseña
+
+El **administrador** puede:
+- 📊 Ver un panel con el resumen de la actividad (familias, cuidadores, solicitudes, ingresos y valoración media), gráficos de barras y los avisos que requieren atención
+- 🚫 Bloquear y desbloquear cuentas de usuario
+- 🗑️ Eliminar valoraciones inadecuadas
+- 📋 Consultar todas las solicitudes, filtradas por estado
 
 Cualquier visitante puede consultar el **aviso legal** y la **política de privacidad** desde el pie de página.
 
@@ -88,7 +95,7 @@ npm run dev
 La aplicación quedará disponible en <mark>http://localhost:5173</mark> 🎉.
 
 > [!IMPORTANT]
-> Para que funcione completamente, el backend debe estar arrancado en <mark>http://localhost:8080</mark> (ver el README del repositorio de backend).
+> Para que funcione completamente, el backend debe estar arrancado en <mark>http://localhost:8080</mark> (ver el README del repositorio de backend). Para entrar como administrador, el backend tiene que haberse arrancado con las variables <mark>ADMIN_EMAIL</mark> y <mark>ADMIN_PASSWORD</mark>; en ese README se explica cómo.
 
 | Comando | Descripción |
 |---|---|
@@ -105,14 +112,15 @@ La aplicación quedará disponible en <mark>http://localhost:5173</mark> 🎉.
 src/
 ├── assets/          Imágenes, bocetos y diagramas
 ├── components/      NavBar, AppFooter, SolicitudCard, FotoCuidador (reutilizables)
+│   └── admin/       Piezas del panel: Avisos, Tarjetas, Barras, Pagos, Cuidadores, Valoraciones, Usuarios y Solicitudes
 ├── pinia/           Configuración de Pinia
-├── repositories/    Auth, Cuidador, Pago, Role, Solicitud, Usuario, Valoracion + Repository base
+├── repositories/    Admin, Auth, Cuidador, Pago, Role, Solicitud, Usuario, Valoracion + Repository base
 ├── router/          Definición de rutas
 ├── stores/          auth.js (estado de sesión)
 ├── styles/          variables.css, base.css, style.css
 ├── tests/           Tests de componentes, vistas, rutas, store y repositorios
-├── utils/           catalogoCuidados.js, formatearFecha.js, reducirImagen.js
-├── views/           Una vista por pantalla, en carpetas: auth, caregiver, common, family
+├── utils/           catalogoCuidados.js, formatearEuros.js, formatearFecha.js, mensajeDeError.js, reducirImagen.js
+├── views/           Una vista por pantalla, en carpetas: admin, auth, caregiver, common, family
 ├── App.vue
 └── main.js
 ```
@@ -127,7 +135,7 @@ Esta estructura separa claramente responsabilidades: las **vistas** (<mark>views
 |---|---|---|---|
 | 1 | 🏠 **Landing** | <mark>/</mark> | Página pública de bienvenida, con propuesta de valor y accesos a registro/login |
 | 2 | ✍️ **Registro** | <mark>/registro</mark> | Formulario con selección de rol (Familia / Cuidador), cargado dinámicamente desde la API |
-| 3 | 🔑 **Inicio de sesión** | <mark>/login</mark> | Acceso con email y contraseña |
+| 3 | 🔑 **Inicio de sesión** | <mark>/login</mark> | Acceso con email y contraseña; el administrador entra directamente en su panel |
 | 4 | 🔍 **Búsqueda de cuidadores** | <mark>/buscar</mark> | Listado con filtros por ciudad, tipo de cuidado, sexo, servicios, disponibilidad, vehículo propio, valoración mínima y fechas (oculta a los cuidadores que ya tienen un servicio aceptado esos días) |
 | 5 | 🧑‍⚕️ **Perfil de cuidador** (público) | <mark>/cuidador/:id</mark> | Datos profesionales, valoración media y ventana con las reseñas de las familias |
 | 6 | 📝 **Solicitud de servicio** | <mark>/solicitar/:id</mark> | Formulario para pedir el acompañamiento a un cuidador concreto (tipo de cuidado, dirección u hospital, fechas, paciente y necesidades) |
@@ -143,10 +151,34 @@ Esta estructura separa claramente responsabilidades: las **vistas** (<mark>views
 | 16 | 🔐 **Cambiar contraseña** | <mark>/cambiar-password</mark> | Contraseña actual, nueva y repetida |
 | 17 | ⚖️ **Aviso legal** | <mark>/aviso-legal</mark> | Datos del titular y condiciones de uso (público) |
 | 18 | 🛡️ **Política de privacidad** | <mark>/privacidad</mark> | Cómo se tratan los datos personales (público) |
+| 19 | 📊 **Panel de administración** (Administrador) | <mark>/admin</mark> | Resumen de la actividad, gráficos, avisos, valoraciones, usuarios y solicitudes |
 
-Las rutas privadas comprueban en el router que haya sesión y, cuando hace falta, el rol (<mark>FAMILIA</mark> o <mark>CUIDADOR</mark>); si no se cumple, redirigen al login.
+Las rutas privadas comprueban en el router que haya sesión y, cuando hace falta, el rol (<mark>FAMILIA</mark>, <mark>CUIDADOR</mark> o <mark>ADMIN</mark>); si no se cumple, redirigen al login.
 
 Cada vista incluye sus correspondientes estados vacíos (por ejemplo, "Aún no tienes solicitudes") y mensajes de error ante fallos de carga o de envío, para que la interfaz nunca se muestre rota ni en blanco.
+
+---
+
+## 🛡 Panel de administración
+
+Pantalla **/admin**, solo para el rol <mark>ADMIN</mark>. El administrador **observa y modera**: no edita solicitudes ni pagos, no borra usuarios y no puede hacerse pasar por otra cuenta.
+
+| Bloque | Qué muestra |
+|---|---|
+| ⚠️ Avisos | Qué requiere atención (por ejemplo, solicitudes pendientes) y un botón que baja a la tabla de solicitudes ya filtrada |
+| 🔢 Tarjetas | Familias, cuidadores (y cuántos están disponibles ahora), solicitudes, ingresos cobrados y valoración media |
+| 📊 Barras | Solicitudes por estado y por tipo de cuidado, con el tiempo medio hasta aceptar una solicitud |
+| 💶 Pagos | Importe pagado y pendiente |
+| ⭐ Valoraciones | Cuidadores mejor valorados y últimas valoraciones, con botón **Eliminar** y confirmación en la propia fila |
+| 👥 Usuarios | Tabla con rol y estado; botón **Bloquear / Desbloquear** (en su propia fila se ve «Tú», porque no puede bloquearse a sí mismo) |
+| 📋 Solicitudes | Tabla con filtro por estado |
+
+Detalles de diseño:
+
+- El menú del administrador solo tiene **Panel**, **Cambiar contraseña** y **Cerrar sesión**: no lleva «Mi perfil» ni «Editar mis datos», para que el email del administrador (que se crea desde el backend) no pueda cambiar desde la web.
+- Los gráficos son solo texto y CSS, sin librerías de gráficos.
+- En **móvil** (menos de 640 px), las tablas de usuarios y solicitudes se convierten en tarjetas con etiqueta y valor, para que el botón Bloquear siempre esté a la vista.
+- Si una cuenta está bloqueada, el login muestra «Email o contraseña incorrectos, o tu cuenta está bloqueada.» (el backend responde igual que con una contraseña mala).
 
 ---
 
@@ -159,9 +191,14 @@ Algunas de las decisiones principales:
 - 🎨 **BEM + variables CSS globales** para colores, radios y espaciados.
 - 🔌 **Repository Pattern** para el consumo de la API: cada entidad tiene su repositorio, que extiende una clase base.
 - 🍍 **Estado de sesión con Pinia** (<mark>useAuthStore</mark>), persistido en <mark>sessionStorage</mark>.
-- 🧭 **<mark>NavBar</mark> compartido**, que muestra enlaces distintos según el rol.
+- 🧭 **<mark>NavBar</mark> compartido**, que muestra enlaces distintos según el rol (familia, cuidador o administrador).
 - 🔎 **Filtros de búsqueda en el navegador** y **filtro por fechas con ayuda del backend** (<mark>GET /solicitudes/cuidadores-ocupados</mark>).
 - 📱 **Diseño responsive** con media queries (punto de corte de 768 px).
+- 🛡️ **Panel de administración dividido en componentes** pequeños (uno por bloque) que reciben los datos por <mark>props</mark> y avisan con eventos; la vista <mark>AdminView</mark> es la única que habla con la API.
+- 📊 **Gráficos hechos con CSS**, sin librerías, para no añadir dependencias.
+- 🗑️ **Confirmación en la propia fila** al eliminar una valoración, en vez de una ventana emergente.
+- 📱 **Tablas que se convierten en tarjetas en móvil**, con CSS y atributos <mark>data-label</mark>, sin duplicar el contenido.
+- 🔒 **El administrador no puede bloquearse a sí mismo**, ni en el backend ni en el frontend.
 
 👉 Todas las decisiones y la metodología de trabajo: [Decisiones técnicas](https://github.com/AndreaVaGo/acompaname-frontend/wiki/Decisiones-tecnicas).
 
@@ -174,6 +211,10 @@ Proceso de diseño: bocetos → wireframes → mockups → prototipo, para móvi
 | Landing | Buscar | Solicitar |
 |---|---|---|
 | ![landing](docs/screenshots/landing.png) | ![buscar](docs/screenshots/buscar.png) | ![solicitar](docs/screenshots/solicitar.png) |
+
+| Panel de administración (escritorio) | Panel de administración (móvil) |
+|---|---|
+| ![panel de administración en escritorio](docs/screenshots/admin-escritorio.png) | ![panel de administración en móvil](docs/screenshots/admin-movil.png) |
 
 👉 Bocetos, mockups y todas las capturas de la app: [Diseño y capturas](https://github.com/AndreaVaGo/acompaname-frontend/wiki/Diseno-y-capturas).
 
@@ -189,7 +230,9 @@ Arquitectura del frontend, flujo de navegación, casos de uso, diagramas de secu
 
 ## ✅ Tests
 
-El proyecto tiene **338 tests unitarios** en 32 archivos (Vitest + Vue Test Utils) y **9 tests e2e** (Playwright). Los unitarios mockean el repositorio correspondiente para no depender del backend; los e2e abren un navegador de verdad y **necesitan el backend arrancado**.
+El proyecto tiene **470 tests unitarios** en 46 archivos (Vitest + Vue Test Utils) y **9 tests e2e** (Playwright). Los unitarios mockean el repositorio correspondiente para no depender del backend; los e2e abren un navegador de verdad y **necesitan el backend arrancado**.
+
+El panel de administración tiene **60 tests unitarios** (8 componentes, el formateo de euros y la vista completa), además de los del repositorio, el router, el login y el menú.
 
 ```bash
 npm run test:unit      # tests unitarios
@@ -197,7 +240,7 @@ npm run test:coverage  # cobertura (informe en coverage/index.html)
 npm run test:e2e       # tests e2e (con el backend en marcha)
 ```
 
-Cobertura actual: **98 % de líneas**, **98 % de ramas**, **98 % de sentencias** y **97 % de funciones** (el mínimo pedido era el 70 %).
+Cobertura actual: **98 % de líneas**, **98 % de ramas**, **98 % de sentencias** y **98 % de funciones** (el mínimo pedido era el 70 %).
 
 ![Resultado de los tests del frontend](docs/screenshots/tests-frontend.png)
 ![Cobertura de los tests del frontend](docs/screenshots/cobertura-frontend.png)
@@ -242,6 +285,8 @@ Cobertura actual: **98 % de líneas**, **98 % de ramas**, **98 % de sentencias**
 - 💳 El checkout (<mark>/pagar/:id</mark>) llama al endpoint <mark>PATCH /pagos/{id}/pagar</mark> del backend y el pago queda como completado, pero los datos de la tarjeta son de prueba: no se cobra nada ni hay pasarela de pago real.
 - 🔑 La autenticación es Basic Auth: las credenciales viajan en cada petición.
 - 🎨 Algunas vistas todavía tienen colores escritos a mano en el CSS en vez de usar las variables de la paleta (pendiente de <mark>refactorizar</mark>).
+- 🎭 Los tests e2e todavía no cubren el panel de administración (sí lo cubren los 60 tests unitarios y la comprobación manual).
+- 🚫 Una persona con la cuenta bloqueada no sabe el motivo: el login le muestra el mismo mensaje que con una contraseña incorrecta.
 
 ---
 
@@ -251,6 +296,7 @@ Cobertura actual: **98 % de líneas**, **98 % de ramas**, **98 % de sentencias**
 - 🌐 Revisar la configuración de CORS tras la migración a JWT
 - 💳 Conectar el checkout con una pasarela de pago real (por ejemplo Stripe en modo test)
 - 🖼️ Guardar las fotos de perfil como archivos en un almacenamiento externo (ahora se envían reducidas a 300 px y se guardan como texto)
+- 🎭 Añadir tests e2e del panel de administración
 - 🚀 Desplegar frontend y backend
 
 ---
