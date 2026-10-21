@@ -152,12 +152,16 @@ th {
   color: var(--color-text-muted);
   padding: 10px 12px;
   border-bottom: 2px solid var(--color-accent-bg);
+  /* Las palabras no se parten: si no caben, la tabla se desliza */
+  white-space: nowrap;
 }
 
 td {
   padding: 12px;
   border-bottom: 1px solid var(--color-neutral-bg);
   font-size: 0.9rem;
+  /* Las palabras no se parten: si no caben, la tabla se desliza */
+  white-space: nowrap;
 }
 
 tr:last-child td {
