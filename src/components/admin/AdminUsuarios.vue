@@ -55,14 +55,14 @@ function esMiCuenta(usuario, idPropio) {
         </thead>
         <tbody>
           <tr v-for="usuario in usuarios" :key="usuario.id">
-            <td>{{ usuario.nombre }}</td>
-            <td>{{ usuario.email }}</td>
-            <td>
+            <td data-label="Nombre">{{ usuario.nombre }}</td>
+            <td data-label="Email">{{ usuario.email }}</td>
+            <td data-label="Rol">
               <span class="admin-usuarios__pildora" :class="claseRol(usuario.rol)">
                 {{ nombreRol(usuario.rol) }}
               </span>
             </td>
-            <td>
+            <td data-label="Estado">
               <span
                 v-if="!usuario.activo"
                 class="admin-usuarios__pildora admin-usuarios__pildora--bloqueado"
@@ -71,7 +71,7 @@ function esMiCuenta(usuario, idPropio) {
               </span>
               <span v-else>Activo</span>
             </td>
-            <td>
+            <td data-label="Acción">
               <span v-if="esMiCuenta(usuario, idPropio)" class="admin-usuarios__tu">Tú</span>
               <button
                 v-else
@@ -101,7 +101,7 @@ function esMiCuenta(usuario, idPropio) {
   margin-top: 0;
 }
 
-/* En el móvil la tabla se desliza hacia los lados en vez de desbordar la página */
+/* En pantallas medianas la tabla se desliza hacia los lados en vez de desbordar la página */
 .admin-usuarios__tabla {
   overflow-x: auto;
 }
@@ -169,5 +169,58 @@ tr:last-child td {
 .admin-usuarios__boton {
   padding: 8px 16px;
   font-size: 0.85rem;
+}
+
+/* En el móvil cada usuario se ve como una tarjeta: etiqueta a la izquierda y valor a la derecha */
+@media (max-width: 640px) {
+  .admin-usuarios__tabla {
+    overflow-x: visible;
+  }
+
+  table,
+  tbody,
+  tr,
+  td {
+    display: block;
+  }
+
+  thead {
+    display: none;
+  }
+
+  tr {
+    border: 1px solid var(--color-neutral-bg);
+    border-radius: var(--radius-input);
+    margin-bottom: 12px;
+    padding: 4px 12px;
+  }
+
+  td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    text-align: right;
+    white-space: normal;
+  }
+
+  td::before {
+    content: attr(data-label);
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: var(--color-text-muted);
+    text-align: left;
+    /* La etiqueta no se encoge ni se parte aunque el valor sea largo */
+    flex-shrink: 0;
+  }
+
+  tr:last-child td {
+    border-bottom: 1px solid var(--color-neutral-bg);
+  }
+
+  tr td:last-child {
+    border-bottom: none;
+  }
 }
 </style>
