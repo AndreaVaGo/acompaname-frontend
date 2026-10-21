@@ -33,7 +33,8 @@ test.describe("Registro y login", () => {
 
     await iniciarSesion(page, familia.email, "ContraseñaMala1");
 
-    await expect(page.getByText("Email o contraseña incorrectos.")).toBeVisible();
+    // El mensaje también avisa de que la cuenta puede estar bloqueada
+    await expect(page.getByText("Email o contraseña incorrectos")).toBeVisible();
     await expect(page).toHaveURL("/login");
     await page.screenshot({ path: "docs/screenshots/e2e-02-login-error.png" });
   });
@@ -44,8 +45,9 @@ test.describe("Registro y login", () => {
 
     await rellenarRegistro(page, familia);
 
+    // Después de la frase fija, la pantalla añade el motivo que da el servidor
     await expect(
-      page.getByText("No se pudo completar el registro. Revisa los datos."),
+      page.getByText("No se pudo completar el registro."),
     ).toBeVisible();
     await expect(page).toHaveURL("/registro");
   });
