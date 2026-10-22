@@ -60,7 +60,8 @@ async function cargarDatosCuenta() {
 
 // Cuenta las solicitudes que necesitan tu atención:
 // el cuidador, las pendientes de responder;
-// la familia, las aceptadas que todavía no ha pagado;
+// la familia, las completadas que todavía no ha pagado
+// (el pago solo se puede hacer cuando el cuidador completa la solicitud);
 // el administrador no tiene solicitudes propias (sus avisos están en el panel)
 async function cargarAvisos() {
   if (!authStore.estaAutenticado) {
@@ -84,7 +85,7 @@ async function cargarAvisos() {
         .filter((pago) => pago.estado === "COMPLETADO")
         .map((pago) => pago.solicitudId);
       avisos.value = solicitudes.filter(
-        (s) => s.estado === "ACEPTADA" && !idsPagados.includes(s.id),
+        (s) => s.estado === "COMPLETADA" && !idsPagados.includes(s.id),
       ).length;
     }
   } catch (err) {
