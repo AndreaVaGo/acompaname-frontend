@@ -40,7 +40,7 @@ function cerrarSesion() {
 <template>
   <div class="mi-perfil" v-if="usuario">
     <h1>Mi perfil</h1>
-    <p class="mi-perfil__subtitle">Los datos de contacto de tu familia.</p>
+    <p class="mi-perfil__subtitle">Tus datos de contacto.</p>
 
     <div class="mi-perfil__box">
       <div class="mi-perfil__cabecera">
