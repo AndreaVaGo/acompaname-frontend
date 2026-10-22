@@ -30,7 +30,7 @@ const inicial = computed(() =>
 
 const tipoCuenta = computed(() => {
   if (authStore.rol === "FAMILIA") {
-    return "Cuenta de familia";
+    return "Cuenta de solicitante";
   }
   if (authStore.rol === "ADMIN") {
     return "Cuenta de administración";
