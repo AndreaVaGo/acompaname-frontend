@@ -63,17 +63,31 @@ describe('SolicitudCard', () => {
     expect(wrapper.text()).toContain('Familia Serrano')
   })
 
-  test('muestra el botón Pagar si la solicitud está aceptada y sin pagar', () => {
-    const wrapper = montarTarjeta('ACEPTADA', false)
+  test('muestra el botón Pagar si la solicitud está completada y sin pagar', () => {
+    const wrapper = montarTarjeta('COMPLETADA', false)
 
     expect(wrapper.text()).toContain('Pagar')
     expect(wrapper.text()).not.toContain('Pagado')
   })
 
+  test('el botón Pagar lleva a la página de pago de esa solicitud', () => {
+    const wrapper = montarTarjeta('COMPLETADA', false)
+
+    expect(wrapper.findComponent(RouterLinkStub).props('to')).toBe('/pagar/1')
+  })
+
   test('muestra Pagado en vez del botón si el pago ya está hecho', () => {
-    const wrapper = montarTarjeta('ACEPTADA', true)
+    const wrapper = montarTarjeta('COMPLETADA', true)
 
     expect(wrapper.text()).toContain('Pagado')
+    expect(wrapper.text()).not.toContain('Pagar')
+  })
+
+  test('no muestra ni Pagar ni Pagado si la solicitud está aceptada', () => {
+    const wrapper = montarTarjeta('ACEPTADA', false)
+
+    expect(wrapper.text()).not.toContain('Pagar')
+    expect(wrapper.text()).not.toContain('Pagado')
     expect(wrapper.findComponent(RouterLinkStub).exists()).toBe(false)
   })
 
