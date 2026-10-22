@@ -184,27 +184,16 @@ const avisoDireccion = computed(
       </button>
     </div>
 
-    <div
-      class="solicitudes__acciones"
-      v-if="!mostrarAcciones && solicitud.estado === 'ACEPTADA' && !pagado"
-    >
-      <RouterLink :to="`/pagar/${solicitud.id}`" class="btn btn--primary">
-        Pagar
-      </RouterLink>
-    </div>
-
-    <div
-      class="solicitudes__acciones"
-      v-if="!mostrarAcciones && solicitud.estado === 'ACEPTADA' && pagado"
-    >
-      <p class="solicitudes__pagado">Pagado ✓</p>
-    </div>
-
-    <!-- La familia valora al cuidador desde la tarjeta cuando la solicitud está completada -->
+    <!-- La familia paga y valora al cuidador desde la tarjeta cuando la solicitud está completada -->
     <div
       class="solicitudes__acciones"
       v-if="!mostrarAcciones && solicitud.estado === 'COMPLETADA'"
     >
+      <p v-if="pagado" class="solicitudes__pagado">Pagado ✓</p>
+      <RouterLink v-else :to="`/pagar/${solicitud.id}`" class="btn btn--primary">
+        Pagar
+      </RouterLink>
+
       <p v-if="valorada" class="solicitudes__pagado">Valoración enviada ✓</p>
       <RouterLink
         v-else
