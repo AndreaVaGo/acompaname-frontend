@@ -52,7 +52,7 @@ describe("SolicitudesFamiliaView", () => {
 
   test("mientras carga muestra Cargando solicitudes y no las tarjetas", async () => {
     vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
-      crearSolicitud(1, "ACEPTADA"),
+      crearSolicitud(1, "COMPLETADA"),
     ]);
     vi.spyOn(PagoRepository.prototype, "getMisPagos").mockResolvedValue([]);
     vi.spyOn(ValoracionRepository.prototype, "getAll").mockResolvedValue([]);
@@ -72,7 +72,7 @@ describe("SolicitudesFamiliaView", () => {
 
   test("al terminar de cargar quita el mensaje de carga y muestra las tarjetas", async () => {
     vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
-      crearSolicitud(1, "ACEPTADA"),
+      crearSolicitud(1, "COMPLETADA"),
     ]);
     vi.spyOn(PagoRepository.prototype, "getMisPagos").mockResolvedValue([]);
     vi.spyOn(ValoracionRepository.prototype, "getAll").mockResolvedValue([]);
@@ -84,10 +84,24 @@ describe("SolicitudesFamiliaView", () => {
     expect(wrapper.text()).toContain("Pagar");
   });
 
-  test("marca como pagada solo la solicitud con el pago completado", async () => {
+  test("una solicitud solo aceptada no se puede pagar todavía", async () => {
     vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
       crearSolicitud(1, "ACEPTADA"),
-      crearSolicitud(2, "ACEPTADA"),
+    ]);
+    vi.spyOn(PagoRepository.prototype, "getMisPagos").mockResolvedValue([]);
+    vi.spyOn(ValoracionRepository.prototype, "getAll").mockResolvedValue([]);
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.text()).toContain("Pepe");
+    expect(wrapper.text()).not.toContain("Pagar");
+    expect(wrapper.findAll(".solicitudes__pagado").length).toBe(0);
+  });
+
+  test("marca como pagada solo la solicitud con el pago completado", async () => {
+    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
+      crearSolicitud(1, "COMPLETADA"),
+      crearSolicitud(2, "COMPLETADA"),
     ]);
     vi.spyOn(PagoRepository.prototype, "getMisPagos").mockResolvedValue([
       { id: 10, solicitudId: 1, estado: "COMPLETADO" },
@@ -103,7 +117,7 @@ describe("SolicitudesFamiliaView", () => {
 
   test("si falla la carga de pagos, muestra las solicitudes sin marcar ninguna como pagada", async () => {
     vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
-      crearSolicitud(1, "ACEPTADA"),
+      crearSolicitud(1, "COMPLETADA"),
     ]);
     vi.spyOn(PagoRepository.prototype, "getMisPagos").mockRejectedValue(
       new Error("fallo")
