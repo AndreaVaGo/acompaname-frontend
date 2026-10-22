@@ -228,14 +228,14 @@ describe('NavBar', () => {
     expect(wrapper.find('.navbar__aviso').text()).toBe('2')
   })
 
-  test('la familia ve cuántas solicitudes aceptadas le faltan por pagar', async () => {
+  test('la familia ve cuántas solicitudes completadas le faltan por pagar', async () => {
     vi.spyOn(UsuarioRepository.prototype, 'getById').mockResolvedValue({
       nombre: 'Ana',
     })
     vi.spyOn(SolicitudRepository.prototype, 'getMisSolicitudes').mockResolvedValue(
       [
-        { id: 1, estado: 'ACEPTADA' },
-        { id: 2, estado: 'ACEPTADA' },
+        { id: 1, estado: 'COMPLETADA' },
+        { id: 2, estado: 'COMPLETADA' },
         { id: 3, estado: 'PENDIENTE' },
       ]
     )
@@ -248,6 +248,24 @@ describe('NavBar', () => {
     const wrapper = await montarNavBar()
 
     expect(wrapper.find('.navbar__aviso').text()).toBe('1')
+  })
+
+  test('la familia no recibe aviso de pago por una solicitud solo aceptada', async () => {
+    vi.spyOn(UsuarioRepository.prototype, 'getById').mockResolvedValue({
+      nombre: 'Ana',
+    })
+    vi.spyOn(SolicitudRepository.prototype, 'getMisSolicitudes').mockResolvedValue(
+      [
+        { id: 1, estado: 'ACEPTADA' },
+        { id: 2, estado: 'ACEPTADA' },
+      ]
+    )
+    const authStore = useAuthStore()
+    authStore.login(1, 'ana@test.com', '12345678', 'FAMILIA')
+
+    const wrapper = await montarNavBar()
+
+    expect(wrapper.find('.navbar__aviso').exists()).toBe(false)
   })
 
   test('no muestra aviso cuando no hay nada que atender', async () => {
