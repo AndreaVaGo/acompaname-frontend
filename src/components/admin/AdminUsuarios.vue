@@ -2,8 +2,9 @@
 import { ref, computed } from "vue";
 
 // Tabla de usuarios con botones por rol (Todos, Familias, Cuidadores y Administradores, cada uno
-// con su contador) y buscador por nombre o email. Los dos los hace el propio componente sobre la
-// lista que ya tiene. Avisa a la vista cuando se pulsa Bloquear o Desbloquear.
+// con su contador y con el mismo color que su píldora de rol) y buscador por nombre o email.
+// Los dos los hace el propio componente sobre la lista que ya tiene. Avisa a la vista cuando
+// se pulsa Bloquear o Desbloquear.
 const props = defineProps({
   usuarios: { type: Array, required: true },
   idPropio: { type: [Number, String], default: null },
@@ -11,11 +12,12 @@ const props = defineProps({
 
 const emit = defineEmits(["cambiarActivo"]);
 
+// Cada grupo lleva una clase para darle el color de su rol
 const GRUPOS = [
-  { valor: "", nombre: "Todos" },
-  { valor: "FAMILIA", nombre: "Familias" },
-  { valor: "CUIDADOR", nombre: "Cuidadores" },
-  { valor: "ADMIN", nombre: "Administradores" },
+  { valor: "", nombre: "Todos", clase: "admin-usuarios__grupo--todos" },
+  { valor: "FAMILIA", nombre: "Familias", clase: "admin-usuarios__grupo--familia" },
+  { valor: "CUIDADOR", nombre: "Cuidadores", clase: "admin-usuarios__grupo--cuidador" },
+  { valor: "ADMIN", nombre: "Administradores", clase: "admin-usuarios__grupo--admin" },
 ];
 
 // El grupo que está elegido ("" = todos) y lo que se ha escrito en el buscador
@@ -116,7 +118,7 @@ function esMiCuenta(usuario, idPropio) {
         :key="grupo.valor"
         type="button"
         class="admin-usuarios__grupo"
-        :class="{ 'admin-usuarios__grupo--activo': rolElegido === grupo.valor }"
+        :class="[grupo.clase, { 'admin-usuarios__grupo--activo': rolElegido === grupo.valor }]"
         :aria-pressed="rolElegido === grupo.valor"
         @click="elegirGrupo(grupo.valor)"
       >
@@ -249,29 +251,95 @@ function esMiCuenta(usuario, idPropio) {
   cursor: pointer;
 }
 
-.admin-usuarios__grupo:hover {
+.admin-usuarios__cuenta {
+  min-width: 24px;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+/* Todos: gris neutro */
+.admin-usuarios__grupo--todos .admin-usuarios__cuenta {
+  background-color: var(--color-neutral-bg);
+  color: var(--color-text-muted);
+}
+
+.admin-usuarios__grupo--todos:hover {
   background-color: var(--color-neutral-bg);
 }
 
-.admin-usuarios__grupo--activo,
-.admin-usuarios__grupo--activo:hover {
+.admin-usuarios__grupo--todos.admin-usuarios__grupo--activo {
+  background-color: var(--color-neutral-bg);
+  border-color: var(--color-text-muted);
+  color: var(--color-text);
+}
+
+.admin-usuarios__grupo--todos.admin-usuarios__grupo--activo .admin-usuarios__cuenta {
+  background-color: var(--color-text-muted);
+  color: var(--color-white);
+}
+
+/* Familias: verde, igual que la píldora de rol */
+.admin-usuarios__grupo--familia .admin-usuarios__cuenta {
+  background-color: var(--color-secondary-bg);
+  color: var(--color-secondary);
+}
+
+.admin-usuarios__grupo--familia:hover {
+  background-color: var(--color-secondary-bg);
+}
+
+.admin-usuarios__grupo--familia.admin-usuarios__grupo--activo {
   background-color: var(--color-secondary-bg);
   border-color: var(--color-secondary);
   color: var(--color-secondary);
 }
 
-.admin-usuarios__cuenta {
-  min-width: 24px;
-  padding: 2px 8px;
-  border-radius: var(--radius-pill);
-  background-color: var(--color-neutral-bg);
-  color: var(--color-text-muted);
-  font-size: 0.8rem;
-  text-align: center;
+.admin-usuarios__grupo--familia.admin-usuarios__grupo--activo .admin-usuarios__cuenta {
+  background-color: var(--color-secondary);
+  color: var(--color-white);
 }
 
-.admin-usuarios__grupo--activo .admin-usuarios__cuenta {
-  background-color: var(--color-secondary);
+/* Cuidadores: naranja, igual que la píldora de rol */
+.admin-usuarios__grupo--cuidador .admin-usuarios__cuenta {
+  background-color: var(--color-accent-bg);
+  color: var(--color-accent-dark);
+}
+
+.admin-usuarios__grupo--cuidador:hover {
+  background-color: var(--color-accent-bg);
+}
+
+.admin-usuarios__grupo--cuidador.admin-usuarios__grupo--activo {
+  background-color: var(--color-accent-bg);
+  border-color: var(--color-accent-dark);
+  color: var(--color-accent-dark);
+}
+
+.admin-usuarios__grupo--cuidador.admin-usuarios__grupo--activo .admin-usuarios__cuenta {
+  background-color: var(--color-accent-dark);
+  color: var(--color-white);
+}
+
+/* Administradores: azul, igual que la píldora de rol */
+.admin-usuarios__grupo--admin .admin-usuarios__cuenta {
+  background-color: var(--color-info-bg);
+  color: var(--color-info);
+}
+
+.admin-usuarios__grupo--admin:hover {
+  background-color: var(--color-info-bg);
+}
+
+.admin-usuarios__grupo--admin.admin-usuarios__grupo--activo {
+  background-color: var(--color-info-bg);
+  border-color: var(--color-info);
+  color: var(--color-info);
+}
+
+.admin-usuarios__grupo--admin.admin-usuarios__grupo--activo .admin-usuarios__cuenta {
+  background-color: var(--color-info);
   color: var(--color-white);
 }
 
