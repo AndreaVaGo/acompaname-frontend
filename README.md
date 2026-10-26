@@ -8,7 +8,7 @@ Este repositorio contiene la **aplicación web** del proyecto, desarrollada con 
 
 Proyecto final del bootcamp de Desarrollo Web Full Stack (850h) en **Factoría F5 — Digital Academy**.
 
-![Vue](https://img.shields.io/badge/Vue-3-42b883) ![Vite](https://img.shields.io/badge/Vite-8-646CFF) ![Pinia](https://img.shields.io/badge/Pinia-estado-yellow) ![Vitest](https://img.shields.io/badge/tests-487-success) ![Responsive](https://img.shields.io/badge/responsive-768px-blue)
+![Vue](https://img.shields.io/badge/Vue-3-42b883) ![Vite](https://img.shields.io/badge/Vite-8-646CFF) ![Pinia](https://img.shields.io/badge/Pinia-estado-yellow) ![Vitest](https://img.shields.io/badge/tests-522-success) ![Responsive](https://img.shields.io/badge/responsive-768px-blue)
 
 > [!TIP]
 > 📚 **Documentación completa en la [wiki del proyecto](https://github.com/AndreaVaGo/acompaname-frontend/wiki).** Aquí está lo imprescindible para entender, arrancar y probar el frontend; el detalle (decisiones, diseño, diagramas y tests) está en la wiki.
@@ -57,6 +57,7 @@ El **administrador** puede:
 - 🚫 Bloquear y desbloquear cuentas de usuario
 - 🗑️ Eliminar valoraciones inadecuadas
 - 📋 Consultar todas las solicitudes, filtradas por estado
+- 💶 Analizar los pagos: cuánto se ha cobrado y cuánto está pendiente, con gráficos por mes, por estado, por tipo de cuidado y por cuidador, y una tabla con filtro y buscador
 
 Cualquier visitante puede consultar el **aviso legal** y la **política de privacidad** desde el pie de página.
 
@@ -112,7 +113,7 @@ La aplicación quedará disponible en <mark>http://localhost:5173</mark> 🎉.
 src/
 ├── assets/          Imágenes, bocetos y diagramas
 ├── components/      NavBar, AppFooter, SolicitudCard, FotoCuidador (reutilizables)
-│   └── admin/       Piezas del panel: Menu, Avisos, Tarjetas, Barras, Pagos, Cuidadores, Valoraciones, Usuarios y Solicitudes
+│   └── admin/       Piezas del panel: Menu, Avisos, Tarjetas, Barras, Pagos, Cuidadores, Valoraciones, Usuarios, Solicitudes y cuatro piezas de la sección Pagos
 ├── pinia/           Configuración de Pinia
 ├── repositories/    Admin, Auth, Cuidador, Pago, Role, Solicitud, Usuario, Valoracion + Repository base
 ├── router/          Definición de rutas
@@ -151,7 +152,7 @@ Esta estructura separa claramente responsabilidades: las **vistas** (<mark>views
 | 16 | 🔐 **Cambiar contraseña** | <mark>/cambiar-password</mark> | Contraseña actual, nueva y repetida |
 | 17 | ⚖️ **Aviso legal** | <mark>/aviso-legal</mark> | Datos del titular y condiciones de uso (público) |
 | 18 | 🛡️ **Política de privacidad** | <mark>/privacidad</mark> | Cómo se tratan los datos personales (público) |
-| 19 | 📊 **Panel de administración** (Administrador) | <mark>/admin</mark> | Menú lateral con tres secciones: Resumen, Solicitudes y Usuarios |
+| 19 | 📊 **Panel de administración** (Administrador) | <mark>/admin</mark> | Menú lateral con cuatro secciones: Resumen, Solicitudes, Pagos y Usuarios |
 
 Las rutas privadas comprueban en el router que haya sesión y, cuando hace falta, el rol (<mark>FAMILIA</mark>, <mark>CUIDADOR</mark> o <mark>ADMIN</mark>); si no se cumple, redirigen al login.
 
@@ -172,11 +173,12 @@ Pantalla **/admin**, solo para el rol <mark>ADMIN</mark>. El administrador **obs
 | ⭐ Valoraciones | Cuidadores mejor valorados y últimas valoraciones, con botón **Eliminar** y confirmación en la propia fila |
 | 👥 Usuarios | Tabla con rol y estado; botón **Bloquear / Desbloquear** (en su propia fila se ve «Tú», porque no puede bloquearse a sí mismo) |
 | 📋 Solicitudes | Tabla con filtro por estado |
+| 💶 Pagos (sección) | Tarjetas de cobrado y pendiente, gráfico de pagos por mes, barras por estado, por tipo de cuidado y de los cuidadores que más han cobrado, y tabla de detalle con filtro por estado y buscador |
 
 Detalles de diseño:
 
 - El menú del administrador solo tiene **Panel**, **Cambiar contraseña** y **Cerrar sesión**: no lleva «Mi perfil» ni «Editar mis datos», para que el email del administrador (que se crea desde el backend) no pueda cambiar desde la web.
-- El panel se divide en **tres secciones** con un menú lateral (en móvil, una fila de pestañas): **Resumen**, **Solicitudes** y **Usuarios**. Solo se ve una a la vez y los datos se cargan una sola vez al entrar.
+- El panel se divide en **cuatro secciones** con un menú lateral (en móvil, una fila de pestañas): **Resumen**, **Solicitudes**, **Pagos** y **Usuarios**. Solo se ve una a la vez y los datos se cargan una sola vez al entrar.
 - Los gráficos son solo texto y CSS, sin librerías de gráficos.
 - En **móvil** (menos de 640 px), las tablas de usuarios y solicitudes se convierten en tarjetas con etiqueta y valor, para que el botón Bloquear siempre esté a la vista.
 - Si una cuenta está bloqueada, el login muestra «Email o contraseña incorrectos, o tu cuenta está bloqueada.» (el backend responde igual que con una contraseña mala).
@@ -231,9 +233,9 @@ Arquitectura del frontend, flujo de navegación, casos de uso, diagramas de secu
 
 ## ✅ Tests
 
-El proyecto tiene **487 tests unitarios** en 47 archivos (Vitest + Vue Test Utils) y **13 tests e2e** (Playwright). Los unitarios mockean el repositorio correspondiente para no depender del backend; los e2e abren un navegador de verdad y **necesitan el backend arrancado**.
+El proyecto tiene **522 tests unitarios** en 51 archivos (Vitest + Vue Test Utils) y **15 tests e2e** (Playwright). Los unitarios mockean el repositorio correspondiente para no depender del backend; los e2e abren un navegador de verdad y **necesitan el backend arrancado**.
 
-El panel de administración tiene **71 tests unitarios** (9 componentes, incluido el menú lateral, el formateo de euros y la vista completa), además de los del repositorio, el router, el login y el menú.
+El panel de administración tiene **103 tests unitarios** (13 componentes, incluido el menú lateral, el formateo de euros y la vista completa), además de los del repositorio, el router, el login y el menú.
 
 ```bash
 npm run test:unit      # tests unitarios
