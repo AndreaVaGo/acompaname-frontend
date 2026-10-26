@@ -1,9 +1,9 @@
 <script setup>
 import { ref, computed } from "vue";
 
-// Tabla de usuarios con filtro por rol y buscador por nombre o email (los dos los hace
-// el propio componente sobre la lista que ya tiene). Avisa a la vista cuando se pulsa
-// Bloquear o Desbloquear.
+// Tabla de usuarios con botones por rol (Todos, Familias, Cuidadores y Administradores, cada uno
+// con su contador) y buscador por nombre o email. Los dos los hace el propio componente sobre la
+// lista que ya tiene. Avisa a la vista cuando se pulsa Bloquear o Desbloquear.
 const props = defineProps({
   usuarios: { type: Array, required: true },
   idPropio: { type: [Number, String], default: null },
@@ -11,18 +11,36 @@ const props = defineProps({
 
 const emit = defineEmits(["cambiarActivo"]);
 
-const ROLES = [
+const GRUPOS = [
   { valor: "", nombre: "Todos" },
   { valor: "FAMILIA", nombre: "Familias" },
   { valor: "CUIDADOR", nombre: "Cuidadores" },
   { valor: "ADMIN", nombre: "Administradores" },
 ];
 
-// Lo que está elegido en el filtro ("" = todos) y lo que se ha escrito en el buscador
+// El grupo que está elegido ("" = todos) y lo que se ha escrito en el buscador
 const rolElegido = ref("");
 const busqueda = ref("");
 
-// Los usuarios que cumplen el rol elegido y lo escrito en el buscador (sin mirar mayúsculas)
+// Cuántos usuarios hay en cada grupo (no depende de lo que se busque)
+function cuantos(valor) {
+  if (valor === "") {
+    return props.usuarios.length;
+  }
+  let total = 0;
+  for (const usuario of props.usuarios) {
+    if (usuario.rol === valor) {
+      total = total + 1;
+    }
+  }
+  return total;
+}
+
+function elegirGrupo(valor) {
+  rolElegido.value = valor;
+}
+
+// Los usuarios que cumplen el grupo elegido y lo escrito en el buscador (sin mirar mayúsculas)
 const usuariosMostrados = computed(() => {
   const texto = busqueda.value.trim().toLowerCase();
   const resultado = [];
@@ -83,23 +101,28 @@ function esMiCuenta(usuario, idPropio) {
     <div class="admin-usuarios__cabecera">
       <h2 class="admin-usuarios__titulo">Usuarios</h2>
 
-      <div class="admin-usuarios__controles">
-        <input
-          v-model="busqueda"
-          type="search"
-          class="admin-usuarios__buscador"
-          placeholder="Buscar por nombre o email"
-          aria-label="Buscar por nombre o email"
-        />
-        <label class="admin-usuarios__filtro">
-          <span>Rol</span>
-          <select v-model="rolElegido">
-            <option v-for="opcion in ROLES" :key="opcion.valor" :value="opcion.valor">
-              {{ opcion.nombre }}
-            </option>
-          </select>
-        </label>
-      </div>
+      <input
+        v-model="busqueda"
+        type="search"
+        class="admin-usuarios__buscador"
+        placeholder="Buscar por nombre o email"
+        aria-label="Buscar por nombre o email"
+      />
+    </div>
+
+    <div class="admin-usuarios__grupos" role="group" aria-label="Filtrar por rol">
+      <button
+        v-for="grupo in GRUPOS"
+        :key="grupo.valor"
+        type="button"
+        class="admin-usuarios__grupo"
+        :class="{ 'admin-usuarios__grupo--activo': rolElegido === grupo.valor }"
+        :aria-pressed="rolElegido === grupo.valor"
+        @click="elegirGrupo(grupo.valor)"
+      >
+        {{ grupo.nombre }}
+        <span class="admin-usuarios__cuenta">{{ cuantos(grupo.valor) }}</span>
+      </button>
     </div>
 
     <p v-if="usuarios.length === 0" class="admin-usuarios__vacio">No hay usuarios.</p>
@@ -172,7 +195,7 @@ function esMiCuenta(usuario, idPropio) {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   padding-bottom: 8px;
   border-bottom: 2px solid var(--color-accent-bg);
 }
@@ -183,15 +206,8 @@ function esMiCuenta(usuario, idPropio) {
   color: var(--color-accent-dark);
 }
 
-.admin-usuarios__controles {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
-}
-
-.admin-usuarios__buscador,
-.admin-usuarios__filtro select {
+.admin-usuarios__buscador {
+  min-width: 240px;
   padding: 10px 14px;
   border-radius: var(--radius-input);
   border: 1px solid var(--color-border);
@@ -200,16 +216,53 @@ function esMiCuenta(usuario, idPropio) {
   background-color: var(--color-white);
 }
 
-.admin-usuarios__buscador {
-  min-width: 240px;
+/* Botones de grupo: Todos, Familias, Cuidadores y Administradores */
+.admin-usuarios__grupos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
 }
 
-.admin-usuarios__filtro {
-  display: flex;
+.admin-usuarios__grupo {
+  display: inline-flex;
   align-items: center;
-  gap: 10px;
-  font-size: 0.95rem;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-white);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 0.9rem;
   font-weight: bold;
+  cursor: pointer;
+}
+
+.admin-usuarios__grupo:hover {
+  background-color: var(--color-neutral-bg);
+}
+
+.admin-usuarios__grupo--activo,
+.admin-usuarios__grupo--activo:hover {
+  background-color: var(--color-secondary-bg);
+  border-color: var(--color-secondary);
+  color: var(--color-secondary);
+}
+
+.admin-usuarios__cuenta {
+  min-width: 24px;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-neutral-bg);
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.admin-usuarios__grupo--activo .admin-usuarios__cuenta {
+  background-color: var(--color-secondary);
+  color: var(--color-white);
 }
 
 .admin-usuarios__vacio {
@@ -299,10 +352,6 @@ tr:last-child td {
 @media (max-width: 640px) {
   .admin-usuarios__buscador {
     min-width: 0;
-    width: 100%;
-  }
-
-  .admin-usuarios__controles {
     width: 100%;
   }
 
