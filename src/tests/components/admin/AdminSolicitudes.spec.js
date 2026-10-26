@@ -29,6 +29,13 @@ function montar(solicitudes, estado) {
   })
 }
 
+// El botón del filtro con ese nombre (Todos, Pendiente, Aceptada...)
+function botonFiltro(wrapper, nombre) {
+  return wrapper
+    .findAll('.admin-solicitudes__filtro')
+    .find((boton) => boton.text() === nombre)
+}
+
 describe('AdminSolicitudes', () => {
   test('muestra el tipo, la familia, el cuidador, la fecha y el estado', () => {
     const wrapper = montar(SOLICITUDES, '')
@@ -54,6 +61,15 @@ describe('AdminSolicitudes', () => {
     expect(pildoras[1].classes()).toContain('admin-solicitudes__pildora--completada')
   })
 
+  test('cada tipo de cuidado lleva su clase de color', () => {
+    const wrapper = montar(SOLICITUDES, '')
+
+    const tipos = wrapper.findAll('.admin-solicitudes__tipo')
+
+    expect(tipos[0].classes()).toContain('admin-solicitudes__tipo--hospitalario')
+    expect(tipos[1].classes()).toContain('admin-solicitudes__tipo--domicilio')
+  })
+
   test('no enseña datos privados de la solicitud', () => {
     const wrapper = montar(SOLICITUDES, '')
 
@@ -61,28 +77,45 @@ describe('AdminSolicitudes', () => {
     expect(wrapper.text()).not.toContain('Juan')
   })
 
-  test('el filtro tiene las cinco opciones y tiene elegida la actual', () => {
+  test('el filtro tiene cinco botones y marca el estado elegido', () => {
     const wrapper = montar(SOLICITUDES, 'ACEPTADA')
 
-    const opciones = wrapper.findAll('option').map((opcion) => opcion.text())
+    const botones = wrapper.findAll('.admin-solicitudes__filtro')
 
-    expect(opciones).toEqual(['Todos', 'Pendiente', 'Aceptada', 'Completada', 'Rechazada'])
-    expect(wrapper.find('select').element.value).toBe('ACEPTADA')
+    expect(botones.map((boton) => boton.text())).toEqual([
+      'Todos',
+      'Pendiente',
+      'Aceptada',
+      'Completada',
+      'Rechazada',
+    ])
+    expect(botonFiltro(wrapper, 'Aceptada').classes()).toContain('admin-solicitudes__filtro--activo')
+    expect(botonFiltro(wrapper, 'Aceptada').attributes('aria-pressed')).toBe('true')
+    expect(botonFiltro(wrapper, 'Todos').attributes('aria-pressed')).toBe('false')
   })
 
-  test('al cambiar el filtro avisa con el estado elegido', async () => {
+  test('cada botón del filtro lleva el color de su estado', () => {
     const wrapper = montar(SOLICITUDES, '')
 
-    await wrapper.find('select').setValue('PENDIENTE')
+    expect(botonFiltro(wrapper, 'Pendiente').classes()).toContain('admin-solicitudes__filtro--pendiente')
+    expect(botonFiltro(wrapper, 'Aceptada').classes()).toContain('admin-solicitudes__filtro--aceptada')
+    expect(botonFiltro(wrapper, 'Completada').classes()).toContain('admin-solicitudes__filtro--completada')
+    expect(botonFiltro(wrapper, 'Rechazada').classes()).toContain('admin-solicitudes__filtro--rechazada')
+  })
+
+  test('al pulsar un botón avisa con el estado elegido', async () => {
+    const wrapper = montar(SOLICITUDES, '')
+
+    await botonFiltro(wrapper, 'Pendiente').trigger('click')
 
     expect(wrapper.emitted('cambiarEstado').length).toBe(1)
     expect(wrapper.emitted('cambiarEstado')[0]).toEqual(['PENDIENTE'])
   })
 
-  test('elegir Todos avisa con el texto vacío', async () => {
+  test('pulsar Todos avisa con el texto vacío', async () => {
     const wrapper = montar(SOLICITUDES, 'PENDIENTE')
 
-    await wrapper.find('select').setValue('')
+    await botonFiltro(wrapper, 'Todos').trigger('click')
 
     expect(wrapper.emitted('cambiarEstado')[0]).toEqual([''])
   })
@@ -92,6 +125,7 @@ describe('AdminSolicitudes', () => {
 
     expect(wrapper.text()).toContain('No hay solicitudes con este estado.')
     expect(wrapper.find('table').exists()).toBe(false)
-    expect(wrapper.find('select').exists()).toBe(true)
+    expect(wrapper.findAll('.admin-solicitudes__filtro').length).toBe(5)
+    expect(botonFiltro(wrapper, 'Rechazada').classes()).toContain('admin-solicitudes__filtro--activo')
   })
 })
