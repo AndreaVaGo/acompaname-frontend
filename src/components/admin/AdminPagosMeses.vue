@@ -61,6 +61,9 @@ function descripcion(mes) {
           class="admin-pagos-meses__columna"
           :title="descripcion(mes)"
         >
+          <span class="admin-pagos-meses__importe">
+            {{ formatearEuros(mes.cobrado + mes.pendiente) }}
+          </span>
           <div class="admin-pagos-meses__barra">
             <div
               class="admin-pagos-meses__tramo admin-pagos-meses__tramo--cobrado"
@@ -72,9 +75,6 @@ function descripcion(mes) {
             ></div>
           </div>
           <span class="admin-pagos-meses__mes">{{ nombreMes(mes.mes) }}</span>
-          <span class="admin-pagos-meses__importe">
-            {{ formatearEuros(mes.cobrado + mes.pendiente) }}
-          </span>
         </div>
       </div>
 
@@ -104,10 +104,14 @@ function descripcion(mes) {
   color: var(--color-text-muted);
 }
 
+/* Líneas de guía horizontales detrás de las columnas (cada 25 % de la altura de la barra) */
 .admin-pagos-meses__grafico {
   display: flex;
-  gap: 12px;
+  gap: 14px;
   align-items: flex-end;
+  padding: 8px 8px 0;
+  border-radius: var(--radius-input);
+  background-color: var(--color-accent-bg);
 }
 
 .admin-pagos-meses__columna {
@@ -117,18 +121,26 @@ function descripcion(mes) {
   flex-direction: column;
   align-items: center;
   gap: 6px;
+  padding-bottom: 10px;
+  border-radius: var(--radius-input);
+  transition: transform 0.2s;
+}
+
+.admin-pagos-meses__columna:hover {
+  transform: translateY(-4px);
 }
 
 /* Las columnas se llenan de abajo hacia arriba: primero lo cobrado y encima lo pendiente */
 .admin-pagos-meses__barra {
   width: 100%;
-  max-width: 48px;
-  height: 160px;
+  max-width: 56px;
+  height: 170px;
   display: flex;
   flex-direction: column-reverse;
-  background-color: var(--color-neutral-bg);
-  border-radius: 8px;
+  background-color: var(--color-white);
+  border-radius: 14px;
   overflow: hidden;
+  box-shadow: inset 0 0 0 1px var(--color-border);
 }
 
 .admin-pagos-meses__tramo--cobrado {
@@ -142,35 +154,68 @@ function descripcion(mes) {
 .admin-pagos-meses__mes {
   font-size: 0.8rem;
   font-weight: bold;
+  color: var(--color-text-muted);
 }
 
+.admin-pagos-meses__columna:hover .admin-pagos-meses__mes {
+  color: var(--color-text);
+}
+
+/* El importe total del mes va arriba de su columna, en negrita */
 .admin-pagos-meses__importe {
-  font-size: 0.75rem;
-  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  font-weight: bold;
 }
 
 .admin-pagos-meses__leyenda {
   display: flex;
-  gap: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
   margin-top: 18px;
   font-size: 0.85rem;
+  font-weight: bold;
+}
+
+/* La leyenda son pastillas con el color de cada tramo */
+.admin-pagos-meses__ficha {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
 }
 
 .admin-pagos-meses__ficha::before {
   content: "";
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  border-radius: 3px;
-  margin-right: 6px;
-  vertical-align: middle;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: currentColor;
 }
 
-.admin-pagos-meses__ficha--cobrado::before {
-  background-color: var(--color-secondary);
+.admin-pagos-meses__ficha--cobrado {
+  background-color: var(--color-secondary-bg);
+  color: var(--color-secondary);
 }
 
-.admin-pagos-meses__ficha--pendiente::before {
-  background-color: var(--color-accent);
+.admin-pagos-meses__ficha--pendiente {
+  background-color: var(--color-accent-bg);
+  color: var(--color-accent-dark);
+}
+
+/* En el móvil las columnas se juntan un poco para que quepan */
+@media (max-width: 640px) {
+  .admin-pagos-meses__grafico {
+    gap: 6px;
+    padding: 8px 4px 0;
+  }
+
+  .admin-pagos-meses__barra {
+    height: 140px;
+  }
+
+  .admin-pagos-meses__importe {
+    font-size: 0.7rem;
+  }
 }
 </style>
