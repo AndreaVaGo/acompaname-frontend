@@ -88,6 +88,13 @@ async function montarVista() {
   return wrapper
 }
 
+// Pulsa un botón del menú lateral por su texto (Resumen, Solicitudes, Usuarios)
+async function irASeccion(wrapper, texto) {
+  const boton = wrapper.findAll('.admin-menu__boton').find((b) => b.text() === texto)
+  await boton.trigger('click')
+  await flushPromises()
+}
+
 function errorDelServidor(status) {
   const error = new Error('fallo')
   error.status = status
@@ -113,15 +120,19 @@ describe('AdminView', () => {
 
     expect(wrapper.text()).toContain('Cargando el panel...')
     expect(wrapper.text()).not.toContain('Requieren atención')
+    expect(wrapper.find('.admin-menu').exists()).toBe(false)
   })
 
-  test('al terminar de cargar muestra todos los bloques del panel', async () => {
+  test('al terminar de cargar muestra el menú y la sección Resumen', async () => {
     prepararRepositorio()
 
     const wrapper = await montarVista()
 
     expect(wrapper.text()).not.toContain('Cargando el panel...')
     expect(wrapper.text()).toContain('Panel de administración')
+    const textosMenu = wrapper.findAll('.admin-menu__boton').map((b) => b.text())
+    expect(textosMenu).toEqual(['Resumen', 'Solicitudes', 'Usuarios'])
+    expect(wrapper.find('.admin-menu__boton--activo').text()).toBe('Resumen')
     expect(wrapper.text()).toContain('Requieren atención')
     expect(wrapper.text()).toContain('Ingresos cobrados')
     expect(wrapper.text()).toContain('Solicitudes por estado')
@@ -129,12 +140,66 @@ describe('AdminView', () => {
     expect(wrapper.text()).toContain('Pagos')
     expect(wrapper.text()).toContain('Cuidadores mejor valorados')
     expect(wrapper.text()).toContain('Últimas valoraciones')
-    expect(wrapper.text()).toContain('Usuarios')
     expect(wrapper.text()).toContain('Marta Suárez')
-    expect(wrapper.text()).toContain('pepe@test.com')
   })
 
-  test('la solicitudes se piden sin filtro al empezar', async () => {
+  test('en Resumen no se ven las tablas de usuarios ni de solicitudes', async () => {
+    prepararRepositorio()
+
+    const wrapper = await montarVista()
+
+    expect(wrapper.find('.admin-usuarios').exists()).toBe(false)
+    expect(wrapper.find('.admin-solicitudes').exists()).toBe(false)
+  })
+
+  test('la sección Usuarios muestra la tabla de usuarios y oculta el resumen', async () => {
+    prepararRepositorio()
+    const wrapper = await montarVista()
+
+    await irASeccion(wrapper, 'Usuarios')
+
+    expect(wrapper.find('.admin-menu__boton--activo').text()).toBe('Usuarios')
+    expect(wrapper.find('.admin-usuarios').exists()).toBe(true)
+    expect(wrapper.text()).toContain('pepe@test.com')
+    expect(wrapper.text()).not.toContain('Requieren atención')
+    expect(wrapper.find('.admin-solicitudes').exists()).toBe(false)
+  })
+
+  test('la sección Solicitudes muestra la tabla de solicitudes', async () => {
+    prepararRepositorio()
+    const wrapper = await montarVista()
+
+    await irASeccion(wrapper, 'Solicitudes')
+
+    expect(wrapper.find('.admin-menu__boton--activo').text()).toBe('Solicitudes')
+    expect(wrapper.findAll('.admin-solicitudes tbody tr')).toHaveLength(1)
+    expect(wrapper.text()).not.toContain('Cuidadores mejor valorados')
+    expect(wrapper.find('.admin-usuarios').exists()).toBe(false)
+  })
+
+  test('se puede volver a Resumen desde otra sección', async () => {
+    prepararRepositorio()
+    const wrapper = await montarVista()
+
+    await irASeccion(wrapper, 'Usuarios')
+    await irASeccion(wrapper, 'Resumen')
+
+    expect(wrapper.text()).toContain('Requieren atención')
+    expect(wrapper.find('.admin-usuarios').exists()).toBe(false)
+  })
+
+  test('cambiar de sección no vuelve a pedir los datos al servidor', async () => {
+    prepararRepositorio()
+    const wrapper = await montarVista()
+
+    await irASeccion(wrapper, 'Usuarios')
+    await irASeccion(wrapper, 'Solicitudes')
+
+    expect(AdminRepository.prototype.getUsuarios).toHaveBeenCalledTimes(1)
+    expect(AdminRepository.prototype.getSolicitudes).toHaveBeenCalledTimes(1)
+  })
+
+  test('las solicitudes se piden sin filtro al empezar', async () => {
     prepararRepositorio()
 
     await montarVista()
@@ -169,11 +234,13 @@ describe('AdminView', () => {
     )
     expect(wrapper.text()).not.toContain('Cargando el panel...')
     expect(wrapper.text()).not.toContain('Cuidadores mejor valorados')
+    expect(wrapper.find('.admin-menu').exists()).toBe(false)
   })
 
   test('al cambiar el filtro vuelve a pedir las solicitudes de ese estado', async () => {
     prepararRepositorio()
     const wrapper = await montarVista()
+    await irASeccion(wrapper, 'Solicitudes')
 
     await wrapper.find('select').setValue('ACEPTADA')
     await flushPromises()
@@ -182,7 +249,20 @@ describe('AdminView', () => {
     expect(wrapper.find('select').element.value).toBe('ACEPTADA')
   })
 
-  test('el botón de los avisos filtra las solicitudes pendientes', async () => {
+  test('el filtro de solicitudes se conserva al ir a otra sección y volver', async () => {
+    prepararRepositorio()
+    const wrapper = await montarVista()
+    await irASeccion(wrapper, 'Solicitudes')
+    await wrapper.find('select').setValue('RECHAZADA')
+    await flushPromises()
+
+    await irASeccion(wrapper, 'Usuarios')
+    await irASeccion(wrapper, 'Solicitudes')
+
+    expect(wrapper.find('select').element.value).toBe('RECHAZADA')
+  })
+
+  test('el botón de los avisos abre Solicitudes con las pendientes', async () => {
     prepararRepositorio()
     const wrapper = await montarVista()
 
@@ -193,24 +273,27 @@ describe('AdminView', () => {
     await flushPromises()
 
     expect(AdminRepository.prototype.getSolicitudes).toHaveBeenLastCalledWith('PENDIENTE')
+    expect(wrapper.find('.admin-menu__boton--activo').text()).toBe('Solicitudes')
     expect(wrapper.find('select').element.value).toBe('PENDIENTE')
   })
 
   test('si falla al filtrar muestra el motivo y mantiene la tabla', async () => {
     prepararRepositorio()
     const wrapper = await montarVista()
+    await irASeccion(wrapper, 'Solicitudes')
     AdminRepository.prototype.getSolicitudes.mockRejectedValue(errorDelServidor(500))
 
     await wrapper.find('select').setValue('RECHAZADA')
     await flushPromises()
 
     expect(wrapper.text()).toContain('No se pudieron cargar las solicitudes.')
-    expect(wrapper.text()).toContain('Cuidadores mejor valorados')
+    expect(wrapper.findAll('.admin-solicitudes tbody tr')).toHaveLength(1)
   })
 
   test('bloquear a un usuario lo guarda, recarga la lista y lo confirma', async () => {
     prepararRepositorio()
     const wrapper = await montarVista()
+    await irASeccion(wrapper, 'Usuarios')
 
     // La segunda fila de la tabla de usuarios es Pepe (id 2), que está activo
     await wrapper.findAll('.admin-usuarios tbody tr')[1].find('button').trigger('click')
@@ -224,6 +307,7 @@ describe('AdminView', () => {
   test('desbloquear a un usuario bloqueado lo vuelve a activar', async () => {
     prepararRepositorio()
     const wrapper = await montarVista()
+    await irASeccion(wrapper, 'Usuarios')
 
     // La tercera fila es Luis (id 3), que está bloqueado
     await wrapper.findAll('.admin-usuarios tbody tr')[2].find('button').trigger('click')
@@ -237,6 +321,7 @@ describe('AdminView', () => {
     prepararRepositorio()
     AdminRepository.prototype.cambiarActivo.mockRejectedValue(errorDelServidor(403))
     const wrapper = await montarVista()
+    await irASeccion(wrapper, 'Usuarios')
 
     await wrapper.findAll('.admin-usuarios tbody tr')[1].find('button').trigger('click')
     await flushPromises()
@@ -247,9 +332,23 @@ describe('AdminView', () => {
     expect(wrapper.text()).not.toContain('Usuario bloqueado.')
   })
 
+  test('el mensaje de una acción desaparece al cambiar de sección', async () => {
+    prepararRepositorio()
+    const wrapper = await montarVista()
+    await irASeccion(wrapper, 'Usuarios')
+    await wrapper.findAll('.admin-usuarios tbody tr')[1].find('button').trigger('click')
+    await flushPromises()
+    expect(wrapper.text()).toContain('Usuario bloqueado.')
+
+    await irASeccion(wrapper, 'Solicitudes')
+
+    expect(wrapper.text()).not.toContain('Usuario bloqueado.')
+  })
+
   test('el administrador no tiene botón para bloquearse a sí mismo', async () => {
     prepararRepositorio()
     const wrapper = await montarVista()
+    await irASeccion(wrapper, 'Usuarios')
 
     const filaAdmin = wrapper.findAll('.admin-usuarios tbody tr')[3]
 
