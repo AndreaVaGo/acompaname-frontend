@@ -111,6 +111,37 @@ describe("AdminRepository", () => {
     );
   });
 
+  test("getPagosResumen pide el resumen y análisis de los pagos", async () => {
+    const fetchFalso = prepararFetch({ totalCobrado: 54, numeroCobrados: 2 });
+    const repository = new AdminRepository();
+
+    const resultado = await repository.getPagosResumen();
+
+    expect(fetchFalso.mock.calls[0][0]).toBe(`${API}/admin/pagos/resumen`);
+    expect(resultado.numeroCobrados).toBe(2);
+  });
+
+  test("getPagos sin estado pide todos los pagos", async () => {
+    const fetchFalso = prepararFetch([{ id: 1 }]);
+    const repository = new AdminRepository();
+
+    const resultado = await repository.getPagos();
+
+    expect(fetchFalso.mock.calls[0][0]).toBe(`${API}/admin/pagos`);
+    expect(resultado[0].id).toBe(1);
+  });
+
+  test("getPagos con estado pide solo los de ese estado", async () => {
+    const fetchFalso = prepararFetch([]);
+    const repository = new AdminRepository();
+
+    await repository.getPagos("COMPLETADO");
+
+    expect(fetchFalso.mock.calls[0][0]).toBe(
+      `${API}/admin/pagos?estado=COMPLETADO`
+    );
+  });
+
   test("si el servidor responde con error, el repositorio lanza el error con su código", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue({
       ok: false,
