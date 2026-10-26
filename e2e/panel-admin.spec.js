@@ -31,6 +31,7 @@ test.describe("Panel de administración", () => {
     ).toBeVisible();
     await expect(botonMenu(page, "Resumen")).toHaveAttribute("aria-current", "page");
     await expect(botonMenu(page, "Solicitudes")).toBeVisible();
+    await expect(botonMenu(page, "Pagos")).toBeVisible();
     await expect(botonMenu(page, "Usuarios")).toBeVisible();
     await expect(bloqueResumen(page)).toBeVisible();
     await expect(page.getByText("Cuidadores mejor valorados")).toBeVisible();
@@ -56,6 +57,38 @@ test.describe("Panel de administración", () => {
     await expect(page.locator(".admin-solicitudes select")).toHaveValue("PENDIENTE");
     await expect(bloqueResumen(page)).toHaveCount(0);
     await page.screenshot({ path: "docs/screenshots/e2e-10-admin-solicitudes.png" });
+  });
+
+  test("la sección Pagos muestra las tarjetas, los gráficos y el detalle", async ({ page }) => {
+    await botonMenu(page, "Pagos").click();
+
+    await expect(botonMenu(page, "Pagos")).toHaveAttribute("aria-current", "page");
+    await expect(page.getByText("Total cobrado")).toBeVisible();
+    await expect(page.getByText("Pendiente de cobro")).toBeVisible();
+    await expect(page.getByText("Porcentaje cobrado")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Pagos por mes" })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Facturado por tipo de cuidado" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Cuidadores que más han cobrado" }),
+    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Detalle de pagos" })).toBeVisible();
+    await expect(bloqueResumen(page)).toHaveCount(0);
+    await page.screenshot({ path: "docs/screenshots/e2e-11-admin-pagos.png", fullPage: true });
+  });
+
+  test("la tabla de pagos se puede filtrar por estado y buscar", async ({ page }) => {
+    await botonMenu(page, "Pagos").click();
+
+    await page.locator(".admin-pagos-tabla select").selectOption("CANCELADO");
+    await expect(page.locator(".admin-pagos-tabla select")).toHaveValue("CANCELADO");
+
+    // Con un texto que no existe, la tabla avisa (según haya pagos o no en ese estado)
+    await page.locator(".admin-pagos-tabla input[type='search']").fill("zzzzzz");
+    await expect(
+      page.getByText(/No hay pagos con este estado|Ningún pago coincide con la búsqueda/),
+    ).toBeVisible();
   });
 
   test("se puede volver al Resumen desde otra sección", async ({ page }) => {
