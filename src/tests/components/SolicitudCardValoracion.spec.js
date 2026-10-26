@@ -12,14 +12,16 @@ function crearSolicitud(estado) {
   }
 }
 
-// Tarjeta tal y como la ve la familia
-function montarTarjetaFamilia(estado, valorada) {
+// Tarjeta tal y como la ve la familia. Por defecto el pago ya está hecho,
+// así el único enlace que queda en la tarjeta es el de valorar
+function montarTarjetaFamilia(estado, valorada, pagado = true) {
   return mount(SolicitudCard, {
     props: {
       solicitud: crearSolicitud(estado),
       nombreMostrado: 'cuidador demo',
       mostrarAcciones: false,
       valorada: valorada,
+      pagado: pagado,
     },
     global: {
       stubs: { RouterLink: RouterLinkStub },
@@ -61,6 +63,23 @@ describe('SolicitudCard valoración', () => {
 
     expect(wrapper.text()).toContain('Valoración enviada ✓')
     expect(wrapper.text()).not.toContain('Dejar valoración')
+    expect(wrapper.findComponent(RouterLinkStub).exists()).toBe(false)
+  })
+
+  test('una solicitud completada sin pagar ni valorar muestra los dos enlaces', () => {
+    const wrapper = montarTarjetaFamilia('COMPLETADA', false, false)
+
+    const enlaces = wrapper.findAllComponents(RouterLinkStub)
+    expect(enlaces.length).toBe(2)
+    expect(enlaces[0].props('to')).toBe('/pagar/1')
+    expect(enlaces[1].props('to')).toBe('/valorar/1')
+  })
+
+  test('una solicitud completada, pagada y valorada no muestra ningún enlace', () => {
+    const wrapper = montarTarjetaFamilia('COMPLETADA', true, true)
+
+    expect(wrapper.text()).toContain('Pagado ✓')
+    expect(wrapper.text()).toContain('Valoración enviada ✓')
     expect(wrapper.findComponent(RouterLinkStub).exists()).toBe(false)
   })
 
