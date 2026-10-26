@@ -272,7 +272,6 @@ function esMiCuenta(usuario, idPropio) {
 .admin-usuarios__grupo--todos.admin-usuarios__grupo--activo {
   background-color: var(--color-neutral-bg);
   border-color: var(--color-text-muted);
-  color: var(--color-text);
 }
 
 .admin-usuarios__grupo--todos.admin-usuarios__grupo--activo .admin-usuarios__cuenta {
@@ -280,10 +279,13 @@ function esMiCuenta(usuario, idPropio) {
   color: var(--color-white);
 }
 
-/* Familias: verde, igual que la píldora de rol */
+/* Familias: letra y color en verde, igual que la píldora de rol */
+.admin-usuarios__grupo--familia {
+  color: var(--color-secondary);
+}
+
 .admin-usuarios__grupo--familia .admin-usuarios__cuenta {
   background-color: var(--color-secondary-bg);
-  color: var(--color-secondary);
 }
 
 .admin-usuarios__grupo--familia:hover {
@@ -293,7 +295,6 @@ function esMiCuenta(usuario, idPropio) {
 .admin-usuarios__grupo--familia.admin-usuarios__grupo--activo {
   background-color: var(--color-secondary-bg);
   border-color: var(--color-secondary);
-  color: var(--color-secondary);
 }
 
 .admin-usuarios__grupo--familia.admin-usuarios__grupo--activo .admin-usuarios__cuenta {
@@ -301,10 +302,13 @@ function esMiCuenta(usuario, idPropio) {
   color: var(--color-white);
 }
 
-/* Cuidadores: naranja, igual que la píldora de rol */
+/* Cuidadores: letra y color en naranja, igual que la píldora de rol */
+.admin-usuarios__grupo--cuidador {
+  color: var(--color-accent-dark);
+}
+
 .admin-usuarios__grupo--cuidador .admin-usuarios__cuenta {
   background-color: var(--color-accent-bg);
-  color: var(--color-accent-dark);
 }
 
 .admin-usuarios__grupo--cuidador:hover {
@@ -314,7 +318,6 @@ function esMiCuenta(usuario, idPropio) {
 .admin-usuarios__grupo--cuidador.admin-usuarios__grupo--activo {
   background-color: var(--color-accent-bg);
   border-color: var(--color-accent-dark);
-  color: var(--color-accent-dark);
 }
 
 .admin-usuarios__grupo--cuidador.admin-usuarios__grupo--activo .admin-usuarios__cuenta {
@@ -322,10 +325,13 @@ function esMiCuenta(usuario, idPropio) {
   color: var(--color-white);
 }
 
-/* Administradores: azul, igual que la píldora de rol */
+/* Administradores: letra y color en azul, igual que la píldora de rol */
+.admin-usuarios__grupo--admin {
+  color: var(--color-info);
+}
+
 .admin-usuarios__grupo--admin .admin-usuarios__cuenta {
   background-color: var(--color-info-bg);
-  color: var(--color-info);
 }
 
 .admin-usuarios__grupo--admin:hover {
@@ -335,7 +341,6 @@ function esMiCuenta(usuario, idPropio) {
 .admin-usuarios__grupo--admin.admin-usuarios__grupo--activo {
   background-color: var(--color-info-bg);
   border-color: var(--color-info);
-  color: var(--color-info);
 }
 
 .admin-usuarios__grupo--admin.admin-usuarios__grupo--activo .admin-usuarios__cuenta {
