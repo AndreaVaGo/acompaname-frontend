@@ -12,6 +12,10 @@ import AdminCuidadores from "@/components/admin/AdminCuidadores.vue";
 import AdminValoraciones from "@/components/admin/AdminValoraciones.vue";
 import AdminUsuarios from "@/components/admin/AdminUsuarios.vue";
 import AdminSolicitudes from "@/components/admin/AdminSolicitudes.vue";
+import AdminPagosTarjetas from "@/components/admin/AdminPagosTarjetas.vue";
+import AdminPagosMeses from "@/components/admin/AdminPagosMeses.vue";
+import AdminPagosBarras from "@/components/admin/AdminPagosBarras.vue";
+import AdminPagosTabla from "@/components/admin/AdminPagosTabla.vue";
 
 const adminRepository = new AdminRepository();
 const authStore = useAuthStore();
@@ -20,6 +24,7 @@ const authStore = useAuthStore();
 const secciones = [
   { id: "resumen", texto: "Resumen" },
   { id: "solicitudes", texto: "Solicitudes" },
+  { id: "pagos", texto: "Pagos" },
   { id: "usuarios", texto: "Usuarios" },
 ];
 // Sección que se está viendo: solo se muestra una a la vez
@@ -37,8 +42,12 @@ const cuidadores = ref([]);
 const valoraciones = ref([]);
 const usuarios = ref([]);
 const solicitudes = ref([]);
+const pagosResumen = ref(null);
+const pagos = ref([]);
 // Estado elegido en el filtro de solicitudes ("" = todas)
 const estadoFiltro = ref("");
+// Estado elegido en el filtro de pagos ("" = todos)
+const estadoPagos = ref("");
 
 // Filas de la tarjeta «Solicitudes por estado»
 const filasEstado = computed(() => {
@@ -76,6 +85,43 @@ const notaTipo = computed(() => {
   return "Tiempo medio hasta aceptar una solicitud: " + String(horas).replace(".", ",") + " h.";
 });
 
+// «1 pago» o «3 pagos»
+function textoPagos(cantidad) {
+  if (cantidad === 1) {
+    return "1 pago";
+  }
+  return cantidad + " pagos";
+}
+
+// Filas de «Facturado por tipo de cuidado» en la pestaña Pagos
+const filasTipoPago = computed(() => {
+  if (!pagosResumen.value) {
+    return [];
+  }
+  const filas = [];
+  for (const tipo of pagosResumen.value.porTipoCuidado) {
+    const nombre = tipo.tipoCuidado.charAt(0).toUpperCase() + tipo.tipoCuidado.slice(1);
+    filas.push({ texto: nombre, importe: tipo.importe, detalle: textoPagos(tipo.pagos) });
+  }
+  return filas;
+});
+
+// Filas de «Cuidadores que más han cobrado» en la pestaña Pagos
+const filasCuidadoresPago = computed(() => {
+  if (!pagosResumen.value) {
+    return [];
+  }
+  const filas = [];
+  for (const cuidador of pagosResumen.value.topCuidadores) {
+    filas.push({
+      texto: cuidador.nombre,
+      importe: cuidador.importeCobrado,
+      detalle: textoPagos(cuidador.pagos),
+    });
+  }
+  return filas;
+});
+
 async function cargarTodo() {
   try {
     estadisticas.value = await adminRepository.getEstadisticas();
@@ -84,6 +130,8 @@ async function cargarTodo() {
     valoraciones.value = await adminRepository.getUltimasValoraciones();
     usuarios.value = await adminRepository.getUsuarios();
     solicitudes.value = await adminRepository.getSolicitudes(estadoFiltro.value);
+    pagosResumen.value = await adminRepository.getPagosResumen();
+    pagos.value = await adminRepository.getPagos(estadoPagos.value);
   } catch (err) {
     error.value = mensajeDeError(err, "No se pudo cargar el panel.");
   } finally {
@@ -112,6 +160,17 @@ async function cambiarEstado(estado) {
     solicitudes.value = await adminRepository.getSolicitudes(estado);
   } catch (err) {
     mensajeError.value = mensajeDeError(err, "No se pudieron cargar las solicitudes.");
+  }
+}
+
+// Cambia el filtro y vuelve a pedir los pagos de ese estado
+async function cambiarEstadoPagos(estado) {
+  limpiarMensajes();
+  estadoPagos.value = estado;
+  try {
+    pagos.value = await adminRepository.getPagos(estado);
+  } catch (err) {
+    mensajeError.value = mensajeDeError(err, "No se pudieron cargar los pagos.");
   }
 }
 
@@ -196,6 +255,30 @@ async function eliminarValoracion(id) {
           :estado="estadoFiltro"
           @cambiar-estado="cambiarEstado"
         />
+
+        <template v-else-if="seccion === 'pagos'">
+          <AdminPagosTarjetas :resumen="pagosResumen" />
+
+          <section class="admin__fila">
+            <AdminPagosMeses :meses="pagosResumen.porMes" />
+          </section>
+
+          <section class="admin__fila">
+            <AdminPagosBarras titulo="Facturado por tipo de cuidado" :filas="filasTipoPago" />
+            <AdminPagosBarras
+              titulo="Cuidadores que más han cobrado"
+              :filas="filasCuidadoresPago"
+              color="var(--color-info)"
+              vacio="Todavía no hay cuidadores con pagos cobrados."
+            />
+          </section>
+
+          <AdminPagosTabla
+            :pagos="pagos"
+            :estado="estadoPagos"
+            @cambiar-estado="cambiarEstadoPagos"
+          />
+        </template>
 
         <AdminUsuarios
           v-else-if="seccion === 'usuarios'"
