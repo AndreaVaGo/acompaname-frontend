@@ -93,6 +93,18 @@ function textoPagos(cantidad) {
   return cantidad + " pagos";
 }
 
+// Filas de «Estado de los pagos» en la pestaña Pagos
+const filasEstadoPago = computed(() => {
+  if (!pagosResumen.value) {
+    return [];
+  }
+  return [
+    { texto: "Cobrados", cantidad: pagosResumen.value.numeroCobrados, color: "var(--color-secondary)" },
+    { texto: "Pendientes", cantidad: pagosResumen.value.numeroPendientes, color: "var(--color-accent)" },
+    { texto: "Cancelados", cantidad: pagosResumen.value.numeroCancelados, color: "var(--color-text-muted)" },
+  ];
+});
+
 // Filas de «Facturado por tipo de cuidado» en la pestaña Pagos
 const filasTipoPago = computed(() => {
   if (!pagosResumen.value) {
@@ -264,6 +276,7 @@ async function eliminarValoracion(id) {
           </section>
 
           <section class="admin__fila">
+            <AdminBarras titulo="Estado de los pagos" :filas="filasEstadoPago" />
             <AdminPagosBarras titulo="Facturado por tipo de cuidado" :filas="filasTipoPago" />
             <AdminPagosBarras
               titulo="Cuidadores que más han cobrado"
