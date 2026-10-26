@@ -61,6 +61,45 @@ const SOLICITUDES = [
   },
 ]
 
+const PAGOS_RESUMEN = {
+  totalCobrado: 54,
+  totalPendiente: 36,
+  numeroCobrados: 2,
+  numeroPendientes: 1,
+  numeroCancelados: 0,
+  importeMedio: 30,
+  porcentajeCobrado: 66.7,
+  pendientesMasDeSieteDias: 1,
+  importePendienteMasDeSieteDias: 36,
+  porTipoCuidado: [
+    { tipoCuidado: 'hospitalario', pagos: 2, importe: 54 },
+    { tipoCuidado: 'domicilio', pagos: 1, importe: 36 },
+  ],
+  porMes: [
+    { mes: '2026-05', cobrado: 0, pendiente: 0 },
+    { mes: '2026-06', cobrado: 0, pendiente: 0 },
+    { mes: '2026-07', cobrado: 0, pendiente: 0 },
+    { mes: '2026-08', cobrado: 0, pendiente: 0 },
+    { mes: '2026-09', cobrado: 0, pendiente: 0 },
+    { mes: '2026-10', cobrado: 54, pendiente: 36 },
+  ],
+  topCuidadores: [{ cuidadorId: 1, nombre: 'Pepe Cobrador', pagos: 2, importeCobrado: 54 }],
+}
+
+const PAGOS = [
+  {
+    id: 1,
+    solicitudId: 5,
+    nombreFamilia: 'Ana',
+    nombreCuidador: 'Pepe',
+    tipoCuidado: 'hospitalario',
+    importe: 36,
+    estado: 'PENDIENTE',
+    fecha: '2026-10-10',
+    diasDesdeCreacion: 10,
+  },
+]
+
 // Hace que el repositorio devuelva datos de prueba (los cambios sustituyen a los de por defecto)
 function prepararRepositorio(cambios) {
   const datos = {
@@ -70,6 +109,8 @@ function prepararRepositorio(cambios) {
     valoraciones: VALORACIONES,
     usuarios: USUARIOS,
     solicitudes: SOLICITUDES,
+    pagosResumen: PAGOS_RESUMEN,
+    pagos: PAGOS,
     ...cambios,
   }
   vi.spyOn(AdminRepository.prototype, 'getEstadisticas').mockResolvedValue(datos.estadisticas)
@@ -78,6 +119,8 @@ function prepararRepositorio(cambios) {
   vi.spyOn(AdminRepository.prototype, 'getUltimasValoraciones').mockResolvedValue(datos.valoraciones)
   vi.spyOn(AdminRepository.prototype, 'getUsuarios').mockResolvedValue(datos.usuarios)
   vi.spyOn(AdminRepository.prototype, 'getSolicitudes').mockResolvedValue(datos.solicitudes)
+  vi.spyOn(AdminRepository.prototype, 'getPagosResumen').mockResolvedValue(datos.pagosResumen)
+  vi.spyOn(AdminRepository.prototype, 'getPagos').mockResolvedValue(datos.pagos)
   vi.spyOn(AdminRepository.prototype, 'cambiarActivo').mockResolvedValue({})
   vi.spyOn(AdminRepository.prototype, 'borrarValoracion').mockResolvedValue()
 }
@@ -88,7 +131,7 @@ async function montarVista() {
   return wrapper
 }
 
-// Pulsa un botón del menú lateral por su texto (Resumen, Solicitudes, Usuarios)
+// Pulsa un botón del menú lateral por su texto (Resumen, Solicitudes, Pagos, Usuarios)
 async function irASeccion(wrapper, texto) {
   const boton = wrapper.findAll('.admin-menu__boton').find((b) => b.text() === texto)
   await boton.trigger('click')
@@ -131,25 +174,25 @@ describe('AdminView', () => {
     expect(wrapper.text()).not.toContain('Cargando el panel...')
     expect(wrapper.text()).toContain('Panel de administración')
     const textosMenu = wrapper.findAll('.admin-menu__boton').map((b) => b.text())
-    expect(textosMenu).toEqual(['Resumen', 'Solicitudes', 'Usuarios'])
+    expect(textosMenu).toEqual(['Resumen', 'Solicitudes', 'Pagos', 'Usuarios'])
     expect(wrapper.find('.admin-menu__boton--activo').text()).toBe('Resumen')
     expect(wrapper.text()).toContain('Requieren atención')
     expect(wrapper.text()).toContain('Ingresos cobrados')
     expect(wrapper.text()).toContain('Solicitudes por estado')
     expect(wrapper.text()).toContain('Tipo de cuidado')
-    expect(wrapper.text()).toContain('Pagos')
     expect(wrapper.text()).toContain('Cuidadores mejor valorados')
     expect(wrapper.text()).toContain('Últimas valoraciones')
     expect(wrapper.text()).toContain('Marta Suárez')
   })
 
-  test('en Resumen no se ven las tablas de usuarios ni de solicitudes', async () => {
+  test('en Resumen no se ven las tablas de usuarios, solicitudes ni pagos', async () => {
     prepararRepositorio()
 
     const wrapper = await montarVista()
 
     expect(wrapper.find('.admin-usuarios').exists()).toBe(false)
     expect(wrapper.find('.admin-solicitudes').exists()).toBe(false)
+    expect(wrapper.find('.admin-pagos-tabla').exists()).toBe(false)
   })
 
   test('la sección Usuarios muestra la tabla de usuarios y oculta el resumen', async () => {
@@ -177,6 +220,34 @@ describe('AdminView', () => {
     expect(wrapper.find('.admin-usuarios').exists()).toBe(false)
   })
 
+  test('la sección Pagos muestra las tarjetas, los gráficos y la tabla de detalle', async () => {
+    prepararRepositorio()
+    const wrapper = await montarVista()
+
+    await irASeccion(wrapper, 'Pagos')
+
+    expect(wrapper.find('.admin-menu__boton--activo').text()).toBe('Pagos')
+    expect(wrapper.text()).toContain('Total cobrado')
+    expect(wrapper.text()).toContain('66,7 %')
+    expect(wrapper.text()).toContain('Pagos por mes')
+    expect(wrapper.text()).toContain('Facturado por tipo de cuidado')
+    expect(wrapper.text()).toContain('Hospitalario')
+    expect(wrapper.text()).toContain('Cuidadores que más han cobrado')
+    expect(wrapper.text()).toContain('Pepe Cobrador')
+    expect(wrapper.text()).toContain('Detalle de pagos')
+    expect(wrapper.findAll('.admin-pagos-tabla tbody tr')).toHaveLength(1)
+    expect(wrapper.text()).not.toContain('Requieren atención')
+  })
+
+  test('sin cuidadores que hayan cobrado el top lo dice', async () => {
+    prepararRepositorio({ pagosResumen: { ...PAGOS_RESUMEN, topCuidadores: [] } })
+    const wrapper = await montarVista()
+
+    await irASeccion(wrapper, 'Pagos')
+
+    expect(wrapper.text()).toContain('Todavía no hay cuidadores con pagos cobrados.')
+  })
+
   test('se puede volver a Resumen desde otra sección', async () => {
     prepararRepositorio()
     const wrapper = await montarVista()
@@ -194,17 +265,21 @@ describe('AdminView', () => {
 
     await irASeccion(wrapper, 'Usuarios')
     await irASeccion(wrapper, 'Solicitudes')
+    await irASeccion(wrapper, 'Pagos')
 
     expect(AdminRepository.prototype.getUsuarios).toHaveBeenCalledTimes(1)
     expect(AdminRepository.prototype.getSolicitudes).toHaveBeenCalledTimes(1)
+    expect(AdminRepository.prototype.getPagosResumen).toHaveBeenCalledTimes(1)
+    expect(AdminRepository.prototype.getPagos).toHaveBeenCalledTimes(1)
   })
 
-  test('las solicitudes se piden sin filtro al empezar', async () => {
+  test('las solicitudes y los pagos se piden sin filtro al empezar', async () => {
     prepararRepositorio()
 
     await montarVista()
 
     expect(AdminRepository.prototype.getSolicitudes).toHaveBeenCalledWith('')
+    expect(AdminRepository.prototype.getPagos).toHaveBeenCalledWith('')
   })
 
   test('muestra el tiempo medio hasta aceptar con coma', async () => {
@@ -237,6 +312,16 @@ describe('AdminView', () => {
     expect(wrapper.find('.admin-menu').exists()).toBe(false)
   })
 
+  test('si fallan los pagos al cargar muestra el motivo y no el panel', async () => {
+    prepararRepositorio()
+    AdminRepository.prototype.getPagosResumen.mockRejectedValue(errorDelServidor(500))
+
+    const wrapper = await montarVista()
+
+    expect(wrapper.text()).toContain('No se pudo cargar el panel.')
+    expect(wrapper.find('.admin-menu').exists()).toBe(false)
+  })
+
   test('al cambiar el filtro vuelve a pedir las solicitudes de ese estado', async () => {
     prepararRepositorio()
     const wrapper = await montarVista()
@@ -260,6 +345,31 @@ describe('AdminView', () => {
     await irASeccion(wrapper, 'Solicitudes')
 
     expect(wrapper.find('select').element.value).toBe('RECHAZADA')
+  })
+
+  test('al cambiar el filtro de pagos vuelve a pedir los pagos de ese estado', async () => {
+    prepararRepositorio()
+    const wrapper = await montarVista()
+    await irASeccion(wrapper, 'Pagos')
+
+    await wrapper.find('.admin-pagos-tabla select').setValue('COMPLETADO')
+    await flushPromises()
+
+    expect(AdminRepository.prototype.getPagos).toHaveBeenLastCalledWith('COMPLETADO')
+    expect(wrapper.find('.admin-pagos-tabla select').element.value).toBe('COMPLETADO')
+  })
+
+  test('si falla al filtrar los pagos muestra el motivo y mantiene la tabla', async () => {
+    prepararRepositorio()
+    const wrapper = await montarVista()
+    await irASeccion(wrapper, 'Pagos')
+    AdminRepository.prototype.getPagos.mockRejectedValue(errorDelServidor(500))
+
+    await wrapper.find('.admin-pagos-tabla select').setValue('CANCELADO')
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('No se pudieron cargar los pagos.')
+    expect(wrapper.findAll('.admin-pagos-tabla tbody tr')).toHaveLength(1)
   })
 
   test('el botón de los avisos abre Solicitudes con las pendientes', async () => {
