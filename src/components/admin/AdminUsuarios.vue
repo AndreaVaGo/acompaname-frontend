@@ -1,11 +1,51 @@
 <script setup>
-// Tabla de usuarios: avisa a la vista cuando se pulsa Bloquear o Desbloquear
-defineProps({
+import { ref, computed } from "vue";
+
+// Tabla de usuarios con filtro por rol y buscador por nombre o email (los dos los hace
+// el propio componente sobre la lista que ya tiene). Avisa a la vista cuando se pulsa
+// Bloquear o Desbloquear.
+const props = defineProps({
   usuarios: { type: Array, required: true },
   idPropio: { type: [Number, String], default: null },
 });
 
 const emit = defineEmits(["cambiarActivo"]);
+
+const ROLES = [
+  { valor: "", nombre: "Todos" },
+  { valor: "FAMILIA", nombre: "Familias" },
+  { valor: "CUIDADOR", nombre: "Cuidadores" },
+  { valor: "ADMIN", nombre: "Administradores" },
+];
+
+// Lo que está elegido en el filtro ("" = todos) y lo que se ha escrito en el buscador
+const rolElegido = ref("");
+const busqueda = ref("");
+
+// Los usuarios que cumplen el rol elegido y lo escrito en el buscador (sin mirar mayúsculas)
+const usuariosMostrados = computed(() => {
+  const texto = busqueda.value.trim().toLowerCase();
+  const resultado = [];
+  for (const usuario of props.usuarios) {
+    const coincideRol = rolElegido.value === "" || usuario.rol === rolElegido.value;
+    const coincideTexto =
+      texto === "" ||
+      usuario.nombre.toLowerCase().includes(texto) ||
+      usuario.email.toLowerCase().includes(texto);
+    if (coincideRol && coincideTexto) {
+      resultado.push(usuario);
+    }
+  }
+  return resultado;
+});
+
+// «1 usuario» o «3 usuarios»
+function textoUsuarios(cantidad) {
+  if (cantidad === 1) {
+    return "1 usuario";
+  }
+  return cantidad + " usuarios";
+}
 
 // Nombre del rol tal como se enseña en la tabla
 function nombreRol(rol) {
@@ -40,52 +80,81 @@ function esMiCuenta(usuario, idPropio) {
 
 <template>
   <section class="admin-usuarios" id="usuarios">
-    <h2 class="titulo-seccion">Usuarios</h2>
+    <div class="admin-usuarios__cabecera">
+      <h2 class="admin-usuarios__titulo">Usuarios</h2>
 
-    <div class="admin-usuarios__tabla">
-      <table>
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Email</th>
-            <th>Rol</th>
-            <th>Estado</th>
-            <th>Acción</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="usuario in usuarios" :key="usuario.id">
-            <td data-label="Nombre">{{ usuario.nombre }}</td>
-            <td data-label="Email">{{ usuario.email }}</td>
-            <td data-label="Rol">
-              <span class="admin-usuarios__pildora" :class="claseRol(usuario.rol)">
-                {{ nombreRol(usuario.rol) }}
-              </span>
-            </td>
-            <td data-label="Estado">
-              <span
-                v-if="!usuario.activo"
-                class="admin-usuarios__pildora admin-usuarios__pildora--bloqueado"
-              >
-                Bloqueado
-              </span>
-              <span v-else>Activo</span>
-            </td>
-            <td data-label="Acción">
-              <span v-if="esMiCuenta(usuario, idPropio)" class="admin-usuarios__tu">Tú</span>
-              <button
-                v-else
-                type="button"
-                class="btn btn--secondary admin-usuarios__boton"
-                @click="emit('cambiarActivo', usuario)"
-              >
-                {{ usuario.activo ? "Bloquear" : "Desbloquear" }}
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="admin-usuarios__controles">
+        <input
+          v-model="busqueda"
+          type="search"
+          class="admin-usuarios__buscador"
+          placeholder="Buscar por nombre o email"
+          aria-label="Buscar por nombre o email"
+        />
+        <label class="admin-usuarios__filtro">
+          <span>Rol</span>
+          <select v-model="rolElegido">
+            <option v-for="opcion in ROLES" :key="opcion.valor" :value="opcion.valor">
+              {{ opcion.nombre }}
+            </option>
+          </select>
+        </label>
+      </div>
     </div>
+
+    <p v-if="usuarios.length === 0" class="admin-usuarios__vacio">No hay usuarios.</p>
+    <p v-else-if="usuariosMostrados.length === 0" class="admin-usuarios__vacio">
+      Ningún usuario coincide con la búsqueda.
+    </p>
+
+    <template v-else>
+      <div class="admin-usuarios__tabla">
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Email</th>
+              <th>Rol</th>
+              <th>Estado</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="usuario in usuariosMostrados" :key="usuario.id">
+              <td data-label="Nombre">{{ usuario.nombre }}</td>
+              <td data-label="Email">{{ usuario.email }}</td>
+              <td data-label="Rol">
+                <span class="admin-usuarios__pildora" :class="claseRol(usuario.rol)">
+                  {{ nombreRol(usuario.rol) }}
+                </span>
+              </td>
+              <td data-label="Estado">
+                <span
+                  v-if="!usuario.activo"
+                  class="admin-usuarios__pildora admin-usuarios__pildora--bloqueado"
+                >
+                  Bloqueado
+                </span>
+                <span v-else>Activo</span>
+              </td>
+              <td data-label="Acción">
+                <span v-if="esMiCuenta(usuario, idPropio)" class="admin-usuarios__tu">Tú</span>
+                <button
+                  v-else
+                  type="button"
+                  class="btn btn--secondary admin-usuarios__boton"
+                  @click="emit('cambiarActivo', usuario)"
+                >
+                  {{ usuario.activo ? "Bloquear" : "Desbloquear" }}
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="admin-usuarios__pie">{{ textoUsuarios(usuariosMostrados.length) }}</p>
+    </template>
   </section>
 </template>
 
@@ -97,8 +166,63 @@ function esMiCuenta(usuario, idPropio) {
   box-shadow: var(--shadow-card);
 }
 
-.admin-usuarios .titulo-seccion {
-  margin-top: 0;
+.admin-usuarios__cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--color-accent-bg);
+}
+
+.admin-usuarios__titulo {
+  margin: 0;
+  font-size: 1.15rem;
+  color: var(--color-accent-dark);
+}
+
+.admin-usuarios__controles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-usuarios__buscador,
+.admin-usuarios__filtro select {
+  padding: 10px 14px;
+  border-radius: var(--radius-input);
+  border: 1px solid var(--color-border);
+  font-family: inherit;
+  font-size: 0.95rem;
+  background-color: var(--color-white);
+}
+
+.admin-usuarios__buscador {
+  min-width: 240px;
+}
+
+.admin-usuarios__filtro {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.95rem;
+  font-weight: bold;
+}
+
+.admin-usuarios__vacio {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.admin-usuarios__pie {
+  margin: 14px 0 0;
+  text-align: right;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: var(--color-text-muted);
 }
 
 /* En pantallas medianas la tabla se desliza hacia los lados en vez de desbordar la página */
@@ -173,6 +297,15 @@ tr:last-child td {
 
 /* En el móvil cada usuario se ve como una tarjeta: etiqueta a la izquierda y valor a la derecha */
 @media (max-width: 640px) {
+  .admin-usuarios__buscador {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .admin-usuarios__controles {
+    width: 100%;
+  }
+
   .admin-usuarios__tabla {
     overflow-x: visible;
   }
