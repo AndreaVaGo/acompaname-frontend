@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from "vue";
 import AdminRepository from "@/repositories/AdminRepository";
 import { useAuthStore } from "@/stores/auth";
 import { mensajeDeError } from "@/utils/mensajeDeError";
+import AdminMenu from "@/components/admin/AdminMenu.vue";
 import AdminAvisos from "@/components/admin/AdminAvisos.vue";
 import AdminTarjetas from "@/components/admin/AdminTarjetas.vue";
 import AdminBarras from "@/components/admin/AdminBarras.vue";
@@ -14,6 +15,15 @@ import AdminSolicitudes from "@/components/admin/AdminSolicitudes.vue";
 
 const adminRepository = new AdminRepository();
 const authStore = useAuthStore();
+
+// Secciones del menú del panel
+const secciones = [
+  { id: "resumen", texto: "Resumen" },
+  { id: "solicitudes", texto: "Solicitudes" },
+  { id: "usuarios", texto: "Usuarios" },
+];
+// Sección que se está viendo: solo se muestra una a la vez
+const seccion = ref("resumen");
 
 const cargando = ref(true);
 const error = ref("");
@@ -88,6 +98,12 @@ function limpiarMensajes() {
   mensajeError.value = "";
 }
 
+// Cambia de sección y quita los mensajes de la sección anterior
+function cambiarSeccion(id) {
+  limpiarMensajes();
+  seccion.value = id;
+}
+
 // Cambia el filtro y vuelve a pedir las solicitudes de ese estado
 async function cambiarEstado(estado) {
   limpiarMensajes();
@@ -99,13 +115,10 @@ async function cambiarEstado(estado) {
   }
 }
 
-// El botón de los avisos filtra las solicitudes pendientes y baja hasta la tabla
+// El botón de los avisos filtra las solicitudes pendientes y abre la sección Solicitudes
 async function verPendientes() {
+  seccion.value = "solicitudes";
   await cambiarEstado("PENDIENTE");
-  const seccion = document.getElementById("solicitudes");
-  if (seccion && seccion.scrollIntoView) {
-    seccion.scrollIntoView({ behavior: "smooth" });
-  }
 }
 
 // Bloquea al usuario si estaba activo y lo desbloquea si estaba bloqueado
@@ -150,40 +163,48 @@ async function eliminarValoracion(id) {
     <p v-if="cargando" class="admin__estado">Cargando el panel...</p>
     <p v-else-if="error" class="admin__error" role="alert">{{ error }}</p>
 
-    <template v-else>
-      <p v-if="mensajeOk" class="admin__ok" role="status">{{ mensajeOk }}</p>
-      <p v-if="mensajeError" class="admin__error" role="alert">{{ mensajeError }}</p>
+    <div v-else class="admin__cuerpo">
+      <AdminMenu :secciones="secciones" :activa="seccion" @cambiar="cambiarSeccion" />
 
-      <AdminAvisos :avisos="avisos" @ver-pendientes="verPendientes" />
+      <div class="admin__contenido">
+        <p v-if="mensajeOk" class="admin__ok" role="status">{{ mensajeOk }}</p>
+        <p v-if="mensajeError" class="admin__error" role="alert">{{ mensajeError }}</p>
 
-      <AdminTarjetas :estadisticas="estadisticas" />
+        <template v-if="seccion === 'resumen'">
+          <AdminAvisos :avisos="avisos" @ver-pendientes="verPendientes" />
 
-      <section class="admin__fila">
-        <AdminBarras titulo="Solicitudes por estado" :filas="filasEstado" />
-        <AdminBarras titulo="Tipo de cuidado" :filas="filasTipo" :nota="notaTipo" />
-        <AdminPagos
-          :cobrados="estadisticas.ingresosCobrados"
-          :pendientes="estadisticas.ingresosPendientes"
+          <AdminTarjetas :estadisticas="estadisticas" />
+
+          <section class="admin__fila">
+            <AdminBarras titulo="Solicitudes por estado" :filas="filasEstado" />
+            <AdminBarras titulo="Tipo de cuidado" :filas="filasTipo" :nota="notaTipo" />
+            <AdminPagos
+              :cobrados="estadisticas.ingresosCobrados"
+              :pendientes="estadisticas.ingresosPendientes"
+            />
+          </section>
+
+          <section class="admin__fila">
+            <AdminCuidadores :cuidadores="cuidadores" />
+            <AdminValoraciones :valoraciones="valoraciones" @eliminar="eliminarValoracion" />
+          </section>
+        </template>
+
+        <AdminSolicitudes
+          v-else-if="seccion === 'solicitudes'"
+          :solicitudes="solicitudes"
+          :estado="estadoFiltro"
+          @cambiar-estado="cambiarEstado"
         />
-      </section>
 
-      <section class="admin__fila">
-        <AdminCuidadores :cuidadores="cuidadores" />
-        <AdminValoraciones :valoraciones="valoraciones" @eliminar="eliminarValoracion" />
-      </section>
-
-      <AdminUsuarios
-        :usuarios="usuarios"
-        :id-propio="authStore.id"
-        @cambiar-activo="cambiarActivo"
-      />
-
-      <AdminSolicitudes
-        :solicitudes="solicitudes"
-        :estado="estadoFiltro"
-        @cambiar-estado="cambiarEstado"
-      />
-    </template>
+        <AdminUsuarios
+          v-else-if="seccion === 'usuarios'"
+          :usuarios="usuarios"
+          :id-propio="authStore.id"
+          @cambiar-activo="cambiarActivo"
+        />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -236,6 +257,22 @@ async function eliminarValoracion(id) {
   margin: 0;
 }
 
+/* Menú a la izquierda y la sección elegida a la derecha */
+.admin__cuerpo {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.admin__contenido {
+  /* Sin esto, una tabla ancha estira la columna y se sale de la pantalla */
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
 .admin__fila {
   display: flex;
   flex-wrap: wrap;
@@ -245,6 +282,12 @@ async function eliminarValoracion(id) {
 @media (max-width: 768px) {
   .admin {
     padding: 16px 16px 32px;
+  }
+
+  /* En móvil el menú queda arriba como una fila de pestañas */
+  .admin__cuerpo {
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
 }
 </style>
