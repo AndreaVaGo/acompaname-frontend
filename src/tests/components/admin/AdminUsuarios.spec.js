@@ -9,9 +9,9 @@ const USUARIOS = [
   { id: 9, nombre: 'Admin', email: 'admin@test.com', telefono: '633', rol: 'ADMIN', activo: true },
 ]
 
-function montar(idPropio) {
+function montar(idPropio, lista) {
   return mount(AdminUsuarios, {
-    props: { usuarios: USUARIOS, idPropio: idPropio },
+    props: { usuarios: lista || USUARIOS, idPropio: idPropio },
   })
 }
 
@@ -69,5 +69,107 @@ describe('AdminUsuarios', () => {
     const filaAdmin = wrapper.findAll('tbody tr')[3]
 
     expect(filaAdmin.find('button').exists()).toBe(false)
+  })
+
+  test('al principio enseña todos los usuarios y cuántos son', () => {
+    const wrapper = montar(9)
+
+    expect(wrapper.findAll('tbody tr')).toHaveLength(4)
+    expect(wrapper.text()).toContain('4 usuarios')
+  })
+
+  test('el filtro Familias solo enseña a las familias', async () => {
+    const wrapper = montar(9)
+
+    await wrapper.find('select').setValue('FAMILIA')
+
+    expect(wrapper.findAll('tbody tr')).toHaveLength(2)
+    expect(wrapper.text()).toContain('Ana')
+    expect(wrapper.text()).toContain('Luis')
+    expect(wrapper.text()).not.toContain('Pepe')
+    expect(wrapper.text()).toContain('2 usuarios')
+  })
+
+  test('el filtro Cuidadores solo enseña a los cuidadores y dice 1 usuario', async () => {
+    const wrapper = montar(9)
+
+    await wrapper.find('select').setValue('CUIDADOR')
+
+    expect(wrapper.findAll('tbody tr')).toHaveLength(1)
+    expect(wrapper.text()).toContain('Pepe')
+    expect(wrapper.text()).toContain('1 usuario')
+    expect(wrapper.text()).not.toContain('1 usuarios')
+  })
+
+  test('el filtro Administradores solo enseña a los administradores', async () => {
+    const wrapper = montar(9)
+
+    await wrapper.find('select').setValue('ADMIN')
+
+    expect(wrapper.findAll('tbody tr')).toHaveLength(1)
+    expect(wrapper.text()).toContain('admin@test.com')
+  })
+
+  test('al volver a Todos se ven otra vez todos los usuarios', async () => {
+    const wrapper = montar(9)
+    await wrapper.find('select').setValue('CUIDADOR')
+
+    await wrapper.find('select').setValue('')
+
+    expect(wrapper.findAll('tbody tr')).toHaveLength(4)
+  })
+
+  test('el buscador encuentra por nombre sin mirar mayúsculas', async () => {
+    const wrapper = montar(9)
+
+    await wrapper.find('input[type="search"]').setValue('PEPE')
+
+    expect(wrapper.findAll('tbody tr')).toHaveLength(1)
+    expect(wrapper.text()).toContain('pepe@test.com')
+  })
+
+  test('el buscador también encuentra por email', async () => {
+    const wrapper = montar(9)
+
+    await wrapper.find('input[type="search"]').setValue('luis@')
+
+    expect(wrapper.findAll('tbody tr')).toHaveLength(1)
+    expect(wrapper.text()).toContain('Luis')
+  })
+
+  test('el filtro de rol y el buscador funcionan a la vez', async () => {
+    const wrapper = montar(9)
+
+    await wrapper.find('select').setValue('FAMILIA')
+    await wrapper.find('input[type="search"]').setValue('ana')
+
+    expect(wrapper.findAll('tbody tr')).toHaveLength(1)
+    expect(wrapper.text()).toContain('ana@test.com')
+    expect(wrapper.text()).not.toContain('Luis')
+  })
+
+  test('si nadie coincide con la búsqueda lo dice y no enseña la tabla', async () => {
+    const wrapper = montar(9)
+
+    await wrapper.find('input[type="search"]').setValue('zzz')
+
+    expect(wrapper.text()).toContain('Ningún usuario coincide con la búsqueda.')
+    expect(wrapper.find('table').exists()).toBe(false)
+  })
+
+  test('sin usuarios dice que no hay usuarios', () => {
+    const wrapper = montar(9, [])
+
+    expect(wrapper.text()).toContain('No hay usuarios.')
+    expect(wrapper.find('table').exists()).toBe(false)
+  })
+
+  test('con el filtro puesto, el botón avisa con el usuario que se ve en esa fila', async () => {
+    const wrapper = montar(9)
+    await wrapper.find('select').setValue('CUIDADOR')
+
+    await wrapper.find('tbody tr button').trigger('click')
+
+    expect(wrapper.emitted('cambiarActivo')[0][0].id).toBe(2)
   })
 })
