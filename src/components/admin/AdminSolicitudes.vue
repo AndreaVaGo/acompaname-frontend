@@ -1,7 +1,7 @@
 <script setup>
 import { formatearFecha } from "@/utils/formatearFecha";
 
-// Tabla de solicitudes con el filtro por estado.
+// Tabla de solicitudes con botones de estado (cada uno con el mismo color que su píldora).
 // estado es lo que está elegido en el filtro ("" = todas).
 defineProps({
   solicitudes: { type: Array, required: true },
@@ -10,12 +10,13 @@ defineProps({
 
 const emit = defineEmits(["cambiarEstado"]);
 
+// Cada estado lleva una clase para darle su color
 const ESTADOS = [
-  { valor: "", nombre: "Todos" },
-  { valor: "PENDIENTE", nombre: "Pendiente" },
-  { valor: "ACEPTADA", nombre: "Aceptada" },
-  { valor: "COMPLETADA", nombre: "Completada" },
-  { valor: "RECHAZADA", nombre: "Rechazada" },
+  { valor: "", nombre: "Todos", clase: "admin-solicitudes__filtro--todos" },
+  { valor: "PENDIENTE", nombre: "Pendiente", clase: "admin-solicitudes__filtro--pendiente" },
+  { valor: "ACEPTADA", nombre: "Aceptada", clase: "admin-solicitudes__filtro--aceptada" },
+  { valor: "COMPLETADA", nombre: "Completada", clase: "admin-solicitudes__filtro--completada" },
+  { valor: "RECHAZADA", nombre: "Rechazada", clase: "admin-solicitudes__filtro--rechazada" },
 ];
 
 // El tipo llega en minúsculas (hospitalario) y se enseña con la primera en mayúscula
@@ -24,6 +25,14 @@ function nombreTipo(tipo) {
     return "";
   }
   return tipo.charAt(0).toUpperCase() + tipo.slice(1);
+}
+
+// Clase de color de la píldora del tipo (hospitalario o domicilio)
+function claseTipo(tipo) {
+  if (!tipo) {
+    return "";
+  }
+  return "admin-solicitudes__tipo--" + tipo.toLowerCase();
 }
 
 function nombreEstado(estado) {
@@ -40,17 +49,20 @@ function nombreEstado(estado) {
   <section class="admin-solicitudes" id="solicitudes">
     <div class="admin-solicitudes__cabecera">
       <h2 class="admin-solicitudes__titulo">Solicitudes</h2>
-      <label class="admin-solicitudes__filtro">
-        <span>Estado</span>
-        <select
-          :value="estado"
-          @change="emit('cambiarEstado', $event.target.value)"
-        >
-          <option v-for="opcion in ESTADOS" :key="opcion.valor" :value="opcion.valor">
-            {{ opcion.nombre }}
-          </option>
-        </select>
-      </label>
+    </div>
+
+    <div class="admin-solicitudes__filtros" role="group" aria-label="Filtrar por estado">
+      <button
+        v-for="opcion in ESTADOS"
+        :key="opcion.valor"
+        type="button"
+        class="admin-solicitudes__filtro"
+        :class="[opcion.clase, { 'admin-solicitudes__filtro--activo': estado === opcion.valor }]"
+        :aria-pressed="estado === opcion.valor"
+        @click="emit('cambiarEstado', opcion.valor)"
+      >
+        {{ opcion.nombre }}
+      </button>
     </div>
 
     <p v-if="solicitudes.length === 0" class="admin-solicitudes__vacio">
@@ -70,10 +82,21 @@ function nombreEstado(estado) {
         </thead>
         <tbody>
           <tr v-for="solicitud in solicitudes" :key="solicitud.id">
-            <td data-label="Tipo">{{ nombreTipo(solicitud.tipoCuidado) }}</td>
+            <td data-label="Tipo">
+              <span
+                class="admin-solicitudes__tipo"
+                :class="claseTipo(solicitud.tipoCuidado)"
+              >
+                {{ nombreTipo(solicitud.tipoCuidado) }}
+              </span>
+            </td>
             <td data-label="Familia">{{ solicitud.nombreFamilia }}</td>
             <td data-label="Cuidador">{{ solicitud.nombreCuidador }}</td>
-            <td data-label="Fecha">{{ formatearFecha(solicitud.fechaCuidado) }}</td>
+            <td data-label="Fecha">
+              <span class="admin-solicitudes__fecha">
+                {{ formatearFecha(solicitud.fechaCuidado) }}
+              </span>
+            </td>
             <td data-label="Estado">
               <span
                 class="admin-solicitudes__pildora"
@@ -98,12 +121,7 @@ function nombreEstado(estado) {
 }
 
 .admin-solicitudes__cabecera {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   padding-bottom: 8px;
   border-bottom: 2px solid var(--color-accent-bg);
 }
@@ -114,21 +132,75 @@ function nombreEstado(estado) {
   color: var(--color-accent-dark);
 }
 
-.admin-solicitudes__filtro {
+/* Botones de estado: Todos, Pendiente, Aceptada, Completada y Rechazada */
+.admin-solicitudes__filtros {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.95rem;
-  font-weight: bold;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
 }
 
-.admin-solicitudes__filtro select {
-  padding: 10px 14px;
-  border-radius: var(--radius-input);
+.admin-solicitudes__filtro {
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
   border: 1px solid var(--color-border);
-  font-family: inherit;
-  font-size: 0.95rem;
   background-color: var(--color-white);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Todos: gris neutro */
+.admin-solicitudes__filtro--todos:hover,
+.admin-solicitudes__filtro--todos.admin-solicitudes__filtro--activo {
+  background-color: var(--color-neutral-bg);
+  border-color: var(--color-text-muted);
+}
+
+/* Pendiente: naranja, igual que su píldora */
+.admin-solicitudes__filtro--pendiente {
+  color: var(--color-accent-dark);
+}
+
+.admin-solicitudes__filtro--pendiente:hover,
+.admin-solicitudes__filtro--pendiente.admin-solicitudes__filtro--activo {
+  background-color: var(--color-accent-bg);
+  border-color: var(--color-accent-dark);
+}
+
+/* Aceptada: verde */
+.admin-solicitudes__filtro--aceptada {
+  color: var(--color-secondary);
+}
+
+.admin-solicitudes__filtro--aceptada:hover,
+.admin-solicitudes__filtro--aceptada.admin-solicitudes__filtro--activo {
+  background-color: var(--color-secondary-bg);
+  border-color: var(--color-secondary);
+}
+
+/* Completada: azul */
+.admin-solicitudes__filtro--completada {
+  color: var(--color-info);
+}
+
+.admin-solicitudes__filtro--completada:hover,
+.admin-solicitudes__filtro--completada.admin-solicitudes__filtro--activo {
+  background-color: var(--color-info-bg);
+  border-color: var(--color-info);
+}
+
+/* Rechazada: gris */
+.admin-solicitudes__filtro--rechazada {
+  color: var(--color-text-muted);
+}
+
+.admin-solicitudes__filtro--rechazada:hover,
+.admin-solicitudes__filtro--rechazada.admin-solicitudes__filtro--activo {
+  background-color: var(--color-neutral-bg);
+  border-color: var(--color-text-muted);
 }
 
 .admin-solicitudes__vacio {
@@ -168,12 +240,53 @@ tr:last-child td {
   border-bottom: none;
 }
 
-.admin-solicitudes__pildora {
+/* Tipo: hospitalario en azul y domicilio en verde (como en el gráfico del Resumen) */
+.admin-solicitudes__tipo {
   display: inline-block;
   padding: 4px 12px;
   border-radius: var(--radius-pill);
   font-size: 0.8rem;
   font-weight: bold;
+  background-color: var(--color-neutral-bg);
+  color: var(--color-text-muted);
+}
+
+.admin-solicitudes__tipo--hospitalario {
+  background-color: var(--color-info-bg);
+  color: var(--color-info);
+}
+
+.admin-solicitudes__tipo--domicilio {
+  background-color: var(--color-secondary-bg);
+  color: var(--color-secondary);
+}
+
+/* Fecha en una pastilla suave y en negrita */
+.admin-solicitudes__fecha {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: var(--radius-input);
+  background-color: var(--color-neutral-bg);
+  font-weight: bold;
+}
+
+/* Estado: píldora de color con un puntito delante */
+.admin-solicitudes__pildora {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.admin-solicitudes__pildora::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: currentColor;
 }
 
 .admin-solicitudes__pildora--pendiente {
