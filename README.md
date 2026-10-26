@@ -8,7 +8,7 @@ Este repositorio contiene la **aplicación web** del proyecto, desarrollada con 
 
 Proyecto final del bootcamp de Desarrollo Web Full Stack (850h) en **Factoría F5 — Digital Academy**.
 
-![Vue](https://img.shields.io/badge/Vue-3-42b883) ![Vite](https://img.shields.io/badge/Vite-8-646CFF) ![Pinia](https://img.shields.io/badge/Pinia-estado-yellow) ![Vitest](https://img.shields.io/badge/tests-522-success) ![Responsive](https://img.shields.io/badge/responsive-768px-blue)
+![Vue](https://img.shields.io/badge/Vue-3-42b883) ![Vite](https://img.shields.io/badge/Vite-8-646CFF) ![Pinia](https://img.shields.io/badge/Pinia-estado-yellow) ![Vitest](https://img.shields.io/badge/tests-540-success) ![Responsive](https://img.shields.io/badge/responsive-768px-blue)
 
 > [!TIP]
 > 📚 **Documentación completa en la [wiki del proyecto](https://github.com/AndreaVaGo/acompaname-frontend/wiki).** Aquí está lo imprescindible para entender, arrancar y probar el frontend; el detalle (decisiones, diseño, diagramas y tests) está en la wiki.
@@ -171,9 +171,9 @@ Pantalla **/admin**, solo para el rol <mark>ADMIN</mark>. El administrador **obs
 | 📊 Barras | Solicitudes por estado y por tipo de cuidado, con el tiempo medio hasta aceptar una solicitud |
 | 💶 Pagos | Importe pagado y pendiente |
 | ⭐ Valoraciones | Cuidadores mejor valorados y últimas valoraciones, con botón **Eliminar** y confirmación en la propia fila |
-| 👥 Usuarios | Tabla con rol y estado; botón **Bloquear / Desbloquear** (en su propia fila se ve «Tú», porque no puede bloquearse a sí mismo) |
-| 📋 Solicitudes | Tabla con filtro por estado |
-| 💶 Pagos (sección) | Tarjetas de cobrado y pendiente, gráfico de pagos por mes, barras por estado, por tipo de cuidado y de los cuidadores que más han cobrado, y tabla de detalle con filtro por estado y buscador |
+| 👥 Usuarios | Tabla con rol y estado, botones por rol con contador, buscador y botón **Bloquear / Desbloquear** (en su propia fila se ve «Tú», porque no puede bloquearse a sí mismo) |
+| 📋 Solicitudes | Tabla con botones de estado de colores |
+| 💶 Pagos (sección) | Tarjetas de cobrado y pendiente, gráfico de pagos por mes, barras por estado, por tipo de cuidado y de los cuidadores que más han cobrado, y tabla de detalle con botones de estado, días sin cobrar destacados y buscador |
 
 Detalles de diseño:
 
@@ -233,9 +233,9 @@ Arquitectura del frontend, flujo de navegación, casos de uso, diagramas de secu
 
 ## ✅ Tests
 
-El proyecto tiene **522 tests unitarios** en 51 archivos (Vitest + Vue Test Utils) y **15 tests e2e** (Playwright). Los unitarios mockean el repositorio correspondiente para no depender del backend; los e2e abren un navegador de verdad y **necesitan el backend arrancado**.
+El proyecto tiene **540 tests unitarios** en 51 archivos (Vitest + Vue Test Utils) y **16 tests e2e** (Playwright). Los unitarios mockean el repositorio correspondiente para no depender del backend; los e2e abren un navegador de verdad y **necesitan el backend arrancado**.
 
-El panel de administración tiene **103 tests unitarios** (13 componentes, incluido el menú lateral, el formateo de euros y la vista completa), además de los del repositorio, el router, el login y el menú.
+El panel de administración tiene **116 tests unitarios** (13 componentes, incluido el menú lateral, el formateo de euros y la vista completa), además de los del repositorio, el router, el login y el menú.
 
 ```bash
 npm run test:unit      # tests unitarios
