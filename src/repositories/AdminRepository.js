@@ -42,4 +42,17 @@ export default class AdminRepository extends Repository {
     }
     return this.get("/admin/solicitudes");
   }
+
+  // Resumen y análisis de los pagos: totales, por tipo de cuidado, por mes y cuidadores que más cobran
+  async getPagosResumen() {
+    return this.get("/admin/pagos/resumen");
+  }
+
+  // Si no se indica estado, salen todos los pagos
+  async getPagos(estado) {
+    if (estado) {
+      return this.get(`/admin/pagos?estado=${estado}`);
+    }
+    return this.get("/admin/pagos");
+  }
 }
