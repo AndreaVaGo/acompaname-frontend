@@ -30,7 +30,13 @@ function porcentaje(fila) {
     <h2 class="titulo-seccion">{{ titulo }}</h2>
 
     <div class="admin-barras__lista">
-      <div v-for="fila in filas" :key="fila.texto" class="admin-barras__fila">
+      <!-- El color de la fila se guarda en una variable CSS para usarlo en el puntito y en la cantidad -->
+      <div
+        v-for="fila in filas"
+        :key="fila.texto"
+        class="admin-barras__fila"
+        :style="{ '--color-fila': fila.color }"
+      >
         <span class="admin-barras__texto">{{ fila.texto }}</span>
         <div class="admin-barras__fondo">
           <div
@@ -62,7 +68,7 @@ function porcentaje(fila) {
 .admin-barras__lista {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
 .admin-barras__fila {
@@ -71,26 +77,46 @@ function porcentaje(fila) {
   gap: 12px;
 }
 
+/* Puntito del color de la fila delante del texto */
 .admin-barras__texto {
-  flex: 0 0 96px;
+  flex: 0 0 110px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.admin-barras__texto::before {
+  content: "";
+  flex: 0 0 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--color-fila);
 }
 
 .admin-barras__fondo {
   flex: 1 1 auto;
-  height: 14px;
+  height: 18px;
   border-radius: var(--radius-pill);
   background-color: var(--color-neutral-bg);
 }
 
 .admin-barras__relleno {
-  height: 14px;
+  height: 18px;
   border-radius: var(--radius-pill);
 }
 
+/* La cantidad va en una pastilla del color de la fila */
 .admin-barras__cantidad {
-  flex: 0 0 28px;
-  text-align: right;
+  flex: 0 0 auto;
+  min-width: 32px;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-fila);
+  color: var(--color-white);
+  text-align: center;
+  font-size: 0.85rem;
   font-weight: bold;
 }
 
