@@ -86,6 +86,17 @@ function estaRetrasado(pago) {
   return pago.estado === "PENDIENTE" && pago.diasDesdeCreacion > 7;
 }
 
+// Color de los días sin cobrar: rojo si se retrasa, naranja si está pendiente y gris si no aplica
+function claseDias(pago) {
+  if (estaRetrasado(pago)) {
+    return "admin-pagos-tabla__dias--retrasado";
+  }
+  if (pago.estado === "PENDIENTE") {
+    return "admin-pagos-tabla__dias--pendiente";
+  }
+  return "admin-pagos-tabla__dias--ninguno";
+}
+
 function textoPagos(cantidad) {
   if (cantidad === 1) {
     return "1 pago";
@@ -162,7 +173,9 @@ function textoPagos(cantidad) {
                 data-label="Sin cobrar"
                 :class="{ 'admin-pagos-tabla__retrasado': estaRetrasado(pago) }"
               >
-                {{ diasSinCobrar(pago) }}
+                <span class="admin-pagos-tabla__dias" :class="claseDias(pago)">
+                  {{ diasSinCobrar(pago) }}
+                </span>
               </td>
               <td data-label="Estado">
                 <span
@@ -358,9 +371,29 @@ tr:last-child td {
   font-weight: bold;
 }
 
-.admin-pagos-tabla__retrasado {
-  color: var(--color-error);
+/* Sin cobrar: rojo si se retrasa (más de 7 días), naranja si está pendiente y gris si no aplica */
+.admin-pagos-tabla__dias {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 0.8rem;
   font-weight: bold;
+}
+
+.admin-pagos-tabla__dias--retrasado {
+  background-color: var(--color-error-bg);
+  border: 1px solid var(--color-error-border);
+  color: var(--color-error);
+}
+
+.admin-pagos-tabla__dias--pendiente {
+  background-color: var(--color-accent-bg);
+  color: var(--color-accent-dark);
+}
+
+.admin-pagos-tabla__dias--ninguno {
+  padding: 4px 0;
+  color: var(--color-text-muted);
 }
 
 /* Estado: píldora de color con un puntito delante */
