@@ -55,10 +55,26 @@ const filasEstado = computed(() => {
     return [];
   }
   return [
-    { texto: "Pendientes", cantidad: estadisticas.value.solicitudesPendientes, color: "var(--color-accent)" },
-    { texto: "Aceptadas", cantidad: estadisticas.value.solicitudesAceptadas, color: "var(--color-secondary)" },
-    { texto: "Completadas", cantidad: estadisticas.value.solicitudesCompletadas, color: "var(--color-info)" },
-    { texto: "Rechazadas", cantidad: estadisticas.value.solicitudesRechazadas, color: "var(--color-text-muted)" },
+    {
+      texto: "Pendientes",
+      cantidad: estadisticas.value.solicitudesPendientes,
+      color: "var(--color-accent)",
+    },
+    {
+      texto: "Aceptadas",
+      cantidad: estadisticas.value.solicitudesAceptadas,
+      color: "var(--color-secondary)",
+    },
+    {
+      texto: "Completadas",
+      cantidad: estadisticas.value.solicitudesCompletadas,
+      color: "var(--color-info)",
+    },
+    {
+      texto: "Rechazadas",
+      cantidad: estadisticas.value.solicitudesRechazadas,
+      color: "var(--color-text-muted)",
+    },
   ];
 });
 
@@ -68,8 +84,16 @@ const filasTipo = computed(() => {
     return [];
   }
   return [
-    { texto: "Hospitalario", cantidad: estadisticas.value.solicitudesHospital, color: "var(--color-info)" },
-    { texto: "Domicilio", cantidad: estadisticas.value.solicitudesDomicilio, color: "var(--color-secondary)" },
+    {
+      texto: "Hospitalario",
+      cantidad: estadisticas.value.solicitudesHospital,
+      color: "var(--color-info)",
+    },
+    {
+      texto: "Domicilio",
+      cantidad: estadisticas.value.solicitudesDomicilio,
+      color: "var(--color-secondary)",
+    },
   ];
 });
 
@@ -82,7 +106,11 @@ const notaTipo = computed(() => {
   if (horas === null) {
     return "Todavía no se ha aceptado ninguna solicitud.";
   }
-  return "Tiempo medio hasta aceptar una solicitud: " + String(horas).replace(".", ",") + " h.";
+  return (
+    "Tiempo medio hasta aceptar una solicitud: " +
+    String(horas).replace(".", ",") +
+    " h."
+  );
 });
 
 // «1 pago» o «3 pagos»
@@ -99,11 +127,31 @@ const filasEstadoPago = computed(() => {
     return [];
   }
   return [
-    { texto: "Cobrados", cantidad: pagosResumen.value.numeroCobrados, color: "var(--color-secondary)" },
-    { texto: "Pendientes", cantidad: pagosResumen.value.numeroPendientes, color: "var(--color-accent)" },
-    { texto: "Cancelados", cantidad: pagosResumen.value.numeroCancelados, color: "var(--color-text-muted)" },
+    {
+      texto: "Cobrados",
+      cantidad: pagosResumen.value.numeroCobrados,
+      color: "var(--color-secondary)",
+    },
+    {
+      texto: "Pendientes",
+      cantidad: pagosResumen.value.numeroPendientes,
+      color: "var(--color-accent)",
+    },
+    {
+      texto: "Cancelados",
+      cantidad: pagosResumen.value.numeroCancelados,
+      color: "var(--color-text-muted)",
+    },
   ];
 });
+
+// Color de cada tipo de cuidado: hospitalario en azul y domicilio en verde
+function colorTipo(tipoCuidado) {
+  if (tipoCuidado === "hospitalario") {
+    return "var(--color-info)";
+  }
+  return "var(--color-secondary)";
+}
 
 // Filas de «Facturado por tipo de cuidado» en la pestaña Pagos
 const filasTipoPago = computed(() => {
@@ -112,8 +160,14 @@ const filasTipoPago = computed(() => {
   }
   const filas = [];
   for (const tipo of pagosResumen.value.porTipoCuidado) {
-    const nombre = tipo.tipoCuidado.charAt(0).toUpperCase() + tipo.tipoCuidado.slice(1);
-    filas.push({ texto: nombre, importe: tipo.importe, detalle: textoPagos(tipo.pagos) });
+    const nombre =
+      tipo.tipoCuidado.charAt(0).toUpperCase() + tipo.tipoCuidado.slice(1);
+    filas.push({
+      texto: nombre,
+      importe: tipo.importe,
+      detalle: textoPagos(tipo.pagos),
+      color: colorTipo(tipo.tipoCuidado),
+    });
   }
   return filas;
 });
@@ -141,7 +195,9 @@ async function cargarTodo() {
     cuidadores.value = await adminRepository.getMejoresCuidadores();
     valoraciones.value = await adminRepository.getUltimasValoraciones();
     usuarios.value = await adminRepository.getUsuarios();
-    solicitudes.value = await adminRepository.getSolicitudes(estadoFiltro.value);
+    solicitudes.value = await adminRepository.getSolicitudes(
+      estadoFiltro.value,
+    );
     pagosResumen.value = await adminRepository.getPagosResumen();
     pagos.value = await adminRepository.getPagos(estadoPagos.value);
   } catch (err) {
@@ -171,7 +227,10 @@ async function cambiarEstado(estado) {
   try {
     solicitudes.value = await adminRepository.getSolicitudes(estado);
   } catch (err) {
-    mensajeError.value = mensajeDeError(err, "No se pudieron cargar las solicitudes.");
+    mensajeError.value = mensajeDeError(
+      err,
+      "No se pudieron cargar las solicitudes.",
+    );
   }
 }
 
@@ -182,7 +241,10 @@ async function cambiarEstadoPagos(estado) {
   try {
     pagos.value = await adminRepository.getPagos(estado);
   } catch (err) {
-    mensajeError.value = mensajeDeError(err, "No se pudieron cargar los pagos.");
+    mensajeError.value = mensajeDeError(
+      err,
+      "No se pudieron cargar los pagos.",
+    );
   }
 }
 
@@ -205,7 +267,10 @@ async function cambiarActivo(usuario) {
       mensajeOk.value = "Usuario bloqueado.";
     }
   } catch (err) {
-    mensajeError.value = mensajeDeError(err, "No se pudo cambiar el estado del usuario.");
+    mensajeError.value = mensajeDeError(
+      err,
+      "No se pudo cambiar el estado del usuario.",
+    );
   }
 }
 
@@ -219,7 +284,10 @@ async function eliminarValoracion(id) {
     estadisticas.value = await adminRepository.getEstadisticas();
     mensajeOk.value = "Valoración eliminada.";
   } catch (err) {
-    mensajeError.value = mensajeDeError(err, "No se pudo eliminar la valoración.");
+    mensajeError.value = mensajeDeError(
+      err,
+      "No se pudo eliminar la valoración.",
+    );
   }
 }
 </script>
@@ -235,11 +303,17 @@ async function eliminarValoracion(id) {
     <p v-else-if="error" class="admin__error" role="alert">{{ error }}</p>
 
     <div v-else class="admin__cuerpo">
-      <AdminMenu :secciones="secciones" :activa="seccion" @cambiar="cambiarSeccion" />
+      <AdminMenu
+        :secciones="secciones"
+        :activa="seccion"
+        @cambiar="cambiarSeccion"
+      />
 
       <div class="admin__contenido">
         <p v-if="mensajeOk" class="admin__ok" role="status">{{ mensajeOk }}</p>
-        <p v-if="mensajeError" class="admin__error" role="alert">{{ mensajeError }}</p>
+        <p v-if="mensajeError" class="admin__error" role="alert">
+          {{ mensajeError }}
+        </p>
 
         <template v-if="seccion === 'resumen'">
           <AdminAvisos :avisos="avisos" @ver-pendientes="verPendientes" />
@@ -248,7 +322,11 @@ async function eliminarValoracion(id) {
 
           <section class="admin__fila">
             <AdminBarras titulo="Solicitudes por estado" :filas="filasEstado" />
-            <AdminBarras titulo="Tipo de cuidado" :filas="filasTipo" :nota="notaTipo" />
+            <AdminBarras
+              titulo="Tipo de cuidado"
+              :filas="filasTipo"
+              :nota="notaTipo"
+            />
             <AdminPagos
               :cobrados="estadisticas.ingresosCobrados"
               :pendientes="estadisticas.ingresosPendientes"
@@ -257,7 +335,10 @@ async function eliminarValoracion(id) {
 
           <section class="admin__fila">
             <AdminCuidadores :cuidadores="cuidadores" />
-            <AdminValoraciones :valoraciones="valoraciones" @eliminar="eliminarValoracion" />
+            <AdminValoraciones
+              :valoraciones="valoraciones"
+              @eliminar="eliminarValoracion"
+            />
           </section>
         </template>
 
@@ -276,8 +357,14 @@ async function eliminarValoracion(id) {
           </section>
 
           <section class="admin__fila">
-            <AdminBarras titulo="Estado de los pagos" :filas="filasEstadoPago" />
-            <AdminPagosBarras titulo="Facturado por tipo de cuidado" :filas="filasTipoPago" />
+            <AdminBarras
+              titulo="Estado de los pagos"
+              :filas="filasEstadoPago"
+            />
+            <AdminPagosBarras
+              titulo="Facturado por tipo de cuidado"
+              :filas="filasTipoPago"
+            />
             <AdminPagosBarras
               titulo="Cuidadores que más han cobrado"
               :filas="filasCuidadoresPago"
@@ -306,7 +393,7 @@ async function eliminarValoracion(id) {
 
 <style scoped>
 .admin {
-  /* Ocupa todo el ancho disponible: sin esto, con margin auto se ensancha según su contenido */
+  /* Ocupa todo el ancho disponible: sin esto, con margen auto se ensancha según su contenido */
   width: 100%;
   max-width: 1152px;
   margin: 0 auto;
