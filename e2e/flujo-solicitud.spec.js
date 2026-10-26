@@ -7,7 +7,7 @@ async function cerrarSesion(page) {
   await page.getByRole("button", { name: "Cerrar sesión" }).click();
 }
 
-test("la familia solicita, el cuidador acepta y la familia paga", async ({
+test("la familia solicita, el cuidador acepta y completa, y la familia paga", async ({
   page,
 }) => {
   // Datos de los dos usuarios (el nombre del cuidador es único en cada ejecución)
@@ -66,10 +66,24 @@ test("la familia solicita, el cuidador acepta y la familia paga", async ({
   await iniciarSesion(page, cuidador.email, cuidador.password);
   await page.getByRole("link", { name: "Solicitudes" }).click();
   await page.getByRole("button", { name: "Aceptar" }).click();
-  await expect(page.getByText("Aceptada")).toBeVisible();
+  await expect(page.getByText("Aceptada", { exact: true })).toBeVisible();
   await cerrarSesion(page);
 
-  // 5. La familia entra y paga (el pago se creó solo al aceptar)
+  // 5. Con la solicitud solo aceptada, la familia todavía no puede pagar
+  await iniciarSesion(page, familia.email, familia.password);
+  await page.getByRole("link", { name: "Solicitudes" }).click();
+  await expect(page.getByText("Aceptada", { exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Pagar" })).toHaveCount(0);
+  await cerrarSesion(page);
+
+  // 6. El cuidador presta el servicio y marca la solicitud como completada
+  await iniciarSesion(page, cuidador.email, cuidador.password);
+  await page.getByRole("link", { name: "Solicitudes" }).click();
+  await page.getByRole("button", { name: "Marcar como completada" }).click();
+  await expect(page.getByText("Completada", { exact: true })).toBeVisible();
+  await cerrarSesion(page);
+
+  // 7. La familia entra y paga (el pago se creó solo al completar la solicitud)
   await iniciarSesion(page, familia.email, familia.password);
   await page.getByRole("link", { name: "Solicitudes" }).click();
   await page.getByRole("link", { name: "Pagar" }).click();
@@ -81,10 +95,10 @@ test("la familia solicita, el cuidador acepta y la familia paga", async ({
   await page.screenshot({ path: "docs/screenshots/e2e-07-checkout.png" });
   await page.getByRole("button", { name: "Pagar" }).click();
 
-  // 6. Aparece la confirmación del pago
+  // 8. Aparece la confirmación del pago
   await expect(page.getByText("¡Pago realizado!")).toBeVisible();
 
-  // 7. En la lista de solicitudes ya figura como pagado
+  // 9. En la lista de solicitudes ya figura como pagado
   await page.getByRole("button", { name: "Ver mis solicitudes" }).click();
   await expect(page.getByText("Pagado ✓")).toBeVisible();
 });
