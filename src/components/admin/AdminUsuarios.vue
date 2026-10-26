@@ -153,19 +153,29 @@ function esMiCuenta(usuario, idPropio) {
               </td>
               <td data-label="Estado">
                 <span
-                  v-if="!usuario.activo"
+                  v-if="usuario.activo"
+                  class="admin-usuarios__pildora admin-usuarios__pildora--activo"
+                >
+                  Activo
+                </span>
+                <span
+                  v-else
                   class="admin-usuarios__pildora admin-usuarios__pildora--bloqueado"
                 >
                   Bloqueado
                 </span>
-                <span v-else>Activo</span>
               </td>
               <td data-label="Acción">
                 <span v-if="esMiCuenta(usuario, idPropio)" class="admin-usuarios__tu">Tú</span>
                 <button
                   v-else
                   type="button"
-                  class="btn btn--secondary admin-usuarios__boton"
+                  class="btn admin-usuarios__boton"
+                  :class="
+                    usuario.activo
+                      ? 'admin-usuarios__boton--bloquear'
+                      : 'admin-usuarios__boton--desbloquear'
+                  "
                   @click="emit('cambiarActivo', usuario)"
                 >
                   {{ usuario.activo ? "Bloquear" : "Desbloquear" }}
@@ -333,9 +343,31 @@ tr:last-child td {
   color: var(--color-info);
 }
 
+/* Activo (verde) y Bloqueado (rojo) llevan un puntito delante */
+.admin-usuarios__pildora--activo,
 .admin-usuarios__pildora--bloqueado {
-  background-color: var(--color-neutral-bg);
-  color: var(--color-text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-usuarios__pildora--activo::before,
+.admin-usuarios__pildora--bloqueado::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: currentColor;
+}
+
+.admin-usuarios__pildora--activo {
+  background-color: var(--color-secondary-bg);
+  color: var(--color-secondary);
+}
+
+.admin-usuarios__pildora--bloqueado {
+  background-color: var(--color-error-bg);
+  color: var(--color-error);
 }
 
 .admin-usuarios__tu {
@@ -343,9 +375,30 @@ tr:last-child td {
   font-style: italic;
 }
 
+/* Bloquear en rojo suave y Desbloquear en verde */
 .admin-usuarios__boton {
   padding: 8px 16px;
   font-size: 0.85rem;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+}
+
+.admin-usuarios__boton--bloquear {
+  color: var(--color-error);
+  border-color: var(--color-error-border);
+}
+
+.admin-usuarios__boton--bloquear:hover {
+  background-color: var(--color-error-bg);
+}
+
+.admin-usuarios__boton--desbloquear {
+  color: var(--color-secondary);
+  border-color: var(--color-secondary);
+}
+
+.admin-usuarios__boton--desbloquear:hover {
+  background-color: var(--color-secondary-bg);
 }
 
 /* En el móvil cada usuario se ve como una tarjeta: etiqueta a la izquierda y valor a la derecha */
