@@ -65,18 +65,19 @@ const facturados = computed(() => {
 </template>
 
 <style scoped>
+/* Una rejilla reparte el ancho a partes iguales: las cinco caben en una fila en escritorio
+   y en pantallas pequeñas pasan a dos o a una por fila */
 .admin-pagos-tarjetas {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: var(--gap-md);
 }
 
 .admin-pagos-tarjetas__tarjeta {
-  flex: 1 1 180px;
   background-color: var(--color-white);
   border-radius: var(--radius-card);
   border-left: 6px solid var(--color-secondary);
-  padding: 20px 22px;
+  padding: 18px 18px;
   box-shadow: var(--shadow-card);
 }
 
@@ -89,18 +90,20 @@ const facturados = computed(() => {
 }
 
 .admin-pagos-tarjetas__nombre {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--color-text-muted);
 }
 
 .admin-pagos-tarjetas__numero {
-  font-size: 1.9rem;
+  font-size: 1.6rem;
   font-weight: bold;
   margin-top: 4px;
+  /* Un importe grande no se parte en dos líneas */
+  white-space: nowrap;
 }
 
 .admin-pagos-tarjetas__detalle {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--color-text-muted);
   margin-top: 2px;
 }
