@@ -48,6 +48,24 @@ test.describe("Panel de administración", () => {
     await page.screenshot({ path: "docs/screenshots/e2e-09-admin-usuarios.png" });
   });
 
+  test("la tabla de usuarios se puede filtrar por rol y buscar", async ({ page }) => {
+    await botonMenu(page, "Usuarios").click();
+
+    // Con el rol Administradores sale la cuenta del administrador
+    await page.locator(".admin-usuarios select").selectOption("ADMIN");
+    await expect(page.locator(".admin-usuarios select")).toHaveValue("ADMIN");
+    await expect(page.locator(".admin-usuarios")).toContainText(EMAIL_ADMIN);
+
+    // Con el rol Cuidadores el administrador ya no sale
+    await page.locator(".admin-usuarios select").selectOption("CUIDADOR");
+    await expect(page.locator(".admin-usuarios")).not.toContainText(EMAIL_ADMIN);
+
+    // Con un texto que no existe, la tabla avisa
+    await page.locator(".admin-usuarios select").selectOption("");
+    await page.locator(".admin-usuarios input[type='search']").fill("zzzzzz");
+    await expect(page.getByText("Ningún usuario coincide con la búsqueda.")).toBeVisible();
+  });
+
   test("la sección Solicitudes tiene el filtro por estado", async ({ page }) => {
     await botonMenu(page, "Solicitudes").click();
 
