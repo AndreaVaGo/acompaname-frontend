@@ -13,6 +13,11 @@ function botonMenu(page, texto) {
     .getByRole("button", { name: texto, exact: true });
 }
 
+// Botón de grupo de la sección Usuarios (Todos, Familias, Cuidadores o Administradores)
+function botonGrupo(page, texto) {
+  return page.locator(".admin-usuarios__grupo", { hasText: texto });
+}
+
 // Bloque que siempre sale en el Resumen (el de avisos solo sale si hay avisos)
 function bloqueResumen(page) {
   return page.getByText("Solicitudes por estado");
@@ -48,20 +53,25 @@ test.describe("Panel de administración", () => {
     await page.screenshot({ path: "docs/screenshots/e2e-09-admin-usuarios.png" });
   });
 
-  test("la tabla de usuarios se puede filtrar por rol y buscar", async ({ page }) => {
+  test("la tabla de usuarios se separa por rol con los botones y se puede buscar", async ({
+    page,
+  }) => {
     await botonMenu(page, "Usuarios").click();
 
-    // Con el rol Administradores sale la cuenta del administrador
-    await page.locator(".admin-usuarios select").selectOption("ADMIN");
-    await expect(page.locator(".admin-usuarios select")).toHaveValue("ADMIN");
+    // Al principio está elegido Todos
+    await expect(botonGrupo(page, "Todos")).toHaveAttribute("aria-pressed", "true");
+
+    // Con el botón Administradores sale la cuenta del administrador
+    await botonGrupo(page, "Administradores").click();
+    await expect(botonGrupo(page, "Administradores")).toHaveAttribute("aria-pressed", "true");
     await expect(page.locator(".admin-usuarios")).toContainText(EMAIL_ADMIN);
 
-    // Con el rol Cuidadores el administrador ya no sale
-    await page.locator(".admin-usuarios select").selectOption("CUIDADOR");
+    // Con el botón Cuidadores el administrador ya no sale
+    await botonGrupo(page, "Cuidadores").click();
     await expect(page.locator(".admin-usuarios")).not.toContainText(EMAIL_ADMIN);
 
     // Con un texto que no existe, la tabla avisa
-    await page.locator(".admin-usuarios select").selectOption("");
+    await botonGrupo(page, "Todos").click();
     await page.locator(".admin-usuarios input[type='search']").fill("zzzzzz");
     await expect(page.getByText("Ningún usuario coincide con la búsqueda.")).toBeVisible();
   });
