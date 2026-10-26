@@ -81,8 +81,8 @@ test.describe("Panel de administración", () => {
 
     await expect(botonMenu(page, "Solicitudes")).toHaveAttribute("aria-current", "page");
     await expect(page.getByRole("heading", { name: "Solicitudes", exact: true })).toBeVisible();
-    await page.locator(".admin-solicitudes select").selectOption("PENDIENTE");
-    await expect(page.locator(".admin-solicitudes select")).toHaveValue("PENDIENTE");
+    await page.locator(".admin-solicitudes__filtro--pendiente").click();
+    await expect(page.locator(".admin-solicitudes__filtro--pendiente")).toHaveAttribute("aria-pressed", "true");
     await expect(bloqueResumen(page)).toHaveCount(0);
     await page.screenshot({ path: "docs/screenshots/e2e-10-admin-solicitudes.png" });
   });
@@ -109,8 +109,8 @@ test.describe("Panel de administración", () => {
   test("la tabla de pagos se puede filtrar por estado y buscar", async ({ page }) => {
     await botonMenu(page, "Pagos").click();
 
-    await page.locator(".admin-pagos-tabla select").selectOption("CANCELADO");
-    await expect(page.locator(".admin-pagos-tabla select")).toHaveValue("CANCELADO");
+    await page.locator(".admin-pagos-tabla__filtro--cancelado").click();
+    await expect(page.locator(".admin-pagos-tabla__filtro--cancelado")).toHaveAttribute("aria-pressed", "true");
 
     // Con un texto que no existe, la tabla avisa (según haya pagos o no en ese estado)
     await page.locator(".admin-pagos-tabla input[type='search']").fill("zzzzzz");
