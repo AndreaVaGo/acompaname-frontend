@@ -53,6 +53,13 @@ function montar(pagos, estado) {
   return mount(AdminPagosTabla, { props: { pagos: pagos, estado: estado } })
 }
 
+// El botón del filtro con ese nombre (Todos, Pendiente, Cobrado, Cancelado)
+function botonFiltro(wrapper, nombre) {
+  return wrapper
+    .findAll('.admin-pagos-tabla__filtro')
+    .find((boton) => boton.text() === nombre)
+}
+
 describe('AdminPagosTabla', () => {
   test('muestra la familia, el cuidador, el tipo, el importe, la fecha y el estado', () => {
     const wrapper = montar(PAGOS, '')
@@ -73,6 +80,15 @@ describe('AdminPagosTabla', () => {
 
     expect(wrapper.findAll('tbody tr')[2].text()).toContain('Cobrado')
     expect(wrapper.findAll('tbody tr')[3].text()).toContain('Cancelado')
+  })
+
+  test('cada tipo de cuidado lleva su clase de color', () => {
+    const wrapper = montar(PAGOS, '')
+
+    const tipos = wrapper.findAll('.admin-pagos-tabla__tipo')
+
+    expect(tipos[0].classes()).toContain('admin-pagos-tabla__tipo--hospitalario')
+    expect(tipos[1].classes()).toContain('admin-pagos-tabla__tipo--domicilio')
   })
 
   test('los días sin cobrar solo salen en los pendientes y en singular si es uno', () => {
@@ -98,18 +114,38 @@ describe('AdminPagosTabla', () => {
     )
   })
 
-  test('al cambiar el filtro avisa con el estado elegido', async () => {
+  test('al pulsar un botón del filtro avisa con el estado elegido', async () => {
     const wrapper = montar(PAGOS, '')
 
-    await wrapper.find('select').setValue('COMPLETADO')
+    await botonFiltro(wrapper, 'Cobrado').trigger('click')
 
     expect(wrapper.emitted('cambiarEstado')).toEqual([['COMPLETADO']])
   })
 
-  test('el filtro enseña el estado que le llega', () => {
+  test('pulsar Todos avisa con el texto vacío', async () => {
     const wrapper = montar(PAGOS, 'CANCELADO')
 
-    expect(wrapper.find('select').element.value).toBe('CANCELADO')
+    await botonFiltro(wrapper, 'Todos').trigger('click')
+
+    expect(wrapper.emitted('cambiarEstado')).toEqual([['']])
+  })
+
+  test('el filtro marca el estado que le llega y cada botón lleva su color', () => {
+    const wrapper = montar(PAGOS, 'CANCELADO')
+
+    const botones = wrapper.findAll('.admin-pagos-tabla__filtro')
+
+    expect(botones.map((boton) => boton.text())).toEqual([
+      'Todos',
+      'Pendiente',
+      'Cobrado',
+      'Cancelado',
+    ])
+    expect(botonFiltro(wrapper, 'Cancelado').classes()).toContain('admin-pagos-tabla__filtro--activo')
+    expect(botonFiltro(wrapper, 'Cancelado').attributes('aria-pressed')).toBe('true')
+    expect(botonFiltro(wrapper, 'Todos').attributes('aria-pressed')).toBe('false')
+    expect(botonFiltro(wrapper, 'Pendiente').classes()).toContain('admin-pagos-tabla__filtro--pendiente')
+    expect(botonFiltro(wrapper, 'Cobrado').classes()).toContain('admin-pagos-tabla__filtro--completado')
   })
 
   test('el buscador filtra por el nombre de la familia sin mirar mayúsculas', async () => {
@@ -149,10 +185,11 @@ describe('AdminPagosTabla', () => {
     expect(wrapper.find('.admin-pagos-tabla__pie').text()).toBe('1 pago · Total 20,00 €')
   })
 
-  test('sin pagos muestra el mensaje de vacío', () => {
+  test('sin pagos muestra el mensaje de vacío y mantiene los botones', () => {
     const wrapper = montar([], 'CANCELADO')
 
     expect(wrapper.text()).toContain('No hay pagos con este estado.')
     expect(wrapper.find('table').exists()).toBe(false)
+    expect(wrapper.findAll('.admin-pagos-tabla__filtro').length).toBe(4)
   })
 })
