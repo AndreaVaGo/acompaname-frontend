@@ -8,7 +8,7 @@ Este repositorio contiene la **aplicación web** del proyecto, desarrollada con 
 
 Proyecto final del bootcamp de Desarrollo Web Full Stack (850h) en **Factoría F5 — Digital Academy**.
 
-![Vue](https://img.shields.io/badge/Vue-3-42b883) ![Vite](https://img.shields.io/badge/Vite-8-646CFF) ![Pinia](https://img.shields.io/badge/Pinia-estado-yellow) ![Vitest](https://img.shields.io/badge/tests-470-success) ![Responsive](https://img.shields.io/badge/responsive-768px-blue)
+![Vue](https://img.shields.io/badge/Vue-3-42b883) ![Vite](https://img.shields.io/badge/Vite-8-646CFF) ![Pinia](https://img.shields.io/badge/Pinia-estado-yellow) ![Vitest](https://img.shields.io/badge/tests-476-success) ![Responsive](https://img.shields.io/badge/responsive-768px-blue)
 
 > [!TIP]
 > 📚 **Documentación completa en la [wiki del proyecto](https://github.com/AndreaVaGo/acompaname-frontend/wiki).** Aquí está lo imprescindible para entender, arrancar y probar el frontend; el detalle (decisiones, diseño, diagramas y tests) está en la wiki.
@@ -43,7 +43,7 @@ Las **familias** pueden:
 - 📝 Registrarse e iniciar sesión
 - 🔎 Buscar cuidadores con filtros (ciudad, tipo de cuidado, sexo, servicios, disponibilidad, vehículo, valoración mínima y fechas libres) y consultar su perfil y sus reseñas
 - 📋 Enviar solicitudes de servicio y seguir su estado
-- 💳 Pagar el servicio (el pago se marca como completado en el backend, se muestra una confirmación y la solicitud pasa a verse como pagada; los datos de la tarjeta son de prueba)
+- 💳 Pagar el servicio una vez que el cuidador lo ha completado (el pago se marca como completado en el backend, se muestra una confirmación y la solicitud pasa a verse como pagada; los datos de la tarjeta son de prueba)
 - ⭐ Valorar el servicio una vez completado y ver en el historial qué servicios ya están valorados
 - 👤 Editar sus datos de contacto y cambiar la contraseña
 
@@ -230,7 +230,7 @@ Arquitectura del frontend, flujo de navegación, casos de uso, diagramas de secu
 
 ## ✅ Tests
 
-El proyecto tiene **470 tests unitarios** en 46 archivos (Vitest + Vue Test Utils) y **9 tests e2e** (Playwright). Los unitarios mockean el repositorio correspondiente para no depender del backend; los e2e abren un navegador de verdad y **necesitan el backend arrancado**.
+El proyecto tiene **476 tests unitarios** en 46 archivos (Vitest + Vue Test Utils) y **9 tests e2e** (Playwright). Los unitarios mockean el repositorio correspondiente para no depender del backend; los e2e abren un navegador de verdad y **necesitan el backend arrancado**.
 
 El panel de administración tiene **60 tests unitarios** (8 componentes, el formateo de euros y la vista completa), además de los del repositorio, el router, el login y el menú.
 
