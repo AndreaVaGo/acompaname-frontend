@@ -8,7 +8,7 @@ Este repositorio contiene la **aplicación web** del proyecto, desarrollada con 
 
 Proyecto final del bootcamp de Desarrollo Web Full Stack (850h) en **Factoría F5 — Digital Academy**.
 
-![Vue](https://img.shields.io/badge/Vue-3-42b883) ![Vite](https://img.shields.io/badge/Vite-8-646CFF) ![Pinia](https://img.shields.io/badge/Pinia-estado-yellow) ![Vitest](https://img.shields.io/badge/tests-476-success) ![Responsive](https://img.shields.io/badge/responsive-768px-blue)
+![Vue](https://img.shields.io/badge/Vue-3-42b883) ![Vite](https://img.shields.io/badge/Vite-8-646CFF) ![Pinia](https://img.shields.io/badge/Pinia-estado-yellow) ![Vitest](https://img.shields.io/badge/tests-487-success) ![Responsive](https://img.shields.io/badge/responsive-768px-blue)
 
 > [!TIP]
 > 📚 **Documentación completa en la [wiki del proyecto](https://github.com/AndreaVaGo/acompaname-frontend/wiki).** Aquí está lo imprescindible para entender, arrancar y probar el frontend; el detalle (decisiones, diseño, diagramas y tests) está en la wiki.
@@ -112,7 +112,7 @@ La aplicación quedará disponible en <mark>http://localhost:5173</mark> 🎉.
 src/
 ├── assets/          Imágenes, bocetos y diagramas
 ├── components/      NavBar, AppFooter, SolicitudCard, FotoCuidador (reutilizables)
-│   └── admin/       Piezas del panel: Avisos, Tarjetas, Barras, Pagos, Cuidadores, Valoraciones, Usuarios y Solicitudes
+│   └── admin/       Piezas del panel: Menu, Avisos, Tarjetas, Barras, Pagos, Cuidadores, Valoraciones, Usuarios y Solicitudes
 ├── pinia/           Configuración de Pinia
 ├── repositories/    Admin, Auth, Cuidador, Pago, Role, Solicitud, Usuario, Valoracion + Repository base
 ├── router/          Definición de rutas
@@ -151,7 +151,7 @@ Esta estructura separa claramente responsabilidades: las **vistas** (<mark>views
 | 16 | 🔐 **Cambiar contraseña** | <mark>/cambiar-password</mark> | Contraseña actual, nueva y repetida |
 | 17 | ⚖️ **Aviso legal** | <mark>/aviso-legal</mark> | Datos del titular y condiciones de uso (público) |
 | 18 | 🛡️ **Política de privacidad** | <mark>/privacidad</mark> | Cómo se tratan los datos personales (público) |
-| 19 | 📊 **Panel de administración** (Administrador) | <mark>/admin</mark> | Resumen de la actividad, gráficos, avisos, valoraciones, usuarios y solicitudes |
+| 19 | 📊 **Panel de administración** (Administrador) | <mark>/admin</mark> | Menú lateral con tres secciones: Resumen, Solicitudes y Usuarios |
 
 Las rutas privadas comprueban en el router que haya sesión y, cuando hace falta, el rol (<mark>FAMILIA</mark>, <mark>CUIDADOR</mark> o <mark>ADMIN</mark>); si no se cumple, redirigen al login.
 
@@ -165,7 +165,7 @@ Pantalla **/admin**, solo para el rol <mark>ADMIN</mark>. El administrador **obs
 
 | Bloque | Qué muestra |
 |---|---|
-| ⚠️ Avisos | Qué requiere atención (por ejemplo, solicitudes pendientes) y un botón que baja a la tabla de solicitudes ya filtrada |
+| ⚠️ Avisos | Qué requiere atención (por ejemplo, solicitudes pendientes) y un botón que abre la sección Solicitudes ya filtrada |
 | 🔢 Tarjetas | Familias, cuidadores (y cuántos están disponibles ahora), solicitudes, ingresos cobrados y valoración media |
 | 📊 Barras | Solicitudes por estado y por tipo de cuidado, con el tiempo medio hasta aceptar una solicitud |
 | 💶 Pagos | Importe pagado y pendiente |
@@ -176,6 +176,7 @@ Pantalla **/admin**, solo para el rol <mark>ADMIN</mark>. El administrador **obs
 Detalles de diseño:
 
 - El menú del administrador solo tiene **Panel**, **Cambiar contraseña** y **Cerrar sesión**: no lleva «Mi perfil» ni «Editar mis datos», para que el email del administrador (que se crea desde el backend) no pueda cambiar desde la web.
+- El panel se divide en **tres secciones** con un menú lateral (en móvil, una fila de pestañas): **Resumen**, **Solicitudes** y **Usuarios**. Solo se ve una a la vez y los datos se cargan una sola vez al entrar.
 - Los gráficos son solo texto y CSS, sin librerías de gráficos.
 - En **móvil** (menos de 640 px), las tablas de usuarios y solicitudes se convierten en tarjetas con etiqueta y valor, para que el botón Bloquear siempre esté a la vista.
 - Si una cuenta está bloqueada, el login muestra «Email o contraseña incorrectos, o tu cuenta está bloqueada.» (el backend responde igual que con una contraseña mala).
@@ -230,9 +231,9 @@ Arquitectura del frontend, flujo de navegación, casos de uso, diagramas de secu
 
 ## ✅ Tests
 
-El proyecto tiene **476 tests unitarios** en 46 archivos (Vitest + Vue Test Utils) y **9 tests e2e** (Playwright). Los unitarios mockean el repositorio correspondiente para no depender del backend; los e2e abren un navegador de verdad y **necesitan el backend arrancado**.
+El proyecto tiene **487 tests unitarios** en 47 archivos (Vitest + Vue Test Utils) y **13 tests e2e** (Playwright). Los unitarios mockean el repositorio correspondiente para no depender del backend; los e2e abren un navegador de verdad y **necesitan el backend arrancado**.
 
-El panel de administración tiene **60 tests unitarios** (8 componentes, el formateo de euros y la vista completa), además de los del repositorio, el router, el login y el menú.
+El panel de administración tiene **71 tests unitarios** (9 componentes, incluido el menú lateral, el formateo de euros y la vista completa), además de los del repositorio, el router, el login y el menú.
 
 ```bash
 npm run test:unit      # tests unitarios
@@ -285,7 +286,6 @@ Cobertura actual: **98 % de líneas**, **98 % de ramas**, **98 % de sentencias**
 - 💳 El checkout (<mark>/pagar/:id</mark>) llama al endpoint <mark>PATCH /pagos/{id}/pagar</mark> del backend y el pago queda como completado, pero los datos de la tarjeta son de prueba: no se cobra nada ni hay pasarela de pago real.
 - 🔑 La autenticación es Basic Auth: las credenciales viajan en cada petición.
 - 🎨 Algunas vistas todavía tienen colores escritos a mano en el CSS en vez de usar las variables de la paleta (pendiente de <mark>refactorizar</mark>).
-- 🎭 Los tests e2e todavía no cubren el panel de administración (sí lo cubren los 60 tests unitarios y la comprobación manual).
 - 🚫 Una persona con la cuenta bloqueada no sabe el motivo: el login le muestra el mismo mensaje que con una contraseña incorrecta.
 
 ---
@@ -296,7 +296,6 @@ Cobertura actual: **98 % de líneas**, **98 % de ramas**, **98 % de sentencias**
 - 🌐 Revisar la configuración de CORS tras la migración a JWT
 - 💳 Conectar el checkout con una pasarela de pago real (por ejemplo Stripe en modo test)
 - 🖼️ Guardar las fotos de perfil como archivos en un almacenamiento externo (ahora se envían reducidas a 300 px y se guardan como texto)
-- 🎭 Añadir tests e2e del panel de administración
 - 🚀 Desplegar frontend y backend
 
 ---
