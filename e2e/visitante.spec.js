@@ -28,6 +28,18 @@ test.describe("Visitante sin sesión", () => {
     ).toBeVisible();
   });
 
+  test("las tarjetas de la portada aparecen al llegar a ellas", async ({ page }) => {
+    await page.goto("/");
+
+    const tarjetas = page.locator(".landing__step-card");
+    await tarjetas.first().scrollIntoViewIfNeeded();
+
+    // Empiezan invisibles y, al verse, terminan con opacidad completa
+    for (let i = 0; i < 3; i++) {
+      await expect(tarjetas.nth(i)).toHaveCSS("opacity", "1");
+    }
+  });
+
   test("si entra en sus solicitudes lo mandan al login", async ({ page }) => {
     await page.goto("/solicitudes");
 
