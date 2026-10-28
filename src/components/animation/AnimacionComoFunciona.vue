@@ -259,8 +259,18 @@ onBeforeUnmount(() => {
       </div>
     </div>
 
-    <button type="button" class="animacion__pausa" @click="alternar">
-      {{ textoBoton }}
+    <!-- Botón con icono de pausa o de play; el texto lo leen los lectores de pantalla -->
+    <button
+      type="button"
+      class="animacion__pausa"
+      :aria-label="textoBoton"
+      :title="textoBoton"
+      @click="alternar"
+    >
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+        <path v-if="pausada" d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5Z" />
+        <path v-else d="M7 5h3.5a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm6.5 0H17a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1h-3.5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z" />
+      </svg>
     </button>
   </div>
 </template>
@@ -737,17 +747,33 @@ onBeforeUnmount(() => {
   color: var(--color-secondary);
 }
 
-/* Botón para pausar (quien lo necesite puede parar el movimiento) */
+/* Botón redondo de pausa y play (quien lo necesite puede parar el movimiento) */
 .animacion__pausa {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-pill);
+  border-radius: 50%;
   background-color: var(--color-white);
   color: var(--color-text);
-  font-family: inherit;
-  font-size: 0.85rem;
-  font-weight: bold;
-  padding: 6px 14px;
   cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  & svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    background-color: var(--color-accent-bg);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--color-accent);
+    outline-offset: 2px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
