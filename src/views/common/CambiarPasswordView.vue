@@ -3,6 +3,7 @@ import { ref } from "vue";
 import UsuarioRepository from "@/repositories/UsuarioRepository";
 import { useAuthStore } from "@/stores/auth";
 import { mensajeDeError } from "@/utils/mensajeDeError";
+import { mensajePassword } from "@/utils/validarPassword";
 
 const passwordActual = ref("");
 const passwordNueva = ref("");
@@ -20,8 +21,12 @@ async function handleSubmit() {
     error.value = "Por favor, rellena todos los campos.";
     return;
   }
-  if (passwordNueva.value.length < 8) {
-    error.value = "La contraseña nueva debe tener al menos 8 caracteres.";
+
+  // La contraseña nueva debe cumplir las mismas reglas que en el registro.
+  // La actual NO se comprueba: puede ser una contraseña antigua y débil.
+  const mensaje = mensajePassword(passwordNueva.value);
+  if (mensaje) {
+    error.value = mensaje;
     return;
   }
   if (passwordNueva.value !== passwordRepetida.value) {
@@ -91,6 +96,9 @@ async function handleSubmit() {
             placeholder="Mínimo 8 caracteres"
             v-model="passwordNueva"
           />
+          <p class="cambiar-password__ayuda">
+            Con mayúscula, minúscula, número y un carácter especial.
+          </p>
 
           <label for="password-repetida">Repite la contraseña nueva</label>
           <input
@@ -183,6 +191,13 @@ async function handleSubmit() {
   & .btn {
     padding: 14px;
   }
+}
+
+/* Texto pequeño bajo la contraseña nueva con los requisitos */
+.cambiar-password__ayuda {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  margin: -8px 0 16px;
 }
 
 .cambiar-password__error {
