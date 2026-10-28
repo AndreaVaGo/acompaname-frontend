@@ -53,18 +53,35 @@ describe("AnimacionComoFunciona", () => {
   test("el botón empieza ofreciendo pausar y al pulsarlo cambia a reproducir", async () => {
     const wrapper = mount(AnimacionComoFunciona);
     const boton = wrapper.find(".animacion__pausa");
-    expect(boton.text()).toBe("Pausar animación");
+    expect(boton.attributes("aria-label")).toBe("Pausar animación");
     await boton.trigger("click");
-    expect(boton.text()).toBe("Reproducir animación");
+    expect(boton.attributes("aria-label")).toBe("Reproducir animación");
     await boton.trigger("click");
-    expect(boton.text()).toBe("Pausar animación");
+    expect(boton.attributes("aria-label")).toBe("Pausar animación");
+  });
+
+  test("el botón enseña un icono y no texto", () => {
+    const wrapper = mount(AnimacionComoFunciona);
+    const boton = wrapper.find(".animacion__pausa");
+    expect(boton.find("svg").exists()).toBe(true);
+    expect(boton.text()).toBe("");
+  });
+
+  test("el icono cambia entre pausa y play", async () => {
+    const wrapper = mount(AnimacionComoFunciona);
+    const boton = wrapper.find(".animacion__pausa");
+    const dibujoPausa = boton.find("path").attributes("d");
+    await boton.trigger("click");
+    expect(boton.find("path").attributes("d")).not.toBe(dibujoPausa);
   });
 
   test("si la persona prefiere menos movimiento, empieza pausada", async () => {
     menosMovimiento = true;
     const wrapper = mount(AnimacionComoFunciona);
     await nextTick();
-    expect(wrapper.find(".animacion__pausa").text()).toBe("Reproducir animación");
+    expect(wrapper.find(".animacion__pausa").attributes("aria-label")).toBe(
+      "Reproducir animación",
+    );
   });
 
   test("pide al navegador los fotogramas y los cancela al desmontar", () => {
