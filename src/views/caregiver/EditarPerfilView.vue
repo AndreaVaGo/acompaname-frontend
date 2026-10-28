@@ -119,7 +119,7 @@ async function guardar() {
     <div class="editar__wrapper">
       <h1>Mi perfil profesional</h1>
       <p class="editar__subtitle">
-        Esto es lo que verán las familias cuando busquen cuidador.
+        Esto es lo que verán las familias cuando busquen una persona cuidadora.
       </p>
 
       <p v-if="guardado" class="editar__ok">Perfil guardado correctamente.</p>
