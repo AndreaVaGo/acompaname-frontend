@@ -4,6 +4,7 @@ import { RouterLink, useRouter, useRoute } from "vue-router";
 import AuthRepository from "@/repositories/AuthRepository";
 import RoleRepository from "../../repositories/RoleRepository";
 import { mensajeDeError } from "@/utils/mensajeDeError";
+import { mensajePassword } from "@/utils/validarPassword";
 
 const route = useRoute();
 // Si la dirección trae ?rol=cuidador, ese rol ya viene marcado
@@ -13,6 +14,8 @@ const rolSeleccionado = ref(rolInicial);
 const nombre = ref("");
 const email = ref("");
 const password = ref("");
+// Segunda vez que se escribe la contraseña, para evitar errores al teclearla
+const passwordRepetida = ref("");
 const telefono = ref("");
 const error = ref("");
 
@@ -26,8 +29,26 @@ onMounted(async () => {
 });
 
 async function handleSubmit() {
-  if (!nombre.value || !email.value || !password.value || !telefono.value) {
+  if (
+    !nombre.value ||
+    !email.value ||
+    !password.value ||
+    !passwordRepetida.value ||
+    !telefono.value
+  ) {
     error.value = "Por favor, rellena todos los campos.";
+    return;
+  }
+
+  // Se comprueban las reglas de la contraseña antes de llamar al back
+  // (el back las vuelve a comprobar: esta comprobación solo ahorra una petición)
+  const mensaje = mensajePassword(password.value);
+  if (mensaje) {
+    error.value = mensaje;
+    return;
+  }
+  if (password.value !== passwordRepetida.value) {
+    error.value = "Las contraseñas no coinciden.";
     return;
   }
   error.value = "";
@@ -95,6 +116,17 @@ async function handleSubmit() {
             id="password"
             placeholder="Mínimo 8 caracteres"
             v-model="password"
+          />
+          <p class="register__ayuda">
+            Con mayúscula, minúscula, número y un carácter especial.
+          </p>
+
+          <label for="password-repetida">Repite la contraseña</label>
+          <input
+            type="password"
+            id="password-repetida"
+            placeholder="••••••••"
+            v-model="passwordRepetida"
           />
 
           <label for="telefono">Teléfono</label>
@@ -261,6 +293,13 @@ async function handleSubmit() {
   & .btn {
     padding: 14px;
   }
+}
+
+/* Texto pequeño bajo la contraseña con los requisitos */
+.register__ayuda {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  margin: -8px 0 16px;
 }
 
 .register__error {
