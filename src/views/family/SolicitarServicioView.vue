@@ -1,10 +1,12 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { RouterLink } from "vue-router";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
 import CuidadorRepository from "@/repositories/CuidadorRepository";
+import SelectorGrupos from "@/components/SelectorGrupos.vue";
 import { CUIDADOS } from "@/utils/catalogoCuidados";
+import { buscarGrupo, edadValidaParaGrupo } from "@/utils/catalogoGrupos";
 import { useAuthStore } from "@/stores/auth";
 import { mensajeDeError } from "@/utils/mensajeDeError";
 
@@ -17,6 +19,8 @@ const cuidadorRepository = new CuidadorRepository();
 const cuidadorId = route.params.id;
 const cuidadorNombre = ref("");
 
+// Código del grupo de edad de la persona cuidada (es lo primero que se elige)
+const grupoEdad = ref("");
 const tipoCuidado = ref("");
 const direccion = ref("");
 const hospital = ref("");
@@ -28,6 +32,9 @@ const edadPaciente = ref("");
 const necesidades = ref([]);
 const notas = ref("");
 const error = ref("");
+
+// El grupo elegido trae los textos de ejemplo y los límites de edad (todo está en catalogoGrupos)
+const grupo = computed(() => buscarGrupo(grupoEdad.value));
 
 onMounted(async () => {
   try {
@@ -53,15 +60,25 @@ function faltaDireccion() {
   return !direccion.value.trim();
 }
 
+// La edad 0 es válida (un bebé), así que no se puede comprobar con "!edadPaciente"
+function faltaEdad() {
+  return edadPaciente.value === "" || edadPaciente.value === null;
+}
+
 async function enviarSolicitud() {
   if (
+    !grupoEdad.value ||
     !tipoCuidado.value ||
     faltaDireccion() ||
     !fechaInicio.value ||
     !nombrePaciente.value ||
-    !edadPaciente.value
+    faltaEdad()
   ) {
     error.value = "Por favor, rellena todos los campos obligatorios.";
+    return;
+  }
+  if (!edadValidaParaGrupo(grupoEdad.value, Number(edadPaciente.value))) {
+    error.value = `Para "${grupo.value.nombre}" la edad tiene que estar entre ${grupo.value.edadMin} y ${grupo.value.edadMax} años.`;
     return;
   }
   // Las fechas tienen formato AAAA-MM-DD, así que se pueden comparar como texto
@@ -76,6 +93,7 @@ async function enviarSolicitud() {
       tipoCuidado: tipoCuidado.value,
       direccion: direccionCompleta(),
       nombrePaciente: nombrePaciente.value,
+      grupoEdad: grupoEdad.value,
       notas: notas.value,
       edadPaciente: Number(edadPaciente.value),
       fechaCuidado: fechaInicio.value,
@@ -99,18 +117,28 @@ async function enviarSolicitud() {
 
     <h1>Solicitar a {{ cuidadorNombre }}</h1>
     <p class="solicitar__subtitle">
-      Cinco datos y listo. Puedes cambiarlos después hablando con el cuidador.
+      Cinco datos y listo. Puedes cambiarlos después hablando con la persona cuidadora.
     </p>
 
     <div class="solicitar__box">
       <div class="solicitar__cabecera">
         <span class="solicitar__icono">📝</span>
         <span class="solicitar__aviso">
-          Cuanto más detalle des, mejor podrá prepararse el cuidador.
+          Cuanto más detalle des, mejor podrá prepararse la persona cuidadora.
         </span>
       </div>
 
       <form class="formulario solicitar__form" @submit.prevent="enviarSolicitud">
+        <h2 class="titulo-seccion" data-icono="👥">¿Quién necesita cuidados?</h2>
+        <div class="solicitar__grupos">
+          <SelectorGrupos
+            v-model="grupoEdad"
+            ocultar-legend
+            legend="Grupo de edad de la persona cuidada"
+            name="grupo-solicitud"
+          />
+        </div>
+
         <h2 class="titulo-seccion" data-icono="🩺">Tipo de cuidado</h2>
         <div class="solicitar__opciones">
           <button
@@ -184,59 +212,69 @@ async function enviarSolicitud() {
           </div>
         </div>
 
-        <h2 class="titulo-seccion" data-icono="👤">El paciente</h2>
+        <h2 class="titulo-seccion" data-icono="👤">La persona cuidada</h2>
 
-        <div class="solicitar__row">
-          <div>
-            <label for="paciente">Nombre del paciente</label>
-            <input
-              type="text"
-              id="paciente"
-              v-model="nombrePaciente"
-              placeholder="Antonio Serrano"
-            />
-          </div>
-          <div>
-            <label for="edad">Edad del paciente</label>
-            <input
-              type="number"
-              id="edad"
-              v-model="edadPaciente"
-              placeholder="81"
-            />
-          </div>
-        </div>
-
-        <p class="solicitar__titulo-grupo">
-          Necesidades del paciente (opcional)
+        <p v-if="!grupo" class="solicitar__ayuda">
+          Elige arriba quién necesita cuidados y te pediremos los datos que hacen
+          falta.
         </p>
-        <div class="solicitar__necesidades">
-          <label
-            v-for="cuidado in CUIDADOS"
-            :key="cuidado.codigo"
-            class="solicitar__check"
-            :class="{
-              'solicitar__check--marcado': necesidades.includes(
-                cuidado.codigo,
-              ),
-            }"
-          >
-            <input
-              type="checkbox"
-              :id="'necesidad-' + cuidado.codigo"
-              :value="cuidado.codigo"
-              v-model="necesidades"
-            />
-            {{ cuidado.nombre }}
-          </label>
-        </div>
 
-        <label for="notas">Información sobre el paciente</label>
-        <textarea
-          id="notas"
-          v-model="notas"
-          placeholder="Horario de medicación, alergias, rutinas diarias, movilidad, cualquier detalle que el cuidador deba conocer..."
-        ></textarea>
+        <template v-else>
+          <div class="solicitar__row">
+            <div>
+              <label for="paciente">Nombre de la persona cuidada</label>
+              <input
+                type="text"
+                id="paciente"
+                v-model="nombrePaciente"
+                :placeholder="grupo.ejemploNombre"
+              />
+            </div>
+            <div>
+              <label for="edad">Edad de la persona cuidada</label>
+              <input
+                type="number"
+                id="edad"
+                v-model="edadPaciente"
+                :min="grupo.edadMin"
+                :max="grupo.edadMax"
+                step="1"
+                :placeholder="grupo.ejemploEdad"
+              />
+            </div>
+          </div>
+
+          <p class="solicitar__titulo-grupo">
+            Necesidades de la persona cuidada (opcional)
+          </p>
+          <div class="solicitar__necesidades">
+            <label
+              v-for="cuidado in CUIDADOS"
+              :key="cuidado.codigo"
+              class="solicitar__check"
+              :class="{
+                'solicitar__check--marcado': necesidades.includes(
+                  cuidado.codigo,
+                ),
+              }"
+            >
+              <input
+                type="checkbox"
+                :id="'necesidad-' + cuidado.codigo"
+                :value="cuidado.codigo"
+                v-model="necesidades"
+              />
+              {{ cuidado.nombre }}
+            </label>
+          </div>
+
+          <label for="notas">Información sobre la persona cuidada</label>
+          <textarea
+            id="notas"
+            v-model="notas"
+            :placeholder="grupo.ejemploNotas"
+          ></textarea>
+        </template>
 
         <p v-if="error" class="solicitar__error">{{ error }}</p>
 
@@ -367,6 +405,17 @@ async function enviarSolicitud() {
   font-weight: bold;
   font-size: 0.95rem;
   margin: 0 0 8px;
+}
+
+/* Aviso mientras no se ha elegido el grupo de edad */
+.solicitar__ayuda {
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+  margin: 0 0 var(--gap-md);
+}
+
+.solicitar__grupos {
+  margin-bottom: var(--gap-md);
 }
 
 .solicitar__necesidades {
