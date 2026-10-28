@@ -42,6 +42,8 @@ test("la familia solicita, el cuidador acepta y completa, y la familia paga", as
   // 3. La familia entra en su perfil y le envía una solicitud
   await page.getByRole("link", { name: "Ver perfil" }).click();
   await page.getByRole("link", { name: "Solicitar servicio" }).click();
+  // Lo primero es elegir el grupo de edad de la persona cuidada
+  await page.check('input[name="grupo-solicitud"][value="MAYORES"]');
   await page.getByRole("button", { name: "Hospitalario" }).click();
   // El cuidado hospitalario exige indicar el hospital y la ubicación
   await page.fill("#hospital", "Hospital de Cabueñes");
