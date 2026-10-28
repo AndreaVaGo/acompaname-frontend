@@ -3,7 +3,8 @@
 // Número distinto en cada ejecución, para que los emails no se repitan
 const numero = Date.now();
 
-export const PASSWORD = "Password123";
+// Cumple la regla de contraseña segura: mayúscula, minúscula, número y carácter especial
+export const PASSWORD = "Password123!";
 
 export function datosUsuario(nombre, rol) {
   const nombreSinEspacios = nombre.toLowerCase().replaceAll(" ", ".");
