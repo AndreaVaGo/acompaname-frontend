@@ -52,6 +52,31 @@ test.describe("Registro y login", () => {
     await expect(page).toHaveURL("/registro");
   });
 
+  test("no deja registrarse con una contraseña débil y dice qué le falta", async ({
+    page,
+  }) => {
+    const familia = datosUsuario("Elena E2E", "familia");
+    // Solo minúsculas: faltan mayúscula, número y carácter especial
+    familia.password = "abcdefgh";
+
+    await rellenarRegistro(page, familia);
+
+    await expect(page.getByText("una letra mayúscula")).toBeVisible();
+    await expect(page).toHaveURL("/registro");
+  });
+
+  test("no deja registrarse si las dos contraseñas no coinciden", async ({
+    page,
+  }) => {
+    const familia = datosUsuario("Julia E2E", "familia");
+    familia.passwordRepetida = "Distinta123!";
+
+    await rellenarRegistro(page, familia);
+
+    await expect(page.getByText("Las contraseñas no coinciden.")).toBeVisible();
+    await expect(page).toHaveURL("/registro");
+  });
+
   test("cerrar sesión lleva al login", async ({ page }) => {
     const familia = datosUsuario("Sara E2E", "familia");
     await registrar(page, familia);
