@@ -68,9 +68,9 @@ describe("LandingView", () => {
   test("la animación se puede pausar", () => {
     const wrapper = montarVista();
 
-    expect(wrapper.find(".landing__hero-image button").text()).toContain(
-      "Pausar animación",
-    );
+    expect(
+      wrapper.find(".landing__hero-image button").attributes("aria-label"),
+    ).toBe("Pausar animación");
   });
 
   test("las tres tarjetas de los pasos aparecen una tras otra", () => {
