@@ -1,6 +1,7 @@
 <script setup>
 import { RouterLink } from "vue-router";
 import AnimacionComoFunciona from "../../components/animation/AnimacionComoFunciona.vue";
+import AparecerAlVer from "../../components/animation/AparecerAlVer.vue";
 </script>
 
 <template>
@@ -45,7 +46,7 @@ import AnimacionComoFunciona from "../../components/animation/AnimacionComoFunci
     <section class="landing__steps">
       <h2>Así de sencillo</h2>
       <div class="landing__steps-grid">
-        <div class="landing__step-card">
+        <AparecerAlVer class="landing__step-card" :retraso="0">
           <span class="landing__step-icon">
             <svg
               width="20"
@@ -60,8 +61,8 @@ import AnimacionComoFunciona from "../../components/animation/AnimacionComoFunci
           </span>
           <h3>1. Cuéntanos qué necesitas</h3>
           <p>Hospital, domicilio o ambos. En un minuto.</p>
-        </div>
-        <div class="landing__step-card">
+        </AparecerAlVer>
+        <AparecerAlVer class="landing__step-card" :retraso="150">
           <span class="landing__step-icon">
             <svg
               width="20"
@@ -78,8 +79,8 @@ import AnimacionComoFunciona from "../../components/animation/AnimacionComoFunci
           </span>
           <h3>2. Elige a la persona</h3>
           <p>Perfiles con experiencia, tarifa y valoraciones reales.</p>
-        </div>
-        <div class="landing__step-card">
+        </AparecerAlVer>
+        <AparecerAlVer class="landing__step-card" :retraso="300">
           <span class="landing__step-icon">
             <svg
               width="20"
@@ -94,13 +95,13 @@ import AnimacionComoFunciona from "../../components/animation/AnimacionComoFunci
           </span>
           <h3>3. Solicita y acompaña</h3>
           <p>La persona cuidadora acepta y os coordináis desde la app.</p>
-        </div>
+        </AparecerAlVer>
       </div>
     </section>
 
     <hr class="landing__divider" />
 
-    <section class="landing__cta">
+    <AparecerAlVer class="landing__cta">
       <div class="landing__cta-icon">🏠</div>
       <h2>¿Eres cuidador o cuidadora profesional?</h2>
       <p>
@@ -110,7 +111,7 @@ import AnimacionComoFunciona from "../../components/animation/AnimacionComoFunci
       <RouterLink to="/registro?rol=cuidador" class="btn btn--primary"
         >Crear mi perfil profesional</RouterLink
       >
-    </section>
+    </AparecerAlVer>
 
   </div>
 </template>
@@ -252,6 +253,9 @@ import AnimacionComoFunciona from "../../components/animation/AnimacionComoFunci
   padding: var(--gap-md);
   box-shadow: var(--shadow-card);
   text-align: left;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 
   & h3 {
     margin-bottom: 6px;
@@ -266,6 +270,19 @@ import AnimacionComoFunciona from "../../components/animation/AnimacionComoFunci
   align-items: center;
   justify-content: center;
   margin-bottom: 10px;
+  transition: transform 0.25s ease;
+}
+
+/* Al pasar el ratón, la tarjeta sube un poco y su icono se inclina */
+.landing__step-card:hover,
+.landing__cta:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.landing__step-card:hover .landing__step-icon,
+.landing__cta:hover .landing__cta-icon {
+  transform: rotate(-10deg) scale(1.12);
 }
 
 .landing__cta {
@@ -276,6 +293,9 @@ import AnimacionComoFunciona from "../../components/animation/AnimacionComoFunci
   border-radius: var(--radius-card);
   text-align: center;
   box-shadow: var(--shadow-card);
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 
   & h2 {
     margin-bottom: 12px;
@@ -292,6 +312,24 @@ import AnimacionComoFunciona from "../../components/animation/AnimacionComoFunci
   border-radius: 50%;
   margin-bottom: 12px;
   font-size: 1.3rem;
+  transition: transform 0.25s ease;
+}
+
+/* Quien prefiere menos movimiento no ve los efectos al pasar el ratón */
+@media (prefers-reduced-motion: reduce) {
+  .landing__step-card,
+  .landing__step-icon,
+  .landing__cta,
+  .landing__cta-icon {
+    transition: none;
+  }
+
+  .landing__step-card:hover,
+  .landing__cta:hover,
+  .landing__step-card:hover .landing__step-icon,
+  .landing__cta:hover .landing__cta-icon {
+    transform: none;
+  }
 }
 
 @media (max-width: 768px) {
