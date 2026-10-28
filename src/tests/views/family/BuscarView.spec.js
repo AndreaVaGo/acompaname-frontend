@@ -19,6 +19,7 @@ vi.spyOn(CuidadorRepository.prototype, "getAll").mockResolvedValue([
     tipoCuidado: "hospitalario",
     servicios: ["medicacion", "higiene"],
     sexo: "HOMBRE",
+    gruposEdad: ["ADULTOS", "MAYORES"],
   },
   {
     id: 2,
@@ -34,6 +35,7 @@ vi.spyOn(CuidadorRepository.prototype, "getAll").mockResolvedValue([
     tipoCuidado: "domicilio",
     servicios: ["medicacion"],
     sexo: "MUJER",
+    gruposEdad: ["BEBES", "NINOS"],
   },
   {
     id: 3,
@@ -541,6 +543,110 @@ describe("BuscarView", () => {
       "No se pudo comprobar la disponibilidad por fechas",
     );
     expect(wrapper.text()).toContain("Ana");
+  });
+
+  test("enseña el filtro por edad con Cualquier edad marcado al principio", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(wrapper.text()).toContain("Edad de la persona que necesita cuidados");
+    expect(
+      wrapper.find('input[name="filtro-grupo"][value=""]').element.checked,
+    ).toBe(true);
+    expect(wrapper.text()).toContain("Pepe");
+    expect(wrapper.text()).toContain("Ana");
+    expect(wrapper.text()).toContain("Luis");
+  });
+
+  test("filtrar por bebés deja solo a quien cuida bebés", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper.find('input[name="filtro-grupo"][value="BEBES"]').setValue(true);
+
+    expect(wrapper.text()).toContain("Ana");
+    expect(wrapper.text()).not.toContain("Pepe");
+    expect(wrapper.text()).toContain("1 persona cuidadora para ti");
+  });
+
+  test("filtrar por personas mayores deja solo a quien cuida mayores", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper.find('input[name="filtro-grupo"][value="MAYORES"]').setValue(true);
+
+    expect(wrapper.text()).toContain("Pepe");
+    expect(wrapper.text()).not.toContain("Ana");
+  });
+
+  test("con un grupo elegido no sale quien no ha indicado ningún grupo", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    // Luis no tiene grupos en su perfil
+    await wrapper.find('input[name="filtro-grupo"][value="ADULTOS"]').setValue(true);
+
+    expect(wrapper.text()).not.toContain("Luis");
+  });
+
+  test("al volver a Cualquier edad salen todas las personas cuidadoras", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper.find('input[name="filtro-grupo"][value="BEBES"]').setValue(true);
+    await wrapper.find('input[name="filtro-grupo"][value=""]').setValue(true);
+
+    expect(wrapper.text()).toContain("Pepe");
+    expect(wrapper.text()).toContain("Ana");
+    expect(wrapper.text()).toContain("Luis");
+  });
+
+  test("si nadie cuida al grupo elegido se cuentan cero personas", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper
+      .find('input[name="filtro-grupo"][value="DISCAPACIDAD_DEPENDENCIA"]')
+      .setValue(true);
+
+    expect(wrapper.text()).toContain("0 personas cuidadoras para ti");
+  });
+
+  test("cada tarjeta enseña los grupos de edad a los que cuida la persona", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    const etiquetas = wrapper
+      .findAll(".buscar__tag--grupo")
+      .map((etiqueta) => etiqueta.text());
+    // Pepe: adultos y mayores. Ana: bebés y niñas y niños. Luis no tiene ninguno.
+    expect(etiquetas).toEqual([
+      "Personas adultas",
+      "Personas mayores",
+      "Bebés",
+      "Niñas y niños",
+    ]);
   });
 
   test("si falla la carga de cuidadores avisa en la pantalla", async () => {
