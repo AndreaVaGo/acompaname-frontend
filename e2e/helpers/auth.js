@@ -23,11 +23,14 @@ export async function rellenarRegistro(page, usuario) {
   // Esperamos a que la página termine de cargar los roles
   await page.waitForLoadState("networkidle");
 
+  // La contraseña repetida es la misma, salvo que el test pida otra
+  // (usuario.passwordRepetida) para comprobar el aviso de que no coinciden
+  const repetida = usuario.passwordRepetida || usuario.password;
+
   await page.fill("#nombre", usuario.nombre);
   await page.fill("#email", usuario.email);
   await page.fill("#password", usuario.password);
-  // La contraseña se escribe dos veces en el registro
-  await page.fill("#password-repetida", usuario.password);
+  await page.fill("#password-repetida", repetida);
   await page.fill("#telefono", usuario.telefono);
 
   // Cada botón de rol tiene un texto distinto: "Ofrezco servicios" / "Busco cuidador"
