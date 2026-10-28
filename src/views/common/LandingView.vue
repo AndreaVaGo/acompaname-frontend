@@ -1,5 +1,6 @@
 <script setup>
 import { RouterLink } from "vue-router";
+import AnimacionComoFunciona from "../../components/animation/AnimacionComoFunciona.vue";
 </script>
 
 <template>
@@ -34,11 +35,8 @@ import { RouterLink } from "vue-router";
         </p>
       </div>
       <div class="landing__hero-image">
-        <!-- Foto de dos manos unidas: no se ve la edad de nadie, así vale para cualquier persona -->
-        <img
-          src="../../assets/hero-manos.jpg"
-          alt="Dos manos entrelazadas, una sosteniendo a la otra, en señal de cuidado y apoyo"
-        />
+        <!-- Animación de 15 segundos que explica cómo funciona la web (sustituye a la foto) -->
+        <AnimacionComoFunciona />
       </div>
     </section>
 
@@ -169,7 +167,7 @@ import { RouterLink } from "vue-router";
   text-decoration: underline;
 }
 
-/* El texto a la izquierda y la foto a la derecha, centrada en vertical */
+/* El texto a la izquierda y la animación a la derecha, centrada en vertical */
 .landing__hero {
   display: flex;
   justify-content: space-between;
@@ -218,16 +216,10 @@ import { RouterLink } from "vue-router";
   margin-bottom: 32px;
 }
 
+/* La animación es cuadrada y ocupa el mismo hueco que tenía la foto */
 .landing__hero-image {
   flex-shrink: 0;
-}
-
-.landing__hero-image img {
-  display: block;
-  max-width: 480px;
-  width: 100%;
-  border-radius: var(--radius-card);
-  object-fit: cover;
+  width: 500px;
 }
 
 .landing__divider {
@@ -318,8 +310,8 @@ import { RouterLink } from "vue-router";
     font-size: 1.8rem;
   }
 
-  .landing__hero-image img {
-    max-width: 100%;
+  .landing__hero-image {
+    width: 100%;
   }
 
   .landing__divider {
