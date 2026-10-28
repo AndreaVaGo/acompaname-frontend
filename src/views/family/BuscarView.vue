@@ -4,7 +4,9 @@ import { RouterLink } from "vue-router";
 import CuidadorRepository from "@/repositories/CuidadorRepository";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
 import FotoCuidador from "@/components/FotoCuidador.vue";
+import SelectorGrupos from "@/components/SelectorGrupos.vue";
 import { CUIDADOS, nombreCuidado } from "@/utils/catalogoCuidados";
+import { nombreGrupo } from "@/utils/catalogoGrupos";
 import { mensajeDeError } from "@/utils/mensajeDeError";
 
 const cuidadorRepository = new CuidadorRepository();
@@ -15,6 +17,8 @@ const ciudadBuscada = ref("");
 const tipoBuscado = ref("todos");
 const sexoBuscado = ref("todos");
 const serviciosBuscados = ref([]);
+// Código del grupo de edad elegido ("" = cualquier edad)
+const grupoBuscado = ref("");
 const soloDisponibles = ref(false);
 const soloVehiculo = ref(false);
 const valoracionMinima = ref(0);
@@ -81,6 +85,17 @@ function serviciosDe(cuidador) {
   return cuidador.servicios || [];
 }
 
+// Una persona cuidadora sin grupos de edad indicados se trata como una lista vacía
+function gruposDe(cuidador) {
+  return cuidador.gruposEdad || [];
+}
+
+// Con un grupo elegido, la persona cuidadora tiene que haberlo marcado en su perfil
+// (quien no ha indicado ningún grupo no sale, porque no sabemos a quién cuida)
+function cuidaAlGrupo(cuidador) {
+  return grupoBuscado.value === "" || gruposDe(cuidador).includes(grupoBuscado.value);
+}
+
 // El cuidador tiene que ofrecer TODOS los servicios que se han marcado
 function tieneLosServicios(cuidador) {
   for (const codigo of serviciosBuscados.value) {
@@ -118,6 +133,8 @@ const cuidadoresFiltrados = computed(() => {
 
     const coincideServicios = tieneLosServicios(cuidador);
 
+    const coincideGrupo = cuidaAlGrupo(cuidador);
+
     // Si el filtro no está activado, todos los cuidadores valen
     const coincideDisponible =
       !soloDisponibles.value || cuidador.disponibleAhora;
@@ -138,6 +155,7 @@ const cuidadoresFiltrados = computed(() => {
       coincideTipo &&
       coincideSexo &&
       coincideServicios &&
+      coincideGrupo &&
       coincideDisponible &&
       coincideVehiculo &&
       coincideValoracion &&
@@ -167,6 +185,16 @@ const cuidadoresFiltrados = computed(() => {
     </div>
 
     <div class="buscar__filters">
+      <!-- La edad de la persona que necesita cuidados es lo primero que se elige -->
+      <div class="buscar__filter-group buscar__filter-group--ancho buscar__filter-group--primero">
+        <SelectorGrupos
+          v-model="grupoBuscado"
+          legend="Edad de la persona que necesita cuidados"
+          texto-todos="Cualquier edad"
+          name="filtro-grupo"
+        />
+      </div>
+
       <div class="buscar__filter-group">
         <label for="filtro-ciudad">Ciudad</label>
         <input
@@ -442,6 +470,15 @@ const cuidadoresFiltrados = computed(() => {
           >
         </div>
 
+        <div class="buscar__tags" v-if="gruposDe(cuidador).length > 0">
+          <span
+            class="buscar__tag buscar__tag--grupo"
+            v-for="codigo in gruposDe(cuidador)"
+            :key="codigo"
+            >{{ nombreGrupo(codigo) }}</span
+          >
+        </div>
+
         <div class="buscar__tags" v-if="serviciosDe(cuidador).length > 0">
           <span
             class="buscar__tag buscar__tag--servicio"
@@ -569,6 +606,12 @@ const cuidadoresFiltrados = computed(() => {
   grid-column: 1 / -1;
   border-top: 1px solid var(--color-neutral-bg);
   padding-top: 22px;
+}
+
+/* El filtro de edad va arriba, sin línea de separación */
+.buscar__filter-group--primero {
+  border-top: none;
+  padding-top: 0;
 }
 
 .buscar__filter-group {
@@ -794,6 +837,11 @@ const cuidadoresFiltrados = computed(() => {
 .buscar__tag--servicio {
   background-color: var(--color-secondary-bg);
   color: var(--color-secondary);
+}
+
+.buscar__tag--grupo {
+  background-color: var(--color-accent-bg);
+  color: var(--color-accent-dark);
 }
 
 .buscar__card-footer {
