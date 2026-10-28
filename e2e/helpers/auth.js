@@ -26,6 +26,8 @@ export async function rellenarRegistro(page, usuario) {
   await page.fill("#nombre", usuario.nombre);
   await page.fill("#email", usuario.email);
   await page.fill("#password", usuario.password);
+  // La contraseña se escribe dos veces en el registro
+  await page.fill("#password-repetida", usuario.password);
   await page.fill("#telefono", usuario.telefono);
 
   // Cada botón de rol tiene un texto distinto: "Ofrezco servicios" / "Busco cuidador"
