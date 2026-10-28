@@ -29,7 +29,7 @@ onMounted(async () => {
   try {
     cuidadores.value = await cuidadorRepository.getAll();
   } catch (err) {
-    error.value = mensajeDeError(err, "No se pudieron cargar los cuidadores.");
+    error.value = mensajeDeError(err, "No se pudieron cargar las personas cuidadoras.");
   } finally {
     cargando.value = false;
   }
@@ -150,7 +150,7 @@ const cuidadoresFiltrados = computed(() => {
 <template>
   <div class="buscar">
     <header class="buscar__header">
-      <h1>Cuidadores disponibles</h1>
+      <h1>Personas cuidadoras disponibles</h1>
       <p>
         Elige el tipo de cuidado que necesitas y mira quién puede acompañaros.
       </p>
@@ -238,7 +238,7 @@ const cuidadoresFiltrados = computed(() => {
       </div>
 
       <div class="buscar__filter-group">
-        <label>Sexo del cuidador</label>
+        <label>Sexo de la persona cuidadora</label>
         <div class="buscar__filter-options">
           <button
             id="filtro-sexo-todos"
@@ -379,7 +379,7 @@ const cuidadoresFiltrados = computed(() => {
 
     <p class="buscar__count">
       {{ cuidadoresFiltrados.length }}
-      {{ cuidadoresFiltrados.length === 1 ? "cuidador" : "cuidadores" }} para ti
+      {{ cuidadoresFiltrados.length === 1 ? "persona cuidadora" : "personas cuidadoras" }} para ti
     </p>
 
     <div class="buscar__grid">
