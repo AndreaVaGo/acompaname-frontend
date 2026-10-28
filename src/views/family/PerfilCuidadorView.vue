@@ -33,7 +33,7 @@ onMounted(async () => {
       abrirValoraciones();
     }
   } catch (err) {
-    error.value = mensajeDeError(err, "No se pudo cargar el perfil del cuidador.");
+    error.value = mensajeDeError(err, "No se pudo cargar el perfil de la persona cuidadora.");
   } finally {
     cargando.value = false;
   }
@@ -165,8 +165,8 @@ function estrellas(puntuacion) {
           Inicia sesión para solicitar
         </RouterLink>
         <p class="perfil__nota">
-          Sin compromiso: la solicitud se envía y el cuidador la acepta o la
-          rechaza.
+          Sin compromiso: la solicitud se envía y la persona cuidadora la acepta o
+          la rechaza.
         </p>
       </div>
     </div>
