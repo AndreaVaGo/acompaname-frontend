@@ -5,6 +5,9 @@ import CambiarPasswordView from "../../../views/common/CambiarPasswordView.vue";
 import UsuarioRepository from "../../../repositories/UsuarioRepository";
 import { useAuthStore } from "../../../stores/auth";
 
+// Contraseña nueva que cumple todas las reglas (mayúscula, minúscula, número y carácter especial)
+const PASSWORD_NUEVA = "Nueva12345!";
+
 function montarVista() {
   const pinia = createPinia();
   const wrapper = mount(CambiarPasswordView, {
@@ -51,14 +54,37 @@ describe("CambiarPasswordView", () => {
     expect(espia).not.toHaveBeenCalled();
   });
 
+  test("muestra qué le falta a una contraseña nueva débil", async () => {
+    const espia = vi.spyOn(UsuarioRepository.prototype, "cambiarPassword");
+    const { wrapper } = montarVista();
+
+    await rellenarFormulario(wrapper, "actual1234", "nueva12345", "nueva12345");
+
+    const error = wrapper.find(".cambiar-password__error").text();
+    expect(error).toContain("una letra mayúscula");
+    expect(error).toContain("un carácter especial");
+    expect(espia).not.toHaveBeenCalled();
+  });
+
   test("muestra error si las contraseñas nuevas no coinciden", async () => {
     const espia = vi.spyOn(UsuarioRepository.prototype, "cambiarPassword");
     const { wrapper } = montarVista();
 
-    await rellenarFormulario(wrapper, "actual1234", "nueva12345", "otra123456");
+    await rellenarFormulario(wrapper, "actual1234", PASSWORD_NUEVA, "Otra123456!");
 
     expect(wrapper.text()).toContain("no coinciden");
     expect(espia).not.toHaveBeenCalled();
+  });
+
+  test("no exige que la contraseña actual cumpla las reglas (puede ser antigua y débil)", async () => {
+    const espia = vi
+      .spyOn(UsuarioRepository.prototype, "cambiarPassword")
+      .mockResolvedValue();
+    const { wrapper } = montarVista();
+
+    await rellenarFormulario(wrapper, "1234", PASSWORD_NUEVA, PASSWORD_NUEVA);
+
+    expect(espia).toHaveBeenCalledWith(1, "1234", PASSWORD_NUEVA);
   });
 
   test("cambia la contraseña y actualiza las credenciales guardadas", async () => {
@@ -67,18 +93,18 @@ describe("CambiarPasswordView", () => {
       .mockResolvedValue();
     const { wrapper, authStore } = montarVista();
 
-    await rellenarFormulario(wrapper, "actual1234", "nueva12345", "nueva12345");
+    await rellenarFormulario(wrapper, "actual1234", PASSWORD_NUEVA, PASSWORD_NUEVA);
 
-    expect(espia).toHaveBeenCalledWith(1, "actual1234", "nueva12345");
+    expect(espia).toHaveBeenCalledWith(1, "actual1234", PASSWORD_NUEVA);
     expect(wrapper.text()).toContain("Contraseña cambiada correctamente.");
-    expect(authStore.credenciales).toBe(btoa("ana@test.com:nueva12345"));
+    expect(authStore.credenciales).toBe(btoa("ana@test.com:" + PASSWORD_NUEVA));
   });
 
   test("vacía los campos después de cambiar la contraseña", async () => {
     vi.spyOn(UsuarioRepository.prototype, "cambiarPassword").mockResolvedValue();
     const { wrapper } = montarVista();
 
-    await rellenarFormulario(wrapper, "actual1234", "nueva12345", "nueva12345");
+    await rellenarFormulario(wrapper, "actual1234", PASSWORD_NUEVA, PASSWORD_NUEVA);
 
     expect(wrapper.find("#password-actual").element.value).toBe("");
     expect(wrapper.find("#password-nueva").element.value).toBe("");
@@ -91,7 +117,7 @@ describe("CambiarPasswordView", () => {
     );
     const { wrapper, authStore } = montarVista();
 
-    await rellenarFormulario(wrapper, "mala12345", "nueva12345", "nueva12345");
+    await rellenarFormulario(wrapper, "mala12345", PASSWORD_NUEVA, PASSWORD_NUEVA);
 
     expect(wrapper.text()).toContain("No se pudo cambiar la contraseña");
     expect(authStore.credenciales).toBe(btoa("ana@test.com:actual1234"));
@@ -105,7 +131,7 @@ describe("CambiarPasswordView", () => {
     );
     const { wrapper, authStore } = montarVista();
 
-    await rellenarFormulario(wrapper, "mala12345", "nueva12345", "nueva12345");
+    await rellenarFormulario(wrapper, "mala12345", PASSWORD_NUEVA, PASSWORD_NUEVA);
 
     expect(wrapper.text()).toContain(
       "No se pudo cambiar la contraseña. Revisa que la actual sea correcta y que la nueva sea distinta."
@@ -121,7 +147,7 @@ describe("CambiarPasswordView", () => {
     );
     const { wrapper, authStore } = montarVista();
 
-    await rellenarFormulario(wrapper, "actual1234", "nueva12345", "nueva12345");
+    await rellenarFormulario(wrapper, "actual1234", PASSWORD_NUEVA, PASSWORD_NUEVA);
 
     expect(wrapper.text()).toContain(
       "No se pudo cambiar la contraseña. Ha ocurrido un error en el servidor. Inténtalo más tarde."
