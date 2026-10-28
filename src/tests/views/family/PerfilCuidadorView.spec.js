@@ -122,7 +122,7 @@ describe("PerfilCuidadorView", () => {
     const wrapper = await montarVista("FAMILIA");
 
     expect(wrapper.text()).toContain(
-      "No se pudo cargar el perfil del cuidador."
+      "No se pudo cargar el perfil de la persona cuidadora."
     );
   });
 
@@ -136,7 +136,7 @@ describe("PerfilCuidadorView", () => {
     const wrapper = await montarVista("FAMILIA");
 
     expect(wrapper.text()).toContain(
-      "No se pudo cargar el perfil del cuidador. No se ha encontrado lo que buscas."
+      "No se pudo cargar el perfil de la persona cuidadora. No se ha encontrado lo que buscas."
     );
   });
 
