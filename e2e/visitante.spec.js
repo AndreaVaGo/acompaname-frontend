@@ -7,9 +7,9 @@ test.describe("Visitante sin sesión", () => {
     await page.getByRole("link", { name: "Ver personas cuidadoras disponibles" }).click();
 
     await expect(page).toHaveURL("/buscar");
-    await expect(page.getByText("Cuidadores disponibles")).toBeVisible();
+    await expect(page.getByText("Personas cuidadoras disponibles")).toBeVisible();
     await expect(
-      page.getByText("No se pudieron cargar los cuidadores."),
+      page.getByText("No se pudieron cargar las personas cuidadoras."),
     ).toHaveCount(0);
     await page.screenshot({ path: "docs/screenshots/e2e-08-visitante-buscar.png" });
   });
