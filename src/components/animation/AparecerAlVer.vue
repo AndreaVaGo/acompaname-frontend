@@ -58,20 +58,22 @@ onBeforeUnmount(() => {
   opacity: 0;
 }
 
-/* Al verse, sube un poco y aparece (con animation, para no chocar con el efecto de pasar el ratón) */
+/* Al verse, sube, crece un poco y aparece (con animation, para no chocar con el efecto de pasar el ratón) */
 .aparecer--visible {
-  animation: aparecer 0.6s ease-out both;
+  animation: aparecer 0.9s ease-out both;
   animation-delay: var(--retraso);
 }
 
 @keyframes aparecer {
   from {
     opacity: 0;
-    translate: 0 24px;
+    translate: 0 50px;
+    scale: 0.94;
   }
   to {
     opacity: 1;
     translate: 0 0;
+    scale: 1;
   }
 }
 
