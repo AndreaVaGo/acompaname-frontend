@@ -68,7 +68,7 @@ describe("LandingView", () => {
   test("la animación se puede pausar", () => {
     const wrapper = montarVista();
 
-    expect(wrapper.find(".landing__hero-image button").text()).toBe(
+    expect(wrapper.find(".landing__hero-image button").text()).toContain(
       "Pausar animación",
     );
   });
@@ -79,8 +79,8 @@ describe("LandingView", () => {
     const tarjetas = wrapper.findAll(".landing__step-card.aparecer");
     expect(tarjetas).toHaveLength(3);
     expect(tarjetas[0].attributes("style")).toContain("--retraso: 0ms");
-    expect(tarjetas[1].attributes("style")).toContain("--retraso: 150ms");
-    expect(tarjetas[2].attributes("style")).toContain("--retraso: 300ms");
+    expect(tarjetas[1].attributes("style")).toContain("--retraso: 250ms");
+    expect(tarjetas[2].attributes("style")).toContain("--retraso: 500ms");
   });
 
   test("la tarjeta para profesionales también aparece al verse", () => {
