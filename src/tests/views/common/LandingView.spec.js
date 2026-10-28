@@ -56,12 +56,20 @@ describe("LandingView", () => {
     expect(wrapper.findAll(".landing__step-card")).toHaveLength(3);
   });
 
-  test("la foto principal tiene un texto alternativo que la describe", () => {
+  test("muestra la animación que explica cómo funciona, con descripción para lectores de pantalla", () => {
     const wrapper = montarVista();
 
-    // El texto alternativo lo leen los lectores de pantalla
-    expect(wrapper.find(".landing__hero-image img").attributes("alt")).toContain(
-      "manos entrelazadas",
+    // La animación sustituye a la foto y su texto alternativo lo leen los lectores de pantalla
+    const animacion = wrapper.find('.landing__hero-image [role="img"]');
+    expect(animacion.exists()).toBe(true);
+    expect(animacion.attributes("aria-label")).toContain("Animación de 15 segundos");
+  });
+
+  test("la animación se puede pausar", () => {
+    const wrapper = montarVista();
+
+    expect(wrapper.find(".landing__hero-image button").text()).toBe(
+      "Pausar animación",
     );
   });
 
