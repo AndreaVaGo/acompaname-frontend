@@ -12,6 +12,9 @@ const props = defineProps({
   multiple: { type: Boolean, default: false },
   // Título del grupo de opciones (lo leen los lectores de pantalla)
   legend: { type: String, required: true },
+  // Esconde el título solo a la vista (los lectores de pantalla lo siguen leyendo),
+  // para cuando la pantalla ya tiene un título encima
+  ocultarLegend: { type: Boolean, default: false },
   // Si se escribe, aparece una primera opción con este texto que deja el valor vacío
   textoTodos: { type: String, default: "" },
   // Las opciones de un mismo selector comparten nombre (necesario para las de elegir una sola)
@@ -55,7 +58,12 @@ function elegir(codigo) {
 
 <template>
   <fieldset class="grupos">
-    <legend class="grupos__legend">{{ legend }}</legend>
+    <legend
+      class="grupos__legend"
+      :class="{ 'grupos__legend--oculta': ocultarLegend }"
+    >
+      {{ legend }}
+    </legend>
     <div class="grupos__lista">
       <label
         v-if="textoTodos"
@@ -105,6 +113,18 @@ function elegir(codigo) {
   font-weight: bold;
   padding: 0;
   margin-bottom: var(--gap-sm);
+}
+
+/* Escondido a la vista pero disponible para los lectores de pantalla */
+.grupos__legend--oculta {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .grupos__lista {
