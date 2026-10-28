@@ -2,6 +2,7 @@
 import { RouterLink } from "vue-router";
 import AnimacionComoFunciona from "../../components/animation/AnimacionComoFunciona.vue";
 import AparecerAlVer from "../../components/animation/AparecerAlVer.vue";
+import AvataresPersonas from "../../components/animation/AvataresPersonas.vue";
 </script>
 
 <template>
@@ -30,9 +31,11 @@ import AparecerAlVer from "../../components/animation/AparecerAlVer.vue";
         </div>
         <p class="landing__hint">
           ¿Solo quieres mirar?
-          <RouterLink to="/buscar" class="landing__link"
-            >Ver personas cuidadoras disponibles</RouterLink
-          >
+          <RouterLink to="/buscar" class="landing__link">
+            <AvataresPersonas class="landing__avatares" />
+            <span>Ver personas cuidadoras disponibles</span>
+            <span class="landing__flecha" aria-hidden="true">→</span>
+          </RouterLink>
         </p>
       </div>
       <div class="landing__hero-image">
@@ -158,14 +161,33 @@ import AparecerAlVer from "../../components/animation/AparecerAlVer.vue";
   margin: 0;
 }
 
-/* El enlace va en su propia línea, debajo de la pregunta */
+/* El enlace va en su propia línea, con tres personas delante y una flecha detrás */
 .landing__link {
-  display: block;
-  margin-top: 6px;
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
   color: var(--color-secondary);
   font-size: 1.1rem;
   font-weight: bold;
   text-decoration: underline;
+}
+
+/* Los círculos laten con suavidad (misma animación que los iconos de las tarjetas) */
+.landing__avatares {
+  flex-shrink: 0;
+  border-radius: 999px;
+  --halo: rgba(46, 125, 91, 0.2);
+  animation: latido 3s ease-out infinite;
+}
+
+.landing__flecha {
+  transition: transform 0.25s ease;
+}
+
+.landing__link:hover .landing__flecha {
+  transform: translateX(5px);
 }
 
 /* El texto a la izquierda y la animación a la derecha, centrada en vertical */
@@ -345,7 +367,9 @@ import AparecerAlVer from "../../components/animation/AparecerAlVer.vue";
   .landing__step-card,
   .landing__step-icon,
   .landing__cta,
-  .landing__cta-icon {
+  .landing__cta-icon,
+  .landing__avatares,
+  .landing__flecha {
     transition: none;
     animation: none;
   }
@@ -353,7 +377,8 @@ import AparecerAlVer from "../../components/animation/AparecerAlVer.vue";
   .landing__step-card:hover,
   .landing__cta:hover,
   .landing__step-card:hover .landing__step-icon,
-  .landing__cta:hover .landing__cta-icon {
+  .landing__cta:hover .landing__cta-icon,
+  .landing__link:hover .landing__flecha {
     transform: none;
   }
 }
