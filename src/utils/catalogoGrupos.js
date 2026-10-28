@@ -26,7 +26,7 @@ export const GRUPOS = [
     ejemploNombre: "Mateo",
     ejemploEdad: "8",
     ejemploNotas:
-      "Pediatra de referencia, alergias, horarios de comida y de colegio, juegos o rutinas que le tranquilizan...",
+      "Pediatra de referencia, alergias, medicación, horarios de comida, rutinas que le tranquilizan...",
   },
   {
     codigo: "ADOLESCENTES",
@@ -37,7 +37,7 @@ export const GRUPOS = [
     ejemploNombre: "Daniel",
     ejemploEdad: "15",
     ejemploNotas:
-      "Médico de referencia, alergias, horarios de estudio y de descanso, cómo prefiere que le acompañen...",
+      "Médico de referencia, alergias, medicación, horarios de descanso, cómo prefiere que le acompañen...",
   },
   {
     codigo: "ADULTOS",
