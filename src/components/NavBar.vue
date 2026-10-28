@@ -35,7 +35,7 @@ const tipoCuenta = computed(() => {
   if (authStore.rol === "ADMIN") {
     return "Cuenta de administración";
   }
-  return "Cuenta de cuidador";
+  return "Cuenta de persona cuidadora";
 });
 
 // Carga el nombre (y la foto si es cuidador) para enseñarlos en el menú
