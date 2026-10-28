@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue";
 import CuidadorRepository from "@/repositories/CuidadorRepository";
 import FotoCuidador from "@/components/FotoCuidador.vue";
+import SelectorGrupos from "@/components/SelectorGrupos.vue";
 import { reducirImagen } from "@/utils/reducirImagen";
 import { CUIDADOS } from "@/utils/catalogoCuidados";
 import { useAuthStore } from "@/stores/auth";
@@ -16,6 +17,7 @@ const ciudad = ref("");
 const tipoCuidado = ref("ambos");
 const sexo = ref("");
 const servicios = ref([]);
+const gruposEdad = ref([]);
 const anosExperiencia = ref(0);
 const tarifaHora = ref(0);
 const bio = ref("");
@@ -35,6 +37,7 @@ onMounted(async () => {
     tipoCuidado.value = perfil.value.tipoCuidado || "ambos";
     sexo.value = perfil.value.sexo || "";
     servicios.value = perfil.value.servicios || [];
+    gruposEdad.value = perfil.value.gruposEdad || [];
     anosExperiencia.value = perfil.value.anosExperiencia;
     tarifaHora.value = perfil.value.tarifaHora;
     bio.value = perfil.value.bio;
@@ -100,6 +103,7 @@ async function guardar() {
       ciudad: ciudad.value.trim() || null,
       tipoCuidado: tipoCuidado.value,
       servicios: servicios.value,
+      gruposEdad: gruposEdad.value,
       // Vacío = prefiero no indicarlo (el back lo borra)
       sexo: sexo.value,
     });
@@ -202,6 +206,21 @@ async function guardar() {
                   <option value="ambos">Ambos (hospital y domicilio)</option>
                 </select>
               </div>
+            </div>
+
+            <h2 class="editar__seccion">Personas a las que cuidas</h2>
+            <p class="editar__ayuda">
+              Marca los grupos de edad a los que puedes cuidar. Las familias
+              podrán encontrarte al buscar por grupo.
+            </p>
+            <div class="editar__grupos">
+              <SelectorGrupos
+                v-model="gruposEdad"
+                multiple
+                ocultar-legend
+                legend="Grupos de edad a los que cuidas"
+                name="grupos-edad"
+              />
             </div>
 
             <h2 class="editar__seccion">
@@ -482,14 +501,18 @@ async function guardar() {
 }
 
 .editar__seccion:nth-of-type(2)::before {
-  content: "🩺";
+  content: "👥";
 }
 
 .editar__seccion:nth-of-type(3)::before {
-  content: "⭐";
+  content: "🩺";
 }
 
 .editar__seccion:nth-of-type(4)::before {
+  content: "⭐";
+}
+
+.editar__seccion:nth-of-type(5)::before {
   content: "📅";
 }
 
@@ -506,6 +529,10 @@ async function guardar() {
     display: flex;
     flex-direction: column;
   }
+}
+
+.editar__grupos {
+  margin-bottom: var(--gap-md);
 }
 
 .editar__servicios {
