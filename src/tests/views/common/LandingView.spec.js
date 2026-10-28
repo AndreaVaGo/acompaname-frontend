@@ -89,6 +89,18 @@ describe("LandingView", () => {
     expect(wrapper.find(".landing__cta.aparecer").exists()).toBe(true);
   });
 
+  test("el enlace para mirar sin registrarse lleva tres personas y una flecha decorativas", () => {
+    const wrapper = montarVista();
+
+    const enlace = wrapper.find(".landing__link");
+    expect(enlace.attributes("href")).toBe("/buscar");
+    expect(enlace.find(".landing__avatares").exists()).toBe(true);
+    expect(enlace.find(".landing__flecha").attributes("aria-hidden")).toBe(
+      "true",
+    );
+    expect(enlace.text()).toContain("Ver personas cuidadoras disponibles");
+  });
+
   test("invita a las personas cuidadoras a crear su perfil", () => {
     const wrapper = montarVista();
 
