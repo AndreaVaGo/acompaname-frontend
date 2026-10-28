@@ -62,7 +62,7 @@ import AparecerAlVer from "../../components/animation/AparecerAlVer.vue";
           <h3>1. Cuéntanos qué necesitas</h3>
           <p>Hospital, domicilio o ambos. En un minuto.</p>
         </AparecerAlVer>
-        <AparecerAlVer class="landing__step-card" :retraso="150">
+        <AparecerAlVer class="landing__step-card" :retraso="250">
           <span class="landing__step-icon">
             <svg
               width="20"
@@ -80,7 +80,7 @@ import AparecerAlVer from "../../components/animation/AparecerAlVer.vue";
           <h3>2. Elige a la persona</h3>
           <p>Perfiles con experiencia, tarifa y valoraciones reales.</p>
         </AparecerAlVer>
-        <AparecerAlVer class="landing__step-card" :retraso="300">
+        <AparecerAlVer class="landing__step-card" :retraso="500">
           <span class="landing__step-icon">
             <svg
               width="20"
@@ -271,6 +271,28 @@ import AparecerAlVer from "../../components/animation/AparecerAlVer.vue";
   justify-content: center;
   margin-bottom: 10px;
   transition: transform 0.25s ease;
+  /* Latido suave: un halo coral que se expande y se apaga */
+  --halo: rgba(242, 137, 107, 0.45);
+  animation: latido 3s ease-out infinite;
+}
+
+/* Cada tarjeta late un poco después que la anterior */
+.landing__step-card:nth-child(2) .landing__step-icon {
+  animation-delay: 1s;
+}
+
+.landing__step-card:nth-child(3) .landing__step-icon {
+  animation-delay: 2s;
+}
+
+@keyframes latido {
+  0% {
+    box-shadow: 0 0 0 0 var(--halo);
+  }
+  60%,
+  100% {
+    box-shadow: 0 0 0 14px transparent;
+  }
 }
 
 /* Al pasar el ratón, la tarjeta sube un poco y su icono se inclina */
@@ -283,6 +305,7 @@ import AparecerAlVer from "../../components/animation/AparecerAlVer.vue";
 .landing__step-card:hover .landing__step-icon,
 .landing__cta:hover .landing__cta-icon {
   transform: rotate(-10deg) scale(1.12);
+  animation: none;
 }
 
 .landing__cta {
@@ -313,15 +336,18 @@ import AparecerAlVer from "../../components/animation/AparecerAlVer.vue";
   margin-bottom: 12px;
   font-size: 1.3rem;
   transition: transform 0.25s ease;
+  --halo: rgba(46, 125, 91, 0.35);
+  animation: latido 3s ease-out infinite;
 }
 
-/* Quien prefiere menos movimiento no ve los efectos al pasar el ratón */
+/* Quien prefiere menos movimiento no ve ni el latido ni los efectos al pasar el ratón */
 @media (prefers-reduced-motion: reduce) {
   .landing__step-card,
   .landing__step-icon,
   .landing__cta,
   .landing__cta-icon {
     transition: none;
+    animation: none;
   }
 
   .landing__step-card:hover,
