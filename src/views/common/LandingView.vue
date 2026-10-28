@@ -10,10 +10,13 @@ import { RouterLink } from "vue-router";
           <span class="landing__badge-icon">♥</span>
           Nunca sola, nunca solo
         </span>
-        <h1>Cuidadores de confianza, cuando tu familia más lo necesita</h1>
+        <h1>
+          Personas cuidadoras de confianza, cuando tu familia más lo necesita
+        </h1>
         <p class="landing__hero-text">
-          Encuentra profesionales para acompañar a personas dependientes en el
-          hospital o en casa. Sin llamadas interminables ni papeleo.
+          Encuentra profesionales para acompañar en el hospital o en casa a
+          quien lo necesite por enfermedad o dependencia, sea cual sea su edad.
+          Sin llamadas interminables ni papeleo.
         </p>
         <div class="landing__hero-actions">
           <RouterLink to="/registro" class="btn btn--primary"
@@ -26,14 +29,15 @@ import { RouterLink } from "vue-router";
         <p class="landing__hint">
           ¿Solo quieres mirar?
           <RouterLink to="/buscar" class="landing__link"
-            >Ver cuidadores disponibles</RouterLink
+            >Ver personas cuidadoras disponibles</RouterLink
           >
         </p>
       </div>
       <div class="landing__hero-image">
+        <!-- Foto de dos manos unidas: no se ve la edad de nadie, así vale para cualquier persona -->
         <img
-          src="../../assets/hero.jpg"
-          alt="Cuidadora acompañando a una persona mayor"
+          src="../../assets/hero-manos.jpg"
+          alt="Dos manos entrelazadas, una sosteniendo a la otra, en señal de cuidado y apoyo"
         />
       </div>
     </section>
@@ -91,7 +95,7 @@ import { RouterLink } from "vue-router";
             </svg>
           </span>
           <h3>3. Solicita y acompaña</h3>
-          <p>El cuidador acepta y os coordináis desde la app.</p>
+          <p>La persona cuidadora acepta y os coordináis desde la app.</p>
         </div>
       </div>
     </section>
@@ -106,7 +110,7 @@ import { RouterLink } from "vue-router";
         agenda desde un único sitio.
       </p>
       <RouterLink to="/registro?rol=cuidador" class="btn btn--primary"
-        >Crear mi perfil de cuidador</RouterLink
+        >Crear mi perfil profesional</RouterLink
       >
     </section>
 
