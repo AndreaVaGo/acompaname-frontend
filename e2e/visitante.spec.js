@@ -4,7 +4,7 @@ test.describe("Visitante sin sesión", () => {
   test("puede ver los cuidadores desde la portada", async ({ page }) => {
     await page.goto("/");
 
-    await page.getByRole("link", { name: "Ver cuidadores disponibles" }).click();
+    await page.getByRole("link", { name: "Ver personas cuidadoras disponibles" }).click();
 
     await expect(page).toHaveURL("/buscar");
     await expect(page.getByText("Cuidadores disponibles")).toBeVisible();
