@@ -172,10 +172,78 @@ describe("EditarPerfilView", () => {
       ciudad: null,
       tipoCuidado: "ambos",
       servicios: [],
+      gruposEdad: [],
       sexo: "",
     });
     expect(wrapper.text()).toContain("Perfil guardado correctamente.");
     expect(window.scrollTo).toHaveBeenCalledWith(0, 0);
+  });
+
+  test("carga los grupos de edad del perfil marcados en el formulario", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue({
+      ...perfil,
+      gruposEdad: ["BEBES", "MAYORES"],
+    });
+
+    const wrapper = await montarVista();
+
+    const marcado = (codigo) =>
+      wrapper.find(`input[name="grupos-edad"][value="${codigo}"]`).element
+        .checked;
+    expect(marcado("BEBES")).toBe(true);
+    expect(marcado("MAYORES")).toBe(true);
+    expect(marcado("NINOS")).toBe(false);
+  });
+
+  test("si el perfil no tiene grupos de edad no hay ninguno marcado", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue(
+      perfil
+    );
+
+    const wrapper = await montarVista();
+
+    const marcados = wrapper
+      .findAll('input[name="grupos-edad"]')
+      .filter((input) => input.element.checked);
+    expect(marcados).toHaveLength(0);
+  });
+
+  test("guarda los grupos de edad que se marcan", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue({
+      ...perfil,
+      gruposEdad: ["BEBES"],
+    });
+    const updateSpy = vi
+      .spyOn(CuidadorRepository.prototype, "update")
+      .mockResolvedValue({});
+
+    const wrapper = await montarVista();
+    await wrapper.find('input[name="grupos-edad"][value="NINOS"]').setValue(true);
+    await enviar(wrapper);
+
+    expect(updateSpy).toHaveBeenCalledWith(
+      3,
+      expect.objectContaining({ gruposEdad: ["BEBES", "NINOS"] })
+    );
+  });
+
+  test("si se desmarcan todos los grupos se guarda la lista vacía", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue({
+      ...perfil,
+      gruposEdad: ["BEBES"],
+    });
+    const updateSpy = vi
+      .spyOn(CuidadorRepository.prototype, "update")
+      .mockResolvedValue({});
+
+    const wrapper = await montarVista();
+    await wrapper.find('input[name="grupos-edad"][value="BEBES"]').setValue(false);
+    await enviar(wrapper);
+
+    expect(updateSpy).toHaveBeenCalledWith(
+      3,
+      expect.objectContaining({ gruposEdad: [] })
+    );
   });
 
   test("carga la ciudad del perfil en el formulario", async () => {
