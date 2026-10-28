@@ -60,7 +60,7 @@ async function enviarValoracion() {
         <div class="valorar__cabecera">
           <span class="valorar__icono">💬</span>
           <span class="valorar__aviso">
-            Cuéntanos cómo fue la experiencia con el cuidador.
+            Cuéntanos cómo fue la experiencia con la persona cuidadora.
           </span>
         </div>
 
