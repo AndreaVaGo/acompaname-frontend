@@ -19,6 +19,21 @@ describe("SelectorGrupos", () => {
     expect(wrapper.text()).toContain("De 4 a 12 años");
   });
 
+  test("el título se ve por defecto", () => {
+    const wrapper = montar();
+
+    expect(wrapper.find("legend").classes()).not.toContain(
+      "grupos__legend--oculta",
+    );
+  });
+
+  test("con ocultarLegend el título sigue en la página pero escondido a la vista", () => {
+    const wrapper = montar({ ocultarLegend: true });
+
+    expect(wrapper.find("legend").text()).toBe("Grupo de edad");
+    expect(wrapper.find("legend").classes()).toContain("grupos__legend--oculta");
+  });
+
   test("por defecto se elige un solo grupo (botones redondos)", () => {
     const wrapper = montar();
 
