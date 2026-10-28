@@ -50,7 +50,7 @@ onMounted(async () => {
   <div class="solicitudes">
     <header class="solicitudes__header">
       <h1>Mis solicitudes</h1>
-      <p>Solicitudes que has enviado a los cuidadores.</p>
+      <p>Solicitudes que has enviado a las personas cuidadoras.</p>
     </header>
 
     <p v-if="error" class="solicitudes__error">{{ error }}</p>
