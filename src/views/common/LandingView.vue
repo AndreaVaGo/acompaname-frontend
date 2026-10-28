@@ -33,7 +33,7 @@ import AvataresPersonas from "../../components/animation/AvataresPersonas.vue";
           ¿Solo quieres mirar?
           <RouterLink to="/buscar" class="landing__link">
             <AvataresPersonas class="landing__avatares" />
-            <span>Ver personas cuidadoras disponibles</span>
+            <span class="landing__texto">Ver personas cuidadoras disponibles</span>
             <span class="landing__flecha" aria-hidden="true">→</span>
           </RouterLink>
         </p>
@@ -171,6 +171,11 @@ import AvataresPersonas from "../../components/animation/AvataresPersonas.vue";
   color: var(--color-secondary);
   font-size: 1.1rem;
   font-weight: bold;
+  text-decoration: none;
+}
+
+/* Solo el texto va subrayado; las personas y la flecha no */
+.landing__texto {
   text-decoration: underline;
 }
 
@@ -182,7 +187,10 @@ import AvataresPersonas from "../../components/animation/AvataresPersonas.vue";
   animation: latido 3s ease-out infinite;
 }
 
+/* La flecha es más grande que el texto para que se vea bien */
 .landing__flecha {
+  font-size: 1.7rem;
+  line-height: 1;
   transition: transform 0.25s ease;
 }
 
