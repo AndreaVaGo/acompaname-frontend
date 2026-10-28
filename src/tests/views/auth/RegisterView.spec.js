@@ -15,6 +15,9 @@ const roles = [
   { id: 5, name: 'CUIDADOR' },
 ]
 
+// Contraseña que cumple todas las reglas (mayúscula, minúscula, número y carácter especial)
+const PASSWORD_VALIDA = 'Segura123!'
+
 async function esperar() {
   await new Promise((resolve) => setTimeout(resolve, 0))
 }
@@ -33,7 +36,8 @@ async function montarVista() {
 async function rellenarFormulario(wrapper) {
   await wrapper.find('#nombre').setValue('Ana López')
   await wrapper.find('#email').setValue('ana@test.com')
-  await wrapper.find('#password').setValue('12345678')
+  await wrapper.find('#password').setValue(PASSWORD_VALIDA)
+  await wrapper.find('#password-repetida').setValue(PASSWORD_VALIDA)
   await wrapper.find('#telefono').setValue('600111222')
 }
 
@@ -66,7 +70,7 @@ describe('RegisterView', () => {
       nombre: 'Ana López',
       email: 'ana@test.com',
       telefono: '600111222',
-      password: '12345678',
+      password: PASSWORD_VALIDA,
       rolesIds: [4],
     })
     expect(push).toHaveBeenCalledWith('/login')
@@ -152,5 +156,58 @@ describe('RegisterView', () => {
     expect(
       wrapper.findAll('button[type="button"]')[1].classes()
     ).toContain('register__role--active')
+  })
+
+  test('si la contraseña es débil, dice qué le falta y no registra', async () => {
+    const registrar = vi
+      .spyOn(AuthRepository.prototype, 'register')
+      .mockResolvedValue({})
+    const wrapper = await montarVista()
+
+    await rellenarFormulario(wrapper)
+    await wrapper.find('#password').setValue('abcdefgh')
+    await wrapper.find('#password-repetida').setValue('abcdefgh')
+    await wrapper.find('form').trigger('submit')
+    await esperar()
+
+    const error = wrapper.find('.register__error').text()
+    expect(error).toContain('una letra mayúscula')
+    expect(error).toContain('un número')
+    expect(error).toContain('un carácter especial')
+    expect(registrar).not.toHaveBeenCalled()
+  })
+
+  test('si las contraseñas no coinciden, avisa y no registra', async () => {
+    const registrar = vi
+      .spyOn(AuthRepository.prototype, 'register')
+      .mockResolvedValue({})
+    const wrapper = await montarVista()
+
+    await rellenarFormulario(wrapper)
+    await wrapper.find('#password-repetida').setValue('Otra123!x')
+    await wrapper.find('form').trigger('submit')
+    await esperar()
+
+    expect(wrapper.find('.register__error').text()).toBe(
+      'Las contraseñas no coinciden.'
+    )
+    expect(registrar).not.toHaveBeenCalled()
+  })
+
+  test('si falta repetir la contraseña, pide rellenar todos los campos', async () => {
+    const registrar = vi
+      .spyOn(AuthRepository.prototype, 'register')
+      .mockResolvedValue({})
+    const wrapper = await montarVista()
+
+    await rellenarFormulario(wrapper)
+    await wrapper.find('#password-repetida').setValue('')
+    await wrapper.find('form').trigger('submit')
+    await esperar()
+
+    expect(wrapper.find('.register__error').text()).toBe(
+      'Por favor, rellena todos los campos.'
+    )
+    expect(registrar).not.toHaveBeenCalled()
   })
 })
