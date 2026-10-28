@@ -14,6 +14,20 @@ test.describe("Visitante sin sesión", () => {
     await page.screenshot({ path: "docs/screenshots/e2e-08-visitante-buscar.png" });
   });
 
+  test("la portada muestra la animación y se puede pausar", async ({ page }) => {
+    await page.goto("/");
+
+    await expect(
+      page.getByRole("img", { name: /Animación de 15 segundos/ }),
+    ).toBeVisible();
+
+    await page.getByRole("button", { name: "Pausar animación" }).click();
+
+    await expect(
+      page.getByRole("button", { name: "Reproducir animación" }),
+    ).toBeVisible();
+  });
+
   test("si entra en sus solicitudes lo mandan al login", async ({ page }) => {
     await page.goto("/solicitudes");
 
