@@ -121,7 +121,7 @@ describe("BuscarView", () => {
 
     expect(wrapper.text()).not.toContain("Pepe");
     expect(wrapper.text()).not.toContain("Ana");
-    expect(wrapper.text()).toContain("0 cuidadores");
+    expect(wrapper.text()).toContain("0 personas cuidadoras");
   });
 
   test("el filtro Disponible ahora solo deja los cuidadores disponibles", async () => {
@@ -447,7 +447,7 @@ describe("BuscarView", () => {
     await wrapper.find("#filtro-servicio-higiene").setValue(true);
 
     expect(wrapper.text()).not.toContain("Ana");
-    expect(wrapper.text()).toContain("0 cuidadores");
+    expect(wrapper.text()).toContain("0 personas cuidadoras");
   });
 
   test("sin fechas no se consulta qué cuidadores están ocupados", async () => {
@@ -553,7 +553,7 @@ describe("BuscarView", () => {
 
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    expect(wrapper.text()).toContain("No se pudieron cargar los cuidadores.");
+    expect(wrapper.text()).toContain("No se pudieron cargar las personas cuidadoras.");
   });
 
   test("muestra el motivo si el servidor responde con un error al cargar los cuidadores", async () => {
@@ -569,7 +569,7 @@ describe("BuscarView", () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(wrapper.text()).toContain(
-      "No se pudieron cargar los cuidadores. No se ha encontrado lo que buscas.",
+      "No se pudieron cargar las personas cuidadoras. No se ha encontrado lo que buscas.",
     );
   });
 
