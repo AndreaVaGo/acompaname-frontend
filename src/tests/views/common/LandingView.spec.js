@@ -73,6 +73,22 @@ describe("LandingView", () => {
     );
   });
 
+  test("las tres tarjetas de los pasos aparecen una tras otra", () => {
+    const wrapper = montarVista();
+
+    const tarjetas = wrapper.findAll(".landing__step-card.aparecer");
+    expect(tarjetas).toHaveLength(3);
+    expect(tarjetas[0].attributes("style")).toContain("--retraso: 0ms");
+    expect(tarjetas[1].attributes("style")).toContain("--retraso: 150ms");
+    expect(tarjetas[2].attributes("style")).toContain("--retraso: 300ms");
+  });
+
+  test("la tarjeta para profesionales también aparece al verse", () => {
+    const wrapper = montarVista();
+
+    expect(wrapper.find(".landing__cta.aparecer").exists()).toBe(true);
+  });
+
   test("invita a las personas cuidadoras a crear su perfil", () => {
     const wrapper = montarVista();
 
