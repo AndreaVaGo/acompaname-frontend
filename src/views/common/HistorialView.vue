@@ -4,6 +4,7 @@ import { RouterLink } from "vue-router";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
 import ValoracionRepository from "@/repositories/ValoracionRepository";
 import { nombreCuidado } from "@/utils/catalogoCuidados";
+import { nombreGrupo } from "@/utils/catalogoGrupos";
 import { formatearFecha } from "@/utils/formatearFecha";
 import { mensajeDeError } from "@/utils/mensajeDeError";
 
@@ -25,6 +26,7 @@ onMounted(async () => {
         nombre: s.cuidadorNombre,
         paciente: s.nombrePaciente,
         edad: s.edadPaciente,
+        grupoEdad: s.grupoEdad,
         tipoCuidado: s.tipoCuidado,
         fechaInicio: s.fechaCuidado,
         fechaFin: s.fechaFin,
@@ -88,6 +90,10 @@ function textoEstado(estado) {
 
         <ul class="historial__detalles">
           <li class="historial__tipo">🏠 {{ item.tipoCuidado }}</li>
+          <li v-if="item.grupoEdad" class="historial__grupo">
+            👥 <strong>Grupo de edad:</strong>
+            {{ nombreGrupo(item.grupoEdad) }}
+          </li>
           <li>
             📅 <strong>Inicio:</strong> {{ formatearFecha(item.fechaInicio) }}
           </li>
