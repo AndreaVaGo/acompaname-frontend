@@ -2,6 +2,7 @@
 import { computed, ref } from "vue";
 import { RouterLink } from "vue-router";
 import { nombreCuidado } from "@/utils/catalogoCuidados";
+import { nombreGrupo } from "@/utils/catalogoGrupos";
 import { formatearFecha } from "@/utils/formatearFecha";
 
 const props = defineProps([
@@ -73,6 +74,10 @@ const avisoDireccion = computed(
 
     <ul class="solicitudes__detalles">
       <li class="solicitudes__tipo">🏠 {{ solicitud.tipoCuidado }}</li>
+      <li v-if="solicitud.grupoEdad" class="solicitudes__grupo">
+        👥 <strong>Grupo de edad:</strong>
+        {{ nombreGrupo(solicitud.grupoEdad) }}
+      </li>
       <li>
         📅 <strong>Inicio:</strong> {{ formatearFecha(solicitud.fechaCuidado) }}
       </li>
