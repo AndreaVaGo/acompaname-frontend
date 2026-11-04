@@ -142,4 +142,50 @@ describe("ConfirmacionView", () => {
     expect(enlaces).toContain("/solicitudes");
     expect(enlaces).toContain("/buscar");
   });
+
+  test("muestra el nombre del grupo de edad si la solicitud lo tiene", async () => {
+    vi.spyOn(SolicitudRepository.prototype, "getById").mockResolvedValue({
+      cuidadorNombre: "Pepe",
+      tipoCuidado: "domicilio",
+      fechaCuidado: "2026-10-10",
+      grupoEdad: "BEBES",
+      nombrePaciente: "Lucía",
+      edadPaciente: 0,
+    });
+
+    const { wrapper } = await montarVista();
+
+    expect(wrapper.text()).toContain("Grupo de edad");
+    expect(wrapper.text()).toContain("Bebés");
+    expect(wrapper.text()).toContain("Lucía, 0 años");
+  });
+
+  test("no muestra la fila de grupo de edad en las solicitudes antiguas", async () => {
+    vi.spyOn(SolicitudRepository.prototype, "getById").mockResolvedValue({
+      cuidadorNombre: "Pepe",
+      tipoCuidado: "domicilio",
+      fechaCuidado: "2026-10-10",
+      nombrePaciente: "Antonio Serrano",
+      edadPaciente: 81,
+    });
+
+    const { wrapper } = await montarVista();
+
+    expect(wrapper.text()).not.toContain("Grupo de edad");
+  });
+
+  test("habla de persona cuidada y no de paciente", async () => {
+    vi.spyOn(SolicitudRepository.prototype, "getById").mockResolvedValue({
+      cuidadorNombre: "Pepe",
+      tipoCuidado: "domicilio",
+      fechaCuidado: "2026-10-10",
+      nombrePaciente: "Antonio Serrano",
+      edadPaciente: 81,
+    });
+
+    const { wrapper } = await montarVista();
+
+    expect(wrapper.text()).toContain("Persona cuidada");
+    expect(wrapper.text().toLowerCase()).not.toContain("paciente");
+  });
 });
