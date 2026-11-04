@@ -11,8 +11,16 @@ function crearRouter() {
   return createRouter({
     history: createWebHistory(),
     routes: [
-      { path: "/solicitar/:id", name: "solicitar", component: SolicitarServicioView },
-      { path: "/confirmacion", name: "confirmacion", component: { template: "<div>ok</div>" } },
+      {
+        path: "/solicitar/:id",
+        name: "solicitar",
+        component: SolicitarServicioView,
+      },
+      {
+        path: "/confirmacion",
+        name: "confirmacion",
+        component: { template: "<div>ok</div>" },
+      },
     ],
   });
 }
@@ -61,7 +69,7 @@ describe("SolicitarServicioView", () => {
 
   test("muestra error si falla la carga del cuidador", async () => {
     vi.spyOn(CuidadorRepository.prototype, "getById").mockRejectedValue(
-      new Error("fallo")
+      new Error("fallo"),
     );
 
     const { wrapper } = await montarVista();
@@ -73,13 +81,13 @@ describe("SolicitarServicioView", () => {
     const errorNoEncontrado = new Error("fallo");
     errorNoEncontrado.status = 404;
     vi.spyOn(CuidadorRepository.prototype, "getById").mockRejectedValue(
-      errorNoEncontrado
+      errorNoEncontrado,
     );
 
     const { wrapper } = await montarVista();
 
     expect(wrapper.text()).toContain(
-      "No se pudo cargar el cuidador. No se ha encontrado lo que buscas."
+      "No se pudo cargar el cuidador. No se ha encontrado lo que buscas.",
     );
   });
 
@@ -96,7 +104,7 @@ describe("SolicitarServicioView", () => {
     await wrapper.find("form").trigger("submit.prevent");
 
     expect(wrapper.text()).toContain(
-      "Por favor, rellena todos los campos obligatorios."
+      "Por favor, rellena todos los campos obligatorios.",
     );
     expect(createSpy).not.toHaveBeenCalled();
   });
@@ -169,7 +177,7 @@ describe("SolicitarServicioView", () => {
       expect.objectContaining({
         fechaCuidado: "2026-10-10",
         fechaFin: "2026-10-17",
-      })
+      }),
     );
   });
 
@@ -197,7 +205,7 @@ describe("SolicitarServicioView", () => {
     await wrapper.find("form").trigger("submit.prevent");
 
     expect(wrapper.text()).toContain(
-      "La fecha de fin no puede ser anterior a la de inicio."
+      "La fecha de fin no puede ser anterior a la de inicio.",
     );
     expect(createSpy).not.toHaveBeenCalled();
   });
@@ -207,7 +215,7 @@ describe("SolicitarServicioView", () => {
       usuarioNombre: "Pepe",
     });
     vi.spyOn(SolicitudRepository.prototype, "create").mockRejectedValue(
-      new Error("fallo")
+      new Error("fallo"),
     );
 
     const { wrapper } = await montarVista();
@@ -234,7 +242,7 @@ describe("SolicitarServicioView", () => {
       usuarioNombre: "Pepe",
     });
     vi.spyOn(SolicitudRepository.prototype, "create").mockRejectedValue(
-      errorPermiso
+      errorPermiso,
     );
 
     const { wrapper } = await montarVista();
@@ -252,11 +260,11 @@ describe("SolicitarServicioView", () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(wrapper.text()).toContain(
-      "No se pudo enviar la solicitud. No tienes permiso para hacer esto."
+      "No se pudo enviar la solicitud. No tienes permiso para hacer esto.",
     );
   });
 
-  test("muestra los checkboxes de las necesidades de la persona cuidada", async () => {
+    test("muestra los checkboxes de las necesidades de la persona cuidada", async () => {
     vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
       usuarioNombre: "Pepe",
     });
@@ -264,8 +272,9 @@ describe("SolicitarServicioView", () => {
     const { wrapper } = await montarVista();
     await elegirGrupo(wrapper, "MAYORES");
 
-    expect(wrapper.findAll(".solicitar__check").length).toBe(9);
-    expect(wrapper.text()).toContain("Compañía y conversación");
+    expect(wrapper.findAll(".solicitar__check").length).toBe(10);
+    expect(wrapper.text()).toContain("Ayuda a domicilio");
+    expect(wrapper.text()).toContain("Acompañamiento general");
     expect(wrapper.text()).toContain("Movilidad reducida");
     expect(wrapper.text()).toContain("Cuidados paliativos");
     expect(wrapper.find("#necesidad-medicacion").element.checked).toBe(false);
@@ -297,7 +306,7 @@ describe("SolicitarServicioView", () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(createSpy).toHaveBeenCalledWith(
-      expect.objectContaining({ necesidades: ["movilidad", "nocturno"] })
+      expect.objectContaining({ necesidades: ["movilidad", "nocturno"] }),
     );
   });
 
@@ -327,7 +336,7 @@ describe("SolicitarServicioView", () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(createSpy).toHaveBeenCalledWith(
-      expect.objectContaining({ necesidades: [] })
+      expect.objectContaining({ necesidades: [] }),
     );
   });
 
@@ -374,7 +383,7 @@ describe("SolicitarServicioView", () => {
     await wrapper.find("form").trigger("submit.prevent");
 
     expect(wrapper.text()).toContain(
-      "Por favor, rellena todos los campos obligatorios."
+      "Por favor, rellena todos los campos obligatorios.",
     );
     expect(createSpy).not.toHaveBeenCalled();
   });
@@ -401,7 +410,7 @@ describe("SolicitarServicioView", () => {
     await wrapper.find("form").trigger("submit.prevent");
 
     expect(wrapper.text()).toContain(
-      "Por favor, rellena todos los campos obligatorios."
+      "Por favor, rellena todos los campos obligatorios.",
     );
     expect(createSpy).not.toHaveBeenCalled();
   });
@@ -431,7 +440,9 @@ describe("SolicitarServicioView", () => {
 
     expect(wrapper.find("#paciente").exists()).toBe(true);
     expect(wrapper.find("#edad").exists()).toBe(true);
-    expect(wrapper.text()).not.toContain("Elige arriba quién necesita cuidados");
+    expect(wrapper.text()).not.toContain(
+      "Elige arriba quién necesita cuidados",
+    );
   });
 
   test("en los textos visibles se habla de persona cuidada y no de paciente", async () => {
@@ -458,15 +469,17 @@ describe("SolicitarServicioView", () => {
     await elegirGrupo(wrapper, "BEBES");
     expect(wrapper.find("#paciente").attributes("placeholder")).toBe("Lucía");
     expect(wrapper.find("#edad").attributes("placeholder")).toBe("1");
-    expect(wrapper.find("#notas").attributes("placeholder")).toContain("Pediatra");
+    expect(wrapper.find("#notas").attributes("placeholder")).toContain(
+      "Pediatra",
+    );
 
     await elegirGrupo(wrapper, "MAYORES");
     expect(wrapper.find("#paciente").attributes("placeholder")).toBe(
-      "Antonio Serrano"
+      "Antonio Serrano",
     );
     expect(wrapper.find("#edad").attributes("placeholder")).toBe("81");
     expect(wrapper.find("#notas").attributes("placeholder")).not.toContain(
-      "Pediatra"
+      "Pediatra",
     );
   });
 
@@ -495,7 +508,9 @@ describe("SolicitarServicioView", () => {
     await elegirGrupo(wrapper, "BEBES");
     const paraBebes = wrapper.findAll(".solicitar__check").map((c) => c.text());
     await elegirGrupo(wrapper, "MAYORES");
-    const paraMayores = wrapper.findAll(".solicitar__check").map((c) => c.text());
+    const paraMayores = wrapper
+      .findAll(".solicitar__check")
+      .map((c) => c.text());
 
     expect(paraBebes).toEqual(paraMayores);
     expect(paraBebes).toContain("Cuidados paliativos");
@@ -519,7 +534,7 @@ describe("SolicitarServicioView", () => {
     await wrapper.find("form").trigger("submit.prevent");
 
     expect(wrapper.text()).toContain(
-      "Por favor, rellena todos los campos obligatorios."
+      "Por favor, rellena todos los campos obligatorios.",
     );
     expect(createSpy).not.toHaveBeenCalled();
   });
@@ -544,7 +559,7 @@ describe("SolicitarServicioView", () => {
     await wrapper.find("form").trigger("submit.prevent");
 
     expect(wrapper.text()).toContain(
-      'Para "Bebés" la edad tiene que estar entre 0 y 3 años.'
+      'Para "Bebés" la edad tiene que estar entre 0 y 3 años.',
     );
     expect(createSpy).not.toHaveBeenCalled();
   });
@@ -570,7 +585,7 @@ describe("SolicitarServicioView", () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(createSpy).toHaveBeenCalledWith(
-      expect.objectContaining({ grupoEdad: "BEBES", edadPaciente: 0 })
+      expect.objectContaining({ grupoEdad: "BEBES", edadPaciente: 0 }),
     );
   });
 });
