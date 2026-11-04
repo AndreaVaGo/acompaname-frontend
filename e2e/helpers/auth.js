@@ -33,11 +33,13 @@ export async function rellenarRegistro(page, usuario) {
   await page.fill("#password-repetida", repetida);
   await page.fill("#telefono", usuario.telefono);
 
-  // Cada botón de rol tiene un texto distinto: "Ofrezco servicios" / "Busco cuidador"
+  // Cada botón de rol tiene un texto distinto: "Ofrezco servicios" / "Busco una persona cuidadora"
   if (usuario.rol === "cuidador") {
     await page.getByRole("button", { name: "Ofrezco servicios" }).click();
   } else {
-    await page.getByRole("button", { name: "Busco cuidador" }).click();
+    await page
+      .getByRole("button", { name: "Busco una persona cuidadora" })
+      .click();
   }
 
   await page.getByRole("button", { name: "Crear mi cuenta" }).click();
