@@ -83,15 +83,10 @@ async function handleSubmit() {
       <div class="register__box">
         <div class="register__cabecera">
           <span class="register__icono">🌱</span>
-          <span class="register__aviso">
-            Crea tu cuenta en un minuto.
-          </span>
+          <span class="register__aviso"> Crea tu cuenta en un minuto. </span>
         </div>
 
-        <form
-          class="formulario register__form"
-          @submit.prevent="handleSubmit"
-        >
+        <form class="formulario register__form" @submit.prevent="handleSubmit">
           <h2 class="titulo-seccion" data-icono="👤">Tus datos</h2>
 
           <label for="nombre">Nombre completo</label>
@@ -166,8 +161,12 @@ async function handleSubmit() {
                   <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                 </svg>
               </span>
-              <span class="register__role-title">Busco cuidador</span>
-              <span class="register__role-desc">Para mí o para un familiar</span>
+              <span class="register__role-title"
+                >Busco una persona cuidadora</span
+              >
+              <span class="register__role-desc"
+                >Para mí o para alguien de mi familia</span
+              >
             </button>
             <button
               type="button"
@@ -198,7 +197,7 @@ async function handleSubmit() {
                   <path d="m15 18-2-2" />
                 </svg>
               </span>
-              <span class="register__role-title">Cuidador</span>
+              <span class="register__role-title">Persona cuidadora</span>
               <span class="register__role-desc">Ofrezco servicios</span>
             </button>
           </div>
