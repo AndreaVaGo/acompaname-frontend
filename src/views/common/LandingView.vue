@@ -3,6 +3,7 @@ import { RouterLink } from "vue-router";
 import AnimacionComoFunciona from "../../components/animation/AnimacionComoFunciona.vue";
 import AparecerAlVer from "../../components/animation/AparecerAlVer.vue";
 import AvataresPersonas from "../../components/animation/AvataresPersonas.vue";
+import IconoManoCorazon from "../../components/animation/IconoManoCorazon.vue";
 </script>
 
 <template>
@@ -105,7 +106,7 @@ import AvataresPersonas from "../../components/animation/AvataresPersonas.vue";
     <hr class="landing__divider" />
 
     <AparecerAlVer class="landing__cta">
-      <div class="landing__cta-icon">🏠</div>
+      <div class="landing__cta-icon"><IconoManoCorazon /></div>
       <h2>¿Eres cuidador o cuidadora profesional?</h2>
       <p>
         Publica tu perfil, recibe solicitudes de familias cercanas y gestiona tu
@@ -355,8 +356,10 @@ import AvataresPersonas from "../../components/animation/AvataresPersonas.vue";
   }
 }
 
+/* Mismo estilo que los iconos de las tarjetas de arriba: círculo coral claro, icono coral
+   (el color del icono viene del propio componente) y latido coral */
 .landing__cta-icon {
-  background-color: var(--color-secondary-bg);
+  background-color: var(--color-accent-bg);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -364,10 +367,14 @@ import AvataresPersonas from "../../components/animation/AvataresPersonas.vue";
   height: 46px;
   border-radius: 50%;
   margin-bottom: 12px;
-  font-size: 1.3rem;
   transition: transform 0.25s ease;
-  --halo: rgba(46, 125, 91, 0.35);
+  --halo: rgba(242, 137, 107, 0.45);
   animation: latido 3s ease-out infinite;
+}
+
+.landing__cta-icon svg {
+  width: 24px;
+  height: 24px;
 }
 
 /* Quien prefiere menos movimiento no ve ni el latido ni los efectos al pasar el ratón */
