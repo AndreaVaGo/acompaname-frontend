@@ -10,7 +10,8 @@ export const CUIDADOS = [
   { codigo: "alimentacion", nombre: "Alimentación" },
   { codigo: "nocturno", nombre: "Acompañamiento nocturno" },
   { codigo: "paliativos", nombre: "Cuidados paliativos" },
-  { codigo: "compania", nombre: "Compañía y conversación" },
+  { codigo: "domicilio", nombre: "Ayuda a domicilio" },
+  { codigo: "acompanamiento", nombre: "Acompañamiento general" },
   { codigo: "traslados", nombre: "Traslados y citas médicas" },
 ];
 
