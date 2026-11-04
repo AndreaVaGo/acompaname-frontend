@@ -4,6 +4,7 @@ import { useRoute, RouterLink } from "vue-router";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
 import { formatearFecha } from "@/utils/formatearFecha";
 import { mensajeDeError } from "@/utils/mensajeDeError";
+import { nombreGrupo } from "@/utils/catalogoGrupos";
 
 const route = useRoute();
 const solicitudRepository = new SolicitudRepository();
@@ -51,8 +52,12 @@ onMounted(async () => {
           <span>Fecha de fin</span>
           <strong>{{ formatearFecha(solicitud.fechaFin) }}</strong>
         </div>
+        <div v-if="solicitud.grupoEdad" class="confirmacion__fila">
+          <span>Grupo de edad</span>
+          <strong>{{ nombreGrupo(solicitud.grupoEdad) }}</strong>
+        </div>
         <div class="confirmacion__fila">
-          <span>Paciente</span>
+          <span>Persona cuidada</span>
           <strong>{{ solicitud.nombrePaciente }}, {{ solicitud.edadPaciente }} años</strong>
         </div>
       </div>
