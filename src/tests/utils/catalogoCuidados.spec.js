@@ -29,16 +29,28 @@ describe("catalogoCuidados", () => {
     ]);
   });
 
-  test("incluye la compañía y los traslados a citas médicas", () => {
+  test("incluye la ayuda a domicilio, el acompañamiento general y los traslados", () => {
     const codigos = CUIDADOS.map((cuidado) => cuidado.codigo);
 
-    expect(codigos).toContain("compania");
+    expect(codigos).toContain("domicilio");
+    expect(codigos).toContain("acompanamiento");
     expect(codigos).toContain("traslados");
+  });
+
+  test("ya no existe la compañía y conversación", () => {
+    const codigos = CUIDADOS.map((cuidado) => cuidado.codigo);
+
+    expect(codigos).not.toContain("compania");
+  });
+
+  test("hay diez cuidados en total", () => {
+    expect(CUIDADOS).toHaveLength(10);
   });
 
   test("nombreCuidado devuelve el nombre que se ve en pantalla", () => {
     expect(nombreCuidado("higiene")).toBe("Higiene personal");
-    expect(nombreCuidado("compania")).toBe("Compañía y conversación");
+    expect(nombreCuidado("domicilio")).toBe("Ayuda a domicilio");
+    expect(nombreCuidado("acompanamiento")).toBe("Acompañamiento general");
   });
 
   test("nombreCuidado devuelve el mismo código si no lo conoce", () => {
