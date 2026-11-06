@@ -5,16 +5,18 @@ export default class AuthRepository extends Repository {
     super(API_URL);
   }
 
+  // Devuelve los datos de la persona y el token que enviará en cada petición
   async login(email, password) {
-    const credenciales = btoa(`${email}:${password}`);
     const response = await fetch(`${this.uri}/login`, {
-      headers: {
-        Authorization: `Basic ${credenciales}`,
-      },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
     });
-    if (!response.ok) await lanzarError(response, "Credenciales incorrectas");
-    const data = await response.json();
-    return { ...data, credenciales };
+    // false: el 401 del login es "email o contraseña mal", no una sesión caducada
+    if (!response.ok) {
+      await lanzarError(response, "Credenciales incorrectas", false);
+    }
+    return await response.json();
   }
 
   async register(usuarioData) {
