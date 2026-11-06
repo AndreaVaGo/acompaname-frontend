@@ -32,21 +32,37 @@ afterEach(() => {
 });
 
 describe("AuthRepository", () => {
-  test("login envía las credenciales y devuelve los datos con las credenciales", async () => {
-    const fetchFalso = prepararFetch({ id: 1, rol: "FAMILIA" });
+   test("login envía el email y la contraseña con POST y devuelve los datos con el token", async () => {
+    const fetchFalso = prepararFetch({
+      id: 1,
+      rol: "FAMILIA",
+      token: "token-de-prueba",
+    });
     const repository = new AuthRepository();
 
     const resultado = await repository.login("ana@test.com", "1234");
 
-    const credenciales = btoa("ana@test.com:1234");
     expect(fetchFalso.mock.calls[0][0]).toBe(`${API}/login`);
-    expect(fetchFalso.mock.calls[0][1].headers.Authorization).toBe(
-      `Basic ${credenciales}`
+    expect(fetchFalso.mock.calls[0][1].method).toBe("POST");
+    expect(fetchFalso.mock.calls[0][1].body).toBe(
+      JSON.stringify({ email: "ana@test.com", password: "1234" })
     );
     expect(resultado.id).toBe(1);
-    expect(resultado.credenciales).toBe(credenciales);
+    expect(resultado.token).toBe("token-de-prueba");
   });
 
+  // El login es público: aunque haya un token viejo guardado, no se envía
+  test("login no envía la cabecera Authorization", async () => {
+    sessionStorage.setItem("token", "token-viejo");
+    const fetchFalso = prepararFetch({ id: 1, token: "token-nuevo" });
+    const repository = new AuthRepository();
+
+    await repository.login("ana@test.com", "1234");
+
+    expect(fetchFalso.mock.calls[0][1].headers.Authorization).toBeUndefined();
+    sessionStorage.clear();
+  });
+  
   test("login lanza un error si las credenciales son incorrectas", async () => {
     prepararFetch({}, false);
     const repository = new AuthRepository();
