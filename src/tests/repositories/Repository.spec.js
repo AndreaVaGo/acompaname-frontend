@@ -1,5 +1,5 @@
 import { describe, test, expect, vi, afterEach } from "vitest";
-import Repository from "../../repositories/Repository";
+import Repository, { lanzarError } from "../../repositories/Repository";
 
 function prepararFetch(respuesta, ok = true) {
   return vi.spyOn(globalThis, "fetch").mockResolvedValue({
@@ -21,10 +21,11 @@ function prepararFetchConError(status, texto) {
 describe("Repository", () => {
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.unstubAllGlobals();
     sessionStorage.clear();
   });
 
-  test("getHeaders no incluye Authorization si no hay credenciales", () => {
+  test("getHeaders no incluye Authorization si no hay token", () => {
     const repository = new Repository("http://prueba");
 
     const cabeceras = repository.getHeaders();
@@ -33,13 +34,13 @@ describe("Repository", () => {
     expect(cabeceras.Authorization).toBeUndefined();
   });
 
-  test("getHeaders incluye Authorization si hay credenciales guardadas", () => {
-    sessionStorage.setItem("credenciales", "abc123");
+  test("getHeaders incluye Authorization Bearer si hay un token guardado", () => {
+    sessionStorage.setItem("token", "abc123");
     const repository = new Repository("http://prueba");
 
     const cabeceras = repository.getHeaders();
 
-    expect(cabeceras.Authorization).toBe("Basic abc123");
+    expect(cabeceras.Authorization).toBe("Bearer abc123");
   });
 
   test("get pide la ruta y devuelve el JSON", async () => {
@@ -217,5 +218,75 @@ describe("Repository", () => {
 
     expect(error.message).toBe("Error en la petición GET");
     expect(error.detalle).toBe("");
+  });
+
+  // ---------- Token caducado: un 401 con la sesión iniciada ----------
+
+  test("con la sesión iniciada, un 401 borra la sesión y manda al login", async () => {
+    sessionStorage.setItem("token", "abc123");
+    sessionStorage.setItem("email", "ana@test.com");
+    vi.stubGlobal("location", { href: "" });
+    prepararFetchConError(401, "");
+    const repository = new Repository("http://prueba");
+
+    let error = null;
+    try {
+      await repository.get("/cosas");
+    } catch (e) {
+      error = e;
+    }
+
+    expect(error.status).toBe(401);
+    expect(sessionStorage.getItem("token")).toBeNull();
+    expect(sessionStorage.getItem("email")).toBeNull();
+    expect(window.location.href).toBe("/login");
+  });
+
+  test("sin sesión iniciada, un 401 no manda al login", async () => {
+    vi.stubGlobal("location", { href: "" });
+    prepararFetchConError(401, "");
+    const repository = new Repository("http://prueba");
+
+    try {
+      await repository.get("/cosas");
+    } catch {
+      // el error es lo esperado
+    }
+
+    expect(window.location.href).toBe("");
+  });
+
+  test("con la sesión iniciada, un 403 no borra la sesión", async () => {
+    sessionStorage.setItem("token", "abc123");
+    vi.stubGlobal("location", { href: "" });
+    prepararFetchConError(403, "No tiene permiso");
+    const repository = new Repository("http://prueba");
+
+    try {
+      await repository.get("/cosas");
+    } catch {
+      // el error es lo esperado
+    }
+
+    expect(sessionStorage.getItem("token")).toBe("abc123");
+    expect(window.location.href).toBe("");
+  });
+
+  // El login gestiona su propio 401 ("email o contraseña mal"), no es una sesión caducada
+  test("lanzarError con cerrarSesionSi401 en false no borra la sesión", async () => {
+    sessionStorage.setItem("token", "abc123");
+    vi.stubGlobal("location", { href: "" });
+    const respuesta = { status: 401, text: async () => "" };
+
+    let error = null;
+    try {
+      await lanzarError(respuesta, "Credenciales incorrectas", false);
+    } catch (e) {
+      error = e;
+    }
+
+    expect(error.status).toBe(401);
+    expect(sessionStorage.getItem("token")).toBe("abc123");
+    expect(window.location.href).toBe("");
   });
 });
