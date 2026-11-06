@@ -22,7 +22,7 @@ async function handleSubmit() {
 
   try {
     const data = await authRepository.login(email.value, password.value);
-    authStore.login(data.id, data.username, password.value, data.roles);
+    authStore.login(data.id, data.username, data.token, data.roles);
     // El administrador entra directamente en su panel
     if (data.roles === "ADMIN") {
       router.push("/admin");
