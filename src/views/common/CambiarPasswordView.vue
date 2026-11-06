@@ -41,8 +41,6 @@ async function handleSubmit() {
       passwordActual.value,
       passwordNueva.value,
     );
-    // Se guardan las credenciales nuevas para que la sesión siga funcionando
-    authStore.actualizarPassword(passwordNueva.value);
     exito.value = "Contraseña cambiada correctamente.";
     passwordActual.value = "";
     passwordNueva.value = "";
