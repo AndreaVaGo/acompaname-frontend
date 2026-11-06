@@ -12,9 +12,9 @@ export default class AuthRepository extends Repository {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
-    // false: el 401 del login es "email o contraseña mal", no una sesión caducada
+    // true: el 401 del login es "email o contraseña mal", no una sesión caducada
     if (!response.ok) {
-      await lanzarError(response, "Credenciales incorrectas", false);
+      await lanzarError(response, "Credenciales incorrectas", true);
     }
     return await response.json();
   }
