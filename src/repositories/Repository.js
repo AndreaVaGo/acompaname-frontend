@@ -6,7 +6,19 @@ export const API_URL =
 // Lanza el error de una respuesta que no es correcta (400, 403, 404, 500...).
 // message es el texto fijo de siempre, status es el código HTTP y
 // detalle es el mensaje con el que el servidor explica el motivo (si lo hay).
-export async function lanzarError(response, mensaje) {
+// cerrarSesionSi401 es false solo en el login, que gestiona su propio 401.
+export async function lanzarError(response, mensaje, cerrarSesionSi401 = true) {
+  // 401 con la sesión iniciada: el token ha caducado (o ya no vale).
+  // Se borra la sesión y se vuelve al login
+  if (
+    cerrarSesionSi401 &&
+    response.status === 401 &&
+    sessionStorage.getItem("token")
+  ) {
+    sessionStorage.clear();
+    window.location.href = "/login";
+  }
+
   const error = new Error(mensaje);
   error.status = response.status;
   error.detalle = "";
@@ -22,12 +34,12 @@ export default class Repository {
   }
 
   getHeaders() {
-    const credenciales = sessionStorage.getItem("credenciales");
+    const token = sessionStorage.getItem("token");
     const headers = {
       "Content-Type": "application/json",
     };
-    if (credenciales) {
-      headers["Authorization"] = `Basic ${credenciales}`;
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
     }
     return headers;
   }
