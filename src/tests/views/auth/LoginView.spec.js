@@ -42,11 +42,12 @@ describe('LoginView', () => {
     expect(wrapper.text()).toContain('Por favor, rellena todos los campos.')
   })
 
-  test('con datos correctos inicia sesión y va al inicio', async () => {
+   test('con datos correctos inicia sesión, guarda el token y va al inicio', async () => {
     vi.spyOn(AuthRepository.prototype, 'login').mockResolvedValue({
       id: 1,
       username: 'ana@test.com',
       roles: 'FAMILIA',
+      token: 'token-de-prueba',
     })
     const push = vi.spyOn(router, 'push').mockResolvedValue()
     const { wrapper, pinia } = montarVista()
@@ -58,9 +59,10 @@ describe('LoginView', () => {
       '12345678'
     )
     expect(useAuthStore(pinia).estaAutenticado).toBe(true)
+    expect(useAuthStore(pinia).token).toBe('token-de-prueba')
     expect(push).toHaveBeenCalledWith('/')
   })
-
+  
   test('el administrador inicia sesión y va a su panel', async () => {
     vi.spyOn(AuthRepository.prototype, 'login').mockResolvedValue({
       id: 9,
