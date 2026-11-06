@@ -21,7 +21,7 @@ async function montarVista() {
   const pinia = createPinia();
   setActivePinia(pinia);
   const authStore = useAuthStore(pinia);
-  authStore.login(1, "ana@test.com", "12345678", "FAMILIA");
+  authStore.login(1, "ana@test.com", "token-de-prueba", "FAMILIA");
 
   const wrapper = mount(EditarDatosView, {
     global: {
@@ -145,10 +145,10 @@ describe("EditarDatosView", () => {
     await enviarFormulario(wrapper, "Ana", "nueva@test.com", "600111222");
 
     expect(authStore.email).toBe("nueva@test.com");
-    expect(authStore.credenciales).toBe(btoa("nueva@test.com:12345678"));
+    expect(authStore.token).toBe("token-de-prueba");
   });
 
-  test("si no cambia el email no toca las credenciales", async () => {
+  test("si no cambia el email no toca la sesión", async () => {
     vi.spyOn(UsuarioRepository.prototype, "getById").mockResolvedValue(
       usuarioInicial
     );
@@ -159,7 +159,7 @@ describe("EditarDatosView", () => {
 
     await enviarFormulario(wrapper, "Ana Nueva", "ana@test.com", "600111222");
 
-    expect(authStore.credenciales).toBe(btoa("ana@test.com:12345678"));
+    expect(authStore.email).toBe("ana@test.com");
   });
 
   test("muestra error si el backend rechaza los datos", async () => {
