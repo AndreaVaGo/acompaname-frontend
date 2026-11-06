@@ -5,39 +5,30 @@ export const useAuthStore = defineStore("auth", () => {
   const id = ref(sessionStorage.getItem("id") || "");
   const email = ref(sessionStorage.getItem("email") || "");
   const rol = ref(sessionStorage.getItem("rol") || "");
-  const credenciales = ref(sessionStorage.getItem("credenciales") || "");
-  const estaAutenticado = ref(!!sessionStorage.getItem("credenciales"));
+  // El token lo da el servidor al iniciar sesión. Ya no se guarda la contraseña
+  const token = ref(sessionStorage.getItem("token") || "");
+  const estaAutenticado = ref(!!sessionStorage.getItem("token"));
   // La foto no se guarda en sessionStorage porque puede ser grande
   const foto = ref("");
 
-  function login(idUsuario, emailUsuario, passwordUsuario, rolUsuario) {
+  function login(idUsuario, emailUsuario, tokenUsuario, rolUsuario) {
     id.value = idUsuario;
     email.value = emailUsuario;
     rol.value = rolUsuario;
-    credenciales.value = btoa(`${emailUsuario}:${passwordUsuario}`);
+    token.value = tokenUsuario;
     estaAutenticado.value = true;
 
     sessionStorage.setItem("id", idUsuario);
     sessionStorage.setItem("email", emailUsuario);
     sessionStorage.setItem("rol", rolUsuario);
-    sessionStorage.setItem("credenciales", credenciales.value);
+    sessionStorage.setItem("token", tokenUsuario);
   }
 
-  // Tras cambiar la contraseña hay que guardar las credenciales nuevas,
-  // si no las siguientes peticiones se harían con la contraseña vieja (401)
-  function actualizarPassword(passwordNueva) {
-    credenciales.value = btoa(`${email.value}:${passwordNueva}`);
-    sessionStorage.setItem("credenciales", credenciales.value);
-  }
-
-  // El email es el usuario con el que se inicia sesión, así que al cambiarlo
-  // hay que rehacer las credenciales (con la misma contraseña de antes)
+  // El token lleva el id de la persona, no el email, así que al cambiar
+  // el email la sesión sigue valiendo: solo hay que actualizar el email guardado
   function actualizarEmail(emailNuevo) {
-    const passwordActual = atob(credenciales.value).split(":").slice(1).join(":");
     email.value = emailNuevo;
-    credenciales.value = btoa(`${emailNuevo}:${passwordActual}`);
     sessionStorage.setItem("email", emailNuevo);
-    sessionStorage.setItem("credenciales", credenciales.value);
   }
 
   function setFoto(nuevaFoto) {
@@ -48,25 +39,24 @@ export const useAuthStore = defineStore("auth", () => {
     id.value = "";
     email.value = "";
     rol.value = "";
-    credenciales.value = "";
+    token.value = "";
     estaAutenticado.value = false;
     foto.value = "";
 
     sessionStorage.removeItem("id");
     sessionStorage.removeItem("email");
     sessionStorage.removeItem("rol");
-    sessionStorage.removeItem("credenciales");
+    sessionStorage.removeItem("token");
   }
 
   return {
     id,
     email,
     rol,
-    credenciales,
+    token,
     estaAutenticado,
     foto,
     login,
-    actualizarPassword,
     actualizarEmail,
     setFoto,
     logout,
