@@ -14,13 +14,13 @@ describe("auth store", () => {
     expect(store.estaAutenticado).toBe(false);
     expect(store.email).toBe("");
     expect(store.rol).toBe("");
-    expect(store.credenciales).toBe("");
+    expect(store.token).toBe("");
   });
 
   test("login guarda los datos del usuario en el store", () => {
     const store = useAuthStore();
 
-    store.login(5, "ana@test.com", "12345678", "FAMILIA");
+    store.login(5, "ana@test.com", "token-de-prueba", "FAMILIA");
 
     expect(store.estaAutenticado).toBe(true);
     expect(store.id).toBe(5);
@@ -28,72 +28,56 @@ describe("auth store", () => {
     expect(store.rol).toBe("FAMILIA");
   });
 
-  test("login genera las credenciales Basic en base64", () => {
+  test("login guarda el token que da el servidor", () => {
     const store = useAuthStore();
 
-    store.login(5, "ana@test.com", "12345678", "FAMILIA");
+    store.login(5, "ana@test.com", "token-de-prueba", "FAMILIA");
 
-    expect(store.credenciales).toBe(btoa("ana@test.com:12345678"));
+    expect(store.token).toBe("token-de-prueba");
   });
 
   test("login guarda la sesión en sessionStorage", () => {
     const store = useAuthStore();
 
-    store.login(5, "ana@test.com", "12345678", "FAMILIA");
+    store.login(5, "ana@test.com", "token-de-prueba", "FAMILIA");
 
     expect(sessionStorage.getItem("email")).toBe("ana@test.com");
     expect(sessionStorage.getItem("rol")).toBe("FAMILIA");
-    expect(sessionStorage.getItem("credenciales")).toBe(
-      btoa("ana@test.com:12345678")
-    );
+    expect(sessionStorage.getItem("token")).toBe("token-de-prueba");
   });
 
-  test("actualizarPassword cambia las credenciales en el store y en sessionStorage", () => {
+  test("actualizarEmail cambia el email en el store y en sessionStorage", () => {
     const store = useAuthStore();
-    store.login(5, "ana@test.com", "12345678", "FAMILIA");
-
-    store.actualizarPassword("nueva12345");
-
-    expect(store.credenciales).toBe(btoa("ana@test.com:nueva12345"));
-    expect(sessionStorage.getItem("credenciales")).toBe(
-      btoa("ana@test.com:nueva12345")
-    );
-  });
-
-  test("actualizarEmail cambia el email y mantiene la contraseña en las credenciales", () => {
-    const store = useAuthStore();
-    store.login(5, "ana@test.com", "12345678", "FAMILIA");
+    store.login(5, "ana@test.com", "token-de-prueba", "FAMILIA");
 
     store.actualizarEmail("nueva@test.com");
 
     expect(store.email).toBe("nueva@test.com");
-    expect(store.credenciales).toBe(btoa("nueva@test.com:12345678"));
     expect(sessionStorage.getItem("email")).toBe("nueva@test.com");
-    expect(sessionStorage.getItem("credenciales")).toBe(
-      btoa("nueva@test.com:12345678")
-    );
   });
 
-  test("actualizarEmail mantiene la contraseña aunque contenga dos puntos", () => {
+  test("actualizarEmail mantiene el token: la sesión sigue valiendo", () => {
     const store = useAuthStore();
-    store.login(5, "ana@test.com", "abc:1234:xyz", "FAMILIA");
+    store.login(5, "ana@test.com", "token-de-prueba", "FAMILIA");
 
     store.actualizarEmail("nueva@test.com");
 
-    expect(store.credenciales).toBe(btoa("nueva@test.com:abc:1234:xyz"));
+    expect(store.token).toBe("token-de-prueba");
+    expect(sessionStorage.getItem("token")).toBe("token-de-prueba");
+    expect(store.estaAutenticado).toBe(true);
   });
 
   test("logout borra el store y el sessionStorage", () => {
     const store = useAuthStore();
-    store.login(5, "ana@test.com", "12345678", "FAMILIA");
+    store.login(5, "ana@test.com", "token-de-prueba", "FAMILIA");
 
     store.logout();
 
     expect(store.estaAutenticado).toBe(false);
     expect(store.email).toBe("");
-    expect(store.credenciales).toBe("");
+    expect(store.token).toBe("");
     expect(sessionStorage.getItem("email")).toBeNull();
-    expect(sessionStorage.getItem("credenciales")).toBeNull();
+    expect(sessionStorage.getItem("token")).toBeNull();
   });
 
   test("setFoto guarda la foto en el store", () => {
@@ -106,7 +90,7 @@ describe("auth store", () => {
 
   test("logout borra la foto", () => {
     const store = useAuthStore();
-    store.login(5, "ana@test.com", "12345678", "CUIDADOR");
+    store.login(5, "ana@test.com", "token-de-prueba", "CUIDADOR");
     store.setFoto("data:image/jpeg;base64,AAAA");
 
     store.logout();
@@ -118,12 +102,23 @@ describe("auth store", () => {
     sessionStorage.setItem("id", "8");
     sessionStorage.setItem("email", "pepe@test.com");
     sessionStorage.setItem("rol", "CUIDADOR");
-    sessionStorage.setItem("credenciales", btoa("pepe@test.com:12345678"));
+    sessionStorage.setItem("token", "token-de-prueba");
 
     const store = useAuthStore();
 
     expect(store.estaAutenticado).toBe(true);
     expect(store.email).toBe("pepe@test.com");
     expect(store.rol).toBe("CUIDADOR");
+    expect(store.token).toBe("token-de-prueba");
+  });
+
+  // Una sesión guardada con el sistema antiguo (credenciales Basic) ya no vale: hay que volver a entrar
+  test("una sesión antigua con credenciales y sin token no cuenta como iniciada", () => {
+    sessionStorage.setItem("email", "pepe@test.com");
+    sessionStorage.setItem("credenciales", "cGVwZUB0ZXN0LmNvbToxMjM0NTY3OA==");
+
+    const store = useAuthStore();
+
+    expect(store.estaAutenticado).toBe(false);
   });
 });
