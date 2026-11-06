@@ -16,7 +16,7 @@ function montarVista() {
     },
   });
   const authStore = useAuthStore(pinia);
-  authStore.login(1, "ana@test.com", "actual1234", "FAMILIA");
+  authStore.login(1, "ana@test.com", "token-de-prueba", "FAMILIA");
   return { wrapper, authStore };
 }
 
@@ -87,7 +87,7 @@ describe("CambiarPasswordView", () => {
     expect(espia).toHaveBeenCalledWith(1, "1234", PASSWORD_NUEVA);
   });
 
-  test("cambia la contraseña y actualiza las credenciales guardadas", async () => {
+  test("cambia la contraseña y no cambia el token de la sesión", async () => {
     const espia = vi
       .spyOn(UsuarioRepository.prototype, "cambiarPassword")
       .mockResolvedValue();
@@ -97,7 +97,7 @@ describe("CambiarPasswordView", () => {
 
     expect(espia).toHaveBeenCalledWith(1, "actual1234", PASSWORD_NUEVA);
     expect(wrapper.text()).toContain("Contraseña cambiada correctamente.");
-    expect(authStore.credenciales).toBe(btoa("ana@test.com:" + PASSWORD_NUEVA));
+    expect(authStore.token).toBe("token-de-prueba");
   });
 
   test("vacía los campos después de cambiar la contraseña", async () => {
@@ -111,7 +111,7 @@ describe("CambiarPasswordView", () => {
     expect(wrapper.find("#password-repetida").element.value).toBe("");
   });
 
-  test("muestra error y no cambia las credenciales si el backend rechaza el cambio", async () => {
+  test("muestra error y mantiene el token si el backend rechaza el cambio", async () => {
     vi.spyOn(UsuarioRepository.prototype, "cambiarPassword").mockRejectedValue(
       new Error("Error al cambiar la contraseña")
     );
@@ -120,7 +120,7 @@ describe("CambiarPasswordView", () => {
     await rellenarFormulario(wrapper, "mala12345", PASSWORD_NUEVA, PASSWORD_NUEVA);
 
     expect(wrapper.text()).toContain("No se pudo cambiar la contraseña");
-    expect(authStore.credenciales).toBe(btoa("ana@test.com:actual1234"));
+    expect(authStore.token).toBe("token-de-prueba");
   });
 
   test("si el servidor responde 400 pide revisar la contraseña actual y la nueva", async () => {
@@ -136,7 +136,7 @@ describe("CambiarPasswordView", () => {
     expect(wrapper.text()).toContain(
       "No se pudo cambiar la contraseña. Revisa que la actual sea correcta y que la nueva sea distinta."
     );
-    expect(authStore.credenciales).toBe(btoa("ana@test.com:actual1234"));
+    expect(authStore.token).toBe("token-de-prueba");
   });
 
   test("si el servidor falla no habla de la contraseña actual", async () => {
@@ -153,6 +153,6 @@ describe("CambiarPasswordView", () => {
       "No se pudo cambiar la contraseña. Ha ocurrido un error en el servidor. Inténtalo más tarde."
     );
     expect(wrapper.text()).not.toContain("Revisa que la actual sea correcta");
-    expect(authStore.credenciales).toBe(btoa("ana@test.com:actual1234"));
+    expect(authStore.token).toBe("token-de-prueba");
   });
 });
