@@ -140,6 +140,25 @@ describe('RegisterView', () => {
     )
   })
 
+  test('si hay demasiados registros seguidos, avisa de que se espere un minuto', async () => {
+    const errorDemasiados = new Error('fallo')
+    errorDemasiados.status = 429
+    vi.spyOn(AuthRepository.prototype, 'register').mockRejectedValue(
+      errorDemasiados
+    )
+    const push = vi.spyOn(router, 'push').mockResolvedValue()
+    const wrapper = await montarVista()
+
+    await rellenarFormulario(wrapper)
+    await wrapper.find('form').trigger('submit')
+    await esperar()
+
+    expect(wrapper.text()).toContain(
+      'No se pudo completar el registro. Demasiados intentos. Espera un minuto y vuelve a intentarlo.'
+    )
+    expect(push).not.toHaveBeenCalled()
+  })
+
   test('si la dirección trae rol=cuidador, el rol cuidador ya viene marcado', async () => {
     await router.push('/registro?rol=cuidador')
     const registrar = vi
