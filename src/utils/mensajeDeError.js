@@ -32,6 +32,10 @@ function motivoDe(error) {
     }
     return "Esta acción entra en conflicto con otra ya existente.";
   }
+  // 429: demasiados intentos seguidos (el servidor limita el login y el registro)
+  if (status === 429) {
+    return "Demasiados intentos. Espera un minuto y vuelve a intentarlo.";
+  }
   if (status >= 500) {
     return "Ha ocurrido un error en el servidor. Inténtalo más tarde.";
   }
