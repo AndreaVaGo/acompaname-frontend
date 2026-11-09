@@ -61,6 +61,12 @@ describe("mensajeDeError", () => {
     );
   });
 
+  test("429 dice que hay demasiados intentos y que se espere un minuto", () => {
+    expect(mensajeDeError(errorHttp(429), CONTEXTO)).toBe(
+      "No se pudo enviar la solicitud. Demasiados intentos. Espera un minuto y vuelve a intentarlo.",
+    );
+  });
+
   test("500 y otros errores del servidor dicen que falló el servidor", () => {
     const esperado =
       "No se pudo enviar la solicitud. Ha ocurrido un error en el servidor. Inténtalo más tarde.";
