@@ -96,6 +96,24 @@ describe('LoginView', () => {
     expect(push).not.toHaveBeenCalled()
   })
 
+  test('si hay demasiados intentos, avisa de que se espere un minuto', async () => {
+    const errorDemasiados = new Error('fallo')
+    errorDemasiados.status = 429
+    vi.spyOn(AuthRepository.prototype, 'login').mockRejectedValue(
+      errorDemasiados
+    )
+    const push = vi.spyOn(router, 'push').mockResolvedValue()
+    const { wrapper } = montarVista()
+
+    await rellenarYEnviar(wrapper, 'ana@test.com', '12345678')
+
+    expect(wrapper.text()).toContain(
+      'No se pudo iniciar sesión. Demasiados intentos. Espera un minuto y vuelve a intentarlo.'
+    )
+    expect(wrapper.text()).not.toContain('Email o contraseña incorrectos')
+    expect(push).not.toHaveBeenCalled()
+  })
+
   test('si el servidor falla, lo dice y no habla de contraseña incorrecta', async () => {
     const errorServidor = new Error('fallo')
     errorServidor.status = 500
