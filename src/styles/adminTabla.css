@@ -1,0 +1,88 @@
+/* Estilos de las tablas del panel de administración (Solicitudes, Pagos y Usuarios).
+   Se usan poniendo class="admin-tabla" en el div que envuelve a la <table>.
+   Cada celda lleva data-label para que en el móvil se vea la etiqueta. */
+
+/* En pantallas medianas la tabla se desliza hacia los lados en vez de desbordar la página */
+.admin-tabla {
+  overflow-x: auto;
+}
+
+.admin-tabla table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.admin-tabla th {
+  text-align: left;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--color-accent-bg);
+  /* Las palabras no se parten: si no caben, la tabla se desliza */
+  white-space: nowrap;
+}
+
+.admin-tabla td {
+  padding: 12px;
+  border-bottom: 1px solid var(--color-neutral-bg);
+  font-size: 0.9rem;
+  /* Las palabras no se parten: si no caben, la tabla se desliza */
+  white-space: nowrap;
+}
+
+.admin-tabla tr:last-child td {
+  border-bottom: none;
+}
+
+/* En el móvil cada fila se ve como una tarjeta: etiqueta a la izquierda y valor a la derecha */
+@media (max-width: 640px) {
+  .admin-tabla {
+    overflow-x: visible;
+  }
+
+  .admin-tabla table,
+  .admin-tabla tbody,
+  .admin-tabla tr,
+  .admin-tabla td {
+    display: block;
+  }
+
+  .admin-tabla thead {
+    display: none;
+  }
+
+  .admin-tabla tr {
+    border: 1px solid var(--color-neutral-bg);
+    border-radius: var(--radius-input);
+    margin-bottom: 12px;
+    padding: 4px 12px;
+  }
+
+  .admin-tabla td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    text-align: right;
+    white-space: normal;
+  }
+
+  .admin-tabla td::before {
+    content: attr(data-label);
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: var(--color-text-muted);
+    text-align: left;
+    /* La etiqueta no se encoge ni se parte aunque el valor sea largo */
+    flex-shrink: 0;
+  }
+
+  .admin-tabla tr:last-child td {
+    border-bottom: 1px solid var(--color-neutral-bg);
+  }
+
+  .admin-tabla tr td:last-child {
+    border-bottom: none;
+  }
+}
