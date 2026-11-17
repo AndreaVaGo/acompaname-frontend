@@ -76,7 +76,7 @@ onMounted(async () => {
       <p>Todos tus pagos en un solo sitio.</p>
     </header>
 
-    <p v-if="error" class="pagos__error">{{ error }}</p>
+    <p role="alert" v-if="error" class="pagos__error">{{ error }}</p>
 
     <p v-if="cargando" class="pagos__cargando">Cargando pagos…</p>
 
