@@ -44,7 +44,7 @@ describe("LandingView icono de la tarjeta para profesionales", () => {
     const wrapper = montarVista();
 
     expect(wrapper.find(".landing__cta h2").text()).toBe(
-      "¿Eres cuidador o cuidadora profesional?",
+      "¿Eres persona cuidadora profesional?",
     );
   });
 });
