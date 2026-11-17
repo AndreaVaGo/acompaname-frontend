@@ -131,7 +131,7 @@ function textoPagos(cantidad) {
     </p>
 
     <template v-else>
-      <div class="admin-pagos-tabla__tabla">
+      <div class="admin-tabla">
         <table>
           <thead>
             <tr>
@@ -233,37 +233,6 @@ function textoPagos(cantidad) {
   color: var(--color-text-muted);
 }
 
-/* En pantallas medianas la tabla se desliza hacia los lados en vez de desbordar la página */
-.admin-pagos-tabla__tabla {
-  overflow-x: auto;
-}
-
-table {
-  border-collapse: collapse;
-  width: 100%;
-}
-
-th {
-  text-align: left;
-  font-size: 0.8rem;
-  color: var(--color-text-muted);
-  padding: 10px 12px;
-  border-bottom: 2px solid var(--color-accent-bg);
-  /* Las palabras no se parten: si no caben, la tabla se desliza */
-  white-space: nowrap;
-}
-
-td {
-  padding: 12px;
-  border-bottom: 1px solid var(--color-neutral-bg);
-  font-size: 0.9rem;
-  white-space: nowrap;
-}
-
-tr:last-child td {
-  border-bottom: none;
-}
-
 /* Importe en negrita */
 .admin-pagos-tabla__importe {
   font-weight: bold;
@@ -303,60 +272,11 @@ tr:last-child td {
   color: var(--color-text-muted);
 }
 
-/* En el móvil cada pago se ve como una tarjeta: etiqueta a la izquierda y valor a la derecha */
+/* En el móvil el buscador ocupa todo el ancho */
 @media (max-width: 640px) {
   .admin-pagos-tabla__buscador {
     min-width: 0;
     width: 100%;
-  }
-
-  .admin-pagos-tabla__tabla {
-    overflow-x: visible;
-  }
-
-  table,
-  tbody,
-  tr,
-  td {
-    display: block;
-  }
-
-  thead {
-    display: none;
-  }
-
-  tr {
-    border: 1px solid var(--color-neutral-bg);
-    border-radius: var(--radius-input);
-    margin-bottom: 12px;
-    padding: 4px 12px;
-  }
-
-  td {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 0;
-    text-align: right;
-    white-space: normal;
-  }
-
-  td::before {
-    content: attr(data-label);
-    font-size: 0.8rem;
-    font-weight: bold;
-    color: var(--color-text-muted);
-    text-align: left;
-    flex-shrink: 0;
-  }
-
-  tr:last-child td {
-    border-bottom: 1px solid var(--color-neutral-bg);
-  }
-
-  tr td:last-child {
-    border-bottom: none;
   }
 }
 </style>
