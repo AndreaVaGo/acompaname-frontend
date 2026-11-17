@@ -20,6 +20,7 @@ vi.spyOn(CuidadorRepository.prototype, "getAll").mockResolvedValue([
     servicios: ["medicacion", "higiene"],
     sexo: "HOMBRE",
     gruposEdad: ["ADULTOS", "MAYORES"],
+    titulaciones: ["PRIMEROS_AUXILIOS"],
   },
   {
     id: 2,
@@ -36,6 +37,7 @@ vi.spyOn(CuidadorRepository.prototype, "getAll").mockResolvedValue([
     servicios: ["medicacion"],
     sexo: "MUJER",
     gruposEdad: ["BEBES", "NINOS"],
+    titulaciones: ["ENFERMERIA", "AUXILIAR_ENFERMERIA"],
   },
   {
     id: 3,
@@ -346,6 +348,33 @@ describe("BuscarView", () => {
     expect(etiquetas[0].text()).toBe("Medicación");
     expect(etiquetas[1].text()).toBe("Higiene personal");
     expect(etiquetas[2].text()).toBe("Medicación");
+  });
+
+  test("muestra las titulaciones del cuidador con su nombre corto", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    const etiquetas = wrapper.findAll(".buscar__tag--titulacion");
+    expect(etiquetas.length).toBe(3);
+    expect(etiquetas[0].text()).toBe("Primeros auxilios");
+    expect(etiquetas[1].text()).toBe("Enfermería");
+    expect(etiquetas[2].text()).toBe("TCAE");
+  });
+
+  test("un cuidador sin titulaciones no muestra la fila de titulaciones", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    const tarjetaLuis = wrapper
+      .findAll(".buscar__card")
+      .find((tarjeta) => tarjeta.text().includes("Luis"));
+    expect(tarjetaLuis.find(".buscar__tag--titulacion").exists()).toBe(false);
   });
 
   test("el filtro de un servicio solo deja a los que lo ofrecen", async () => {
