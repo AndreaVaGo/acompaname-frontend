@@ -2,6 +2,7 @@
 import { ref, computed } from "vue";
 import { formatearEuros } from "@/utils/formatearEuros";
 import { formatearFecha } from "@/utils/formatearFecha";
+import { nombreTipo } from "@/utils/nombreTipo";
 
 // Tabla de pagos con botones de estado (el filtro lo hace el servidor, cada botón lleva el color
 // de su píldora) y buscador por familia o cuidador (lo hace el propio componente).
@@ -44,14 +45,6 @@ const totalMostrado = computed(() => {
   }
   return suma;
 });
-
-// El tipo llega en minúsculas (hospitalario) y se enseña con la primera en mayúscula
-function nombreTipo(tipo) {
-  if (!tipo) {
-    return "";
-  }
-  return tipo.charAt(0).toUpperCase() + tipo.slice(1);
-}
 
 // Clase de color de la píldora del tipo (hospitalario o domicilio)
 function claseTipo(tipo) {
