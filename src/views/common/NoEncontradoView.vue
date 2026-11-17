@@ -48,7 +48,7 @@ import { RouterLink } from "vue-router";
   font-size: 4rem;
   font-weight: bold;
   line-height: 1;
-  color: var(--color-accent) !important;
+  color: var(--color-accent-dark) !important;
 }
 
 .no-encontrado h1 {
