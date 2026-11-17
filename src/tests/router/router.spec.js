@@ -175,4 +175,29 @@ describe('guard del router', () => {
 
     expect(router.currentRoute.value.name).toBe('landing')
   })
+
+  test('un visitante que entra en las sugerencias va al login', async () => {
+    await router.push('/sugerencias')
+
+    expect(router.currentRoute.value.name).toBe('login')
+  })
+
+  test('una familia y un cuidador pueden entrar en las sugerencias', async () => {
+    useAuthStore(pinia).login(1, 'ana@test.com', '12345678', 'FAMILIA')
+    await router.push('/sugerencias')
+    expect(router.currentRoute.value.name).toBe('sugerencias')
+
+    await router.push('/buscar')
+    useAuthStore(pinia).login(2, 'pepe@test.com', '12345678', 'CUIDADOR')
+    await router.push('/sugerencias')
+    expect(router.currentRoute.value.name).toBe('sugerencias')
+  })
+
+  test('el administrador no puede entrar en las sugerencias', async () => {
+    useAuthStore(pinia).login(9, 'admin@test.com', '12345678', 'ADMIN')
+
+    await router.push('/sugerencias')
+
+    expect(router.currentRoute.value.name).toBe('landing')
+  })
 })
