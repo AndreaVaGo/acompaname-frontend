@@ -173,6 +173,8 @@ describe("EditarPerfilView", () => {
       tipoCuidado: "ambos",
       servicios: [],
       gruposEdad: [],
+      titulaciones: [],
+      otrasTitulaciones: "",
       sexo: "",
     });
     expect(wrapper.text()).toContain("Perfil guardado correctamente.");
@@ -523,6 +525,106 @@ describe("EditarPerfilView", () => {
     expect(updateSpy).toHaveBeenCalledWith(
       3,
       expect.objectContaining({ servicios: [] })
+    );
+  });
+
+  test("carga las titulaciones marcadas del perfil", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue({
+      ...perfil,
+      titulaciones: ["ENFERMERIA", "PRIMEROS_AUXILIOS"],
+    });
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.find("#titulacion-ENFERMERIA").element.checked).toBe(true);
+    expect(wrapper.find("#titulacion-PRIMEROS_AUXILIOS").element.checked).toBe(
+      true,
+    );
+    expect(wrapper.find("#titulacion-AUXILIAR_ENFERMERIA").element.checked).toBe(
+      false,
+    );
+  });
+
+  test("guarda las titulaciones marcadas", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue(
+      perfil
+    );
+    const updateSpy = vi
+      .spyOn(CuidadorRepository.prototype, "update")
+      .mockResolvedValue({});
+
+    const wrapper = await montarVista();
+    await wrapper.find("#titulacion-ENFERMERIA").setValue(true);
+    await wrapper.find("#titulacion-ATENCION_DEPENDENCIA").setValue(true);
+    await enviar(wrapper);
+
+    expect(updateSpy).toHaveBeenCalledWith(
+      3,
+      expect.objectContaining({
+        titulaciones: ["ENFERMERIA", "ATENCION_DEPENDENCIA"],
+      })
+    );
+  });
+
+  test("si se desmarcan todas las titulaciones se guarda la lista vacía", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue({
+      ...perfil,
+      titulaciones: ["ENFERMERIA"],
+    });
+    const updateSpy = vi
+      .spyOn(CuidadorRepository.prototype, "update")
+      .mockResolvedValue({});
+
+    const wrapper = await montarVista();
+    await wrapper.find("#titulacion-ENFERMERIA").setValue(false);
+    await enviar(wrapper);
+
+    expect(updateSpy).toHaveBeenCalledWith(
+      3,
+      expect.objectContaining({ titulaciones: [] })
+    );
+  });
+
+  test("carga las otras titulaciones del perfil en el campo de texto", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue({
+      ...perfil,
+      otrasTitulaciones: "Curso de geriatría",
+    });
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.find("#otras-titulaciones").element.value).toBe(
+      "Curso de geriatría"
+    );
+  });
+
+  test("guarda las otras titulaciones sin espacios sobrantes", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue(
+      perfil
+    );
+    const updateSpy = vi
+      .spyOn(CuidadorRepository.prototype, "update")
+      .mockResolvedValue({});
+
+    const wrapper = await montarVista();
+    await wrapper.find("#otras-titulaciones").setValue("  Curso de movilización  ");
+    await enviar(wrapper);
+
+    expect(updateSpy).toHaveBeenCalledWith(
+      3,
+      expect.objectContaining({ otrasTitulaciones: "Curso de movilización" })
+    );
+  });
+
+  test("el campo de otras titulaciones no deja escribir más de 200 caracteres", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue(
+      perfil
+    );
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.find("#otras-titulaciones").attributes("maxlength")).toBe(
+      "200"
     );
   });
 
