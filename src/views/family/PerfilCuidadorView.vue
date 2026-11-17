@@ -7,6 +7,7 @@ import CuidadorRepository from "@/repositories/CuidadorRepository";
 import ValoracionRepository from "@/repositories/ValoracionRepository";
 import FotoCuidador from "@/components/FotoCuidador.vue";
 import { nombreCuidado } from "@/utils/catalogoCuidados";
+import { nombreTitulacion } from "@/utils/catalogoTitulaciones";
 import { formatearFecha } from "@/utils/formatearFecha";
 import { mensajeDeError } from "@/utils/mensajeDeError";
 
@@ -19,6 +20,15 @@ const valoracionRepository = new ValoracionRepository();
 const cuidador = ref(null);
 const cargando = ref(true);
 const error = ref("");
+
+// Nombres de las titulaciones marcadas y, al final, las otras que escribió a mano
+function formacionDe(persona) {
+  const nombres = (persona.titulaciones || []).map(nombreTitulacion);
+  if (persona.otrasTitulaciones) {
+    nombres.push(persona.otrasTitulaciones);
+  }
+  return nombres;
+}
 
 const valoraciones = ref([]);
 const mostrarValoraciones = ref(false);
@@ -138,6 +148,22 @@ function estrellas(puntuacion) {
               :key="codigo"
             >
               {{ nombreCuidado(codigo) }}
+            </span>
+          </div>
+        </div>
+
+        <div
+          class="perfil__formacion"
+          v-if="formacionDe(cuidador).length > 0"
+        >
+          <h2>Formación</h2>
+          <div class="perfil__servicios-lista">
+            <span
+              class="perfil__servicio"
+              v-for="nombre in formacionDe(cuidador)"
+              :key="nombre"
+            >
+              {{ nombre }}
             </span>
           </div>
         </div>
