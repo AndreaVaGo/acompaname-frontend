@@ -222,7 +222,9 @@ function irAMiPerfil() {
             :nombre="nombre"
             :tamano="40"
           />
-          <template v-else>{{ inicial }}</template>
+          <!-- Nombre completo (o la inicial si aún no ha cargado o en pantallas pequeñas) -->
+          <span v-if="nombre" class="navbar__nombre">{{ nombre }}</span>
+          <span v-if="authStore.rol !== 'CUIDADOR'" class="navbar__inicial">{{ inicial }}</span>
         </button>
 
         <template v-if="menuAbierto">
@@ -286,6 +288,7 @@ function irAMiPerfil() {
 
 <style scoped>
 .navbar {
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -369,9 +372,11 @@ function irAMiPerfil() {
 }
 
 .navbar__avatar {
-  width: 44px;
+  min-width: 44px;
   height: 44px;
-  border-radius: 50%;
+  border-radius: 22px;
+  gap: 8px;
+  padding: 0 !important;
   border: 2px solid var(--color-border);
   background-color: var(--color-secondary-bg);
   color: var(--color-text);
@@ -384,6 +389,33 @@ function irAMiPerfil() {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.navbar__nombre {
+  font-size: 0.95rem;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0 14px 0 10px;
+}
+
+.navbar__inicial {
+  display: none;
+}
+
+/* Si no hay nombre cargado todavía, se ve la inicial como antes */
+.navbar__avatar:not(:has(.navbar__nombre)) .navbar__inicial {
+  display: inline;
+}
+
+@media (max-width: 900px) {
+  .navbar__nombre {
+    display: none;
+  }
+  .navbar__inicial {
+    display: inline !important;
+  }
 }
 
 .navbar__avatar:hover {
@@ -463,6 +495,14 @@ function irAMiPerfil() {
   .navbar__links {
     flex-wrap: wrap;
     justify-content: center;
+  }
+
+  /* En el móvil el avatar se coloca arriba a la derecha, a la altura del logo */
+  .navbar__account {
+    position: absolute;
+    top: 12px;
+    right: 20px;
+    margin-left: 0;
   }
 }
 </style>
