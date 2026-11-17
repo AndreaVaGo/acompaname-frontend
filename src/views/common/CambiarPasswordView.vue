@@ -4,6 +4,7 @@ import UsuarioRepository from "@/repositories/UsuarioRepository";
 import { useAuthStore } from "@/stores/auth";
 import { mensajeDeError } from "@/utils/mensajeDeError";
 import { mensajePassword } from "@/utils/validarPassword";
+import CampoPassword from "@/components/CampoPassword.vue";
 
 const passwordActual = ref("");
 const passwordNueva = ref("");
@@ -80,16 +81,14 @@ async function handleSubmit() {
           <h2 class="titulo-seccion" data-icono="🔑">Tu contraseña</h2>
 
           <label for="password-actual">Contraseña actual</label>
-          <input
-            type="password"
+          <CampoPassword
             id="password-actual"
             placeholder="••••••"
             v-model="passwordActual"
           />
 
           <label for="password-nueva">Contraseña nueva</label>
-          <input
-            type="password"
+          <CampoPassword
             id="password-nueva"
             placeholder="Mínimo 8 caracteres"
             v-model="passwordNueva"
@@ -99,8 +98,7 @@ async function handleSubmit() {
           </p>
 
           <label for="password-repetida">Repite la contraseña nueva</label>
-          <input
-            type="password"
+          <CampoPassword
             id="password-repetida"
             placeholder="••••••"
             v-model="passwordRepetida"
