@@ -123,6 +123,18 @@ describe('guard del router', () => {
     expect(router.currentRoute.value.name).toBe('landing')
   })
 
+  test('una dirección que no existe muestra la página 404', async () => {
+    await router.push('/esta-pagina-no-existe')
+
+    expect(router.currentRoute.value.name).toBe('no-encontrado')
+  })
+
+  test('una dirección con varios tramos que no existe también muestra la 404', async () => {
+    await router.push('/cuidadores/uno/dos')
+
+    expect(router.currentRoute.value.name).toBe('no-encontrado')
+  })
+
   test('el administrador no puede entrar en las páginas de la familia', async () => {
     useAuthStore(pinia).login(9, 'admin@test.com', '12345678', 'ADMIN')
 
