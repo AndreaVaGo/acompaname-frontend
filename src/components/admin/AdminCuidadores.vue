@@ -1,5 +1,5 @@
 <script setup>
-// Tarjeta «Cuidadores mejor valorados»: nombre, nota media y servicios completados
+// Tarjeta «Personas cuidadoras mejor valoradas»: nombre, nota media y servicios completados
 defineProps({
   cuidadores: { type: Array, required: true },
 });
@@ -24,7 +24,7 @@ function textoServicios(cantidad) {
 
 <template>
   <div class="admin-cuidadores">
-    <h2 class="titulo-seccion">Cuidadores mejor valorados</h2>
+    <h2 class="titulo-seccion">Personas cuidadoras mejor valoradas</h2>
 
     <p v-if="cuidadores.length === 0" class="admin-cuidadores__vacio">
       Todavía no hay cuidadores valorados.
