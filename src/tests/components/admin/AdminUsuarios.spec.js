@@ -223,4 +223,13 @@ describe('AdminUsuarios', () => {
 
     expect(wrapper.find('.admin-tabla table').exists()).toBe(true)
   })
+
+  test('la celda del email lleva la clase que deja partir los emails largos', () => {
+    const wrapper = montar(9)
+
+    const celda = wrapper.find('td[data-label="Email"]')
+
+    expect(celda.classes()).toContain('admin-usuarios__celda-email')
+    expect(celda.text()).toBe('ana@test.com')
+  })
 })
