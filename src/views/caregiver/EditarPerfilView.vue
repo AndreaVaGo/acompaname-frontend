@@ -301,7 +301,7 @@ async function guardar() {
               </label>
             </div>
 
-            <p v-if="error" class="editar__error">{{ error }}</p>
+            <p role="alert" v-if="error" class="editar__error">{{ error }}</p>
 
             <button type="submit" class="btn btn--primary">
               Guardar perfil
@@ -309,7 +309,7 @@ async function guardar() {
           </div>
         </form>
 
-        <p v-if="error && !perfil" class="editar__error editar__error--suelto">
+        <p role="alert" v-if="error && !perfil" class="editar__error editar__error--suelto">
           {{ error }}
         </p>
       </div>
