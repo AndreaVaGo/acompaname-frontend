@@ -1,7 +1,8 @@
 <script setup>
+import { EMAIL_CONTACTO } from "@/utils/contacto";
 // Datos del responsable (de demostración)
 const titular = "Andrea V.G.";
-const emailContacto = "acompaname.proyecto@example.com";
+const emailContacto = EMAIL_CONTACTO;
 </script>
 
 <template>
