@@ -56,7 +56,7 @@ function montar(pagos, estado) {
 // El botón del filtro con ese nombre (Todos, Pendiente, Cobrado, Cancelado)
 function botonFiltro(wrapper, nombre) {
   return wrapper
-    .findAll('.admin-pagos-tabla__filtro')
+    .findAll('.admin-filtros__boton')
     .find((boton) => boton.text() === nombre)
 }
 
@@ -133,7 +133,7 @@ describe('AdminPagosTabla', () => {
   test('el filtro marca el estado que le llega y cada botón lleva su color', () => {
     const wrapper = montar(PAGOS, 'CANCELADO')
 
-    const botones = wrapper.findAll('.admin-pagos-tabla__filtro')
+    const botones = wrapper.findAll('.admin-filtros__boton')
 
     expect(botones.map((boton) => boton.text())).toEqual([
       'Todos',
@@ -141,11 +141,11 @@ describe('AdminPagosTabla', () => {
       'Cobrado',
       'Cancelado',
     ])
-    expect(botonFiltro(wrapper, 'Cancelado').classes()).toContain('admin-pagos-tabla__filtro--activo')
+    expect(botonFiltro(wrapper, 'Cancelado').classes()).toContain('admin-filtros__boton--activo')
     expect(botonFiltro(wrapper, 'Cancelado').attributes('aria-pressed')).toBe('true')
     expect(botonFiltro(wrapper, 'Todos').attributes('aria-pressed')).toBe('false')
-    expect(botonFiltro(wrapper, 'Pendiente').classes()).toContain('admin-pagos-tabla__filtro--pendiente')
-    expect(botonFiltro(wrapper, 'Cobrado').classes()).toContain('admin-pagos-tabla__filtro--completado')
+    expect(botonFiltro(wrapper, 'Pendiente').classes()).toContain('admin-filtros__boton--naranja')
+    expect(botonFiltro(wrapper, 'Cobrado').classes()).toContain('admin-filtros__boton--verde')
   })
 
   test('el buscador filtra por el nombre de la familia sin mirar mayúsculas', async () => {
@@ -190,6 +190,6 @@ describe('AdminPagosTabla', () => {
 
     expect(wrapper.text()).toContain('No hay pagos con este estado.')
     expect(wrapper.find('table').exists()).toBe(false)
-    expect(wrapper.findAll('.admin-pagos-tabla__filtro').length).toBe(4)
+    expect(wrapper.findAll('.admin-filtros__boton').length).toBe(4)
   })
 })
