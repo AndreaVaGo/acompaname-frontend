@@ -182,6 +182,12 @@ function irAMiPerfil() {
         <span v-if="avisos > 0" class="navbar__aviso">{{ avisos }}</span>
       </RouterLink>
       <RouterLink
+        v-if="authStore.rol === 'FAMILIA'"
+        to="/pagos"
+        class="navbar__link"
+        >Pagos</RouterLink
+      >
+      <RouterLink
         v-if="authStore.rol === 'CUIDADOR'"
         to="/solicitudes-cuidador"
         class="navbar__link"
