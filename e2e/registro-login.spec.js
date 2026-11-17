@@ -88,4 +88,31 @@ test.describe("Registro y login", () => {
 
     await expect(page).toHaveURL("/login");
   });
+
+  test("el ojo enseña y oculta la contraseña en el login y en el registro", async ({
+    page,
+  }) => {
+    await page.goto("/login");
+    await page.fill("#password", "Secreta123!");
+    await expect(page.locator("#password")).toHaveAttribute("type", "password");
+
+    await page.getByRole("button", { name: "Mostrar contraseña" }).click();
+    await expect(page.locator("#password")).toHaveAttribute("type", "text");
+    await expect(page.locator("#password")).toHaveValue("Secreta123!");
+
+    await page.getByRole("button", { name: "Ocultar contraseña" }).click();
+    await expect(page.locator("#password")).toHaveAttribute("type", "password");
+
+    // En el registro hay dos campos, cada uno con su ojo
+    await page.goto("/registro");
+    const ojos = page.getByRole("button", { name: "Mostrar contraseña" });
+    await expect(ojos).toHaveCount(2);
+    await ojos.first().click();
+    await expect(page.locator("#password")).toHaveAttribute("type", "text");
+    await expect(page.locator("#password-repetida")).toHaveAttribute(
+      "type",
+      "password",
+    );
+    await page.screenshot({ path: "docs/screenshots/e2e-03-ojo-password.png" });
+  });
 });
