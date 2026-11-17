@@ -4,6 +4,7 @@ import { RouterLink, useRouter } from "vue-router";
 import AuthRepository from "@/repositories/AuthRepository";
 import { useAuthStore } from "@/stores/auth";
 import { mensajeDeError } from "@/utils/mensajeDeError";
+import CampoPassword from "@/components/CampoPassword.vue";
 
 const email = ref("");
 const password = ref("");
@@ -68,8 +69,7 @@ async function handleSubmit() {
           />
 
           <label for="password">Contraseña</label>
-          <input
-            type="password"
+          <CampoPassword
             id="password"
             placeholder="••••••"
             v-model="password"
