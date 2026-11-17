@@ -31,7 +31,7 @@ describe("AppFooter", () => {
   test("muestra el texto de copyright", () => {
     const wrapper = montarFooter();
 
-    expect(wrapper.find(".footer__text").text()).toContain("© 2026 Acompáñame");
+    expect(wrapper.find(".footer__text").text()).toBe("© 2026 Acompáñame");
   });
 
   test("tiene un enlace al aviso legal", () => {
@@ -58,20 +58,10 @@ describe("AppFooter", () => {
     expect(enlaces[2].attributes("href")).toBe("/terminos");
   });
 
-  test("tiene un enlace a mi perfil de GitHub con su icono", () => {
+  test("no tiene enlace a GitHub", () => {
     const wrapper = montarFooter();
 
-    const enlace = wrapper.find(".footer__github");
-    expect(enlace.text()).toBe("AndreaVaGo");
-    expect(enlace.attributes("href")).toBe("https://github.com/AndreaVaGo");
-    expect(enlace.find("svg").exists()).toBe(true);
-  });
-
-  test("el enlace de GitHub se abre en otra pestaña de forma segura", () => {
-    const wrapper = montarFooter();
-
-    const enlace = wrapper.find(".footer__github");
-    expect(enlace.attributes("target")).toBe("_blank");
-    expect(enlace.attributes("rel")).toContain("noopener");
+    expect(wrapper.find(".footer__github").exists()).toBe(false);
+    expect(wrapper.text()).not.toContain("AndreaVaGo");
   });
 });
