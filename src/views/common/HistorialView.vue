@@ -55,7 +55,7 @@ function textoEstado(estado) {
       <p>El estado final de cada acompañamiento que has gestionado.</p>
     </header>
 
-    <p v-if="error" class="historial__error">{{ error }}</p>
+    <p role="alert" v-if="error" class="historial__error">{{ error }}</p>
 
     <div class="historial__grid" v-if="historial.length">
       <div
