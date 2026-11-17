@@ -55,19 +55,19 @@ describe('AdminSolicitudes', () => {
   test('cada estado lleva su clase de color', () => {
     const wrapper = montar(SOLICITUDES, '')
 
-    const pildoras = wrapper.findAll('.admin-solicitudes__pildora')
+    const pildoras = wrapper.findAll('tbody .admin-pildora--punto')
 
-    expect(pildoras[0].classes()).toContain('admin-solicitudes__pildora--pendiente')
-    expect(pildoras[1].classes()).toContain('admin-solicitudes__pildora--completada')
+    expect(pildoras[0].classes()).toContain('admin-pildora--naranja')
+    expect(pildoras[1].classes()).toContain('admin-pildora--azul')
   })
 
   test('cada tipo de cuidado lleva su clase de color', () => {
     const wrapper = montar(SOLICITUDES, '')
 
-    const tipos = wrapper.findAll('.admin-solicitudes__tipo')
+    const tipos = wrapper.findAll('tbody tr').map((fila) => fila.findAll('.admin-pildora')[0])
 
-    expect(tipos[0].classes()).toContain('admin-solicitudes__tipo--hospitalario')
-    expect(tipos[1].classes()).toContain('admin-solicitudes__tipo--domicilio')
+    expect(tipos[0].classes()).toContain('admin-pildora--azul')
+    expect(tipos[1].classes()).toContain('admin-pildora--verde')
   })
 
   test('no enseña datos privados de la solicitud', () => {
