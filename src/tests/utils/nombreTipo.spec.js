@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { nombreTipo } from "../../utils/nombreTipo";
+import { nombreTipo, colorTipo } from "../../utils/nombreTipo";
 
 describe("nombreTipo", () => {
   test("pone la primera letra en mayúscula", () => {
@@ -15,5 +15,18 @@ describe("nombreTipo", () => {
     expect(nombreTipo("")).toBe("");
     expect(nombreTipo(null)).toBe("");
     expect(nombreTipo(undefined)).toBe("");
+  });
+});
+
+describe("colorTipo", () => {
+  test("hospitalario va en azul y domicilio en verde", () => {
+    expect(colorTipo("hospitalario")).toBe("azul");
+    expect(colorTipo("domicilio")).toBe("verde");
+  });
+
+  test("cualquier otro tipo o vacío va en gris", () => {
+    expect(colorTipo("otro")).toBe("gris");
+    expect(colorTipo("")).toBe("gris");
+    expect(colorTipo(null)).toBe("gris");
   });
 });
