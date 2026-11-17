@@ -1,8 +1,9 @@
 <script setup>
+import { EMAIL_CONTACTO } from "@/utils/contacto";
 import { RouterLink } from "vue-router";
 
 // Mismo contacto que en el aviso legal (de demostración)
-const emailContacto = "acompaname.proyecto@example.com";
+const emailContacto = EMAIL_CONTACTO;
 </script>
 
 <template>
