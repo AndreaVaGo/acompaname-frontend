@@ -193,6 +193,16 @@ describe("PagosView", () => {
     expect(wrapper.text()).not.toContain("Todavía no tienes pagos");
   });
 
+  test("el error de carga se anuncia como alerta a los lectores de pantalla", async () => {
+    vi.spyOn(PagoRepository.prototype, "getMisPagos").mockRejectedValue(
+      new Error("fallo"),
+    );
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.find(".pagos__error").attributes("role")).toBe("alert");
+  });
+
   test("si la persona cuidadora no tiene nombre pone un texto por defecto", async () => {
     const pago = crearPago(1, "PENDIENTE", 36, "2026-09-01", 8);
     pago.cuidadorNombre = null;
