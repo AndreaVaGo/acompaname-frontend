@@ -107,8 +107,8 @@ function textoPagos(cantidad) {
         v-model="busqueda"
         type="search"
         class="admin-pagos-tabla__buscador"
-        placeholder="Buscar por familia o cuidador"
-        aria-label="Buscar por familia o cuidador"
+        placeholder="Buscar por familia o persona cuidadora"
+        aria-label="Buscar por familia o persona cuidadora"
       />
     </div>
 
@@ -139,7 +139,7 @@ function textoPagos(cantidad) {
           <thead>
             <tr>
               <th>Familia</th>
-              <th>Cuidador</th>
+              <th>Persona cuidadora</th>
               <th>Tipo</th>
               <th>Importe</th>
               <th>Fecha</th>
@@ -150,7 +150,7 @@ function textoPagos(cantidad) {
           <tbody>
             <tr v-for="pago in pagosMostrados" :key="pago.id">
               <td data-label="Familia">{{ pago.nombreFamilia }}</td>
-              <td data-label="Cuidador">{{ pago.nombreCuidador }}</td>
+              <td data-label="Persona cuidadora">{{ pago.nombreCuidador }}</td>
               <td data-label="Tipo">
                 <span class="admin-pagos-tabla__tipo" :class="claseTipo(pago.tipoCuidado)">
                   {{ nombreTipo(pago.tipoCuidado) }}
