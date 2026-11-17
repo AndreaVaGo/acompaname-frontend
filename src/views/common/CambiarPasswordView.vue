@@ -104,7 +104,7 @@ async function handleSubmit() {
             v-model="passwordRepetida"
           />
 
-          <p v-if="error" class="cambiar-password__error">{{ error }}</p>
+          <p role="alert" v-if="error" class="cambiar-password__error">{{ error }}</p>
           <p v-if="exito" class="cambiar-password__exito">{{ exito }}</p>
 
           <button type="submit" class="btn btn--primary">
