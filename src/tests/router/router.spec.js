@@ -58,6 +58,36 @@ describe('guard del router', () => {
     expect(router.currentRoute.value.name).toBe('editar-perfil')
   })
 
+  test('un visitante que entra en los pagos va al login', async () => {
+    await router.push('/pagos')
+
+    expect(router.currentRoute.value.name).toBe('login')
+  })
+
+  test('una familia puede entrar en sus pagos', async () => {
+    useAuthStore(pinia).login(1, 'ana@test.com', '12345678', 'FAMILIA')
+
+    await router.push('/pagos')
+
+    expect(router.currentRoute.value.name).toBe('pagos')
+  })
+
+  test('un cuidador no puede entrar en los pagos de la familia', async () => {
+    useAuthStore(pinia).login(2, 'pepe@test.com', '12345678', 'CUIDADOR')
+
+    await router.push('/pagos')
+
+    expect(router.currentRoute.value.name).toBe('landing')
+  })
+
+  test('el administrador no puede entrar en los pagos de la familia', async () => {
+    useAuthStore(pinia).login(9, 'admin@test.com', '12345678', 'ADMIN')
+
+    await router.push('/pagos')
+
+    expect(router.currentRoute.value.name).toBe('landing')
+  })
+
   test('el historial lo pueden ver la familia y el cuidador', async () => {
     const authStore = useAuthStore(pinia)
 
