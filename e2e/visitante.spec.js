@@ -59,6 +59,22 @@ test.describe("Visitante sin sesión", () => {
     ).toBeVisible();
   });
 
+  test("cada página tiene su título en la pestaña", async ({ page }) => {
+    await page.goto("/privacidad");
+
+    await expect(page).toHaveTitle("Política de privacidad · Acompáñame");
+  });
+
+  test("robots.txt y sitemap.xml se pueden consultar", async ({ request }) => {
+    const robots = await request.get("/robots.txt");
+    expect(robots.ok()).toBe(true);
+    expect(await robots.text()).toContain("Sitemap:");
+
+    const sitemap = await request.get("/sitemap.xml");
+    expect(sitemap.ok()).toBe(true);
+    expect(await sitemap.text()).toContain("/terminos");
+  });
+
   test("una dirección que no existe muestra la página 404 y se puede volver", async ({
     page,
   }) => {
