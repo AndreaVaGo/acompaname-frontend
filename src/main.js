@@ -2,6 +2,7 @@ import { createApp } from "vue";
 import "./style.css";
 import "./styles/variables.css";
 import "./styles/base.css";
+import "./styles/adminTabla.css";
 import App from "./App.vue";
 import router from "./router";
 import pinia from "./pinia/pinia";
