@@ -34,7 +34,7 @@ const valoracion = computed(() => {
     </div>
 
     <div class="admin-tarjetas__tarjeta admin-tarjetas__tarjeta--coral">
-      <div class="admin-tarjetas__nombre">Cuidadores</div>
+      <div class="admin-tarjetas__nombre">Personas cuidadoras</div>
       <div class="admin-tarjetas__numero">{{ estadisticas.totalCuidadores }}</div>
       <div class="admin-tarjetas__detalle">
         {{ estadisticas.cuidadoresDisponibles }} disponibles ahora
