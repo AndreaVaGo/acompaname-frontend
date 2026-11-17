@@ -313,6 +313,18 @@ describe('NavBar', () => {
     expect(wrapper.text()).not.toContain('Registrarme')
   })
 
+  test('la familia ve el enlace Pagos y lleva a sus pagos', async () => {
+    const wrapper = await montarNavBarComoFamilia()
+
+    expect(wrapper.find('a[href="/pagos"]').text()).toBe('Pagos')
+  })
+
+  test('el cuidador no ve el enlace Pagos', async () => {
+    const wrapper = await montarNavBarComoCuidador()
+
+    expect(wrapper.find('a[href="/pagos"]').exists()).toBe(false)
+  })
+
   test('el cuidador no ve el enlace Buscar y su Solicitudes va a su página', async () => {
     const wrapper = await montarNavBarComoCuidador()
 
