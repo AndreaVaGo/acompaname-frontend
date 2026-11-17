@@ -2,8 +2,9 @@
 import { ref, computed } from "vue";
 import { formatearEuros } from "@/utils/formatearEuros";
 import { formatearFecha } from "@/utils/formatearFecha";
-import { nombreTipo } from "@/utils/nombreTipo";
+import { nombreTipo, colorTipo } from "@/utils/nombreTipo";
 import AdminFiltros from "@/components/admin/AdminFiltros.vue";
+import AdminPildora from "@/components/admin/AdminPildora.vue";
 
 // Tabla de pagos con botones de estado (el filtro lo hace el servidor, cada botón lleva el color
 // de su píldora) y buscador por familia o cuidador (lo hace el propio componente).
@@ -47,12 +48,14 @@ const totalMostrado = computed(() => {
   return suma;
 });
 
-// Clase de color de la píldora del tipo (hospitalario o domicilio)
-function claseTipo(tipo) {
-  if (!tipo) {
-    return "";
+// Color de la píldora del estado (el mismo que el de su botón del filtro)
+function colorEstado(estado) {
+  for (const opcion of ESTADOS) {
+    if (opcion.valor === estado) {
+      return opcion.color;
+    }
   }
-  return "admin-pagos-tabla__tipo--" + tipo.toLowerCase();
+  return "gris";
 }
 
 function nombreEstado(estado) {
@@ -146,9 +149,9 @@ function textoPagos(cantidad) {
               <td data-label="Familia">{{ pago.nombreFamilia }}</td>
               <td data-label="Persona cuidadora">{{ pago.nombreCuidador }}</td>
               <td data-label="Tipo">
-                <span class="admin-pagos-tabla__tipo" :class="claseTipo(pago.tipoCuidado)">
+                <AdminPildora :color="colorTipo(pago.tipoCuidado)">
                   {{ nombreTipo(pago.tipoCuidado) }}
-                </span>
+                </AdminPildora>
               </td>
               <td data-label="Importe" class="admin-pagos-tabla__importe">
                 {{ formatearEuros(pago.importe) }}
@@ -165,12 +168,9 @@ function textoPagos(cantidad) {
                 </span>
               </td>
               <td data-label="Estado">
-                <span
-                  class="admin-pagos-tabla__pildora"
-                  :class="'admin-pagos-tabla__pildora--' + pago.estado.toLowerCase()"
-                >
+                <AdminPildora :color="colorEstado(pago.estado)" punto>
                   {{ nombreEstado(pago.estado) }}
-                </span>
+                </AdminPildora>
               </td>
             </tr>
           </tbody>
@@ -269,27 +269,6 @@ tr:last-child td {
   font-weight: bold;
 }
 
-/* Tipo: hospitalario en azul y domicilio en verde (como en los gráficos) */
-.admin-pagos-tabla__tipo {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: var(--radius-pill);
-  font-size: 0.8rem;
-  font-weight: bold;
-  background-color: var(--color-neutral-bg);
-  color: var(--color-text-muted);
-}
-
-.admin-pagos-tabla__tipo--hospitalario {
-  background-color: var(--color-info-bg);
-  color: var(--color-info);
-}
-
-.admin-pagos-tabla__tipo--domicilio {
-  background-color: var(--color-secondary-bg);
-  color: var(--color-secondary);
-}
-
 /* Fecha en una pastilla suave y en negrita */
 .admin-pagos-tabla__fecha {
   display: inline-block;
@@ -321,40 +300,6 @@ tr:last-child td {
 
 .admin-pagos-tabla__dias--ninguno {
   padding: 4px 0;
-  color: var(--color-text-muted);
-}
-
-/* Estado: píldora de color con un puntito delante */
-.admin-pagos-tabla__pildora {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  border-radius: var(--radius-pill);
-  font-size: 0.8rem;
-  font-weight: bold;
-}
-
-.admin-pagos-tabla__pildora::before {
-  content: "";
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: currentColor;
-}
-
-.admin-pagos-tabla__pildora--pendiente {
-  background-color: var(--color-accent-bg);
-  color: var(--color-accent-dark);
-}
-
-.admin-pagos-tabla__pildora--completado {
-  background-color: var(--color-secondary-bg);
-  color: var(--color-secondary);
-}
-
-.admin-pagos-tabla__pildora--cancelado {
-  background-color: var(--color-neutral-bg);
   color: var(--color-text-muted);
 }
 
