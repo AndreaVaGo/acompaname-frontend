@@ -17,6 +17,7 @@ import EditarDatosView from "../views/common/EditarDatosView.vue";
 import CambiarPasswordView from "../views/common/CambiarPasswordView.vue";
 import SolicitudesFamiliaView from "../views/family/SolicitudesFamiliaView.vue";
 import CheckoutView from "../views/family/CheckoutView.vue";
+import PagosView from "../views/family/PagosView.vue";
 import AvisoLegalView from "../views/common/AvisoLegalView.vue";
 import PrivacidadView from "../views/common/PrivacidadView.vue";
 import AdminView from "../views/admin/AdminView.vue";
@@ -43,6 +44,7 @@ const router = createRouter({
     { path: "/editar-datos", name: "editar-datos", component: EditarDatosView, meta: { requiereLogin: true } },
     { path: "/cambiar-password", name: "cambiar-password", component: CambiarPasswordView, meta: { requiereLogin: true } },
     { path: "/solicitudes", name: "solicitudes", component: SolicitudesFamiliaView, meta: { requiereLogin: true, rol: "FAMILIA" } },
+    { path: "/pagos", name: "pagos", component: PagosView, meta: { requiereLogin: true, rol: "FAMILIA" } },
     { path: "/pagar/:id", name: "pagar", component: CheckoutView, meta: { requiereLogin: true, rol: "FAMILIA" } },
     { path: "/admin", name: "admin", component: AdminView, meta: { requiereLogin: true, rol: "ADMIN" } },
   ],
