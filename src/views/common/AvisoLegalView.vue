@@ -27,8 +27,9 @@ const emailContacto = EMAIL_CONTACTO;
     <section>
       <h2>2. Finalidad del sitio</h2>
       <p>
-        Acompáñame es una aplicación web que conecta a familias con cuidadores
-        de personas mayores. Se trata de un proyecto formativo y de demostración:
+        Acompáñame es una aplicación web que conecta a familias con personas
+        cuidadoras para el cuidado y el acompañamiento de personas enfermas o
+        dependientes, de cualquier edad. Se trata de un proyecto formativo y de demostración:
         no presta un servicio comercial real, y los pagos que se muestran son
         simulados.
       </p>
@@ -60,7 +61,7 @@ const emailContacto = EMAIL_CONTACTO;
         Al ser un proyecto de demostración, el titular no garantiza la
         disponibilidad continua del sitio ni la exactitud de los datos que
         contiene, y no se hace responsable de los daños que pudieran derivarse
-        de su uso. Los perfiles de cuidadores y las valoraciones mostrados
+        de su uso. Los perfiles de personas cuidadoras y las valoraciones mostrados
         pueden ser datos de prueba.
       </p>
     </section>
