@@ -75,7 +75,7 @@ async function handleSubmit() {
             v-model="password"
           />
 
-          <p v-if="error" class="login__error">{{ error }}</p>
+          <p role="alert" v-if="error" class="login__error">{{ error }}</p>
 
           <button type="submit" class="btn btn--primary">Entrar</button>
         </form>
