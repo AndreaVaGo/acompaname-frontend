@@ -21,6 +21,7 @@ import PagosView from "../views/family/PagosView.vue";
 import AvisoLegalView from "../views/common/AvisoLegalView.vue";
 import PrivacidadView from "../views/common/PrivacidadView.vue";
 import AdminView from "../views/admin/AdminView.vue";
+import NoEncontradoView from "../views/common/NoEncontradoView.vue";
 
 // Las rutas con meta.requiereLogin solo se pueden ver con la sesión iniciada
 // Las rutas con meta.rol solo las puede ver ese rol (FAMILIA, CUIDADOR o ADMIN)
@@ -47,6 +48,8 @@ const router = createRouter({
     { path: "/pagos", name: "pagos", component: PagosView, meta: { requiereLogin: true, rol: "FAMILIA" } },
     { path: "/pagar/:id", name: "pagar", component: CheckoutView, meta: { requiereLogin: true, rol: "FAMILIA" } },
     { path: "/admin", name: "admin", component: AdminView, meta: { requiereLogin: true, rol: "ADMIN" } },
+    // Va la última: recoge cualquier dirección que no exista
+    { path: "/:pathMatch(.*)*", name: "no-encontrado", component: NoEncontradoView },
   ],
 });
 
