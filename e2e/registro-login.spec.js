@@ -24,6 +24,8 @@ test.describe("Registro y login", () => {
     await expect(page).toHaveURL("/");
     await expect(page.getByRole("link", { name: "Buscar" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Solicitudes" })).toBeVisible();
+    // El nombre completo se ve dentro del botón del perfil
+    await expect(page.locator(".navbar__nombre")).toContainText("Luis E2E");
     await page.screenshot({ path: "docs/screenshots/e2e-01-login.png" });
   });
 
