@@ -17,6 +17,20 @@ const error = ref("");
 const pagosOrdenados = computed(() => ordenarPagos(pagos.value));
 const totalPagado = computed(() => sumarImportes(pagos.value, "COMPLETADO"));
 const totalPendiente = computed(() => sumarImportes(pagos.value, "PENDIENTE"));
+const numPendientes = computed(
+  () => pagos.value.filter((pago) => pago.estado === "PENDIENTE").length,
+);
+
+// Frase del resumen: cambia según cuántos pagos faltan por hacer
+const textoPendientes = computed(() => {
+  if (numPendientes.value === 0) {
+    return "Estás al día, no tienes pagos pendientes";
+  }
+  if (numPendientes.value === 1) {
+    return "1 pago por pagar";
+  }
+  return numPendientes.value + " pagos por pagar";
+});
 
 // El back usa COMPLETADO, pero para la familia es un pago "Pagado"
 const NOMBRES_ESTADO = {
@@ -27,6 +41,21 @@ const NOMBRES_ESTADO = {
 
 function nombreEstado(estado) {
   return NOMBRES_ESTADO[estado] || estado;
+}
+
+// Nombre que se enseña en cada pago, con texto por defecto si no hay
+function nombreCuidador(pago) {
+  return pago.cuidadorNombre || "Persona cuidadora";
+}
+
+// Cada tipo de cuidado tiene su icono; si llega uno nuevo se usa el corazón
+const ICONOS_TIPO = {
+  hospitalario: "🏥",
+  domicilio: "🏠",
+};
+
+function iconoDe(pago) {
+  return ICONOS_TIPO[pago.tipoCuidado] || "🤍";
 }
 
 onMounted(async () => {
@@ -53,6 +82,7 @@ onMounted(async () => {
 
     <template v-else-if="!error">
       <div v-if="pagos.length === 0" class="pagos__vacio">
+        <span class="pagos__vacio-icono" aria-hidden="true">🧾</span>
         <p>Todavía no tienes pagos.</p>
         <p>
           Cuando una persona cuidadora complete una solicitud, el pago aparecerá
@@ -65,17 +95,19 @@ onMounted(async () => {
 
       <template v-else>
         <div class="pagos__totales">
-          <div class="pagos__total pagos__total--pagado">
-            <span class="pagos__total-nombre">Total pagado</span>
-            <strong class="pagos__total-importe">{{
-              formatearEuros(totalPagado)
-            }}</strong>
-          </div>
           <div class="pagos__total pagos__total--pendiente">
             <span class="pagos__total-nombre">Pendiente de pagar</span>
             <strong class="pagos__total-importe">{{
               formatearEuros(totalPendiente)
             }}</strong>
+            <span class="pagos__total-texto">{{ textoPendientes }}</span>
+          </div>
+          <div class="pagos__total pagos__total--pagado">
+            <span class="pagos__total-nombre">Total pagado</span>
+            <strong class="pagos__total-importe">{{
+              formatearEuros(totalPagado)
+            }}</strong>
+            <span class="pagos__total-texto">Gracias por confiar en nosotras</span>
           </div>
         </div>
 
@@ -86,8 +118,12 @@ onMounted(async () => {
             class="pagos__tarjeta"
             :class="'pagos__tarjeta--' + pago.estado.toLowerCase()"
           >
+            <span class="pagos__avatar" aria-hidden="true">{{
+              iconoDe(pago)
+            }}</span>
+
             <div class="pagos__datos">
-              <h2>{{ pago.cuidadorNombre || "Persona cuidadora" }}</h2>
+              <h2>{{ nombreCuidador(pago) }}</h2>
               <p class="pagos__detalle">
                 Solicitud nº {{ pago.solicitudId }} ·
                 {{ nombreTipo(pago.tipoCuidado) }} ·
@@ -157,6 +193,12 @@ onMounted(async () => {
 }
 
 /* Mensaje amable cuando todavía no hay ningún pago */
+.pagos__vacio-icono {
+  display: block;
+  font-size: 2.4rem;
+  margin-bottom: 8px;
+}
+
 .pagos__vacio {
   background-color: var(--color-white);
   border-radius: var(--radius-card);
@@ -177,28 +219,29 @@ onMounted(async () => {
 
 .pagos__totales {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 3fr 2fr;
   gap: var(--gap-md);
-  margin-bottom: var(--gap-md);
+  margin-bottom: var(--gap-lg);
 }
 
 .pagos__total {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  background-color: var(--color-white);
+  gap: 6px;
   border-radius: var(--radius-card);
-  border-top: 4px solid var(--color-border);
   box-shadow: var(--shadow-card);
-  padding: 20px 24px;
+  padding: 24px 28px;
+}
+
+/* El pendiente es lo importante: fondo de acento y número grande */
+.pagos__total--pendiente {
+  background-color: var(--color-accent-bg);
+  border: 2px solid var(--color-accent);
 }
 
 .pagos__total--pagado {
-  border-top-color: var(--color-secondary);
-}
-
-.pagos__total--pendiente {
-  border-top-color: var(--color-accent);
+  background-color: var(--color-secondary-bg);
+  border: 2px solid transparent;
 }
 
 .pagos__total-nombre {
@@ -208,7 +251,17 @@ onMounted(async () => {
 }
 
 .pagos__total-importe {
+  font-size: 2.2rem;
+  line-height: 1.1;
+}
+
+.pagos__total--pagado .pagos__total-importe {
   font-size: 1.6rem;
+}
+
+.pagos__total-texto {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
 }
 
 .pagos__lista {
@@ -222,24 +275,57 @@ onMounted(async () => {
 
 .pagos__tarjeta {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
   gap: 16px;
   background-color: var(--color-white);
   border-radius: var(--radius-card);
-  border-left: 6px solid var(--color-border);
+  border: 2px solid transparent;
   box-shadow: var(--shadow-card);
-  padding: 20px 24px 20px 22px;
+  padding: 18px 24px;
 }
 
-/* El color del borde lateral cambia según el estado del pago */
+/* Los pendientes se distinguen de un vistazo: borde de acento y fondo suave */
 .pagos__tarjeta--pendiente {
-  border-left-color: var(--color-accent);
+  border-color: var(--color-accent);
+  background-color: var(--color-accent-bg);
 }
 
-.pagos__tarjeta--completado {
-  border-left-color: var(--color-secondary);
+.pagos__tarjeta--cancelado {
+  opacity: 0.7;
+}
+
+/* Círculo con el icono del tipo de cuidado, con degradado según el estado */
+.pagos__avatar {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    var(--color-secondary-bg),
+    var(--color-white)
+  );
+  border: 2px solid var(--color-secondary);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  font-size: 1.6rem;
+}
+
+.pagos__tarjeta--pendiente .pagos__avatar {
+  background: linear-gradient(
+    135deg,
+    var(--color-accent-bg),
+    var(--color-white)
+  );
+  border-color: var(--color-accent);
+}
+
+.pagos__datos {
+  flex: 1;
+  min-width: 160px;
 }
 
 .pagos__datos h2 {
@@ -294,6 +380,10 @@ onMounted(async () => {
 
   .pagos__totales {
     grid-template-columns: 1fr;
+  }
+
+  .pagos__total-importe {
+    font-size: 1.9rem;
   }
 
   .pagos__derecha {
