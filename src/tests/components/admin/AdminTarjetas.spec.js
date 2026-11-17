@@ -33,7 +33,7 @@ describe('AdminTarjetas', () => {
 
     expect(wrapper.text()).toContain('Familias')
     expect(wrapper.text()).toContain('18')
-    expect(wrapper.text()).toContain('Cuidadores')
+    expect(wrapper.text()).toContain('Personas cuidadoras')
     expect(wrapper.text()).toContain('9')
     expect(wrapper.text()).toContain('4 disponibles ahora')
   })
