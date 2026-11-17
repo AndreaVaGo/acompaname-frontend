@@ -142,6 +142,16 @@ describe("AdminRepository", () => {
     );
   });
 
+  test("getSugerencias pide las sugerencias", async () => {
+    const fetchFalso = prepararFetch([{ id: 1, texto: "Un chat" }]);
+    const repository = new AdminRepository();
+
+    const resultado = await repository.getSugerencias();
+
+    expect(fetchFalso.mock.calls[0][0]).toBe(`${API}/admin/sugerencias`);
+    expect(resultado[0].texto).toBe("Un chat");
+  });
+
   test("si el servidor responde con error, el repositorio lanza el error con su código", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue({
       ok: false,
