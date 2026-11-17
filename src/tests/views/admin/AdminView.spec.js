@@ -61,6 +61,17 @@ const SOLICITUDES = [
   },
 ]
 
+const SUGERENCIAS = [
+  {
+    id: 1,
+    texto: 'Me gustaría poder chatear',
+    fecha: '2026-11-17T22:15:30',
+    nombreUsuario: 'Ana',
+    emailUsuario: 'ana@test.com',
+    rol: 'FAMILIA',
+  },
+]
+
 const PAGOS_RESUMEN = {
   totalCobrado: 54,
   totalPendiente: 36,
@@ -118,6 +129,7 @@ function prepararRepositorio(cambios) {
     solicitudes: SOLICITUDES,
     pagosResumen: PAGOS_RESUMEN,
     pagos: PAGOS,
+    sugerencias: SUGERENCIAS,
     ...cambios,
   }
   vi.spyOn(AdminRepository.prototype, 'getEstadisticas').mockResolvedValue(datos.estadisticas)
@@ -128,6 +140,7 @@ function prepararRepositorio(cambios) {
   vi.spyOn(AdminRepository.prototype, 'getSolicitudes').mockResolvedValue(datos.solicitudes)
   vi.spyOn(AdminRepository.prototype, 'getPagosResumen').mockResolvedValue(datos.pagosResumen)
   vi.spyOn(AdminRepository.prototype, 'getPagos').mockResolvedValue(datos.pagos)
+  vi.spyOn(AdminRepository.prototype, 'getSugerencias').mockResolvedValue(datos.sugerencias)
   vi.spyOn(AdminRepository.prototype, 'cambiarActivo').mockResolvedValue({})
   vi.spyOn(AdminRepository.prototype, 'borrarValoracion').mockResolvedValue()
 }
@@ -138,7 +151,7 @@ async function montarVista() {
   return wrapper
 }
 
-// Pulsa un botón del menú lateral por su texto (Resumen, Solicitudes, Pagos, Usuarios)
+// Pulsa un botón del menú lateral por su texto (Resumen, Solicitudes, Pagos, Usuarios, Sugerencias)
 async function irASeccion(wrapper, texto) {
   const boton = wrapper.findAll('.admin-menu__boton').find((b) => b.text() === texto)
   await boton.trigger('click')
@@ -181,7 +194,7 @@ describe('AdminView', () => {
     expect(wrapper.text()).not.toContain('Cargando el panel...')
     expect(wrapper.text()).toContain('Panel de administración')
     const textosMenu = wrapper.findAll('.admin-menu__boton').map((b) => b.text())
-    expect(textosMenu).toEqual(['Resumen', 'Solicitudes', 'Pagos', 'Usuarios'])
+    expect(textosMenu).toEqual(['Resumen', 'Solicitudes', 'Pagos', 'Usuarios', 'Sugerencias'])
     expect(wrapper.find('.admin-menu__boton--activo').text()).toBe('Resumen')
     expect(wrapper.text()).toContain('Requieren atención')
     expect(wrapper.text()).toContain('Ingresos cobrados')
@@ -463,6 +476,53 @@ describe('AdminView', () => {
     await irASeccion(wrapper, 'Solicitudes')
 
     expect(wrapper.text()).not.toContain('Usuario bloqueado.')
+  })
+
+  test('las sugerencias no se piden al abrir el panel, solo al entrar en su pestaña', async () => {
+    prepararRepositorio()
+
+    const wrapper = await montarVista()
+    expect(AdminRepository.prototype.getSugerencias).not.toHaveBeenCalled()
+
+    await irASeccion(wrapper, 'Sugerencias')
+
+    expect(AdminRepository.prototype.getSugerencias).toHaveBeenCalledTimes(1)
+    expect(wrapper.find('.admin-menu__boton--activo').text()).toBe('Sugerencias')
+    expect(wrapper.findAll('.admin-sugerencias tbody tr')).toHaveLength(1)
+    expect(wrapper.text()).toContain('Me gustaría poder chatear')
+    expect(wrapper.find('.admin-usuarios').exists()).toBe(false)
+  })
+
+  test('cada vez que se entra en Sugerencias se vuelven a pedir', async () => {
+    prepararRepositorio()
+    const wrapper = await montarVista()
+
+    await irASeccion(wrapper, 'Sugerencias')
+    await irASeccion(wrapper, 'Resumen')
+    await irASeccion(wrapper, 'Sugerencias')
+
+    expect(AdminRepository.prototype.getSugerencias).toHaveBeenCalledTimes(2)
+  })
+
+  test('si no hay sugerencias avisa de que todavía no hay ninguna', async () => {
+    prepararRepositorio({ sugerencias: [] })
+    const wrapper = await montarVista()
+
+    await irASeccion(wrapper, 'Sugerencias')
+
+    expect(wrapper.text()).toContain('Todavía no hay sugerencias.')
+  })
+
+  test('si falla al cargar las sugerencias muestra el motivo', async () => {
+    prepararRepositorio()
+    AdminRepository.prototype.getSugerencias.mockRejectedValue(errorDelServidor(500))
+    const wrapper = await montarVista()
+
+    await irASeccion(wrapper, 'Sugerencias')
+
+    expect(wrapper.text()).toContain(
+      'No se pudieron cargar las sugerencias. Ha ocurrido un error en el servidor. Inténtalo más tarde.'
+    )
   })
 
   test('el administrador no tiene botón para bloquearse a sí mismo', async () => {
