@@ -257,6 +257,25 @@ describe('NavBar', () => {
     expect(wrapper.find('.navbar__menu').exists()).toBe(false)
   })
 
+  test('el menú de la familia tiene la opción Enviar una sugerencia y lleva a su página', async () => {
+    const push = vi.spyOn(router, 'push').mockResolvedValue()
+    const wrapper = await montarNavBarComoFamilia()
+    await wrapper.find('.navbar__avatar').trigger('click')
+
+    expect(wrapper.find('#enviar-sugerencia').text()).toBe('Enviar una sugerencia')
+    await wrapper.find('#enviar-sugerencia').trigger('click')
+
+    expect(push).toHaveBeenCalledWith('/sugerencias')
+    expect(wrapper.find('.navbar__menu').exists()).toBe(false)
+  })
+
+  test('el menú del cuidador tiene la opción Enviar una sugerencia', async () => {
+    const wrapper = await montarNavBarComoCuidador()
+    await wrapper.find('.navbar__avatar').trigger('click')
+
+    expect(wrapper.find('#enviar-sugerencia').exists()).toBe(true)
+  })
+
   test('el cuidador ve cuántas solicitudes pendientes tiene', async () => {
     vi.spyOn(UsuarioRepository.prototype, 'getById').mockResolvedValue({
       nombre: 'Pepe',
