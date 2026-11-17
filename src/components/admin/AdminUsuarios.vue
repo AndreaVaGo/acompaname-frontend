@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed } from "vue";
 import AdminFiltros from "@/components/admin/AdminFiltros.vue";
+import AdminPildora from "@/components/admin/AdminPildora.vue";
 
 // Tabla de usuarios con botones por rol (Todos, Familias, Cuidadores y Administradores, cada uno
 // con su contador y con el mismo color que su píldora de rol) y buscador por nombre o email.
@@ -85,15 +86,14 @@ function nombreRol(rol) {
   return rol;
 }
 
-// Clase de color de la píldora del rol
-function claseRol(rol) {
-  if (rol === "FAMILIA") {
-    return "admin-usuarios__pildora--familia";
+// Color de la píldora del rol (el mismo que el de su botón del filtro)
+function colorRol(rol) {
+  for (const grupo of GRUPOS) {
+    if (grupo.valor === rol) {
+      return grupo.color;
+    }
   }
-  if (rol === "CUIDADOR") {
-    return "admin-usuarios__pildora--cuidador";
-  }
-  return "admin-usuarios__pildora--admin";
+  return "gris";
 }
 
 // El id propio puede llegar como texto (sessionStorage) y el del usuario como número
@@ -145,23 +145,13 @@ function esMiCuenta(usuario, idPropio) {
               <td data-label="Nombre">{{ usuario.nombre }}</td>
               <td data-label="Email">{{ usuario.email }}</td>
               <td data-label="Rol">
-                <span class="admin-usuarios__pildora" :class="claseRol(usuario.rol)">
+                <AdminPildora :color="colorRol(usuario.rol)">
                   {{ nombreRol(usuario.rol) }}
-                </span>
+                </AdminPildora>
               </td>
               <td data-label="Estado">
-                <span
-                  v-if="usuario.activo"
-                  class="admin-usuarios__pildora admin-usuarios__pildora--activo"
-                >
-                  Activo
-                </span>
-                <span
-                  v-else
-                  class="admin-usuarios__pildora admin-usuarios__pildora--bloqueado"
-                >
-                  Bloqueado
-                </span>
+                <AdminPildora v-if="usuario.activo" color="verde" punto>Activo</AdminPildora>
+                <AdminPildora v-else color="rojo" punto>Bloqueado</AdminPildora>
               </td>
               <td data-label="Acción">
                 <span v-if="esMiCuenta(usuario, idPropio)" class="admin-usuarios__tu">Tú</span>
@@ -268,56 +258,6 @@ td {
 
 tr:last-child td {
   border-bottom: none;
-}
-
-.admin-usuarios__pildora {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: var(--radius-pill);
-  font-size: 0.8rem;
-  font-weight: bold;
-}
-
-.admin-usuarios__pildora--familia {
-  background-color: var(--color-secondary-bg);
-  color: var(--color-secondary);
-}
-
-.admin-usuarios__pildora--cuidador {
-  background-color: var(--color-accent-bg);
-  color: var(--color-accent-dark);
-}
-
-.admin-usuarios__pildora--admin {
-  background-color: var(--color-info-bg);
-  color: var(--color-info);
-}
-
-/* Activo (verde) y Bloqueado (rojo) llevan un puntito delante */
-.admin-usuarios__pildora--activo,
-.admin-usuarios__pildora--bloqueado {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.admin-usuarios__pildora--activo::before,
-.admin-usuarios__pildora--bloqueado::before {
-  content: "";
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: currentColor;
-}
-
-.admin-usuarios__pildora--activo {
-  background-color: var(--color-secondary-bg);
-  color: var(--color-secondary);
-}
-
-.admin-usuarios__pildora--bloqueado {
-  background-color: var(--color-error-bg);
-  color: var(--color-error);
 }
 
 .admin-usuarios__tu {
