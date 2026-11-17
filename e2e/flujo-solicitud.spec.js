@@ -85,9 +85,12 @@ test("la familia solicita, el cuidador acepta y completa, y la familia paga", as
   await expect(page.getByText("Completada", { exact: true })).toBeVisible();
   await cerrarSesion(page);
 
-  // 7. La familia entra y paga (el pago se creó solo al completar la solicitud)
+  // 7. La familia entra, ve su pago pendiente en la pestaña Pagos y paga
+  // (el pago se creó solo al completar la solicitud)
   await iniciarSesion(page, familia.email, familia.password);
-  await page.getByRole("link", { name: "Solicitudes" }).click();
+  await page.getByRole("link", { name: "Pagos" }).click();
+  await expect(page.getByText("Pendiente de pagar")).toBeVisible();
+  await expect(page.getByRole("heading", { name: nombreCuidador })).toBeVisible();
   await page.getByRole("link", { name: "Pagar" }).click();
   await expect(page.getByText("Importe: 18")).toBeVisible();
   await page.fill("#numero", "4242424242424242");
@@ -103,4 +106,11 @@ test("la familia solicita, el cuidador acepta y completa, y la familia paga", as
   // 9. En la lista de solicitudes ya figura como pagado
   await page.getByRole("button", { name: "Ver mis solicitudes" }).click();
   await expect(page.getByText("Pagado ✓")).toBeVisible();
+
+  // 10. En la pestaña Pagos el pago figura como pagado y se suma al total pagado
+  await page.getByRole("link", { name: "Pagos" }).click();
+  await expect(page.getByText("Total pagado")).toBeVisible();
+  await expect(page.getByText("Pagado", { exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Pagar" })).toHaveCount(0);
+  await page.screenshot({ path: "docs/screenshots/e2e-12-pagos-familia.png" });
 });
