@@ -1,4 +1,5 @@
 import { describe, test, expect } from "vitest";
+import { EMAIL_CONTACTO } from "../../../utils/contacto";
 import { mount } from "@vue/test-utils";
 import { createRouter, createWebHistory } from "vue-router";
 import PrivacidadView from "../../../views/common/PrivacidadView.vue";
@@ -47,5 +48,13 @@ describe("PrivacidadView", () => {
     const wrapper = montarVista();
 
     expect(wrapper.find("a[href='/aviso-legal']").exists()).toBe(true);
+  });
+
+  test("el enlace de contacto usa el correo común", () => {
+    const wrapper = montarVista();
+
+    expect(wrapper.find("a[href^='mailto:']").attributes("href")).toBe(
+      "mailto:" + EMAIL_CONTACTO,
+    );
   });
 });
