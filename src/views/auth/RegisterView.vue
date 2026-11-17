@@ -5,6 +5,7 @@ import AuthRepository from "@/repositories/AuthRepository";
 import RoleRepository from "../../repositories/RoleRepository";
 import { mensajeDeError } from "@/utils/mensajeDeError";
 import { mensajePassword } from "@/utils/validarPassword";
+import CampoPassword from "@/components/CampoPassword.vue";
 
 const route = useRoute();
 // Si la dirección trae ?rol=cuidador, ese rol ya viene marcado
@@ -106,8 +107,7 @@ async function handleSubmit() {
           />
 
           <label for="password">Contraseña</label>
-          <input
-            type="password"
+          <CampoPassword
             id="password"
             placeholder="Mínimo 8 caracteres"
             v-model="password"
@@ -117,8 +117,7 @@ async function handleSubmit() {
           </p>
 
           <label for="password-repetida">Repite la contraseña</label>
-          <input
-            type="password"
+          <CampoPassword
             id="password-repetida"
             placeholder="••••••••"
             v-model="passwordRepetida"
