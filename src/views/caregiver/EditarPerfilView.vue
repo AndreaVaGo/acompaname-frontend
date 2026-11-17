@@ -5,6 +5,7 @@ import FotoCuidador from "@/components/FotoCuidador.vue";
 import SelectorGrupos from "@/components/SelectorGrupos.vue";
 import { reducirImagen } from "@/utils/reducirImagen";
 import { CUIDADOS } from "@/utils/catalogoCuidados";
+import { TITULACIONES } from "@/utils/catalogoTitulaciones";
 import { useAuthStore } from "@/stores/auth";
 import { mensajeDeError } from "@/utils/mensajeDeError";
 
@@ -18,6 +19,8 @@ const tipoCuidado = ref("ambos");
 const sexo = ref("");
 const servicios = ref([]);
 const gruposEdad = ref([]);
+const titulaciones = ref([]);
+const otrasTitulaciones = ref("");
 const anosExperiencia = ref(0);
 const tarifaHora = ref(0);
 const bio = ref("");
@@ -38,6 +41,8 @@ onMounted(async () => {
     sexo.value = perfil.value.sexo || "";
     servicios.value = perfil.value.servicios || [];
     gruposEdad.value = perfil.value.gruposEdad || [];
+    titulaciones.value = perfil.value.titulaciones || [];
+    otrasTitulaciones.value = perfil.value.otrasTitulaciones || "";
     anosExperiencia.value = perfil.value.anosExperiencia;
     tarifaHora.value = perfil.value.tarifaHora;
     bio.value = perfil.value.bio;
@@ -104,6 +109,9 @@ async function guardar() {
       tipoCuidado: tipoCuidado.value,
       servicios: servicios.value,
       gruposEdad: gruposEdad.value,
+      titulaciones: titulaciones.value,
+      // Vacío = ninguna otra (el back lo borra)
+      otrasTitulaciones: otrasTitulaciones.value.trim(),
       // Vacío = prefiero no indicarlo (el back lo borra)
       sexo: sexo.value,
     });
@@ -246,6 +254,42 @@ async function guardar() {
                 {{ servicio.nombre }}
               </label>
             </div>
+
+            <h2 class="editar__seccion">Formación y titulaciones</h2>
+            <p class="editar__ayuda">
+              Marca la formación que tienes. Es solo una declaración tuya: la
+              web no comprueba los títulos.
+            </p>
+            <div class="editar__servicios">
+              <label
+                v-for="titulacion in TITULACIONES"
+                :key="titulacion.codigo"
+                class="editar__check"
+                :class="{
+                  'editar__check--marcado': titulaciones.includes(
+                    titulacion.codigo,
+                  ),
+                }"
+              >
+                <input
+                  type="checkbox"
+                  :id="'titulacion-' + titulacion.codigo"
+                  :value="titulacion.codigo"
+                  v-model="titulaciones"
+                />
+                {{ titulacion.nombre }}
+              </label>
+            </div>
+            <label for="otras-titulaciones"
+              >Otras titulaciones o formación (opcional)</label
+            >
+            <input
+              type="text"
+              id="otras-titulaciones"
+              v-model="otrasTitulaciones"
+              maxlength="200"
+              placeholder="Por ejemplo: curso de movilización de pacientes"
+            />
 
             <h2 class="editar__seccion">Experiencia y tarifa</h2>
             <div class="editar__row">
@@ -509,10 +553,14 @@ async function guardar() {
 }
 
 .editar__seccion:nth-of-type(4)::before {
-  content: "⭐";
+  content: "🎓";
 }
 
 .editar__seccion:nth-of-type(5)::before {
+  content: "⭐";
+}
+
+.editar__seccion:nth-of-type(6)::before {
   content: "📅";
 }
 
