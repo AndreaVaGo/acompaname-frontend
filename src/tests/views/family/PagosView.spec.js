@@ -125,6 +125,63 @@ describe("PagosView", () => {
     expect(wrapper.find(".pagos__totales").exists()).toBe(false);
   });
 
+  test("cada pago tiene un círculo con el icono de su tipo de cuidado", async () => {
+    const pago = crearPago(1, "COMPLETADO", 90, "2026-09-11", 7);
+    pago.tipoCuidado = "hospitalario";
+    vi.spyOn(PagoRepository.prototype, "getMisPagos").mockResolvedValue([pago]);
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.find(".pagos__avatar").text()).toBe("🏥");
+  });
+
+  test("si el tipo de cuidado no tiene icono propio se usa el corazón", async () => {
+    const pago = crearPago(1, "COMPLETADO", 90, "2026-09-11", 7);
+    pago.tipoCuidado = "otro";
+    vi.spyOn(PagoRepository.prototype, "getMisPagos").mockResolvedValue([pago]);
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.find(".pagos__avatar").text()).toBe("🤍");
+  });
+
+  test("el resumen dice cuántos pagos faltan por pagar", async () => {
+    vi.spyOn(PagoRepository.prototype, "getMisPagos").mockResolvedValue([
+      crearPago(1, "PENDIENTE", 36, "2026-09-13", 9),
+      crearPago(2, "PENDIENTE", 20, "2026-09-14", 10),
+    ]);
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.find(".pagos__total--pendiente").text()).toContain(
+      "2 pagos por pagar",
+    );
+  });
+
+  test("si solo hay un pago pendiente el resumen lo dice en singular", async () => {
+    vi.spyOn(PagoRepository.prototype, "getMisPagos").mockResolvedValue([
+      crearPago(1, "PENDIENTE", 36, "2026-09-13", 9),
+    ]);
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.find(".pagos__total--pendiente").text()).toContain(
+      "1 pago por pagar",
+    );
+  });
+
+  test("si no hay pagos pendientes el resumen dice que está al día", async () => {
+    vi.spyOn(PagoRepository.prototype, "getMisPagos").mockResolvedValue([
+      crearPago(1, "COMPLETADO", 90, "2026-09-11", 7),
+    ]);
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.find(".pagos__total--pendiente").text()).toContain(
+      "Estás al día",
+    );
+  });
+
   test("si falla la carga muestra el error", async () => {
     vi.spyOn(PagoRepository.prototype, "getMisPagos").mockRejectedValue(
       new Error("fallo"),
