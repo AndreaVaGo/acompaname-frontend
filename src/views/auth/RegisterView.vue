@@ -201,7 +201,7 @@ async function handleSubmit() {
             </button>
           </div>
 
-          <p v-if="error" class="register__error">{{ error }}</p>
+          <p role="alert" v-if="error" class="register__error">{{ error }}</p>
 
           <button type="submit" class="btn btn--primary">
             Crear mi cuenta
