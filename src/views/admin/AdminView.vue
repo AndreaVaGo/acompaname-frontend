@@ -16,6 +16,7 @@ import AdminPagosTarjetas from "@/components/admin/AdminPagosTarjetas.vue";
 import AdminPagosMeses from "@/components/admin/AdminPagosMeses.vue";
 import AdminPagosBarras from "@/components/admin/AdminPagosBarras.vue";
 import AdminPagosTabla from "@/components/admin/AdminPagosTabla.vue";
+import AdminSugerencias from "@/components/admin/AdminSugerencias.vue";
 
 const adminRepository = new AdminRepository();
 const authStore = useAuthStore();
@@ -26,6 +27,7 @@ const secciones = [
   { id: "solicitudes", texto: "Solicitudes" },
   { id: "pagos", texto: "Pagos" },
   { id: "usuarios", texto: "Usuarios" },
+  { id: "sugerencias", texto: "Sugerencias" },
 ];
 // Sección que se está viendo: solo se muestra una a la vez
 const seccion = ref("resumen");
@@ -44,6 +46,8 @@ const usuarios = ref([]);
 const solicitudes = ref([]);
 const pagosResumen = ref(null);
 const pagos = ref([]);
+// Las sugerencias no se piden al abrir el panel, sino al entrar en su pestaña
+const sugerencias = ref([]);
 // Estado elegido en el filtro de solicitudes ("" = todas)
 const estadoFiltro = ref("");
 // Estado elegido en el filtro de pagos ("" = todos)
@@ -214,10 +218,21 @@ function limpiarMensajes() {
   mensajeError.value = "";
 }
 
-// Cambia de sección y quita los mensajes de la sección anterior
-function cambiarSeccion(id) {
+// Cambia de sección y quita los mensajes de la sección anterior.
+// Al entrar en Sugerencias se piden de nuevo, para ver las últimas que han llegado
+async function cambiarSeccion(id) {
   limpiarMensajes();
   seccion.value = id;
+  if (id === "sugerencias") {
+    try {
+      sugerencias.value = await adminRepository.getSugerencias();
+    } catch (err) {
+      mensajeError.value = mensajeDeError(
+        err,
+        "No se pudieron cargar las sugerencias.",
+      );
+    }
+  }
 }
 
 // Cambia el filtro y vuelve a pedir las solicitudes de ese estado
@@ -385,6 +400,11 @@ async function eliminarValoracion(id) {
           :usuarios="usuarios"
           :id-propio="authStore.id"
           @cambiar-activo="cambiarActivo"
+        />
+
+        <AdminSugerencias
+          v-else-if="seccion === 'sugerencias'"
+          :sugerencias="sugerencias"
         />
       </div>
     </div>
