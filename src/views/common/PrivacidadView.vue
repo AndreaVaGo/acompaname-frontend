@@ -30,7 +30,7 @@ const emailContacto = EMAIL_CONTACTO;
       <ul>
         <li>
           <strong>Datos de la cuenta:</strong> nombre, correo electrónico,
-          contraseña (almacenada cifrada) y rol (familia o cuidador).
+          contraseña (almacenada cifrada) y rol (familia o persona cuidadora).
         </li>
         <li>
           <strong>Datos del perfil de persona cuidadora:</strong> especialidad, años de
@@ -59,8 +59,8 @@ const emailContacto = EMAIL_CONTACTO;
       <h2>3. Para qué los usamos</h2>
       <p>
         Para gestionar tu cuenta, permitir que las familias encuentren
-        cuidadores y soliciten servicios, que los cuidadores gestionen esas
-        solicitudes, simular el pago y publicar las valoraciones de los
+        personas cuidadoras y soliciten servicios, que las personas cuidadoras
+        gestionen esas solicitudes, simular el pago y publicar las valoraciones de los
         servicios.
       </p>
     </section>
@@ -74,8 +74,8 @@ const emailContacto = EMAIL_CONTACTO;
           recibe.
         </li>
         <li>
-          Las <strong>valoraciones</strong> son públicas en el perfil del
-          cuidador y muestran solo la puntuación, el comentario y la fecha, sin
+          Las <strong>valoraciones</strong> son públicas en el perfil de la
+          persona cuidadora y muestran solo la puntuación, el comentario y la fecha, sin
           datos de la familia.
         </li>
         <li>
