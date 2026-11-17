@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Las direcciones son de ejemplo hasta publicar la web -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://acompaname.example/</loc></url>
+  <url><loc>https://acompaname.example/buscar</loc></url>
+  <url><loc>https://acompaname.example/login</loc></url>
+  <url><loc>https://acompaname.example/registro</loc></url>
+  <url><loc>https://acompaname.example/aviso-legal</loc></url>
+  <url><loc>https://acompaname.example/privacidad</loc></url>
+  <url><loc>https://acompaname.example/terminos</loc></url>
+</urlset>
