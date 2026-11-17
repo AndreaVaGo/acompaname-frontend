@@ -123,6 +123,12 @@ describe('guard del router', () => {
     expect(router.currentRoute.value.name).toBe('landing')
   })
 
+  test('los términos y condiciones se pueden ver sin sesión', async () => {
+    await router.push('/terminos')
+
+    expect(router.currentRoute.value.name).toBe('terminos')
+  })
+
   test('una dirección que no existe muestra la página 404', async () => {
     await router.push('/esta-pagina-no-existe')
 
