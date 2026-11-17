@@ -74,7 +74,7 @@ describe("SolicitarServicioView", () => {
 
     const { wrapper } = await montarVista();
 
-    expect(wrapper.text()).toContain("No se pudo cargar el cuidador.");
+    expect(wrapper.text()).toContain("No se pudo cargar a la persona cuidadora.");
   });
 
   test("muestra el motivo si el cuidador no existe", async () => {
@@ -87,7 +87,7 @@ describe("SolicitarServicioView", () => {
     const { wrapper } = await montarVista();
 
     expect(wrapper.text()).toContain(
-      "No se pudo cargar el cuidador. No se ha encontrado lo que buscas.",
+      "No se pudo cargar a la persona cuidadora. No se ha encontrado lo que buscas.",
     );
   });
 
