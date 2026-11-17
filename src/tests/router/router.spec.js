@@ -129,6 +129,33 @@ describe('guard del router', () => {
     expect(router.currentRoute.value.name).toBe('terminos')
   })
 
+  test('cada página pone su título en la pestaña del navegador', async () => {
+    await router.push('/terminos')
+
+    expect(document.title).toBe('Términos y condiciones · Acompáñame')
+  })
+
+  test('la portada solo lleva el nombre de la web como título', async () => {
+    await router.push('/')
+
+    expect(document.title).toBe('Acompáñame')
+  })
+
+  test('la página 404 tiene su propio título', async () => {
+    await router.push('/esta-pagina-no-existe')
+
+    expect(document.title).toBe('Página no encontrada · Acompáñame')
+  })
+
+  test('todas las rutas, menos la portada, tienen título', () => {
+    const sinTitulo = router
+      .getRoutes()
+      .filter((ruta) => ruta.name !== 'landing' && !ruta.meta.titulo)
+      .map((ruta) => ruta.name)
+
+    expect(sinTitulo).toEqual([])
+  })
+
   test('una dirección que no existe muestra la página 404', async () => {
     await router.push('/esta-pagina-no-existe')
 
