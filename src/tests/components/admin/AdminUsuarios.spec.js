@@ -15,7 +15,7 @@ function montar(idPropio, lista) {
   })
 }
 
-// Busca el botón de grupo (Todos, Familias, Cuidadores o Administradores) por su nombre
+// Busca el botón de grupo (Todos, Familias, Personas cuidadoras o Administradores) por su nombre
 function botonGrupo(wrapper, nombre) {
   return wrapper
     .findAll('.admin-usuarios__grupo')
@@ -29,7 +29,7 @@ describe('AdminUsuarios', () => {
     expect(wrapper.text()).toContain('Ana')
     expect(wrapper.text()).toContain('ana@test.com')
     expect(wrapper.text()).toContain('Familia')
-    expect(wrapper.text()).toContain('Cuidador')
+    expect(wrapper.text()).toContain('Persona cuidadora')
     expect(wrapper.text()).toContain('Administrador')
   })
 
@@ -88,7 +88,7 @@ describe('AdminUsuarios', () => {
     expect(botones[0].text()).toContain('4')
     expect(botones[1].text()).toContain('Familias')
     expect(botones[1].text()).toContain('2')
-    expect(botones[2].text()).toContain('Cuidadores')
+    expect(botones[2].text()).toContain('Personas cuidadoras')
     expect(botones[2].text()).toContain('1')
     expect(botones[3].text()).toContain('Administradores')
     expect(botones[3].text()).toContain('1')
@@ -126,10 +126,10 @@ describe('AdminUsuarios', () => {
     expect(botonGrupo(wrapper, 'Todos').attributes('aria-pressed')).toBe('false')
   })
 
-  test('el botón Cuidadores solo enseña a los cuidadores y dice 1 usuario', async () => {
+  test('el botón Personas cuidadoras solo enseña a las personas cuidadoras y dice 1 usuario', async () => {
     const wrapper = montar(9)
 
-    await botonGrupo(wrapper, 'Cuidadores').trigger('click')
+    await botonGrupo(wrapper, 'Personas cuidadoras').trigger('click')
 
     expect(wrapper.findAll('tbody tr')).toHaveLength(1)
     expect(wrapper.text()).toContain('Pepe')
@@ -148,7 +148,7 @@ describe('AdminUsuarios', () => {
 
   test('al volver a Todos se ven otra vez todos los usuarios', async () => {
     const wrapper = montar(9)
-    await botonGrupo(wrapper, 'Cuidadores').trigger('click')
+    await botonGrupo(wrapper, 'Personas cuidadoras').trigger('click')
 
     await botonGrupo(wrapper, 'Todos').trigger('click')
 
@@ -211,7 +211,7 @@ describe('AdminUsuarios', () => {
 
   test('con un grupo elegido, el botón avisa con el usuario que se ve en esa fila', async () => {
     const wrapper = montar(9)
-    await botonGrupo(wrapper, 'Cuidadores').trigger('click')
+    await botonGrupo(wrapper, 'Personas cuidadoras').trigger('click')
 
     await wrapper.find('tbody tr button').trigger('click')
 
