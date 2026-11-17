@@ -123,6 +123,11 @@ function irAEditarDatos() {
   router.push("/editar-datos");
 }
 
+function irASugerencias() {
+  menuAbierto.value = false;
+  router.push("/sugerencias");
+}
+
 function irACambiarPassword() {
   menuAbierto.value = false;
   router.push("/cambiar-password");
@@ -258,6 +263,15 @@ function irAMiPerfil() {
               @click="irAEditarDatos"
             >
               Editar mis datos
+            </button>
+            <button
+              v-if="authStore.rol !== 'ADMIN'"
+              type="button"
+              class="navbar__menu-item"
+              id="enviar-sugerencia"
+              @click="irASugerencias"
+            >
+              Enviar una sugerencia
             </button>
             <button
               type="button"
