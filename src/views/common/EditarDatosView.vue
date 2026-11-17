@@ -99,7 +99,7 @@ async function handleSubmit() {
             <label for="telefono">Teléfono</label>
             <input type="tel" id="telefono" v-model="telefono" />
 
-            <p v-if="error" class="editar-datos__error">{{ error }}</p>
+            <p role="alert" v-if="error" class="editar-datos__error">{{ error }}</p>
             <p v-if="exito" class="editar-datos__exito">{{ exito }}</p>
 
             <button type="submit" class="btn btn--primary">
