@@ -18,7 +18,7 @@ function montar(idPropio, lista) {
 // Busca el botón de grupo (Todos, Familias, Personas cuidadoras o Administradores) por su nombre
 function botonGrupo(wrapper, nombre) {
   return wrapper
-    .findAll('.admin-usuarios__grupo')
+    .findAll('.admin-filtros__boton')
     .find((boton) => boton.text().startsWith(nombre))
 }
 
@@ -81,7 +81,7 @@ describe('AdminUsuarios', () => {
   test('hay un botón por grupo con cuántos usuarios tiene', () => {
     const wrapper = montar(9)
 
-    const botones = wrapper.findAll('.admin-usuarios__grupo')
+    const botones = wrapper.findAll('.admin-filtros__boton')
 
     expect(botones).toHaveLength(4)
     expect(botones[0].text()).toContain('Todos')
@@ -97,7 +97,7 @@ describe('AdminUsuarios', () => {
   test('al principio está elegido Todos y se ven todos los usuarios', () => {
     const wrapper = montar(9)
 
-    expect(botonGrupo(wrapper, 'Todos').classes()).toContain('admin-usuarios__grupo--activo')
+    expect(botonGrupo(wrapper, 'Todos').classes()).toContain('admin-filtros__boton--activo')
     expect(botonGrupo(wrapper, 'Todos').attributes('aria-pressed')).toBe('true')
     expect(wrapper.findAll('tbody tr')).toHaveLength(4)
     expect(wrapper.text()).toContain('4 usuarios')
@@ -120,9 +120,9 @@ describe('AdminUsuarios', () => {
 
     await botonGrupo(wrapper, 'Familias').trigger('click')
 
-    expect(botonGrupo(wrapper, 'Familias').classes()).toContain('admin-usuarios__grupo--activo')
+    expect(botonGrupo(wrapper, 'Familias').classes()).toContain('admin-filtros__boton--activo')
     expect(botonGrupo(wrapper, 'Familias').attributes('aria-pressed')).toBe('true')
-    expect(botonGrupo(wrapper, 'Todos').classes()).not.toContain('admin-usuarios__grupo--activo')
+    expect(botonGrupo(wrapper, 'Todos').classes()).not.toContain('admin-filtros__boton--activo')
     expect(botonGrupo(wrapper, 'Todos').attributes('aria-pressed')).toBe('false')
   })
 
