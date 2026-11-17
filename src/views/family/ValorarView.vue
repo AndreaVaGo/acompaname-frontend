@@ -38,7 +38,6 @@ async function enviarValoracion() {
     await valoracionRepository.create({
       comentario: comentario.value,
       puntuacion: puntuacion.value,
-      fecha: new Date().toISOString().split("T")[0],
       solicitudId: Number(solicitudId),
     });
     router.push({ name: "historial" });
