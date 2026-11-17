@@ -24,6 +24,19 @@ describe("PrivacidadView", () => {
     expect(wrapper.find("h1").text()).toBe("Política de privacidad");
   });
 
+  test("no usa «cuidador» ni «cuidadores» sueltos", () => {
+    const wrapper = montarVista();
+
+    expect(wrapper.text()).not.toMatch(/\bcuidadores?\b/i);
+  });
+
+  test("dice persona cuidadora al explicar el rol y las valoraciones", () => {
+    const wrapper = montarVista();
+
+    expect(wrapper.text()).toContain("rol (familia o persona cuidadora)");
+    expect(wrapper.text()).toContain("perfil de la persona cuidadora y muestran");
+  });
+
   test("indica quién es el responsable y cómo contactar", () => {
     const wrapper = montarVista();
 
