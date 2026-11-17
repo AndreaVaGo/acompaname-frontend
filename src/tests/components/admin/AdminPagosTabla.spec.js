@@ -192,4 +192,10 @@ describe('AdminPagosTabla', () => {
     expect(wrapper.find('table').exists()).toBe(false)
     expect(wrapper.findAll('.admin-filtros__boton').length).toBe(4)
   })
+
+  test('la tabla va dentro del contenedor con los estilos compartidos', () => {
+    const wrapper = montar(PAGOS, '')
+
+    expect(wrapper.find('.admin-tabla table').exists()).toBe(true)
+  })
 })
