@@ -217,4 +217,10 @@ describe('AdminUsuarios', () => {
 
     expect(wrapper.emitted('cambiarActivo')[0][0].id).toBe(2)
   })
+
+  test('la tabla va dentro del contenedor con los estilos compartidos', () => {
+    const wrapper = montar(9)
+
+    expect(wrapper.find('.admin-tabla table').exists()).toBe(true)
+  })
 })
