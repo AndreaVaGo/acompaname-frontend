@@ -46,6 +46,20 @@ test.describe("Visitante sin sesión", () => {
     await expect(page).toHaveURL("/login");
   });
 
+  test("una dirección que no existe muestra la página 404 y se puede volver", async ({
+    page,
+  }) => {
+    await page.goto("/esta-pagina-no-existe");
+
+    await expect(
+      page.getByRole("heading", { name: "No encontramos esta página" }),
+    ).toBeVisible();
+
+    await page.getByRole("link", { name: "Volver al inicio" }).click();
+
+    await expect(page).toHaveURL("/");
+  });
+
   test("si entra en un pago lo mandan al login", async ({ page }) => {
     await page.goto("/pagar/1");
 
