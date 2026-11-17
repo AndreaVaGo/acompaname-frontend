@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+# Zonas privadas: solo se ven con la sesión iniciada
+Disallow: /admin
+Disallow: /solicitudes
+Disallow: /solicitudes-cuidador
+Disallow: /pagos
+Disallow: /pagar/
+Disallow: /solicitar/
+Disallow: /confirmacion
+Disallow: /valorar/
+Disallow: /mi-perfil
+Disallow: /editar-perfil
+Disallow: /editar-datos
+Disallow: /cambiar-password
+Disallow: /historial
+
+# La dirección es de ejemplo hasta publicar la web
+Sitemap: https://acompaname.example/sitemap.xml
