@@ -59,7 +59,7 @@ function nombreEstado(estado) {
       No hay solicitudes con este estado.
     </p>
 
-    <div v-else class="admin-solicitudes__tabla">
+    <div v-else class="admin-tabla">
       <table>
         <thead>
           <tr>
@@ -122,38 +122,6 @@ function nombreEstado(estado) {
   color: var(--color-text-muted);
 }
 
-/* En pantallas medianas la tabla se desliza hacia los lados en vez de desbordar la página */
-.admin-solicitudes__tabla {
-  overflow-x: auto;
-}
-
-table {
-  border-collapse: collapse;
-  width: 100%;
-}
-
-th {
-  text-align: left;
-  font-size: 0.8rem;
-  color: var(--color-text-muted);
-  padding: 10px 12px;
-  border-bottom: 2px solid var(--color-accent-bg);
-  /* Las palabras no se parten: si no caben, la tabla se desliza */
-  white-space: nowrap;
-}
-
-td {
-  padding: 12px;
-  border-bottom: 1px solid var(--color-neutral-bg);
-  font-size: 0.9rem;
-  /* Las palabras no se parten: si no caben, la tabla se desliza */
-  white-space: nowrap;
-}
-
-tr:last-child td {
-  border-bottom: none;
-}
-
 /* Fecha en una pastilla suave y en negrita */
 .admin-solicitudes__fecha {
   display: inline-block;
@@ -161,58 +129,5 @@ tr:last-child td {
   border-radius: var(--radius-input);
   background-color: var(--color-neutral-bg);
   font-weight: bold;
-}
-
-/* En el móvil cada solicitud se ve como una tarjeta: etiqueta a la izquierda y valor a la derecha */
-@media (max-width: 640px) {
-  .admin-solicitudes__tabla {
-    overflow-x: visible;
-  }
-
-  table,
-  tbody,
-  tr,
-  td {
-    display: block;
-  }
-
-  thead {
-    display: none;
-  }
-
-  tr {
-    border: 1px solid var(--color-neutral-bg);
-    border-radius: var(--radius-input);
-    margin-bottom: 12px;
-    padding: 4px 12px;
-  }
-
-  td {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 0;
-    text-align: right;
-    white-space: normal;
-  }
-
-  td::before {
-    content: attr(data-label);
-    font-size: 0.8rem;
-    font-weight: bold;
-    color: var(--color-text-muted);
-    text-align: left;
-    /* La etiqueta no se encoge ni se parte aunque el valor sea largo */
-    flex-shrink: 0;
-  }
-
-  tr:last-child td {
-    border-bottom: 1px solid var(--color-neutral-bg);
-  }
-
-  tr td:last-child {
-    border-bottom: none;
-  }
 }
 </style>
