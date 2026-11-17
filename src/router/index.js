@@ -20,6 +20,7 @@ import CheckoutView from "../views/family/CheckoutView.vue";
 import PagosView from "../views/family/PagosView.vue";
 import AvisoLegalView from "../views/common/AvisoLegalView.vue";
 import PrivacidadView from "../views/common/PrivacidadView.vue";
+import TerminosView from "../views/common/TerminosView.vue";
 import AdminView from "../views/admin/AdminView.vue";
 import NoEncontradoView from "../views/common/NoEncontradoView.vue";
 
@@ -35,6 +36,7 @@ const router = createRouter({
     { path: "/cuidador/:id", name: "perfil-cuidador", component: PerfilCuidadorView },
     { path: "/aviso-legal", name: "aviso-legal", component: AvisoLegalView },
     { path: "/privacidad", name: "privacidad", component: PrivacidadView },
+    { path: "/terminos", name: "terminos", component: TerminosView },
     { path: "/solicitudes-cuidador", name: "solicitudes-cuidador", component: SolicitudesCuidadorView, meta: { requiereLogin: true, rol: "CUIDADOR" } },
     { path: "/editar-perfil", name: "editar-perfil", component: EditarPerfilView, meta: { requiereLogin: true, rol: "CUIDADOR" } },
     { path: "/historial", name: "historial", component: HistorialView, meta: { requiereLogin: true } },
