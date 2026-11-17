@@ -172,7 +172,7 @@ async function handleSubmit() {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background-color: var(--color-accent);
+  background-color: var(--color-accent-dark);
   color: var(--color-white);
   font-size: 1.8rem;
   font-weight: bold;
