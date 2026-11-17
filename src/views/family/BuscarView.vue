@@ -228,7 +228,7 @@ const cuidadoresFiltrados = computed(() => {
             />
           </div>
         </div>
-        <p v-if="errorFechas" class="buscar__error">{{ errorFechas }}</p>
+        <p role="alert" v-if="errorFechas" class="buscar__error">{{ errorFechas }}</p>
       </div>
 
       <div class="buscar__filter-group">
@@ -403,7 +403,7 @@ const cuidadoresFiltrados = computed(() => {
       </div>
     </div>
 
-    <p v-if="error" class="buscar__error">{{ error }}</p>
+    <p role="alert" v-if="error" class="buscar__error">{{ error }}</p>
 
     <p class="buscar__count">
       {{ cuidadoresFiltrados.length }}
