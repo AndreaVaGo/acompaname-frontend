@@ -172,7 +172,7 @@ const filasTipoPago = computed(() => {
   return filas;
 });
 
-// Filas de «Cuidadores que más han cobrado» en la pestaña Pagos
+// Filas de «Personas cuidadoras que más han cobrado» en la pestaña Pagos
 const filasCuidadoresPago = computed(() => {
   if (!pagosResumen.value) {
     return [];
@@ -366,7 +366,7 @@ async function eliminarValoracion(id) {
               :filas="filasTipoPago"
             />
             <AdminPagosBarras
-              titulo="Cuidadores que más han cobrado"
+              titulo="Personas cuidadoras que más han cobrado"
               :filas="filasCuidadoresPago"
               color="var(--color-info)"
               vacio="Todavía no hay cuidadores con pagos cobrados."
