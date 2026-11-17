@@ -15,6 +15,7 @@ import ValorarView from "../views/family/ValorarView.vue";
 import MiPerfilView from "../views/common/MiPerfilView.vue";
 import EditarDatosView from "../views/common/EditarDatosView.vue";
 import CambiarPasswordView from "../views/common/CambiarPasswordView.vue";
+import EnviarSugerenciaView from "../views/common/EnviarSugerenciaView.vue";
 import SolicitudesFamiliaView from "../views/family/SolicitudesFamiliaView.vue";
 import CheckoutView from "../views/family/CheckoutView.vue";
 import PagosView from "../views/family/PagosView.vue";
@@ -27,6 +28,7 @@ import { aplicarMeta } from "../utils/metaPagina";
 
 // Las rutas con meta.requiereLogin solo se pueden ver con la sesión iniciada
 // Las rutas con meta.rol solo las puede ver ese rol (FAMILIA, CUIDADOR o ADMIN)
+// Las rutas con meta.roles las pueden ver varios roles (por ejemplo ["FAMILIA", "CUIDADOR"])
 const router = createRouter({
   history: createWebHistory(),
   routes: [
@@ -47,6 +49,7 @@ const router = createRouter({
     { path: "/mi-perfil", name: "mi-perfil", component: MiPerfilView, meta: { titulo: "Mi perfil", requiereLogin: true, rol: "FAMILIA" } },
     { path: "/editar-datos", name: "editar-datos", component: EditarDatosView, meta: { titulo: "Editar mis datos", requiereLogin: true } },
     { path: "/cambiar-password", name: "cambiar-password", component: CambiarPasswordView, meta: { titulo: "Cambiar contraseña", requiereLogin: true } },
+    { path: "/sugerencias", name: "sugerencias", component: EnviarSugerenciaView, meta: { titulo: "Enviar una sugerencia", requiereLogin: true, roles: ["FAMILIA", "CUIDADOR"] } },
     { path: "/solicitudes", name: "solicitudes", component: SolicitudesFamiliaView, meta: { titulo: "Mis solicitudes", requiereLogin: true, rol: "FAMILIA" } },
     { path: "/pagos", name: "pagos", component: PagosView, meta: { titulo: "Mis pagos", requiereLogin: true, rol: "FAMILIA" } },
     { path: "/pagar/:id", name: "pagar", component: CheckoutView, meta: { titulo: "Pagar", requiereLogin: true, rol: "FAMILIA" } },
@@ -66,6 +69,11 @@ router.beforeEach((to) => {
 
   // Si la ruta es solo para un rol y el usuario tiene otro, se manda al inicio
   if (to.meta.rol && to.meta.rol !== authStore.rol) {
+    return { name: "landing" };
+  }
+
+  // Lo mismo si la ruta admite varios roles y el usuario no tiene ninguno de ellos
+  if (to.meta.roles && !to.meta.roles.includes(authStore.rol)) {
     return { name: "landing" };
   }
 });
