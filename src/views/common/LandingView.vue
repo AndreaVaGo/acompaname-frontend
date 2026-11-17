@@ -145,7 +145,7 @@ import IconoManoCorazon from "../../components/animation/IconoManoCorazon.vue";
 }
 
 .btn--primary {
-  background-color: var(--color-accent);
+  background-color: var(--color-accent-dark);
   color: var(--color-white);
 }
 
