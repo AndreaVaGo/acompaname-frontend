@@ -1,6 +1,7 @@
 <script setup>
 import { formatearFecha } from "@/utils/formatearFecha";
 import { nombreTipo } from "@/utils/nombreTipo";
+import AdminFiltros from "@/components/admin/AdminFiltros.vue";
 
 // Tabla de solicitudes con botones de estado (cada uno con el mismo color que su píldora).
 // estado es lo que está elegido en el filtro ("" = todas).
@@ -11,13 +12,13 @@ defineProps({
 
 const emit = defineEmits(["cambiarEstado"]);
 
-// Cada estado lleva una clase para darle su color
+// Cada estado lleva el color de su píldora
 const ESTADOS = [
-  { valor: "", nombre: "Todos", clase: "admin-solicitudes__filtro--todos" },
-  { valor: "PENDIENTE", nombre: "Pendiente", clase: "admin-solicitudes__filtro--pendiente" },
-  { valor: "ACEPTADA", nombre: "Aceptada", clase: "admin-solicitudes__filtro--aceptada" },
-  { valor: "COMPLETADA", nombre: "Completada", clase: "admin-solicitudes__filtro--completada" },
-  { valor: "RECHAZADA", nombre: "Rechazada", clase: "admin-solicitudes__filtro--rechazada" },
+  { valor: "", nombre: "Todos", color: "neutro" },
+  { valor: "PENDIENTE", nombre: "Pendiente", color: "naranja" },
+  { valor: "ACEPTADA", nombre: "Aceptada", color: "verde" },
+  { valor: "COMPLETADA", nombre: "Completada", color: "azul" },
+  { valor: "RECHAZADA", nombre: "Rechazada", color: "gris" },
 ];
 
 // Clase de color de la píldora del tipo (hospitalario o domicilio)
@@ -44,19 +45,12 @@ function nombreEstado(estado) {
       <h2 class="admin-solicitudes__titulo">Solicitudes</h2>
     </div>
 
-    <div class="admin-solicitudes__filtros" role="group" aria-label="Filtrar por estado">
-      <button
-        v-for="opcion in ESTADOS"
-        :key="opcion.valor"
-        type="button"
-        class="admin-solicitudes__filtro"
-        :class="[opcion.clase, { 'admin-solicitudes__filtro--activo': estado === opcion.valor }]"
-        :aria-pressed="estado === opcion.valor"
-        @click="emit('cambiarEstado', opcion.valor)"
-      >
-        {{ opcion.nombre }}
-      </button>
-    </div>
+    <AdminFiltros
+      :opciones="ESTADOS"
+      :elegido="estado"
+      etiqueta="Filtrar por estado"
+      @elegir="emit('cambiarEstado', $event)"
+    />
 
     <p v-if="solicitudes.length === 0" class="admin-solicitudes__vacio">
       No hay solicitudes con este estado.
@@ -125,76 +119,6 @@ function nombreEstado(estado) {
   color: var(--color-accent-dark);
 }
 
-/* Botones de estado: Todos, Pendiente, Aceptada, Completada y Rechazada */
-.admin-solicitudes__filtros {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-
-.admin-solicitudes__filtro {
-  padding: 8px 16px;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--color-border);
-  background-color: var(--color-white);
-  color: var(--color-text);
-  font-family: inherit;
-  font-size: 0.9rem;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-/* Todos: gris neutro */
-.admin-solicitudes__filtro--todos:hover,
-.admin-solicitudes__filtro--todos.admin-solicitudes__filtro--activo {
-  background-color: var(--color-neutral-bg);
-  border-color: var(--color-text-muted);
-}
-
-/* Pendiente: naranja, igual que su píldora */
-.admin-solicitudes__filtro--pendiente {
-  color: var(--color-accent-dark);
-}
-
-.admin-solicitudes__filtro--pendiente:hover,
-.admin-solicitudes__filtro--pendiente.admin-solicitudes__filtro--activo {
-  background-color: var(--color-accent-bg);
-  border-color: var(--color-accent-dark);
-}
-
-/* Aceptada: verde */
-.admin-solicitudes__filtro--aceptada {
-  color: var(--color-secondary);
-}
-
-.admin-solicitudes__filtro--aceptada:hover,
-.admin-solicitudes__filtro--aceptada.admin-solicitudes__filtro--activo {
-  background-color: var(--color-secondary-bg);
-  border-color: var(--color-secondary);
-}
-
-/* Completada: azul */
-.admin-solicitudes__filtro--completada {
-  color: var(--color-info);
-}
-
-.admin-solicitudes__filtro--completada:hover,
-.admin-solicitudes__filtro--completada.admin-solicitudes__filtro--activo {
-  background-color: var(--color-info-bg);
-  border-color: var(--color-info);
-}
-
-/* Rechazada: gris */
-.admin-solicitudes__filtro--rechazada {
-  color: var(--color-text-muted);
-}
-
-.admin-solicitudes__filtro--rechazada:hover,
-.admin-solicitudes__filtro--rechazada.admin-solicitudes__filtro--activo {
-  background-color: var(--color-neutral-bg);
-  border-color: var(--color-text-muted);
-}
 
 .admin-solicitudes__vacio {
   margin: 0;
