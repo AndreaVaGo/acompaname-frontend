@@ -161,7 +161,7 @@ const emailContacto = EMAIL_CONTACTO;
   }
 
   & a {
-    color: var(--color-accent);
+    color: var(--color-accent-dark);
   }
 
   & ul {
