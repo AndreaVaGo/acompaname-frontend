@@ -1,7 +1,8 @@
 <script setup>
 import { formatearFecha } from "@/utils/formatearFecha";
-import { nombreTipo } from "@/utils/nombreTipo";
+import { nombreTipo, colorTipo } from "@/utils/nombreTipo";
 import AdminFiltros from "@/components/admin/AdminFiltros.vue";
+import AdminPildora from "@/components/admin/AdminPildora.vue";
 
 // Tabla de solicitudes con botones de estado (cada uno con el mismo color que su píldora).
 // estado es lo que está elegido en el filtro ("" = todas).
@@ -21,12 +22,14 @@ const ESTADOS = [
   { valor: "RECHAZADA", nombre: "Rechazada", color: "gris" },
 ];
 
-// Clase de color de la píldora del tipo (hospitalario o domicilio)
-function claseTipo(tipo) {
-  if (!tipo) {
-    return "";
+// Color de la píldora del estado (el mismo que el de su botón del filtro)
+function colorEstado(estado) {
+  for (const opcion of ESTADOS) {
+    if (opcion.valor === estado) {
+      return opcion.color;
+    }
   }
-  return "admin-solicitudes__tipo--" + tipo.toLowerCase();
+  return "gris";
 }
 
 function nombreEstado(estado) {
@@ -70,12 +73,9 @@ function nombreEstado(estado) {
         <tbody>
           <tr v-for="solicitud in solicitudes" :key="solicitud.id">
             <td data-label="Tipo">
-              <span
-                class="admin-solicitudes__tipo"
-                :class="claseTipo(solicitud.tipoCuidado)"
-              >
+              <AdminPildora :color="colorTipo(solicitud.tipoCuidado)">
                 {{ nombreTipo(solicitud.tipoCuidado) }}
-              </span>
+              </AdminPildora>
             </td>
             <td data-label="Familia">{{ solicitud.nombreFamilia }}</td>
             <td data-label="Persona cuidadora">{{ solicitud.nombreCuidador }}</td>
@@ -85,12 +85,9 @@ function nombreEstado(estado) {
               </span>
             </td>
             <td data-label="Estado">
-              <span
-                class="admin-solicitudes__pildora"
-                :class="'admin-solicitudes__pildora--' + solicitud.estado.toLowerCase()"
-              >
+              <AdminPildora :color="colorEstado(solicitud.estado)" punto>
                 {{ nombreEstado(solicitud.estado) }}
-              </span>
+              </AdminPildora>
             </td>
           </tr>
         </tbody>
@@ -157,27 +154,6 @@ tr:last-child td {
   border-bottom: none;
 }
 
-/* Tipo: hospitalario en azul y domicilio en verde (como en el gráfico del Resumen) */
-.admin-solicitudes__tipo {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: var(--radius-pill);
-  font-size: 0.8rem;
-  font-weight: bold;
-  background-color: var(--color-neutral-bg);
-  color: var(--color-text-muted);
-}
-
-.admin-solicitudes__tipo--hospitalario {
-  background-color: var(--color-info-bg);
-  color: var(--color-info);
-}
-
-.admin-solicitudes__tipo--domicilio {
-  background-color: var(--color-secondary-bg);
-  color: var(--color-secondary);
-}
-
 /* Fecha en una pastilla suave y en negrita */
 .admin-solicitudes__fecha {
   display: inline-block;
@@ -185,45 +161,6 @@ tr:last-child td {
   border-radius: var(--radius-input);
   background-color: var(--color-neutral-bg);
   font-weight: bold;
-}
-
-/* Estado: píldora de color con un puntito delante */
-.admin-solicitudes__pildora {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  border-radius: var(--radius-pill);
-  font-size: 0.8rem;
-  font-weight: bold;
-}
-
-.admin-solicitudes__pildora::before {
-  content: "";
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: currentColor;
-}
-
-.admin-solicitudes__pildora--pendiente {
-  background-color: var(--color-accent-bg);
-  color: var(--color-accent-dark);
-}
-
-.admin-solicitudes__pildora--aceptada {
-  background-color: var(--color-secondary-bg);
-  color: var(--color-secondary);
-}
-
-.admin-solicitudes__pildora--completada {
-  background-color: var(--color-info-bg);
-  color: var(--color-info);
-}
-
-.admin-solicitudes__pildora--rechazada {
-  background-color: var(--color-neutral-bg);
-  color: var(--color-text-muted);
 }
 
 /* En el móvil cada solicitud se ve como una tarjeta: etiqueta a la izquierda y valor a la derecha */
