@@ -188,7 +188,7 @@ function estrellas(puntuacion) {
         <h2>Valoraciones de {{ cuidador.usuarioNombre }}</h2>
 
         <p v-if="cargandoValoraciones">Cargando valoraciones...</p>
-        <p v-else-if="errorValoraciones" class="perfil__error">
+        <p role="alert" v-else-if="errorValoraciones" class="perfil__error">
           {{ errorValoraciones }}
         </p>
         <p v-else-if="valoraciones.length === 0">
