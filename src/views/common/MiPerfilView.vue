@@ -124,7 +124,7 @@ function cerrarSesion() {
   width: 88px;
   height: 88px;
   border-radius: 50%;
-  background-color: var(--color-accent);
+  background-color: var(--color-accent-dark);
   color: var(--color-white);
   font-size: 2.4rem;
   font-weight: bold;
