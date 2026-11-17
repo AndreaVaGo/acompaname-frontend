@@ -95,7 +95,7 @@ async function enviarValoracion() {
             placeholder="Cuéntanos cómo fue tu experiencia..."
           ></textarea>
 
-          <p v-if="error" class="valorar__error">{{ error }}</p>
+          <p role="alert" v-if="error" class="valorar__error">{{ error }}</p>
 
           <button
             type="submit"
