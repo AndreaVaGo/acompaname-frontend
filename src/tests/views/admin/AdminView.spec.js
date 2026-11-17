@@ -180,7 +180,7 @@ describe('AdminView', () => {
     expect(wrapper.text()).toContain('Ingresos cobrados')
     expect(wrapper.text()).toContain('Solicitudes por estado')
     expect(wrapper.text()).toContain('Tipo de cuidado')
-    expect(wrapper.text()).toContain('Cuidadores mejor valorados')
+    expect(wrapper.text()).toContain('Personas cuidadoras mejor valoradas')
     expect(wrapper.text()).toContain('Últimas valoraciones')
     expect(wrapper.text()).toContain('Marta Suárez')
   })
@@ -216,7 +216,7 @@ describe('AdminView', () => {
 
     expect(wrapper.find('.admin-menu__boton--activo').text()).toBe('Solicitudes')
     expect(wrapper.findAll('.admin-solicitudes tbody tr')).toHaveLength(1)
-    expect(wrapper.text()).not.toContain('Cuidadores mejor valorados')
+    expect(wrapper.text()).not.toContain('Personas cuidadoras mejor valoradas')
     expect(wrapper.find('.admin-usuarios').exists()).toBe(false)
   })
 
@@ -235,7 +235,7 @@ describe('AdminView', () => {
     expect(wrapper.text()).toContain('Cancelados')
     expect(wrapper.text()).toContain('Facturado por tipo de cuidado')
     expect(wrapper.text()).toContain('Hospitalario')
-    expect(wrapper.text()).toContain('Cuidadores que más han cobrado')
+    expect(wrapper.text()).toContain('Personas cuidadoras que más han cobrado')
     expect(wrapper.text()).toContain('Pepe Cobrador')
     expect(wrapper.text()).toContain('Detalle de pagos')
     expect(wrapper.findAll('.admin-pagos-tabla tbody tr')).toHaveLength(1)
@@ -311,7 +311,7 @@ describe('AdminView', () => {
       'No se pudo cargar el panel. Ha ocurrido un error en el servidor. Inténtalo más tarde.'
     )
     expect(wrapper.text()).not.toContain('Cargando el panel...')
-    expect(wrapper.text()).not.toContain('Cuidadores mejor valorados')
+    expect(wrapper.text()).not.toContain('Personas cuidadoras mejor valoradas')
     expect(wrapper.find('.admin-menu').exists()).toBe(false)
   })
 
