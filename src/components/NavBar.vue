@@ -377,9 +377,9 @@ function irAMiPerfil() {
   border-radius: 22px;
   gap: 8px;
   padding: 0 !important;
-  border: 2px solid var(--color-border);
-  background-color: var(--color-secondary-bg);
-  color: var(--color-text);
+  border: 2px solid var(--color-accent);
+  background-color: var(--color-accent);
+  color: var(--color-white);
   font-weight: bold;
   font-size: 1rem;
   font-family: inherit;
@@ -419,7 +419,8 @@ function irAMiPerfil() {
 }
 
 .navbar__avatar:hover {
-  background-color: var(--color-neutral-bg);
+  background-color: var(--color-accent-dark);
+  border-color: var(--color-accent-dark);
 }
 
 .navbar__overlay {
