@@ -1,5 +1,6 @@
 <script setup>
 import { formatearFecha } from "@/utils/formatearFecha";
+import { nombreTipo } from "@/utils/nombreTipo";
 
 // Tabla de solicitudes con botones de estado (cada uno con el mismo color que su píldora).
 // estado es lo que está elegido en el filtro ("" = todas).
@@ -18,14 +19,6 @@ const ESTADOS = [
   { valor: "COMPLETADA", nombre: "Completada", clase: "admin-solicitudes__filtro--completada" },
   { valor: "RECHAZADA", nombre: "Rechazada", clase: "admin-solicitudes__filtro--rechazada" },
 ];
-
-// El tipo llega en minúsculas (hospitalario) y se enseña con la primera en mayúscula
-function nombreTipo(tipo) {
-  if (!tipo) {
-    return "";
-  }
-  return tipo.charAt(0).toUpperCase() + tipo.slice(1);
-}
 
 // Clase de color de la píldora del tipo (hospitalario o domicilio)
 function claseTipo(tipo) {
