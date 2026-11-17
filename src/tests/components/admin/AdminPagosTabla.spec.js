@@ -85,10 +85,10 @@ describe('AdminPagosTabla', () => {
   test('cada tipo de cuidado lleva su clase de color', () => {
     const wrapper = montar(PAGOS, '')
 
-    const tipos = wrapper.findAll('.admin-pagos-tabla__tipo')
+    const tipos = wrapper.findAll('tbody tr').map((fila) => fila.findAll('.admin-pildora')[0])
 
-    expect(tipos[0].classes()).toContain('admin-pagos-tabla__tipo--hospitalario')
-    expect(tipos[1].classes()).toContain('admin-pagos-tabla__tipo--domicilio')
+    expect(tipos[0].classes()).toContain('admin-pildora--azul')
+    expect(tipos[1].classes()).toContain('admin-pildora--verde')
   })
 
   test('los días sin cobrar solo salen en los pendientes y en singular si es uno', () => {
