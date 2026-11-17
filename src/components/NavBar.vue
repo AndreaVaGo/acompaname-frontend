@@ -350,14 +350,14 @@ function irAMiPerfil() {
   margin-left: 6px;
   padding: 1px 6px;
   border-radius: var(--radius-pill);
-  background-color: var(--color-accent);
+  background-color: var(--color-accent-dark);
   color: var(--color-white);
   font-size: 0.8rem;
   text-align: center;
 }
 
 .navbar__cta {
-  background-color: var(--color-accent);
+  background-color: var(--color-accent-dark);
   color: var(--color-white);
   text-decoration: none;
   font-size: 0.95rem;
@@ -377,8 +377,8 @@ function irAMiPerfil() {
   border-radius: 22px;
   gap: 8px;
   padding: 0 !important;
-  border: 2px solid var(--color-accent);
-  background-color: var(--color-accent);
+  border: 2px solid var(--color-accent-dark);
+  background-color: var(--color-accent-dark);
   color: var(--color-white);
   font-weight: bold;
   font-size: 1rem;
@@ -419,8 +419,8 @@ function irAMiPerfil() {
 }
 
 .navbar__avatar:hover {
-  background-color: var(--color-accent-dark);
-  border-color: var(--color-accent-dark);
+  background-color: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
 }
 
 .navbar__overlay {
