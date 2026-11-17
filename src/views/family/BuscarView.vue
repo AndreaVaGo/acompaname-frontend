@@ -785,7 +785,7 @@ const cuidadoresFiltrados = computed(() => {
 }
 
 .buscar__card-valoracion-enlace {
-  color: var(--color-accent);
+  color: var(--color-accent-dark);
   text-decoration: none;
 }
 
