@@ -280,6 +280,64 @@ describe("PerfilCuidadorView", () => {
     expect(wrapper.text()).not.toContain("Servicios");
   });
 
+  test("muestra la formación con sus nombres y, al final, las otras titulaciones", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
+      usuarioNombre: "Pepe",
+      especialidad: "Geriatría",
+      anosExperiencia: 4,
+      tarifaHora: 18,
+      disponibleAhora: true,
+      bio: "Cuidador con experiencia",
+      titulaciones: ["ENFERMERIA", "PRIMEROS_AUXILIOS"],
+      otrasTitulaciones: "Curso de geriatría",
+    });
+
+    const wrapper = await montarVista("FAMILIA");
+
+    const formacion = wrapper.findAll(".perfil__formacion .perfil__servicio");
+    expect(formacion.length).toBe(3);
+    expect(formacion[0].text()).toBe("Enfermería");
+    expect(formacion[1].text()).toBe("Primeros auxilios");
+    expect(formacion[2].text()).toBe("Curso de geriatría");
+  });
+
+  test("con solo otras titulaciones también sale la formación", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
+      usuarioNombre: "Pepe",
+      especialidad: "Geriatría",
+      anosExperiencia: 4,
+      tarifaHora: 18,
+      disponibleAhora: true,
+      bio: "Cuidador con experiencia",
+      titulaciones: [],
+      otrasTitulaciones: "Curso de geriatría",
+    });
+
+    const wrapper = await montarVista("FAMILIA");
+
+    const formacion = wrapper.findAll(".perfil__formacion .perfil__servicio");
+    expect(formacion.length).toBe(1);
+    expect(formacion[0].text()).toBe("Curso de geriatría");
+  });
+
+  test("no muestra la sección de formación si no hay ninguna", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
+      usuarioNombre: "Pepe",
+      especialidad: "Geriatría",
+      anosExperiencia: 4,
+      tarifaHora: 18,
+      disponibleAhora: true,
+      bio: "Cuidador con experiencia",
+      titulaciones: [],
+      otrasTitulaciones: null,
+    });
+
+    const wrapper = await montarVista("FAMILIA");
+
+    expect(wrapper.find(".perfil__formacion").exists()).toBe(false);
+    expect(wrapper.text()).not.toContain("Formación");
+  });
+
   test("no muestra el sexo del cuidador en el perfil público", async () => {
     vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
       usuarioNombre: "Pepa",
