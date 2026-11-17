@@ -41,7 +41,7 @@ onMounted(async () => {
     const cuidador = await cuidadorRepository.getById(cuidadorId);
     cuidadorNombre.value = cuidador.usuarioNombre;
   } catch (err) {
-    error.value = mensajeDeError(err, "No se pudo cargar el cuidador.");
+    error.value = mensajeDeError(err, "No se pudo cargar a la persona cuidadora.");
   }
 });
 
