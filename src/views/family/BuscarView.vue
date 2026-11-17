@@ -7,6 +7,7 @@ import FotoCuidador from "@/components/FotoCuidador.vue";
 import SelectorGrupos from "@/components/SelectorGrupos.vue";
 import { CUIDADOS, nombreCuidado } from "@/utils/catalogoCuidados";
 import { nombreGrupo } from "@/utils/catalogoGrupos";
+import { nombreCortoTitulacion } from "@/utils/catalogoTitulaciones";
 import { mensajeDeError } from "@/utils/mensajeDeError";
 
 const cuidadorRepository = new CuidadorRepository();
@@ -83,6 +84,11 @@ function textoTipo(cuidador) {
 // Un cuidador sin servicios se trata como una lista vacía
 function serviciosDe(cuidador) {
   return cuidador.servicios || [];
+}
+
+// Una persona cuidadora sin titulaciones indicadas se trata como una lista vacía
+function titulacionesDe(cuidador) {
+  return cuidador.titulaciones || [];
 }
 
 // Una persona cuidadora sin grupos de edad indicados se trata como una lista vacía
@@ -488,6 +494,15 @@ const cuidadoresFiltrados = computed(() => {
           >
         </div>
 
+        <div class="buscar__tags" v-if="titulacionesDe(cuidador).length > 0">
+          <span
+            class="buscar__tag buscar__tag--titulacion"
+            v-for="codigo in titulacionesDe(cuidador)"
+            :key="codigo"
+            >{{ nombreCortoTitulacion(codigo) }}</span
+          >
+        </div>
+
         <div class="buscar__card-footer">
           <span class="buscar__precio">{{ cuidador.tarifaHora }} €/hora</span>
           <RouterLink :to="`/cuidador/${cuidador.id}`" class="btn btn--primary"
@@ -837,6 +852,11 @@ const cuidadoresFiltrados = computed(() => {
 .buscar__tag--servicio {
   background-color: var(--color-secondary-bg);
   color: var(--color-secondary);
+}
+
+.buscar__tag--titulacion {
+  background-color: var(--color-info-bg);
+  color: var(--color-info);
 }
 
 .buscar__tag--grupo {
