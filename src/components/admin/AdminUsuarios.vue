@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed } from "vue";
+import AdminFiltros from "@/components/admin/AdminFiltros.vue";
 
 // Tabla de usuarios con botones por rol (Todos, Familias, Cuidadores y Administradores, cada uno
 // con su contador y con el mismo color que su píldora de rol) y buscador por nombre o email.
@@ -12,12 +13,12 @@ const props = defineProps({
 
 const emit = defineEmits(["cambiarActivo"]);
 
-// Cada grupo lleva una clase para darle el color de su rol
+// Cada grupo lleva el color de su rol
 const GRUPOS = [
-  { valor: "", nombre: "Todos", clase: "admin-usuarios__grupo--todos" },
-  { valor: "FAMILIA", nombre: "Familias", clase: "admin-usuarios__grupo--familia" },
-  { valor: "CUIDADOR", nombre: "Personas cuidadoras", clase: "admin-usuarios__grupo--cuidador" },
-  { valor: "ADMIN", nombre: "Administradores", clase: "admin-usuarios__grupo--admin" },
+  { valor: "", nombre: "Todos", color: "neutro" },
+  { valor: "FAMILIA", nombre: "Familias", color: "verde" },
+  { valor: "CUIDADOR", nombre: "Personas cuidadoras", color: "naranja" },
+  { valor: "ADMIN", nombre: "Administradores", color: "azul" },
 ];
 
 // El grupo que está elegido ("" = todos) y lo que se ha escrito en el buscador
@@ -38,9 +39,12 @@ function cuantos(valor) {
   return total;
 }
 
-function elegirGrupo(valor) {
-  rolElegido.value = valor;
-}
+// Los botones del filtro, cada uno con su contador
+const opcionesGrupo = computed(() => {
+  return GRUPOS.map((grupo) => {
+    return { valor: grupo.valor, nombre: grupo.nombre, color: grupo.color, cuenta: cuantos(grupo.valor) };
+  });
+});
 
 // Los usuarios que cumplen el grupo elegido y lo escrito en el buscador (sin mirar mayúsculas)
 const usuariosMostrados = computed(() => {
@@ -112,20 +116,12 @@ function esMiCuenta(usuario, idPropio) {
       />
     </div>
 
-    <div class="admin-usuarios__grupos" role="group" aria-label="Filtrar por rol">
-      <button
-        v-for="grupo in GRUPOS"
-        :key="grupo.valor"
-        type="button"
-        class="admin-usuarios__grupo"
-        :class="[grupo.clase, { 'admin-usuarios__grupo--activo': rolElegido === grupo.valor }]"
-        :aria-pressed="rolElegido === grupo.valor"
-        @click="elegirGrupo(grupo.valor)"
-      >
-        {{ grupo.nombre }}
-        <span class="admin-usuarios__cuenta">{{ cuantos(grupo.valor) }}</span>
-      </button>
-    </div>
+    <AdminFiltros
+      :opciones="opcionesGrupo"
+      :elegido="rolElegido"
+      etiqueta="Filtrar por rol"
+      @elegir="rolElegido = $event"
+    />
 
     <p v-if="usuarios.length === 0" class="admin-usuarios__vacio">No hay usuarios.</p>
     <p v-else-if="usuariosMostrados.length === 0" class="admin-usuarios__vacio">
@@ -228,125 +224,6 @@ function esMiCuenta(usuario, idPropio) {
   background-color: var(--color-white);
 }
 
-/* Botones de grupo: Todos, Familias, Cuidadores y Administradores */
-.admin-usuarios__grupos {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-
-.admin-usuarios__grupo {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--color-border);
-  background-color: var(--color-white);
-  color: var(--color-text);
-  font-family: inherit;
-  font-size: 0.9rem;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.admin-usuarios__cuenta {
-  min-width: 24px;
-  padding: 2px 8px;
-  border-radius: var(--radius-pill);
-  font-size: 0.8rem;
-  text-align: center;
-}
-
-/* Todos: gris neutro */
-.admin-usuarios__grupo--todos .admin-usuarios__cuenta {
-  background-color: var(--color-neutral-bg);
-  color: var(--color-text-muted);
-}
-
-.admin-usuarios__grupo--todos:hover {
-  background-color: var(--color-neutral-bg);
-}
-
-.admin-usuarios__grupo--todos.admin-usuarios__grupo--activo {
-  background-color: var(--color-neutral-bg);
-  border-color: var(--color-text-muted);
-}
-
-.admin-usuarios__grupo--todos.admin-usuarios__grupo--activo .admin-usuarios__cuenta {
-  background-color: var(--color-text-muted);
-  color: var(--color-white);
-}
-
-/* Familias: letra y color en verde, igual que la píldora de rol */
-.admin-usuarios__grupo--familia {
-  color: var(--color-secondary);
-}
-
-.admin-usuarios__grupo--familia .admin-usuarios__cuenta {
-  background-color: var(--color-secondary-bg);
-}
-
-.admin-usuarios__grupo--familia:hover {
-  background-color: var(--color-secondary-bg);
-}
-
-.admin-usuarios__grupo--familia.admin-usuarios__grupo--activo {
-  background-color: var(--color-secondary-bg);
-  border-color: var(--color-secondary);
-}
-
-.admin-usuarios__grupo--familia.admin-usuarios__grupo--activo .admin-usuarios__cuenta {
-  background-color: var(--color-secondary);
-  color: var(--color-white);
-}
-
-/* Cuidadores: letra y color en naranja, igual que la píldora de rol */
-.admin-usuarios__grupo--cuidador {
-  color: var(--color-accent-dark);
-}
-
-.admin-usuarios__grupo--cuidador .admin-usuarios__cuenta {
-  background-color: var(--color-accent-bg);
-}
-
-.admin-usuarios__grupo--cuidador:hover {
-  background-color: var(--color-accent-bg);
-}
-
-.admin-usuarios__grupo--cuidador.admin-usuarios__grupo--activo {
-  background-color: var(--color-accent-bg);
-  border-color: var(--color-accent-dark);
-}
-
-.admin-usuarios__grupo--cuidador.admin-usuarios__grupo--activo .admin-usuarios__cuenta {
-  background-color: var(--color-accent-dark);
-  color: var(--color-white);
-}
-
-/* Administradores: letra y color en azul, igual que la píldora de rol */
-.admin-usuarios__grupo--admin {
-  color: var(--color-info);
-}
-
-.admin-usuarios__grupo--admin .admin-usuarios__cuenta {
-  background-color: var(--color-info-bg);
-}
-
-.admin-usuarios__grupo--admin:hover {
-  background-color: var(--color-info-bg);
-}
-
-.admin-usuarios__grupo--admin.admin-usuarios__grupo--activo {
-  background-color: var(--color-info-bg);
-  border-color: var(--color-info);
-}
-
-.admin-usuarios__grupo--admin.admin-usuarios__grupo--activo .admin-usuarios__cuenta {
-  background-color: var(--color-info);
-  color: var(--color-white);
-}
 
 .admin-usuarios__vacio {
   margin: 0;
