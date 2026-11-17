@@ -128,4 +128,10 @@ describe('AdminSolicitudes', () => {
     expect(wrapper.findAll('.admin-filtros__boton').length).toBe(5)
     expect(botonFiltro(wrapper, 'Rechazada').classes()).toContain('admin-filtros__boton--activo')
   })
+
+  test('la tabla va dentro del contenedor con los estilos compartidos', () => {
+    const wrapper = montar(SOLICITUDES, '')
+
+    expect(wrapper.find('.admin-tabla table').exists()).toBe(true)
+  })
 })
