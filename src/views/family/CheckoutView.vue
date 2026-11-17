@@ -266,7 +266,7 @@ function verSolicitudes() {
   height: 64px;
   border-radius: 50%;
   background-color: var(--color-accent-bg);
-  color: var(--color-accent);
+  color: var(--color-accent-dark);
   font-size: 2rem;
   display: flex;
   align-items: center;
