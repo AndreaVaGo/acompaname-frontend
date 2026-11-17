@@ -68,7 +68,7 @@ function nombreEstado(estado) {
           <tr>
             <th>Tipo</th>
             <th>Familia</th>
-            <th>Cuidador</th>
+            <th>Persona cuidadora</th>
             <th>Fecha</th>
             <th>Estado</th>
           </tr>
@@ -84,7 +84,7 @@ function nombreEstado(estado) {
               </span>
             </td>
             <td data-label="Familia">{{ solicitud.nombreFamilia }}</td>
-            <td data-label="Cuidador">{{ solicitud.nombreCuidador }}</td>
+            <td data-label="Persona cuidadora">{{ solicitud.nombreCuidador }}</td>
             <td data-label="Fecha">
               <span class="admin-solicitudes__fecha">
                 {{ formatearFecha(solicitud.fechaCuidado) }}
