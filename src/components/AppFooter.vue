@@ -37,6 +37,9 @@ import { RouterLink } from "vue-router";
         <RouterLink to="/privacidad" class="footer__enlace">
           Política de privacidad
         </RouterLink>
+        <RouterLink to="/terminos" class="footer__enlace">
+          Términos y condiciones
+        </RouterLink>
       </nav>
 
       <div class="footer__derecha">
