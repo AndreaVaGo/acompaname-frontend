@@ -88,6 +88,57 @@ describe('NavBar', () => {
     expect(wrapper.text()).toContain('Buscar')
   })
 
+  test('muestra el nombre completo junto al avatar', async () => {
+    vi.spyOn(UsuarioRepository.prototype, 'getById').mockResolvedValue({
+      nombre: 'Ana López',
+    })
+    const authStore = useAuthStore()
+    authStore.login(1, 'ana@test.com', '12345678', 'FAMILIA')
+
+    const wrapper = await montarNavBar()
+
+    expect(wrapper.find('.navbar__nombre').text()).toBe('Ana López')
+  })
+
+  test('no muestra el nombre junto al avatar si todavía no se ha cargado', async () => {
+    vi.spyOn(UsuarioRepository.prototype, 'getById').mockRejectedValue(
+      new Error('fallo')
+    )
+    const authStore = useAuthStore()
+    authStore.login(1, 'ana@test.com', '12345678', 'FAMILIA')
+
+    const wrapper = await montarNavBar()
+
+    expect(wrapper.find('.navbar__nombre').exists()).toBe(false)
+  })
+
+  test('muestra el nombre completo dentro del botón del avatar', async () => {
+    vi.spyOn(UsuarioRepository.prototype, 'getById').mockResolvedValue({
+      nombre: 'Ana López',
+    })
+    const authStore = useAuthStore()
+    authStore.login(1, 'ana@test.com', '12345678', 'FAMILIA')
+
+    const wrapper = await montarNavBar()
+
+    expect(wrapper.find('.navbar__avatar .navbar__nombre').text()).toBe(
+      'Ana López'
+    )
+  })
+
+  test('si el nombre no se carga, el botón del avatar solo tiene la inicial', async () => {
+    vi.spyOn(UsuarioRepository.prototype, 'getById').mockRejectedValue(
+      new Error('fallo')
+    )
+    const authStore = useAuthStore()
+    authStore.login(1, 'ana@test.com', '12345678', 'FAMILIA')
+
+    const wrapper = await montarNavBar()
+
+    expect(wrapper.find('.navbar__nombre').exists()).toBe(false)
+    expect(wrapper.find('.navbar__inicial').text()).toBe('A')
+  })
+
   test('muestra el nombre en el menú en vez del correo', async () => {
     vi.spyOn(UsuarioRepository.prototype, 'getById').mockResolvedValue({
       nombre: 'Ana',
