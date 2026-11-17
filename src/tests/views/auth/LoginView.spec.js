@@ -155,4 +155,30 @@ describe('LoginView', () => {
     expect(wrapper.text()).toContain('No se pudo iniciar sesión.')
     expect(wrapper.text()).not.toContain('Email o contraseña incorrectos')
   })
+
+  test('la contraseña empieza oculta y el ojo la enseña y la vuelve a ocultar', async () => {
+    const { wrapper } = montarVista()
+    await wrapper.find('#password').setValue('Secreta123!')
+    expect(wrapper.find('#password').attributes('type')).toBe('password')
+
+    await wrapper.find('button[aria-label="Mostrar contraseña"]').trigger('click')
+
+    expect(wrapper.find('#password').attributes('type')).toBe('text')
+    expect(wrapper.find('#password').element.value).toBe('Secreta123!')
+
+    await wrapper.find('button[aria-label="Ocultar contraseña"]').trigger('click')
+
+    expect(wrapper.find('#password').attributes('type')).toBe('password')
+  })
+
+  test('pulsar el ojo no envía el formulario', async () => {
+    const login = vi.spyOn(AuthRepository.prototype, 'login')
+    const { wrapper } = montarVista()
+    await wrapper.find('#email').setValue('ana@test.com')
+    await wrapper.find('#password').setValue('12345678')
+
+    await wrapper.find('button[aria-label="Mostrar contraseña"]').trigger('click')
+
+    expect(login).not.toHaveBeenCalled()
+  })
 })
