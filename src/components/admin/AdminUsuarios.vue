@@ -143,7 +143,7 @@ function esMiCuenta(usuario, idPropio) {
           <tbody>
             <tr v-for="usuario in usuariosMostrados" :key="usuario.id">
               <td data-label="Nombre">{{ usuario.nombre }}</td>
-              <td data-label="Email">{{ usuario.email }}</td>
+              <td data-label="Email" class="admin-usuarios__celda-email">{{ usuario.email }}</td>
               <td data-label="Rol">
                 <AdminPildora :color="colorRol(usuario.rol)">
                   {{ nombreRol(usuario.rol) }}
@@ -228,6 +228,13 @@ function esMiCuenta(usuario, idPropio) {
   color: var(--color-text-muted);
 }
 
+/* Los emails largos se parten en vez de ensanchar la tabla y esconder el botón Bloquear */
+.admin-usuarios__celda-email {
+  min-width: 160px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
 .admin-usuarios__tu {
   color: var(--color-text-muted);
   font-style: italic;
@@ -264,6 +271,15 @@ function esMiCuenta(usuario, idPropio) {
   .admin-usuarios__buscador {
     min-width: 0;
     width: 100%;
+  }
+
+  /* En el móvil el email va debajo de su etiqueta para tener todo el ancho */
+  .admin-usuarios__celda-email {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    min-width: 0;
+    text-align: left;
   }
 }
 </style>
