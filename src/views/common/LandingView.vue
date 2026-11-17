@@ -107,7 +107,7 @@ import IconoManoCorazon from "../../components/animation/IconoManoCorazon.vue";
 
     <AparecerAlVer class="landing__cta">
       <div class="landing__cta-icon"><IconoManoCorazon /></div>
-      <h2>¿Eres cuidador o cuidadora profesional?</h2>
+      <h2>¿Eres persona cuidadora profesional?</h2>
       <p>
         Publica tu perfil, recibe solicitudes de familias cercanas y gestiona tu
         agenda desde un único sitio.
