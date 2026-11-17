@@ -16,7 +16,7 @@ const emit = defineEmits(["cambiarActivo"]);
 const GRUPOS = [
   { valor: "", nombre: "Todos", clase: "admin-usuarios__grupo--todos" },
   { valor: "FAMILIA", nombre: "Familias", clase: "admin-usuarios__grupo--familia" },
-  { valor: "CUIDADOR", nombre: "Cuidadores", clase: "admin-usuarios__grupo--cuidador" },
+  { valor: "CUIDADOR", nombre: "Personas cuidadoras", clase: "admin-usuarios__grupo--cuidador" },
   { valor: "ADMIN", nombre: "Administradores", clase: "admin-usuarios__grupo--admin" },
 ];
 
@@ -73,7 +73,7 @@ function nombreRol(rol) {
     return "Familia";
   }
   if (rol === "CUIDADOR") {
-    return "Cuidador";
+    return "Persona cuidadora";
   }
   if (rol === "ADMIN") {
     return "Administrador";
