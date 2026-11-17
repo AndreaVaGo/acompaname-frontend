@@ -23,6 +23,7 @@ import PrivacidadView from "../views/common/PrivacidadView.vue";
 import TerminosView from "../views/common/TerminosView.vue";
 import AdminView from "../views/admin/AdminView.vue";
 import NoEncontradoView from "../views/common/NoEncontradoView.vue";
+import { aplicarMeta } from "../utils/metaPagina";
 
 // Las rutas con meta.requiereLogin solo se pueden ver con la sesión iniciada
 // Las rutas con meta.rol solo las puede ver ese rol (FAMILIA, CUIDADOR o ADMIN)
@@ -30,28 +31,28 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: "/", name: "landing", component: LandingView },
-    { path: "/login", name: "login", component: LoginView },
-    { path: "/registro", name: "registro", component: RegisterView },
-    { path: "/buscar", name: "buscar", component: BuscarView },
-    { path: "/cuidador/:id", name: "perfil-cuidador", component: PerfilCuidadorView },
-    { path: "/aviso-legal", name: "aviso-legal", component: AvisoLegalView },
-    { path: "/privacidad", name: "privacidad", component: PrivacidadView },
-    { path: "/terminos", name: "terminos", component: TerminosView },
-    { path: "/solicitudes-cuidador", name: "solicitudes-cuidador", component: SolicitudesCuidadorView, meta: { requiereLogin: true, rol: "CUIDADOR" } },
-    { path: "/editar-perfil", name: "editar-perfil", component: EditarPerfilView, meta: { requiereLogin: true, rol: "CUIDADOR" } },
-    { path: "/historial", name: "historial", component: HistorialView, meta: { requiereLogin: true } },
-    { path: "/solicitar/:id", name: "solicitar", component: SolicitarServicioView, meta: { requiereLogin: true, rol: "FAMILIA" } },
-    { path: "/confirmacion", name: "confirmacion", component: ConfirmacionView, meta: { requiereLogin: true, rol: "FAMILIA" } },
-    { path: "/valorar/:id", name: "valorar", component: ValorarView, meta: { requiereLogin: true, rol: "FAMILIA" } },
-    { path: "/mi-perfil", name: "mi-perfil", component: MiPerfilView, meta: { requiereLogin: true, rol: "FAMILIA" } },
-    { path: "/editar-datos", name: "editar-datos", component: EditarDatosView, meta: { requiereLogin: true } },
-    { path: "/cambiar-password", name: "cambiar-password", component: CambiarPasswordView, meta: { requiereLogin: true } },
-    { path: "/solicitudes", name: "solicitudes", component: SolicitudesFamiliaView, meta: { requiereLogin: true, rol: "FAMILIA" } },
-    { path: "/pagos", name: "pagos", component: PagosView, meta: { requiereLogin: true, rol: "FAMILIA" } },
-    { path: "/pagar/:id", name: "pagar", component: CheckoutView, meta: { requiereLogin: true, rol: "FAMILIA" } },
-    { path: "/admin", name: "admin", component: AdminView, meta: { requiereLogin: true, rol: "ADMIN" } },
+    { path: "/login", name: "login", component: LoginView, meta: { titulo: "Iniciar sesión", descripcion: "Inicia sesión en Acompáñame para gestionar tus solicitudes de cuidado." } },
+    { path: "/registro", name: "registro", component: RegisterView, meta: { titulo: "Crear cuenta", descripcion: "Crea tu cuenta en Acompáñame como familia o como persona cuidadora." } },
+    { path: "/buscar", name: "buscar", component: BuscarView, meta: { titulo: "Buscar personas cuidadoras", descripcion: "Busca personas cuidadoras de confianza por ciudad, tipo de cuidado y valoraciones." } },
+    { path: "/cuidador/:id", name: "perfil-cuidador", component: PerfilCuidadorView, meta: { titulo: "Perfil de la persona cuidadora", descripcion: "Conoce la experiencia, la tarifa y las valoraciones de esta persona cuidadora." } },
+    { path: "/aviso-legal", name: "aviso-legal", component: AvisoLegalView, meta: { titulo: "Aviso legal", descripcion: "Información legal de Acompáñame." } },
+    { path: "/privacidad", name: "privacidad", component: PrivacidadView, meta: { titulo: "Política de privacidad", descripcion: "Cómo trata Acompáñame tus datos personales." } },
+    { path: "/terminos", name: "terminos", component: TerminosView, meta: { titulo: "Términos y condiciones", descripcion: "Condiciones de uso de Acompáñame." } },
+    { path: "/solicitudes-cuidador", name: "solicitudes-cuidador", component: SolicitudesCuidadorView, meta: { titulo: "Solicitudes recibidas", requiereLogin: true, rol: "CUIDADOR" } },
+    { path: "/editar-perfil", name: "editar-perfil", component: EditarPerfilView, meta: { titulo: "Editar mi perfil", requiereLogin: true, rol: "CUIDADOR" } },
+    { path: "/historial", name: "historial", component: HistorialView, meta: { titulo: "Historial", requiereLogin: true } },
+    { path: "/solicitar/:id", name: "solicitar", component: SolicitarServicioView, meta: { titulo: "Solicitar cuidado", requiereLogin: true, rol: "FAMILIA" } },
+    { path: "/confirmacion", name: "confirmacion", component: ConfirmacionView, meta: { titulo: "Solicitud enviada", requiereLogin: true, rol: "FAMILIA" } },
+    { path: "/valorar/:id", name: "valorar", component: ValorarView, meta: { titulo: "Valorar el servicio", requiereLogin: true, rol: "FAMILIA" } },
+    { path: "/mi-perfil", name: "mi-perfil", component: MiPerfilView, meta: { titulo: "Mi perfil", requiereLogin: true, rol: "FAMILIA" } },
+    { path: "/editar-datos", name: "editar-datos", component: EditarDatosView, meta: { titulo: "Editar mis datos", requiereLogin: true } },
+    { path: "/cambiar-password", name: "cambiar-password", component: CambiarPasswordView, meta: { titulo: "Cambiar contraseña", requiereLogin: true } },
+    { path: "/solicitudes", name: "solicitudes", component: SolicitudesFamiliaView, meta: { titulo: "Mis solicitudes", requiereLogin: true, rol: "FAMILIA" } },
+    { path: "/pagos", name: "pagos", component: PagosView, meta: { titulo: "Mis pagos", requiereLogin: true, rol: "FAMILIA" } },
+    { path: "/pagar/:id", name: "pagar", component: CheckoutView, meta: { titulo: "Pagar", requiereLogin: true, rol: "FAMILIA" } },
+    { path: "/admin", name: "admin", component: AdminView, meta: { titulo: "Administración", requiereLogin: true, rol: "ADMIN" } },
     // Va la última: recoge cualquier dirección que no exista
-    { path: "/:pathMatch(.*)*", name: "no-encontrado", component: NoEncontradoView },
+    { path: "/:pathMatch(.*)*", name: "no-encontrado", component: NoEncontradoView, meta: { titulo: "Página no encontrada" } },
   ],
 });
 
@@ -67,6 +68,11 @@ router.beforeEach((to) => {
   if (to.meta.rol && to.meta.rol !== authStore.rol) {
     return { name: "landing" };
   }
+});
+
+// Al terminar cada navegación se pone el título y la descripción de la página
+router.afterEach((to) => {
+  aplicarMeta(to.meta);
 });
 
 export default router;
