@@ -63,7 +63,7 @@ async function completar(id) {
       <p>Solicitudes que las familias te han enviado.</p>
     </header>
 
-    <p v-if="error" class="solicitudes__error">{{ error }}</p>
+    <p role="alert" v-if="error" class="solicitudes__error">{{ error }}</p>
 
     <div class="solicitudes__grid">
       <SolicitudCard
