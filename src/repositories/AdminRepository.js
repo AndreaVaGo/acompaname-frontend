@@ -55,4 +55,9 @@ export default class AdminRepository extends Repository {
     }
     return this.get("/admin/pagos");
   }
+
+  // Sugerencias enviadas por familias y personas cuidadoras (las más recientes primero)
+  async getSugerencias() {
+    return this.get("/admin/sugerencias");
+  }
 }
