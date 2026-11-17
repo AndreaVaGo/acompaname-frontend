@@ -33,7 +33,7 @@ const emailContacto = EMAIL_CONTACTO;
           contraseña (almacenada cifrada) y rol (familia o cuidador).
         </li>
         <li>
-          <strong>Datos del perfil de cuidador:</strong> especialidad, años de
+          <strong>Datos del perfil de persona cuidadora:</strong> especialidad, años de
           experiencia, tarifa, disponibilidad, servicios, descripción y, si la
           aporta, su foto.
         </li>
@@ -69,8 +69,8 @@ const emailContacto = EMAIL_CONTACTO;
       <h2>4. Con quién se comparten</h2>
       <ul>
         <li>
-          La <strong>familia</strong> ve el perfil público del cuidador, y el
-          <strong>cuidador</strong> elegido ve los datos de las solicitudes que
+          La <strong>familia</strong> ve el perfil público de la persona cuidadora, y la
+          <strong>persona cuidadora</strong> elegida ve los datos de las solicitudes que
           recibe.
         </li>
         <li>
