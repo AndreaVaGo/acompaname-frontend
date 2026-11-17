@@ -15,7 +15,7 @@ describe('AdminCuidadores', () => {
       { id: 2, nombre: 'Rosa Álvarez', notaMedia: 4.5, serviciosCompletados: 7 },
     ])
 
-    expect(wrapper.text()).toContain('Cuidadores mejor valorados')
+    expect(wrapper.text()).toContain('Personas cuidadoras mejor valoradas')
     expect(wrapper.text()).toContain('Marta Suárez')
     expect(wrapper.text()).toContain('4,9 / 5')
     expect(wrapper.text()).toContain('12 servicios completados')
