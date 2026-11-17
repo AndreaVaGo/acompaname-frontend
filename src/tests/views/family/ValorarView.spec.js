@@ -116,6 +116,25 @@ describe("ValorarView", () => {
     expect(router.currentRoute.value.name).toBe("historial");
   });
 
+  test("no envía la fecha: la pone el servidor", async () => {
+    vi.spyOn(SolicitudRepository.prototype, "getById").mockResolvedValue({
+      cuidadorNombre: "Pepe",
+    });
+    const createSpy = vi
+      .spyOn(ValoracionRepository.prototype, "create")
+      .mockResolvedValue({});
+
+    const { wrapper } = await montarVista();
+
+    const estrellas = wrapper.findAll(".valorar__estrella");
+    await estrellas[4].trigger("click");
+    await wrapper.find("form").trigger("submit.prevent");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    const datosEnviados = createSpy.mock.calls[0][0];
+    expect(datosEnviados.fecha).toBeUndefined();
+  });
+
   test("muestra error si falla el envío de la valoración", async () => {
     vi.spyOn(SolicitudRepository.prototype, "getById").mockResolvedValue({
       cuidadorNombre: "Pepe",
