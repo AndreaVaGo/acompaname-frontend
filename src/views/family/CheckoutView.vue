@@ -146,14 +146,14 @@ function verSolicitudes() {
             </div>
           </div>
 
-          <p v-if="error" class="checkout__error">{{ error }}</p>
+          <p role="alert" v-if="error" class="checkout__error">{{ error }}</p>
 
           <button type="submit" class="btn btn--primary" :disabled="procesando">
             {{ procesando ? "Procesando..." : "Pagar" }}
           </button>
         </form>
 
-        <p v-if="error && !pago" class="checkout__error checkout__error--suelto">
+        <p role="alert" v-if="error && !pago" class="checkout__error checkout__error--suelto">
           {{ error }}
         </p>
       </div>
