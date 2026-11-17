@@ -39,7 +39,7 @@ test.describe("Panel de administración", () => {
     await expect(botonMenu(page, "Pagos")).toBeVisible();
     await expect(botonMenu(page, "Usuarios")).toBeVisible();
     await expect(bloqueResumen(page)).toBeVisible();
-    await expect(page.getByText("Cuidadores mejor valorados")).toBeVisible();
+    await expect(page.getByText("Personas cuidadoras mejor valoradas")).toBeVisible();
     await page.screenshot({ path: "docs/screenshots/e2e-08-admin-resumen.png" });
   });
 
@@ -66,8 +66,8 @@ test.describe("Panel de administración", () => {
     await expect(botonGrupo(page, "Administradores")).toHaveAttribute("aria-pressed", "true");
     await expect(page.locator(".admin-usuarios")).toContainText(EMAIL_ADMIN);
 
-    // Con el botón Cuidadores el administrador ya no sale
-    await botonGrupo(page, "Cuidadores").click();
+    // Con el botón Personas cuidadoras el administrador ya no sale
+    await botonGrupo(page, "Personas cuidadoras").click();
     await expect(page.locator(".admin-usuarios")).not.toContainText(EMAIL_ADMIN);
 
     // Con un texto que no existe, la tabla avisa
@@ -99,7 +99,7 @@ test.describe("Panel de administración", () => {
       page.getByRole("heading", { name: "Facturado por tipo de cuidado" }),
     ).toBeVisible();
     await expect(
-      page.getByRole("heading", { name: "Cuidadores que más han cobrado" }),
+      page.getByRole("heading", { name: "Personas cuidadoras que más han cobrado" }),
     ).toBeVisible();
     await expect(page.getByRole("heading", { name: "Detalle de pagos" })).toBeVisible();
     await expect(bloqueResumen(page)).toHaveCount(0);
