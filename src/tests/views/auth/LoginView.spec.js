@@ -96,6 +96,20 @@ describe('LoginView', () => {
     expect(push).not.toHaveBeenCalled()
   })
 
+  test('el mensaje de error se anuncia como alerta a los lectores de pantalla', async () => {
+    const errorCredenciales = new Error('fallo')
+    errorCredenciales.status = 401
+    vi.spyOn(AuthRepository.prototype, 'login').mockRejectedValue(
+      errorCredenciales
+    )
+    vi.spyOn(router, 'push').mockResolvedValue()
+    const { wrapper } = montarVista()
+
+    await rellenarYEnviar(wrapper, 'ana@test.com', 'mal')
+
+    expect(wrapper.find('.login__error').attributes('role')).toBe('alert')
+  })
+
   test('si hay demasiados intentos, avisa de que se espere un minuto', async () => {
     const errorDemasiados = new Error('fallo')
     errorDemasiados.status = 429
