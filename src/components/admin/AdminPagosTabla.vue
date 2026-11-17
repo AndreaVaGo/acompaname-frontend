@@ -3,6 +3,7 @@ import { ref, computed } from "vue";
 import { formatearEuros } from "@/utils/formatearEuros";
 import { formatearFecha } from "@/utils/formatearFecha";
 import { nombreTipo } from "@/utils/nombreTipo";
+import AdminFiltros from "@/components/admin/AdminFiltros.vue";
 
 // Tabla de pagos con botones de estado (el filtro lo hace el servidor, cada botón lleva el color
 // de su píldora) y buscador por familia o cuidador (lo hace el propio componente).
@@ -14,12 +15,12 @@ const props = defineProps({
 
 const emit = defineEmits(["cambiarEstado"]);
 
-// Cada estado lleva una clase para darle su color
+// Cada estado lleva el color de su píldora
 const ESTADOS = [
-  { valor: "", nombre: "Todos", clase: "admin-pagos-tabla__filtro--todos" },
-  { valor: "PENDIENTE", nombre: "Pendiente", clase: "admin-pagos-tabla__filtro--pendiente" },
-  { valor: "COMPLETADO", nombre: "Cobrado", clase: "admin-pagos-tabla__filtro--completado" },
-  { valor: "CANCELADO", nombre: "Cancelado", clase: "admin-pagos-tabla__filtro--cancelado" },
+  { valor: "", nombre: "Todos", color: "neutro" },
+  { valor: "PENDIENTE", nombre: "Pendiente", color: "naranja" },
+  { valor: "COMPLETADO", nombre: "Cobrado", color: "verde" },
+  { valor: "CANCELADO", nombre: "Cancelado", color: "gris" },
 ];
 
 const busqueda = ref("");
@@ -112,19 +113,12 @@ function textoPagos(cantidad) {
       />
     </div>
 
-    <div class="admin-pagos-tabla__filtros" role="group" aria-label="Filtrar por estado">
-      <button
-        v-for="opcion in ESTADOS"
-        :key="opcion.valor"
-        type="button"
-        class="admin-pagos-tabla__filtro"
-        :class="[opcion.clase, { 'admin-pagos-tabla__filtro--activo': estado === opcion.valor }]"
-        :aria-pressed="estado === opcion.valor"
-        @click="emit('cambiarEstado', opcion.valor)"
-      >
-        {{ opcion.nombre }}
-      </button>
-    </div>
+    <AdminFiltros
+      :opciones="ESTADOS"
+      :elegido="estado"
+      etiqueta="Filtrar por estado"
+      @elegir="emit('cambiarEstado', $event)"
+    />
 
     <p v-if="pagos.length === 0" class="admin-pagos-tabla__vacio">
       No hay pagos con este estado.
@@ -225,65 +219,6 @@ function textoPagos(cantidad) {
   background-color: var(--color-white);
 }
 
-/* Botones de estado: Todos, Pendiente, Cobrado y Cancelado */
-.admin-pagos-tabla__filtros {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-
-.admin-pagos-tabla__filtro {
-  padding: 8px 16px;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--color-border);
-  background-color: var(--color-white);
-  color: var(--color-text);
-  font-family: inherit;
-  font-size: 0.9rem;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-/* Todos: gris neutro */
-.admin-pagos-tabla__filtro--todos:hover,
-.admin-pagos-tabla__filtro--todos.admin-pagos-tabla__filtro--activo {
-  background-color: var(--color-neutral-bg);
-  border-color: var(--color-text-muted);
-}
-
-/* Pendiente: naranja, igual que su píldora */
-.admin-pagos-tabla__filtro--pendiente {
-  color: var(--color-accent-dark);
-}
-
-.admin-pagos-tabla__filtro--pendiente:hover,
-.admin-pagos-tabla__filtro--pendiente.admin-pagos-tabla__filtro--activo {
-  background-color: var(--color-accent-bg);
-  border-color: var(--color-accent-dark);
-}
-
-/* Cobrado: verde */
-.admin-pagos-tabla__filtro--completado {
-  color: var(--color-secondary);
-}
-
-.admin-pagos-tabla__filtro--completado:hover,
-.admin-pagos-tabla__filtro--completado.admin-pagos-tabla__filtro--activo {
-  background-color: var(--color-secondary-bg);
-  border-color: var(--color-secondary);
-}
-
-/* Cancelado: gris */
-.admin-pagos-tabla__filtro--cancelado {
-  color: var(--color-text-muted);
-}
-
-.admin-pagos-tabla__filtro--cancelado:hover,
-.admin-pagos-tabla__filtro--cancelado.admin-pagos-tabla__filtro--activo {
-  background-color: var(--color-neutral-bg);
-  border-color: var(--color-text-muted);
-}
 
 .admin-pagos-tabla__vacio {
   margin: 0;
