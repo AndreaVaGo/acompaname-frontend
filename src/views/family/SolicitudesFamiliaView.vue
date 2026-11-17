@@ -53,7 +53,7 @@ onMounted(async () => {
       <p>Solicitudes que has enviado a las personas cuidadoras.</p>
     </header>
 
-    <p v-if="error" class="solicitudes__error">{{ error }}</p>
+    <p role="alert" v-if="error" class="solicitudes__error">{{ error }}</p>
 
     <p v-if="cargando" class="solicitudes__cargando">Cargando solicitudes…</p>
 
