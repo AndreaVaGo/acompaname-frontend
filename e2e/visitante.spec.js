@@ -46,6 +46,19 @@ test.describe("Visitante sin sesión", () => {
     await expect(page).toHaveURL("/login");
   });
 
+  test("desde el pie de página se llega a los términos y condiciones", async ({
+    page,
+  }) => {
+    await page.goto("/");
+
+    await page.getByRole("link", { name: "Términos y condiciones" }).click();
+
+    await expect(page).toHaveURL("/terminos");
+    await expect(
+      page.getByRole("heading", { name: "Términos y condiciones de uso" }),
+    ).toBeVisible();
+  });
+
   test("una dirección que no existe muestra la página 404 y se puede volver", async ({
     page,
   }) => {
