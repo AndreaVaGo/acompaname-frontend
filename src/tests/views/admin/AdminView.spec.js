@@ -100,6 +100,13 @@ const PAGOS = [
   },
 ]
 
+// El botón del filtro con ese nombre (Aceptada, Cobrado...)
+function botonFiltro(wrapper, nombre) {
+  return wrapper
+    .findAll('.admin-filtros__boton')
+    .find((boton) => boton.text() === nombre)
+}
+
 // Hace que el repositorio devuelva datos de prueba (los cambios sustituyen a los de por defecto)
 function prepararRepositorio(cambios) {
   const datos = {
@@ -330,24 +337,24 @@ describe('AdminView', () => {
     const wrapper = await montarVista()
     await irASeccion(wrapper, 'Solicitudes')
 
-    await wrapper.find('.admin-solicitudes__filtro--aceptada').trigger('click')
+    await botonFiltro(wrapper, 'Aceptada').trigger('click')
     await flushPromises()
 
     expect(AdminRepository.prototype.getSolicitudes).toHaveBeenLastCalledWith('ACEPTADA')
-    expect(wrapper.find('.admin-solicitudes__filtro--activo').text()).toBe('Aceptada')
+    expect(wrapper.find('.admin-filtros__boton--activo').text()).toBe('Aceptada')
   })
 
   test('el filtro de solicitudes se conserva al ir a otra sección y volver', async () => {
     prepararRepositorio()
     const wrapper = await montarVista()
     await irASeccion(wrapper, 'Solicitudes')
-    await wrapper.find('.admin-solicitudes__filtro--rechazada').trigger('click')
+    await botonFiltro(wrapper, 'Rechazada').trigger('click')
     await flushPromises()
 
     await irASeccion(wrapper, 'Usuarios')
     await irASeccion(wrapper, 'Solicitudes')
 
-    expect(wrapper.find('.admin-solicitudes__filtro--activo').text()).toBe('Rechazada')
+    expect(wrapper.find('.admin-filtros__boton--activo').text()).toBe('Rechazada')
   })
 
   test('al cambiar el filtro de pagos vuelve a pedir los pagos de ese estado', async () => {
@@ -355,11 +362,11 @@ describe('AdminView', () => {
     const wrapper = await montarVista()
     await irASeccion(wrapper, 'Pagos')
 
-    await wrapper.find('.admin-pagos-tabla__filtro--completado').trigger('click')
+    await botonFiltro(wrapper, 'Cobrado').trigger('click')
     await flushPromises()
 
     expect(AdminRepository.prototype.getPagos).toHaveBeenLastCalledWith('COMPLETADO')
-    expect(wrapper.find('.admin-pagos-tabla__filtro--activo').text()).toBe('Cobrado')
+    expect(wrapper.find('.admin-filtros__boton--activo').text()).toBe('Cobrado')
   })
 
   test('si falla al filtrar los pagos muestra el motivo y mantiene la tabla', async () => {
@@ -368,7 +375,7 @@ describe('AdminView', () => {
     await irASeccion(wrapper, 'Pagos')
     AdminRepository.prototype.getPagos.mockRejectedValue(errorDelServidor(500))
 
-    await wrapper.find('.admin-pagos-tabla__filtro--cancelado').trigger('click')
+    await botonFiltro(wrapper, 'Cancelado').trigger('click')
     await flushPromises()
 
     expect(wrapper.text()).toContain('No se pudieron cargar los pagos.')
@@ -387,7 +394,7 @@ describe('AdminView', () => {
 
     expect(AdminRepository.prototype.getSolicitudes).toHaveBeenLastCalledWith('PENDIENTE')
     expect(wrapper.find('.admin-menu__boton--activo').text()).toBe('Solicitudes')
-    expect(wrapper.find('.admin-solicitudes__filtro--activo').text()).toBe('Pendiente')
+    expect(wrapper.find('.admin-filtros__boton--activo').text()).toBe('Pendiente')
   })
 
   test('si falla al filtrar muestra el motivo y mantiene la tabla', async () => {
@@ -396,7 +403,7 @@ describe('AdminView', () => {
     await irASeccion(wrapper, 'Solicitudes')
     AdminRepository.prototype.getSolicitudes.mockRejectedValue(errorDelServidor(500))
 
-    await wrapper.find('.admin-solicitudes__filtro--rechazada').trigger('click')
+    await botonFiltro(wrapper, 'Rechazada').trigger('click')
     await flushPromises()
 
     expect(wrapper.text()).toContain('No se pudieron cargar las solicitudes.')
