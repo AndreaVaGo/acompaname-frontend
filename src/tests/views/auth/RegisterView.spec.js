@@ -62,7 +62,7 @@ describe('RegisterView', () => {
     const wrapper = await montarVista()
 
     await rellenarFormulario(wrapper)
-    await wrapper.findAll('button[type="button"]')[0].trigger('click')
+    await wrapper.findAll('.register__role')[0].trigger('click')
     await wrapper.find('form').trigger('submit')
     await esperar()
 
@@ -84,7 +84,7 @@ describe('RegisterView', () => {
     const wrapper = await montarVista()
 
     await rellenarFormulario(wrapper)
-    await wrapper.findAll('button[type="button"]')[1].trigger('click')
+    await wrapper.findAll('.register__role')[1].trigger('click')
     await wrapper.find('form').trigger('submit')
     await esperar()
 
@@ -173,7 +173,7 @@ describe('RegisterView', () => {
 
     expect(registrar.mock.calls[0][0].rolesIds).toEqual([5])
     expect(
-      wrapper.findAll('button[type="button"]')[1].classes()
+      wrapper.findAll('.register__role')[1].classes()
     ).toContain('register__role--active')
   })
 
