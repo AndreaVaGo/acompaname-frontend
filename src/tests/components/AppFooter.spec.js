@@ -10,6 +10,7 @@ function montarFooter() {
     routes: [
       { path: "/aviso-legal", component: { template: "<div />" } },
       { path: "/privacidad", component: { template: "<div />" } },
+      { path: "/terminos", component: { template: "<div />" } },
     ],
   });
 
@@ -47,6 +48,14 @@ describe("AppFooter", () => {
     const enlaces = wrapper.findAll(".footer__enlace");
     expect(enlaces[1].text()).toBe("Política de privacidad");
     expect(enlaces[1].attributes("href")).toBe("/privacidad");
+  });
+
+  test("tiene un enlace a los términos y condiciones", () => {
+    const wrapper = montarFooter();
+
+    const enlaces = wrapper.findAll(".footer__enlace");
+    expect(enlaces[2].text()).toBe("Términos y condiciones");
+    expect(enlaces[2].attributes("href")).toBe("/terminos");
   });
 
   test("tiene un enlace a mi perfil de GitHub con su icono", () => {
