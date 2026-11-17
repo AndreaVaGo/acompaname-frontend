@@ -31,6 +31,19 @@ describe("AvisoLegalView", () => {
     expect(wrapper.find("a[href^='mailto:']").exists()).toBe(true);
   });
 
+  test("describe el servicio para personas de cualquier edad con lenguaje inclusivo", () => {
+    const wrapper = montarVista();
+
+    expect(wrapper.text()).toContain("personas enfermas o dependientes, de cualquier edad");
+    expect(wrapper.text()).not.toContain("cuidadores de personas mayores");
+  });
+
+  test("no usa «cuidador» ni «cuidadores» sueltos", () => {
+    const wrapper = montarVista();
+
+    expect(wrapper.text()).not.toMatch(/\bcuidadores?\b/i);
+  });
+
   test("aclara que es un proyecto de demostración", () => {
     const wrapper = montarVista();
 
