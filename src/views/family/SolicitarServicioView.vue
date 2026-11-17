@@ -276,7 +276,7 @@ async function enviarSolicitud() {
           ></textarea>
         </template>
 
-        <p v-if="error" class="solicitar__error">{{ error }}</p>
+        <p role="alert" v-if="error" class="solicitar__error">{{ error }}</p>
 
         <button type="submit" class="btn btn--primary">Enviar solicitud</button>
       </form>
