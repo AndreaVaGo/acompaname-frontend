@@ -323,7 +323,7 @@ function estrellas(puntuacion) {
   border: none;
   padding: 0;
   font: inherit;
-  color: var(--color-accent);
+  color: var(--color-accent-dark);
   text-decoration: none;
   cursor: pointer;
 }
