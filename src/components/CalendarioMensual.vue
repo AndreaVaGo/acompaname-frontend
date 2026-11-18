@@ -7,7 +7,8 @@ import {
   hoyEnFormatoISO,
 } from "@/utils/calendario";
 
-// marcas: qué días tienen algo. Por ejemplo { "2026-12-15": { servicios: 1, bloques: 0 } }
+// marcas: qué días tienen algo. Por ejemplo { "2026-12-15": { servicios: 1, bloques: 0, minutos: 180 } }
+// (minutos = lo que dura lo apuntado ese día; si no viene, el día se considera con horas libres)
 // seleccionado: el día que está marcado ahora (2026-12-15), o "" si ninguno
 // mesInicial: cualquier fecha del mes que se enseña al principio (si no, el mes de hoy)
 const props = defineProps({
@@ -19,6 +20,9 @@ const props = defineProps({
 const emit = defineEmits(["seleccionar"]);
 
 const hoy = hoyEnFormatoISO();
+
+// A partir de 8 horas apuntadas en un día se considera un día completo
+const MINUTOS_DIA_COMPLETO = 480;
 
 // El mes que se está viendo (el mes va de 0 a 11)
 const partesIniciales = (props.mesInicial || hoy).split("-").map(Number);
@@ -56,7 +60,41 @@ function irAHoy() {
 
 // Lo que hay en un día (si no hay nada, ceros)
 function marcaDe(fecha) {
-  return props.marcas[fecha] || { servicios: 0, bloques: 0 };
+  return props.marcas[fecha] || { servicios: 0, bloques: 0, minutos: 0 };
+}
+
+// "libre" (nada apuntado), "parcial" (algo apuntado pero quedan horas libres) o "completo"
+function estadoDe(fecha) {
+  const marca = marcaDe(fecha);
+  if (marca.servicios === 0 && marca.bloques === 0) {
+    return "libre";
+  }
+  if ((marca.minutos || 0) >= MINUTOS_DIA_COMPLETO) {
+    return "completo";
+  }
+  return "parcial";
+}
+
+// "servicio", "bloque" o "mixto" (las dos cosas), para elegir el color de la casilla
+function tipoDe(fecha) {
+  const marca = marcaDe(fecha);
+  if (marca.servicios > 0 && marca.bloques > 0) {
+    return "mixto";
+  }
+  return marca.servicios > 0 ? "servicio" : "bloque";
+}
+
+// Las clases de color de una casilla (los días libres no llevan color)
+function clasesDeColor(fecha) {
+  const estado = estadoDe(fecha);
+  if (estado === "libre") {
+    return ["calendario-mensual__dia--libre"];
+  }
+  const clases = ["calendario-mensual__dia--" + tipoDe(fecha)];
+  if (estado === "completo") {
+    clases.push("calendario-mensual__dia--completo");
+  }
+  return clases;
 }
 
 // El texto que leen los lectores de pantalla en cada día
@@ -67,6 +105,11 @@ function descripcionDe(celda) {
   }
   if (marcaDe(celda.fecha).bloques > 0) {
     texto += ", con rato ocupado";
+  }
+  if (estadoDe(celda.fecha) === "completo") {
+    texto += ", día completo";
+  } else if (estadoDe(celda.fecha) === "parcial") {
+    texto += ", con horas libres";
   }
   return texto;
 }
@@ -107,16 +150,21 @@ function descripcionDe(celda) {
           v-else
           type="button"
           class="calendario-mensual__dia"
-          :class="{
-            'calendario-mensual__dia--hoy': celda.fecha === hoy,
-            'calendario-mensual__dia--seleccionado': celda.fecha === seleccionado,
-            'calendario-mensual__dia--pasado': celda.fecha < hoy,
-          }"
+          :class="[
+            clasesDeColor(celda.fecha),
+            {
+              'calendario-mensual__dia--hoy': celda.fecha === hoy,
+              'calendario-mensual__dia--seleccionado': celda.fecha === seleccionado,
+              'calendario-mensual__dia--pasado': celda.fecha < hoy,
+            },
+          ]"
           :aria-label="descripcionDe(celda)"
           :aria-pressed="celda.fecha === seleccionado"
           @click="emit('seleccionar', celda.fecha)"
         >
           <span class="calendario-mensual__numero">{{ celda.dia }}</span>
+          <span v-if="estadoDe(celda.fecha) === 'completo'" class="calendario-mensual__estado">Completo</span>
+          <span v-else-if="estadoDe(celda.fecha) === 'parcial'" class="calendario-mensual__estado">Parcial</span>
           <span class="calendario-mensual__puntos">
             <span
               v-if="marcaDe(celda.fecha).servicios > 0"
@@ -144,6 +192,9 @@ function descripcionDe(celda) {
       </div>
       <button type="button" class="calendario-mensual__hoy" @click="irAHoy">Hoy</button>
     </div>
+    <p class="calendario-mensual__ayuda">
+      Color suave: ese día todavía tienes horas libres. Color fuerte: día completo. Sin color: día libre.
+    </p>
   </div>
 </template>
 
@@ -213,8 +264,47 @@ function descripcionDe(celda) {
   cursor: pointer;
 }
 
-.calendario-mensual__dia:hover {
+.calendario-mensual__dia--libre:hover {
   background-color: var(--color-accent-bg);
+}
+
+/* Día con algo apuntado y horas libres: color suave */
+.calendario-mensual__dia--servicio {
+  background-color: var(--color-secondary-bg);
+  border-color: var(--color-secondary);
+}
+
+.calendario-mensual__dia--bloque {
+  background-color: var(--color-info-bg);
+  border-color: var(--color-info);
+}
+
+.calendario-mensual__dia--mixto {
+  background: linear-gradient(135deg, var(--color-secondary-bg) 50%, var(--color-info-bg) 50%);
+  border-color: var(--color-info);
+}
+
+/* Día completo: color fuerte y letra blanca */
+.calendario-mensual__dia--completo {
+  color: var(--color-white);
+  font-weight: bold;
+}
+
+.calendario-mensual__dia--servicio.calendario-mensual__dia--completo {
+  background: var(--color-secondary);
+}
+
+.calendario-mensual__dia--bloque.calendario-mensual__dia--completo {
+  background: var(--color-info);
+}
+
+.calendario-mensual__dia--mixto.calendario-mensual__dia--completo {
+  background: linear-gradient(135deg, var(--color-secondary) 50%, var(--color-info) 50%);
+}
+
+.calendario-mensual__estado {
+  font-size: 0.65rem;
+  line-height: 1;
 }
 
 .calendario-mensual__dia--pasado {
@@ -226,14 +316,14 @@ function descripcionDe(celda) {
   font-weight: bold;
 }
 
+/* El día abierto lleva un aro grueso, así no pierde el color que tenga */
 .calendario-mensual__dia--seleccionado {
-  background-color: var(--color-accent);
-  border-color: var(--color-accent);
-  color: var(--color-white);
+  box-shadow: 0 0 0 3px var(--color-accent);
+  font-weight: bold;
 }
 
-.calendario-mensual__dia--seleccionado:hover {
-  background-color: var(--color-accent);
+.calendario-mensual__dia--libre.calendario-mensual__dia--seleccionado {
+  background-color: var(--color-accent-bg);
 }
 
 .calendario-mensual__puntos {
@@ -247,6 +337,7 @@ function descripcionDe(celda) {
   width: 8px;
   height: 8px;
   border-radius: 50%;
+  box-shadow: 0 0 0 1px var(--color-white);
 }
 
 .calendario-mensual__punto--servicio {
@@ -254,7 +345,7 @@ function descripcionDe(celda) {
 }
 
 .calendario-mensual__punto--bloque {
-  background-color: #e8890c;
+  background-color: var(--color-info);
 }
 
 .calendario-mensual__pie {
@@ -278,6 +369,12 @@ function descripcionDe(celda) {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+}
+
+.calendario-mensual__ayuda {
+  margin: 12px 0 0;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
 }
 
 .calendario-mensual__hoy {

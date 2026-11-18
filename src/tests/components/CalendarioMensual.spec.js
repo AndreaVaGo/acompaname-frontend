@@ -119,7 +119,7 @@ describe("CalendarioMensual", () => {
     expect(dia(wrapper, 11).classes()).not.toContain("calendario-mensual__dia--pasado");
   });
 
-  test("pinta un punto verde si hay servicio y uno naranja si hay un rato ocupado", () => {
+  test("pinta un punto verde si hay servicio y uno azul si hay un rato ocupado", () => {
     const wrapper = montar({
       marcas: {
         "2026-12-15": { servicios: 1, bloques: 0 },
@@ -144,8 +144,8 @@ describe("CalendarioMensual", () => {
       },
     });
 
-    expect(dia(wrapper, 15).attributes("aria-label")).toBe("15 de Diciembre, con servicio aceptado");
-    expect(dia(wrapper, 16).attributes("aria-label")).toBe("16 de Diciembre, con rato ocupado");
+    expect(dia(wrapper, 15).attributes("aria-label")).toBe("15 de Diciembre, con servicio aceptado, con horas libres");
+    expect(dia(wrapper, 16).attributes("aria-label")).toBe("16 de Diciembre, con rato ocupado, con horas libres");
     expect(dia(wrapper, 17).attributes("aria-label")).toBe("17 de Diciembre");
   });
 
@@ -155,5 +155,59 @@ describe("CalendarioMensual", () => {
     const leyenda = wrapper.find(".calendario-mensual__leyenda").text();
     expect(leyenda).toContain("Servicio aceptado");
     expect(leyenda).toContain("Rato ocupado");
+  });
+});
+
+describe("CalendarioMensual: colores de los días", () => {
+  test("un día sin nada no lleva color ni texto de estado", () => {
+    const wrapper = montar();
+
+    expect(dia(wrapper, 15).classes()).toContain("calendario-mensual__dia--libre");
+    expect(dia(wrapper, 15).find(".calendario-mensual__estado").exists()).toBe(false);
+  });
+
+  test("un día con poco apuntado lleva color suave y dice Parcial", () => {
+    const wrapper = montar({
+      marcas: {
+        "2026-12-15": { servicios: 1, bloques: 0, minutos: 180 },
+        "2026-12-16": { servicios: 0, bloques: 1, minutos: 120 },
+        "2026-12-17": { servicios: 1, bloques: 1, minutos: 300 },
+      },
+    });
+
+    expect(dia(wrapper, 15).classes()).toContain("calendario-mensual__dia--servicio");
+    expect(dia(wrapper, 16).classes()).toContain("calendario-mensual__dia--bloque");
+    expect(dia(wrapper, 17).classes()).toContain("calendario-mensual__dia--mixto");
+    expect(dia(wrapper, 15).classes()).not.toContain("calendario-mensual__dia--completo");
+    expect(dia(wrapper, 15).find(".calendario-mensual__estado").text()).toBe("Parcial");
+    expect(dia(wrapper, 15).attributes("aria-label")).toContain("con horas libres");
+  });
+
+  test("un día con 8 horas o más apuntadas es un día completo", () => {
+    const wrapper = montar({
+      marcas: {
+        "2026-12-15": { servicios: 0, bloques: 1, minutos: 480 },
+        "2026-12-16": { servicios: 1, bloques: 0, minutos: 1440 },
+        "2026-12-17": { servicios: 0, bloques: 1, minutos: 479 },
+      },
+    });
+
+    expect(dia(wrapper, 15).classes()).toContain("calendario-mensual__dia--completo");
+    expect(dia(wrapper, 15).find(".calendario-mensual__estado").text()).toBe("Completo");
+    expect(dia(wrapper, 15).attributes("aria-label")).toContain("día completo");
+    expect(dia(wrapper, 16).classes()).toContain("calendario-mensual__dia--completo");
+    expect(dia(wrapper, 17).classes()).not.toContain("calendario-mensual__dia--completo");
+  });
+
+  test("si la marca no trae minutos, el día cuenta como parcial", () => {
+    const wrapper = montar({ marcas: { "2026-12-15": { servicios: 1, bloques: 0 } } });
+
+    expect(dia(wrapper, 15).find(".calendario-mensual__estado").text()).toBe("Parcial");
+  });
+
+  test("explica los colores debajo del calendario", () => {
+    const wrapper = montar();
+
+    expect(wrapper.find(".calendario-mensual__ayuda").text()).toContain("horas libres");
   });
 });
