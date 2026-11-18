@@ -759,14 +759,34 @@ onMounted(() => {
     padding: 24px 20px 28px;
   }
 
+  .calendario__detalle {
+    padding: 16px 14px 20px;
+  }
+
+  /* En el móvil no cabe el número grande: la fecha en letras ya dice el día.
+     Queda la fecha en el centro, entre las dos flechas, con las etiquetas debajo */
   .calendario__cabecera-dia {
     gap: 8px;
   }
 
   .calendario__numero-dia {
-    width: 48px;
-    height: 48px;
-    font-size: 1.4rem;
+    display: none;
+  }
+
+  .calendario__cabecera-texto {
+    text-align: center;
+  }
+
+  .calendario__titulo-lista {
+    font-size: 1.05rem;
+  }
+
+  .calendario__etiquetas {
+    justify-content: center;
+  }
+
+  .calendario__etiqueta {
+    font-size: 0.75rem;
   }
 
   .calendario__horas {
