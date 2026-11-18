@@ -2,7 +2,9 @@
 // Una solicitud nueva trae la lista "personas" (nombre y edad de cada una).
 // Una solicitud antigua solo trae nombrePaciente y edadPaciente: cuenta como una sola persona.
 
-// Devuelve siempre una lista de { nombre, edad }
+import { nombreGrupo } from "@/utils/catalogoGrupos";
+
+// Devuelve siempre una lista de { nombre, edad, grupoEdad }
 export function listaDePersonas(solicitud) {
   if (!solicitud) {
     return [];
@@ -61,4 +63,34 @@ export function detalleDePersonas(solicitud) {
 
 export function hayVariasPersonas(solicitud) {
   return listaDePersonas(solicitud).length > 1;
+}
+
+// Códigos de los grupos de edad distintos de la solicitud, sin repetir y en orden.
+// Una persona sin grupo (solicitud antigua) usa el grupo de la solicitud
+export function gruposDePersonas(solicitud) {
+  const grupos = [];
+  for (const persona of listaDePersonas(solicitud)) {
+    const codigo = persona.grupoEdad || (solicitud ? solicitud.grupoEdad : null);
+    if (codigo && !grupos.includes(codigo)) {
+      grupos.push(codigo);
+    }
+  }
+  // Una solicitud sin personas pero con grupo también lo enseña
+  if (grupos.length === 0 && solicitud && solicitud.grupoEdad) {
+    grupos.push(solicitud.grupoEdad);
+  }
+  return grupos;
+}
+
+// "Niñas y niños, Personas mayores" (o un texto vacío si no hay grupos)
+export function textoGrupos(solicitud) {
+  const nombres = [];
+  for (const codigo of gruposDePersonas(solicitud)) {
+    nombres.push(nombreGrupo(codigo));
+  }
+  return nombres.join(", ");
+}
+
+export function hayVariosGrupos(solicitud) {
+  return gruposDePersonas(solicitud).length > 1;
 }
