@@ -298,6 +298,17 @@ const avisoDireccion = computed(
         Dejar valoración
       </RouterLink>
     </div>
+
+    <!-- El chat está para la familia y para la persona cuidadora, salvo en las solicitudes rechazadas -->
+    <div class="solicitudes__chat-fila" v-if="solicitud.estado !== 'RECHAZADA'">
+      <RouterLink
+        :to="`/chat/${solicitud.id}`"
+        class="btn btn--secondary solicitudes__chat"
+        data-testid="enlace-chat"
+      >
+        💬 Chat
+      </RouterLink>
+    </div>
   </div>
 </template>
 
@@ -548,6 +559,19 @@ const avisoDireccion = computed(
   /* Cada botón pide al menos 100px; si no caben todos en una fila, el último baja */
   & .btn {
     flex: 1 1 100px;
+    padding: 12px;
+    text-align: center;
+    text-decoration: none;
+  }
+}
+
+/* Fila del chat: va aparte de los botones de acción para no mezclarse con ellos */
+.solicitudes__chat-fila {
+  display: flex;
+  margin-top: 12px;
+
+  & .btn {
+    flex: 1;
     padding: 12px;
     text-align: center;
     text-decoration: none;

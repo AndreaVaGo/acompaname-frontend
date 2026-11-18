@@ -44,6 +44,13 @@ function montarTarjetaCuidador(estado, valorada) {
   })
 }
 
+// El enlace del chat está en casi todas las tarjetas: aquí solo interesan los de pagar y valorar
+function enlacesSinChat(wrapper) {
+  return wrapper
+    .findAllComponents(RouterLinkStub)
+    .filter((enlace) => !String(enlace.props('to')).startsWith('/chat/'))
+}
+
 describe('SolicitudCard valoración', () => {
   test('una solicitud completada sin valorar muestra el botón Dejar valoración', () => {
     const wrapper = montarTarjetaFamilia('COMPLETADA', false)
@@ -63,13 +70,13 @@ describe('SolicitudCard valoración', () => {
 
     expect(wrapper.text()).toContain('Valoración enviada ✓')
     expect(wrapper.text()).not.toContain('Dejar valoración')
-    expect(wrapper.findComponent(RouterLinkStub).exists()).toBe(false)
+    expect(enlacesSinChat(wrapper).length).toBe(0)
   })
 
   test('una solicitud completada sin pagar ni valorar muestra los dos enlaces', () => {
     const wrapper = montarTarjetaFamilia('COMPLETADA', false, false)
 
-    const enlaces = wrapper.findAllComponents(RouterLinkStub)
+    const enlaces = enlacesSinChat(wrapper)
     expect(enlaces.length).toBe(2)
     expect(enlaces[0].props('to')).toBe('/pagar/1')
     expect(enlaces[1].props('to')).toBe('/valorar/1')
@@ -80,7 +87,7 @@ describe('SolicitudCard valoración', () => {
 
     expect(wrapper.text()).toContain('Pagado ✓')
     expect(wrapper.text()).toContain('Valoración enviada ✓')
-    expect(wrapper.findComponent(RouterLinkStub).exists()).toBe(false)
+    expect(enlacesSinChat(wrapper).length).toBe(0)
   })
 
   test('una solicitud pendiente no muestra nada de valoración', () => {

@@ -88,7 +88,9 @@ describe('SolicitudCard', () => {
 
     expect(wrapper.text()).not.toContain('Pagar')
     expect(wrapper.text()).not.toContain('Pagado')
-    expect(wrapper.findComponent(RouterLinkStub).exists()).toBe(false)
+    // Solo queda el enlace del chat, ninguno para pagar ni valorar
+    const enlaces = wrapper.findAllComponents(RouterLinkStub).map((enlace) => enlace.props('to'))
+    expect(enlaces).toEqual(['/chat/1'])
   })
 
   test('no muestra ni Pagar ni Pagado si la solicitud está pendiente', () => {
@@ -378,5 +380,31 @@ describe('SolicitudCard', () => {
     const wrapper = montarTarjeta('COMPLETADA', false)
 
     expect(wrapper.find('.solicitudes__estado--completada').exists()).toBe(true)
+  })
+
+  test('muestra el enlace al chat en solicitudes pendientes, aceptadas y completadas', () => {
+    const estados = ['PENDIENTE', 'ACEPTADA', 'COMPLETADA']
+
+    for (const estado of estados) {
+      const wrapper = montarTarjeta(estado, true)
+      const enlaces = wrapper.findAllComponents(RouterLinkStub).map((e) => e.props('to'))
+      expect(enlaces).toContain('/chat/1')
+      expect(wrapper.text()).toContain('Chat')
+    }
+  })
+
+  test('no muestra el enlace al chat si la solicitud está rechazada', () => {
+    const wrapper = montarTarjeta('RECHAZADA', false)
+
+    const enlaces = wrapper.findAllComponents(RouterLinkStub).map((e) => e.props('to'))
+    expect(enlaces).not.toContain('/chat/1')
+    expect(wrapper.text()).not.toContain('Chat')
+  })
+
+  test('el cuidador también ve el enlace al chat', () => {
+    const wrapper = montarTarjetaCuidador('ACEPTADA', vi.fn())
+
+    const enlaces = wrapper.findAllComponents(RouterLinkStub).map((e) => e.props('to'))
+    expect(enlaces).toContain('/chat/1')
   })
 })
