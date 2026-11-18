@@ -78,6 +78,18 @@ describe("HistorialView", () => {
     expect(wrapper.text()).not.toContain("2026-09-01");
   });
 
+  test("muestra las horas de inicio y de fin junto a la fecha", async () => {
+    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
+      { id: 1, cuidadorNombre: "Pepe", nombrePaciente: "Antonio", edadPaciente: 80, tipoCuidado: "domicilio", fechaCuidado: "2026-09-01", horaInicio: "09:00:00", horaFin: "12:00:00", notas: "", estado: "COMPLETADA" },
+    ]);
+    vi.spyOn(ValoracionRepository.prototype, "getAll").mockResolvedValue([]);
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.text()).toContain("Inicio: 01-09-2026 · 09:00");
+    expect(wrapper.text()).toContain("Fin: 01-09-2026 · 12:00");
+  });
+
   test("no muestra la línea de fin si la solicitud no tiene fecha de fin", async () => {
     vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
       { id: 1, cuidadorNombre: "Pepe", nombrePaciente: "Antonio", edadPaciente: 80, tipoCuidado: "domicilio", fechaCuidado: "2026-09-01", notas: "", estado: "COMPLETADA" },
