@@ -8,6 +8,9 @@ import {
   celdasDelMes,
   fechasEntre,
   minutosDeLaHora,
+  fechaEnLetras,
+  formatearDuracion,
+  MINUTOS_DIA_COMPLETO,
 } from "../../utils/calendario";
 
 afterEach(() => {
@@ -122,5 +125,37 @@ describe("minutosDeLaHora", () => {
   test("sin hora devuelve 0", () => {
     expect(minutosDeLaHora(null)).toBe(0);
     expect(minutosDeLaHora("")).toBe(0);
+  });
+});
+
+describe("fechaEnLetras", () => {
+  test("escribe el día de la semana, el día y el mes en letras", () => {
+    expect(fechaEnLetras("2026-12-15")).toBe("Martes 15 de diciembre de 2026");
+    expect(fechaEnLetras("2026-11-18")).toBe("Miércoles 18 de noviembre de 2026");
+  });
+
+  test("acierta con el domingo y con el lunes", () => {
+    expect(fechaEnLetras("2026-12-20")).toBe("Domingo 20 de diciembre de 2026");
+    expect(fechaEnLetras("2026-06-01")).toBe("Lunes 1 de junio de 2026");
+  });
+});
+
+describe("formatearDuracion", () => {
+  test("solo minutos si no llega a una hora", () => {
+    expect(formatearDuracion(45)).toBe("45 min");
+  });
+
+  test("solo horas si son exactas", () => {
+    expect(formatearDuracion(180)).toBe("3 h");
+  });
+
+  test("horas y minutos si hay de las dos", () => {
+    expect(formatearDuracion(210)).toBe("3 h 30 min");
+  });
+});
+
+describe("MINUTOS_DIA_COMPLETO", () => {
+  test("un día completo son 8 horas", () => {
+    expect(MINUTOS_DIA_COMPLETO).toBe(480);
   });
 });

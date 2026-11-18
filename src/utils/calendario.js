@@ -77,3 +77,30 @@ export function minutosDeLaHora(hora) {
   const partes = hora.split(":");
   return Number(partes[0]) * 60 + Number(partes[1]);
 }
+
+// A partir de 8 horas apuntadas en un día se considera un día completo
+export const MINUTOS_DIA_COMPLETO = 480;
+
+// Los días de la semana tal como los da getDay(): el 0 es domingo
+const NOMBRES_DIAS_LARGOS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+
+// "2026-12-15" -> "Martes 15 de diciembre de 2026"
+export function fechaEnLetras(fecha) {
+  const partes = fecha.split("-").map(Number);
+  const dia = new Date(partes[0], partes[1] - 1, partes[2]);
+  const nombreDelMes = NOMBRES_MESES[partes[1] - 1].toLowerCase();
+  return NOMBRES_DIAS_LARGOS[dia.getDay()] + " " + partes[2] + " de " + nombreDelMes + " de " + partes[0];
+}
+
+// 45 -> "45 min", 180 -> "3 h", 210 -> "3 h 30 min"
+export function formatearDuracion(minutos) {
+  const horas = Math.floor(minutos / 60);
+  const resto = minutos % 60;
+  if (horas === 0) {
+    return resto + " min";
+  }
+  if (resto === 0) {
+    return horas + " h";
+  }
+  return horas + " h " + resto + " min";
+}
