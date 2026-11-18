@@ -305,6 +305,36 @@ describe("SolicitudRepository", () => {
     );
   });
 
+  test("getCuidadoresOcupados envía las horas si se indican", async () => {
+    const fetchFalso = prepararFetch([4]);
+
+    await new SolicitudRepository().getCuidadoresOcupados(
+      "2026-11-01",
+      "",
+      "15:00",
+      "18:00"
+    );
+
+    expect(fetchFalso.mock.calls[0][0]).toBe(
+      `${API}/solicitudes/cuidadores-ocupados?inicio=2026-11-01&horaInicio=15:00&horaFin=18:00`
+    );
+  });
+
+  test("getCuidadoresOcupados envía solo la hora que se indique", async () => {
+    const fetchFalso = prepararFetch([]);
+
+    await new SolicitudRepository().getCuidadoresOcupados(
+      "2026-11-01",
+      "2026-11-02",
+      "22:00",
+      ""
+    );
+
+    expect(fetchFalso.mock.calls[0][0]).toBe(
+      `${API}/solicitudes/cuidadores-ocupados?inicio=2026-11-01&fin=2026-11-02&horaInicio=22:00`
+    );
+  });
+
   test("getAll pide todas las solicitudes", async () => {
     const fetchFalso = prepararFetch([]);
 
