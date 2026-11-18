@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from "vue";
-import { huecosLibres, minutosAHora } from "@/utils/calendario";
+import { huecosLibres, minutosAHora, formatearDuracion } from "@/utils/calendario";
 
 // tramos: lo que tiene ocupado el día, en minutos desde las 00:00.
 // Por ejemplo [{ inicio: 480, fin: 900, texto: "Rato ocupado · Turno" }] es de 08:00 a 15:00
@@ -22,7 +22,18 @@ const MINUTOS_PARA_ESCRIBIR_DENTRO = 240;
 
 const libres = computed(() => huecosLibres(props.tramos));
 
-// La frase que explica qué horas quedan libres
+// Si no hay huecos que enseñar (todo el día libre o ninguna hora libre), el mensaje que va en su lugar
+const mensajeLibres = computed(() => {
+  if (libres.value.length === 0) {
+    return "No te queda ninguna hora libre este día.";
+  }
+  if (props.tramos.length === 0) {
+    return "Libre todo el día.";
+  }
+  return "";
+});
+
+// La frase que explica qué horas quedan libres (la leen los lectores de pantalla)
 const textoLibres = computed(() => {
   if (libres.value.length === 0) {
     return "No te queda ninguna hora libre este día.";
@@ -105,7 +116,18 @@ function cabeTexto(tramo) {
       </span>
     </div>
 
-    <p class="linea-dia__libres">{{ textoLibres }}</p>
+    <div class="linea-dia__libres">
+      <p v-if="mensajeLibres" class="linea-dia__libres-mensaje">{{ mensajeLibres }}</p>
+      <template v-else>
+        <p class="linea-dia__libres-titulo">Horas libres</p>
+        <ul class="linea-dia__libres-lista">
+          <li v-for="(hueco, posicion) in libres" :key="posicion" class="linea-dia__hueco">
+            <span class="linea-dia__hueco-rango">{{ rangoDe(hueco) }}</span>
+            <span class="linea-dia__hueco-duracion">{{ formatearDuracion(hueco.fin - hueco.inicio) }}</span>
+          </li>
+        </ul>
+      </template>
+    </div>
 
     <div class="linea-dia__leyenda" aria-hidden="true">
       <span class="linea-dia__leyenda-item">
@@ -204,9 +226,51 @@ function cabeTexto(tramo) {
 }
 
 .linea-dia__libres {
-  margin: 10px 0 8px;
+  margin: 12px 0 10px;
+}
+
+.linea-dia__libres-mensaje {
+  margin: 0;
   font-weight: bold;
   color: var(--color-secondary);
+}
+
+.linea-dia__libres-titulo {
+  margin: 0 0 6px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+/* Cada hueco libre es una etiqueta verde: se ve de un vistazo y baja de línea si no cabe */
+.linea-dia__libres-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.linea-dia__hueco {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background-color: var(--color-secondary-bg);
+  border: 1px solid var(--color-secondary);
+  color: var(--color-secondary);
+  white-space: nowrap;
+}
+
+.linea-dia__hueco-rango {
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.linea-dia__hueco-duracion {
+  font-size: 0.75rem;
 }
 
 .linea-dia__leyenda {
@@ -243,8 +307,8 @@ function cabeTexto(tramo) {
     font-size: 0.7rem;
   }
 
-  .linea-dia__libres {
-    font-size: 0.9rem;
+  .linea-dia__hueco {
+    padding: 3px 10px;
   }
 }
 </style>

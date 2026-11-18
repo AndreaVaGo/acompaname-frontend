@@ -47,10 +47,25 @@ describe("LineaDelDia", () => {
     expect(tramos[1].find(".linea-dia__texto").exists()).toBe(false);
   });
 
-  test("dice qué horas quedan libres", () => {
+  test("enseña cada hueco libre en su propia etiqueta, con las horas y lo que dura", () => {
     const wrapper = montar([{ inicio: 480, fin: 900, texto: "Turno" }]);
 
-    expect(wrapper.find(".linea-dia__libres").text()).toBe("Horas libres: 00:00 – 08:00 · 15:00 – 24:00");
+    expect(wrapper.find(".linea-dia__libres-titulo").text()).toBe("Horas libres");
+    const rangos = wrapper.findAll(".linea-dia__hueco-rango").map((r) => r.text());
+    expect(rangos).toEqual(["00:00 – 08:00", "15:00 – 24:00"]);
+    const duraciones = wrapper.findAll(".linea-dia__hueco-duracion").map((d) => d.text());
+    expect(duraciones).toEqual(["8 h", "9 h"]);
+  });
+
+  test("con huecos no enseña el mensaje de día libre ni el de día completo", () => {
+    const wrapper = montar([{ inicio: 480, fin: 900, texto: "Turno" }]);
+
+    expect(wrapper.find(".linea-dia__libres-mensaje").exists()).toBe(false);
+  });
+
+  test("un día libre o completo no enseña etiquetas de huecos", () => {
+    expect(montar([]).findAll(".linea-dia__hueco").length).toBe(0);
+    expect(montar([{ inicio: 0, fin: 1440, texto: "Todo" }]).findAll(".linea-dia__hueco").length).toBe(0);
   });
 
   test("si el día está completo dice que no queda ninguna hora libre", () => {
