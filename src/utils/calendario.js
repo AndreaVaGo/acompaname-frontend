@@ -104,3 +104,30 @@ export function formatearDuracion(minutos) {
   }
   return horas + " h " + resto + " min";
 }
+
+// 480 -> "08:00", 1440 -> "24:00"
+export function minutosAHora(minutos) {
+  const horas = Math.floor(minutos / 60);
+  const resto = minutos % 60;
+  return String(horas).padStart(2, "0") + ":" + String(resto).padStart(2, "0");
+}
+
+// Recibe lo que está ocupado en un día ([{ inicio, fin }] en minutos) y devuelve
+// los huecos libres entre las 00:00 (0) y las 24:00 (1440), por orden y sin solaparse
+export function huecosLibres(ocupados) {
+  const ordenados = [...ocupados].sort((a, b) => a.inicio - b.inicio);
+  const huecos = [];
+  let desde = 0;
+  for (const tramo of ordenados) {
+    if (tramo.inicio > desde) {
+      huecos.push({ inicio: desde, fin: tramo.inicio });
+    }
+    if (tramo.fin > desde) {
+      desde = tramo.fin;
+    }
+  }
+  if (desde < 1440) {
+    huecos.push({ inicio: desde, fin: 1440 });
+  }
+  return huecos;
+}

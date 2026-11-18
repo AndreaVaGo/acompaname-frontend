@@ -11,6 +11,8 @@ import {
   fechaEnLetras,
   formatearDuracion,
   MINUTOS_DIA_COMPLETO,
+  minutosAHora,
+  huecosLibres,
 } from "../../utils/calendario";
 
 afterEach(() => {
@@ -157,5 +159,74 @@ describe("formatearDuracion", () => {
 describe("MINUTOS_DIA_COMPLETO", () => {
   test("un día completo son 8 horas", () => {
     expect(MINUTOS_DIA_COMPLETO).toBe(480);
+  });
+});
+
+describe("minutosAHora", () => {
+  test("pasa minutos a una hora con dos cifras", () => {
+    expect(minutosAHora(0)).toBe("00:00");
+    expect(minutosAHora(480)).toBe("08:00");
+    expect(minutosAHora(570)).toBe("09:30");
+    expect(minutosAHora(1440)).toBe("24:00");
+  });
+});
+
+describe("huecosLibres", () => {
+  test("sin nada ocupado, todo el día está libre", () => {
+    expect(huecosLibres([])).toEqual([{ inicio: 0, fin: 1440 }]);
+  });
+
+  test("un tramo en medio deja un hueco antes y otro después", () => {
+    expect(huecosLibres([{ inicio: 480, fin: 900 }])).toEqual([
+      { inicio: 0, fin: 480 },
+      { inicio: 900, fin: 1440 },
+    ]);
+  });
+
+  test("un tramo que empieza a las 00:00 no deja hueco antes", () => {
+    expect(huecosLibres([{ inicio: 0, fin: 480 }])).toEqual([{ inicio: 480, fin: 1440 }]);
+  });
+
+  test("un tramo que llega a las 24:00 no deja hueco después", () => {
+    expect(huecosLibres([{ inicio: 1200, fin: 1440 }])).toEqual([{ inicio: 0, fin: 1200 }]);
+  });
+
+  test("si el día está entero ocupado no hay huecos", () => {
+    expect(huecosLibres([{ inicio: 0, fin: 1440 }])).toEqual([]);
+  });
+
+  test("ordena los tramos y junta los que se solapan", () => {
+    const ocupados = [
+      { inicio: 840, fin: 1000 },
+      { inicio: 480, fin: 900 },
+    ];
+
+    expect(huecosLibres(ocupados)).toEqual([
+      { inicio: 0, fin: 480 },
+      { inicio: 1000, fin: 1440 },
+    ]);
+  });
+
+  test("dos tramos pegados no dejan hueco entre ellos", () => {
+    const ocupados = [
+      { inicio: 480, fin: 720 },
+      { inicio: 720, fin: 900 },
+    ];
+
+    expect(huecosLibres(ocupados)).toEqual([
+      { inicio: 0, fin: 480 },
+      { inicio: 900, fin: 1440 },
+    ]);
+  });
+
+  test("no cambia la lista que recibe", () => {
+    const ocupados = [
+      { inicio: 840, fin: 1000 },
+      { inicio: 480, fin: 900 },
+    ];
+
+    huecosLibres(ocupados);
+
+    expect(ocupados[0].inicio).toBe(840);
   });
 });
