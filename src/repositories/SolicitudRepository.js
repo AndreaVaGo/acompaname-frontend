@@ -24,12 +24,19 @@ export default class SolicitudRepository extends Repository {
     return await response.json();
   }
 
-  // Ids de los cuidadores con un servicio aceptado entre estas fechas.
+  // Ids de los cuidadores con un servicio aceptado entre estas fechas y horas.
   // Si no hay fecha de fin, solo se pregunta por el día de inicio.
-  async getCuidadoresOcupados(inicio, fin) {
+  // Las horas son opcionales: sin ellas se pregunta por el día completo.
+  async getCuidadoresOcupados(inicio, fin, horaInicio, horaFin) {
     let ruta = `/solicitudes/cuidadores-ocupados?inicio=${inicio}`;
     if (fin) {
       ruta = ruta + `&fin=${fin}`;
+    }
+    if (horaInicio) {
+      ruta = ruta + `&horaInicio=${horaInicio}`;
+    }
+    if (horaFin) {
+      ruta = ruta + `&horaFin=${horaFin}`;
     }
     return this.get(ruta);
   }
