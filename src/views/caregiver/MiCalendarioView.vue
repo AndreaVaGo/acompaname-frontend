@@ -6,7 +6,7 @@ import CalendarioMensual from "@/components/CalendarioMensual.vue";
 import { mensajeDeError } from "@/utils/mensajeDeError";
 import { formatearFecha } from "@/utils/formatearFecha";
 import { formatearHora, formatearMomento } from "@/utils/formatearHora";
-import { hoyEnFormatoISO, fechasEntre } from "@/utils/calendario";
+import { hoyEnFormatoISO, fechasEntre, minutosDeLaHora } from "@/utils/calendario";
 
 const bloqueRepository = new BloqueOcupadoRepository();
 const solicitudRepository = new SolicitudRepository();
@@ -35,25 +35,53 @@ const guardando = ref(false);
 const error = ref("");
 const aviso = ref("");
 
-// Lo que se pinta en el calendario: por cada día, cuántos servicios y cuántos bloques tiene.
+const MINUTOS_DEL_DIA = 1440;
+
+// Cuántos minutos ocupa un servicio en un día concreto.
+// Un servicio sin horas (antiguo) se cuenta como día entero.
+// En uno de varios días: el primer día va desde su hora de inicio hasta medianoche,
+// los del medio son enteros y el último va desde medianoche hasta su hora de fin
+function minutosDelServicioEnElDia(servicio, dia) {
+  if (!servicio.horaInicio || !servicio.horaFin) {
+    return MINUTOS_DEL_DIA;
+  }
+  const inicio = minutosDeLaHora(servicio.horaInicio);
+  const fin = minutosDeLaHora(servicio.horaFin);
+  const ultimoDia = servicio.fechaFin || servicio.fechaCuidado;
+  if (ultimoDia === servicio.fechaCuidado) {
+    return fin - inicio;
+  }
+  if (dia === servicio.fechaCuidado) {
+    return MINUTOS_DEL_DIA - inicio;
+  }
+  if (dia === ultimoDia) {
+    return fin;
+  }
+  return MINUTOS_DEL_DIA;
+}
+
+// Lo que se pinta en el calendario: por cada día, cuántos servicios y bloques tiene
+// y cuántos minutos suman (para saber si el día está completo o le quedan horas libres).
 // Un servicio de varios días marca todos los días que dura
 const marcas = computed(() => {
   const resultado = {};
 
-  function marcar(dia, tipo) {
+  function marcar(dia, tipo, minutos) {
     if (!resultado[dia]) {
-      resultado[dia] = { servicios: 0, bloques: 0 };
+      resultado[dia] = { servicios: 0, bloques: 0, minutos: 0 };
     }
     resultado[dia][tipo] = resultado[dia][tipo] + 1;
+    resultado[dia].minutos = resultado[dia].minutos + minutos;
   }
 
   for (const bloque of bloques.value) {
-    marcar(bloque.fecha, "bloques");
+    const minutos = minutosDeLaHora(bloque.horaFin) - minutosDeLaHora(bloque.horaInicio);
+    marcar(bloque.fecha, "bloques", minutos);
   }
   for (const servicio of servicios.value) {
     const ultimoDia = servicio.fechaFin || servicio.fechaCuidado;
     for (const dia of fechasEntre(servicio.fechaCuidado, ultimoDia)) {
-      marcar(dia, "servicios");
+      marcar(dia, "servicios", minutosDelServicioEnElDia(servicio, dia));
     }
   }
   return resultado;
@@ -419,7 +447,7 @@ onMounted(() => {
   gap: 16px;
   background-color: var(--color-white);
   border-radius: var(--radius-card);
-  border-left: 4px solid #e8890c;
+  border-left: 4px solid var(--color-info);
   box-shadow: var(--shadow-card);
   padding: 14px 18px;
 }

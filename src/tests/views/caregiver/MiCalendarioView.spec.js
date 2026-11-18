@@ -86,7 +86,7 @@ describe("MiCalendarioView: calendario", () => {
     expect(wrapper.findAll(".calendario__servicio").length).toBe(0);
   });
 
-  test("los días con un rato ocupado llevan punto naranja", async () => {
+  test("los días con un rato ocupado llevan punto azul", async () => {
     const wrapper = await montarVista([bloque(1, FUTURO, "Turno")]);
 
     expect(dia(wrapper, 15).find(".calendario-mensual__punto--bloque").exists()).toBe(true);
@@ -347,5 +347,59 @@ describe("MiCalendarioView: quitar bloques", () => {
 
     expect(wrapper.find(".calendario__error").text()).toContain("No se pudo quitar el bloque.");
     expect(wrapper.findAll(".calendario__bloque").length).toBe(1);
+  });
+});
+
+describe("MiCalendarioView: colores según las horas ocupadas", () => {
+  test("un bloque corto deja el día en parcial", async () => {
+    const wrapper = await montarVista([bloque(1, FUTURO, "Turno")]);
+
+    expect(dia(wrapper, 15).classes()).toContain("calendario-mensual__dia--bloque");
+    expect(dia(wrapper, 15).classes()).not.toContain("calendario-mensual__dia--completo");
+  });
+
+  test("un bloque de 8 horas o más deja el día completo", async () => {
+    const largo = { id: 1, fecha: FUTURO, horaInicio: "08:00:00", horaFin: "16:00:00", motivo: "Turno" };
+    const wrapper = await montarVista([largo]);
+
+    expect(dia(wrapper, 15).classes()).toContain("calendario-mensual__dia--completo");
+  });
+
+  test("dos bloques cortos del mismo día suman sus horas", async () => {
+    const manana = { id: 1, fecha: FUTURO, horaInicio: "08:00:00", horaFin: "12:00:00", motivo: "A" };
+    const tarde = { id: 2, fecha: FUTURO, horaInicio: "14:00:00", horaFin: "18:00:00", motivo: "B" };
+    const wrapper = await montarVista([manana, tarde]);
+
+    expect(dia(wrapper, 15).classes()).toContain("calendario-mensual__dia--completo");
+  });
+
+  test("un servicio de pocas horas deja el día en parcial", async () => {
+    const wrapper = await montarVista([], [solicitud(1, "ACEPTADA", FUTURO)]);
+
+    expect(dia(wrapper, 15).classes()).toContain("calendario-mensual__dia--servicio");
+    expect(dia(wrapper, 15).classes()).not.toContain("calendario-mensual__dia--completo");
+  });
+
+  test("un servicio sin horas (antiguo) cuenta como día completo", async () => {
+    const wrapper = await montarVista([], [solicitud(1, "ACEPTADA", FUTURO, { horaInicio: null, horaFin: null })]);
+
+    expect(dia(wrapper, 15).classes()).toContain("calendario-mensual__dia--completo");
+  });
+
+  test("en un servicio de varios días, los del medio salen completos y los extremos según sus horas", async () => {
+    const wrapper = await montarVista([], [
+      solicitud(1, "ACEPTADA", "2026-12-20", { fechaFin: "2026-12-22", horaInicio: "22:00:00", horaFin: "08:00:00" }),
+    ]);
+
+    // Primer día: de 22:00 a medianoche (2 h). Medio: 24 h. Último día: de medianoche a 08:00 (8 h)
+    expect(dia(wrapper, 20).classes()).not.toContain("calendario-mensual__dia--completo");
+    expect(dia(wrapper, 21).classes()).toContain("calendario-mensual__dia--completo");
+    expect(dia(wrapper, 22).classes()).toContain("calendario-mensual__dia--completo");
+  });
+
+  test("un día con servicio y bloque sale con el color mixto", async () => {
+    const wrapper = await montarVista([bloque(1, FUTURO, "Cita")], [solicitud(1, "ACEPTADA", FUTURO)]);
+
+    expect(dia(wrapper, 15).classes()).toContain("calendario-mensual__dia--mixto");
   });
 });
