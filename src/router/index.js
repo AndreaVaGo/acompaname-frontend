@@ -7,6 +7,7 @@ import RegisterView from "../views/auth/RegisterView.vue";
 import BuscarView from "../views/family/BuscarView.vue";
 import SolicitudesCuidadorView from "../views/caregiver/SolicitudesCuidadorView.vue";
 import EditarPerfilView from "../views/caregiver/EditarPerfilView.vue";
+import MiCalendarioView from "../views/caregiver/MiCalendarioView.vue";
 import HistorialView from "../views/common/HistorialView.vue";
 import PerfilCuidadorView from "../views/family/PerfilCuidadorView.vue";
 import SolicitarServicioView from "../views/family/SolicitarServicioView.vue";
@@ -42,6 +43,7 @@ const router = createRouter({
     { path: "/terminos", name: "terminos", component: TerminosView, meta: { titulo: "Términos y condiciones", descripcion: "Condiciones de uso de Acompáñame." } },
     { path: "/solicitudes-cuidador", name: "solicitudes-cuidador", component: SolicitudesCuidadorView, meta: { titulo: "Solicitudes recibidas", requiereLogin: true, rol: "CUIDADOR" } },
     { path: "/editar-perfil", name: "editar-perfil", component: EditarPerfilView, meta: { titulo: "Editar mi perfil", requiereLogin: true, rol: "CUIDADOR" } },
+    { path: "/mi-calendario", name: "mi-calendario", component: MiCalendarioView, meta: { titulo: "Mi calendario", requiereLogin: true, rol: "CUIDADOR" } },
     { path: "/historial", name: "historial", component: HistorialView, meta: { titulo: "Historial", requiereLogin: true } },
     { path: "/solicitar/:id", name: "solicitar", component: SolicitarServicioView, meta: { titulo: "Solicitar cuidado", requiereLogin: true, rol: "FAMILIA" } },
     { path: "/confirmacion", name: "confirmacion", component: ConfirmacionView, meta: { titulo: "Solicitud enviada", requiereLogin: true, rol: "FAMILIA" } },

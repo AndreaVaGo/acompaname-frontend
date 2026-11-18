@@ -200,4 +200,26 @@ describe('guard del router', () => {
 
     expect(router.currentRoute.value.name).toBe('landing')
   })
+
+  test('un visitante que entra en Mi calendario va al login', async () => {
+    await router.push('/mi-calendario')
+
+    expect(router.currentRoute.value.name).toBe('login')
+  })
+
+  test('un cuidador puede entrar en Mi calendario', async () => {
+    useAuthStore(pinia).login(2, 'pepe@test.com', '12345678', 'CUIDADOR')
+
+    await router.push('/mi-calendario')
+
+    expect(router.currentRoute.value.name).toBe('mi-calendario')
+  })
+
+  test('una familia no puede entrar en Mi calendario', async () => {
+    useAuthStore(pinia).login(1, 'ana@test.com', '12345678', 'FAMILIA')
+
+    await router.push('/mi-calendario')
+
+    expect(router.currentRoute.value.name).toBe('landing')
+  })
 })
