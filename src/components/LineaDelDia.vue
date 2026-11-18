@@ -237,4 +237,14 @@ function cabeTexto(tramo) {
 .linea-dia__muestra--ocupado {
   background-color: var(--color-info);
 }
+
+@media (max-width: 480px) {
+  .linea-dia__horas {
+    font-size: 0.7rem;
+  }
+
+  .linea-dia__libres {
+    font-size: 0.9rem;
+  }
+}
 </style>
