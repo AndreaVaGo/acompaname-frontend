@@ -569,8 +569,8 @@ const cuidadoresFiltrados = computed(() => {
   margin: 0 auto;
 }
 
-/* Fondo vivo: un degradado de verde, coral y amarillo suave que se desplaza despacio detrás de la página.
-   Va fijo en la pantalla, así se sigue viendo al hacer scroll */
+/* Fondo con el mismo degradado de la portada (coral arriba a la izquierda y verde a la derecha).
+   Va fijo en la pantalla y se desplaza muy despacio para dar vida a la página */
 .buscar::before {
   content: "";
   position: fixed;
@@ -578,27 +578,10 @@ const cuidadoresFiltrados = computed(() => {
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(circle at 15% 20%, rgba(150, 215, 175, 0.75), transparent 45%),
-    radial-gradient(circle at 85% 25%, rgba(250, 175, 150, 0.6), transparent 45%),
-    radial-gradient(circle at 50% 90%, rgba(253, 226, 160, 0.65), transparent 50%);
-  background-size: 160% 160%;
-  animation: buscar-degradado 18s ease-in-out infinite alternate;
-}
-
-/* Una mancha grande extra que cruza la pantalla para dar profundidad */
-.buscar::after {
-  content: "";
-  position: fixed;
-  top: 30%;
-  left: -10%;
-  z-index: -1;
-  pointer-events: none;
-  width: 520px;
-  height: 520px;
-  border-radius: 50%;
-  filter: blur(60px);
-  background: radial-gradient(circle, rgba(120, 200, 160, 0.55), transparent 70%);
-  animation: buscar-mancha 24s ease-in-out infinite alternate;
+    radial-gradient(circle at 12% 18%, rgba(242, 137, 107, 0.28), transparent 45%),
+    radial-gradient(circle at 88% 62%, rgba(46, 125, 91, 0.24), transparent 50%);
+  background-size: 130% 130%;
+  animation: buscar-degradado 20s ease-in-out infinite alternate;
 }
 
 @keyframes buscar-degradado {
@@ -607,13 +590,6 @@ const cuidadoresFiltrados = computed(() => {
   }
   to {
     background-position: 100% 100%;
-  }
-}
-
-@keyframes buscar-mancha {
-  to {
-    translate: 120vw -20vh;
-    scale: 1.3;
   }
 }
 
@@ -914,8 +890,7 @@ const cuidadoresFiltrados = computed(() => {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .buscar::before,
-  .buscar::after {
+  .buscar::before {
     animation: none;
   }
 

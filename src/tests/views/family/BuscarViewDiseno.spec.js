@@ -36,10 +36,11 @@ describe("BuscarView · diseño de tarjetas", () => {
     expect(archivo).toContain('class="buscar__card-centro"');
   });
 
-  test("el fondo es un degradado que se desplaza despacio y una mancha que cruza la pantalla", () => {
+  test("el fondo usa el degradado de la portada y se desplaza despacio", () => {
     expect(archivo).toContain(".buscar::before");
+    expect(archivo).toContain("radial-gradient(circle at 12% 18%, rgba(242, 137, 107");
+    expect(archivo).toContain("radial-gradient(circle at 88% 62%, rgba(46, 125, 91");
     expect(archivo).toContain("animation: buscar-degradado");
-    expect(archivo).toContain("animation: buscar-mancha");
     expect(archivo).toContain("pointer-events: none");
   });
 
