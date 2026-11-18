@@ -131,3 +131,10 @@ export function huecosLibres(ocupados) {
   }
   return huecos;
 }
+
+// Suma (o resta, con un número negativo) días a una fecha: ("2026-12-31", 1) -> "2027-01-01"
+export function sumarDias(fecha, dias) {
+  const partes = fecha.split("-").map(Number);
+  const resultado = new Date(partes[0], partes[1] - 1, partes[2] + dias);
+  return fechaISO(resultado.getFullYear(), resultado.getMonth(), resultado.getDate());
+}

@@ -13,6 +13,7 @@ import {
   MINUTOS_DIA_COMPLETO,
   minutosAHora,
   huecosLibres,
+  sumarDias,
 } from "../../utils/calendario";
 
 afterEach(() => {
@@ -228,5 +229,27 @@ describe("huecosLibres", () => {
     huecosLibres(ocupados);
 
     expect(ocupados[0].inicio).toBe(840);
+  });
+});
+
+describe("sumarDias", () => {
+  test("suma y resta días dentro del mes", () => {
+    expect(sumarDias("2026-12-10", 1)).toBe("2026-12-11");
+    expect(sumarDias("2026-12-10", -1)).toBe("2026-12-09");
+  });
+
+  test("cruza el cambio de mes y de año", () => {
+    expect(sumarDias("2026-12-31", 1)).toBe("2027-01-01");
+    expect(sumarDias("2026-12-01", -1)).toBe("2026-11-30");
+  });
+
+  test("sabe cuántos días tiene febrero, también en año bisiesto", () => {
+    expect(sumarDias("2027-02-28", 1)).toBe("2027-03-01");
+    expect(sumarDias("2028-02-28", 1)).toBe("2028-02-29");
+    expect(sumarDias("2026-03-01", -1)).toBe("2026-02-28");
+  });
+
+  test("no se equivoca con el cambio de hora de marzo", () => {
+    expect(sumarDias("2026-03-28", 2)).toBe("2026-03-30");
   });
 });
