@@ -74,7 +74,7 @@ describe("MiCalendarioView: calendario", () => {
   test("al empezar tiene abierto el día de hoy", async () => {
     const wrapper = await montarVista();
 
-    expect(wrapper.find(".calendario__titulo-lista").text()).toBe("10-12-2026");
+    expect(wrapper.find(".calendario__titulo-lista").text()).toBe("Jueves 10 de diciembre de 2026");
     expect(dia(wrapper, 10).classes()).toContain("calendario-mensual__dia--seleccionado");
   });
 
@@ -124,7 +124,7 @@ describe("MiCalendarioView: calendario", () => {
 
     await dia(wrapper, 15).trigger("click");
 
-    expect(wrapper.find(".calendario__titulo-lista").text()).toBe("15-12-2026");
+    expect(wrapper.find(".calendario__titulo-lista").text()).toBe("Martes 15 de diciembre de 2026");
     const tarjeta = wrapper.find(".calendario__bloque");
     expect(tarjeta.find(".calendario__bloque-horas").text()).toBe("08:00 - 15:00");
     expect(tarjeta.find(".calendario__bloque-motivo").text()).toBe("Turno en el hospital");
@@ -289,7 +289,7 @@ describe("MiCalendarioView: formulario", () => {
     expect(wrapper.find("#bloque-fecha").element.value).toBe("");
     expect(wrapper.find("#bloque-motivo").element.value).toBe("");
     expect(cargar).toHaveBeenCalled();
-    expect(wrapper.find(".calendario__titulo-lista").text()).toBe("20-12-2026");
+    expect(wrapper.find(".calendario__titulo-lista").text()).toBe("Domingo 20 de diciembre de 2026");
     expect(wrapper.findAll(".calendario__bloque").length).toBe(1);
     expect(dia(wrapper, 20).find(".calendario-mensual__punto--bloque").exists()).toBe(true);
   });
@@ -401,5 +401,77 @@ describe("MiCalendarioView: colores según las horas ocupadas", () => {
     const wrapper = await montarVista([bloque(1, FUTURO, "Cita")], [solicitud(1, "ACEPTADA", FUTURO)]);
 
     expect(dia(wrapper, 15).classes()).toContain("calendario-mensual__dia--mixto");
+  });
+});
+
+describe("MiCalendarioView: panel del día", () => {
+  test("enseña el día en grande, el día de la semana en letras y la etiqueta Hoy", async () => {
+    const wrapper = await montarVista();
+
+    expect(wrapper.find(".calendario__numero-dia").text()).toBe("10");
+    expect(wrapper.find(".calendario__titulo-lista").text()).toBe("Jueves 10 de diciembre de 2026");
+    expect(wrapper.find(".calendario__etiqueta--hoy").exists()).toBe(true);
+  });
+
+  test("otro día que no es hoy no lleva la etiqueta Hoy", async () => {
+    const wrapper = await montarVista();
+
+    await dia(wrapper, 15).trigger("click");
+
+    expect(wrapper.find(".calendario__numero-dia").text()).toBe("15");
+    expect(wrapper.find(".calendario__etiqueta--hoy").exists()).toBe(false);
+  });
+
+  test("un día sin nada dice Día libre y enseña el mensaje amable", async () => {
+    const wrapper = await montarVista();
+
+    expect(wrapper.find(".calendario__etiqueta--libre").text()).toBe("Día libre");
+    expect(wrapper.find(".calendario__vacio-caja").text()).toContain("No tienes nada apuntado este día");
+  });
+
+  test("un día con pocas horas dice cuánto está ocupado y que quedan horas libres", async () => {
+    const wrapper = await montarVista([bloque(1, FUTURO, "Turno")]);
+
+    await dia(wrapper, 15).trigger("click");
+
+    // El bloque de prueba va de 08:00 a 15:00 = 7 horas
+    expect(wrapper.find(".calendario__etiqueta--parcial").text()).toBe("Ocupado 7 h · te quedan horas libres");
+    expect(wrapper.find(".calendario__vacio-caja").exists()).toBe(false);
+  });
+
+  test("un día con 8 horas o más dice Día completo", async () => {
+    const largo = { id: 1, fecha: FUTURO, horaInicio: "08:00:00", horaFin: "16:00:00", motivo: "Turno" };
+    const wrapper = await montarVista([largo]);
+
+    await dia(wrapper, 15).trigger("click");
+
+    expect(wrapper.find(".calendario__etiqueta--completo").text()).toBe("Día completo · 8 h ocupadas");
+  });
+
+  test("mientras carga no enseña el estado del día", () => {
+    vi.spyOn(BloqueOcupadoRepository.prototype, "getMios").mockReturnValue(new Promise(() => {}));
+    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockReturnValue(new Promise(() => {}));
+    const wrapper = mount(MiCalendarioView);
+
+    expect(wrapper.find(".calendario__etiqueta--libre").exists()).toBe(false);
+    expect(wrapper.find(".calendario__vacio-caja").exists()).toBe(false);
+  });
+
+  test("el botón Añadir un rato ocupado este día deja ese día en el formulario", async () => {
+    const wrapper = await montarVista();
+    await dia(wrapper, 20).trigger("click");
+    await wrapper.find("#bloque-fecha").setValue("");
+
+    await wrapper.find(".calendario__apuntar").trigger("click");
+
+    expect(wrapper.find("#bloque-fecha").element.value).toBe(FUTURO_2);
+  });
+
+  test("en un día pasado no sale el botón de añadir", async () => {
+    const wrapper = await montarVista();
+
+    await dia(wrapper, 5).trigger("click");
+
+    expect(wrapper.find(".calendario__apuntar").exists()).toBe(false);
   });
 });

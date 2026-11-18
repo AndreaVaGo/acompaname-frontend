@@ -1,12 +1,19 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, nextTick } from "vue";
 import BloqueOcupadoRepository from "@/repositories/BloqueOcupadoRepository";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
 import CalendarioMensual from "@/components/CalendarioMensual.vue";
 import { mensajeDeError } from "@/utils/mensajeDeError";
 import { formatearFecha } from "@/utils/formatearFecha";
 import { formatearHora, formatearMomento } from "@/utils/formatearHora";
-import { hoyEnFormatoISO, fechasEntre, minutosDeLaHora } from "@/utils/calendario";
+import {
+  hoyEnFormatoISO,
+  fechasEntre,
+  minutosDeLaHora,
+  fechaEnLetras,
+  formatearDuracion,
+  MINUTOS_DIA_COMPLETO,
+} from "@/utils/calendario";
 
 const bloqueRepository = new BloqueOcupadoRepository();
 const solicitudRepository = new SolicitudRepository();
@@ -112,6 +119,36 @@ const diaVacio = computed(
   () => bloquesDelDia.value.length === 0 && serviciosDelDia.value.length === 0,
 );
 
+// El número grande del panel (el día del mes)
+const numeroDelDia = computed(() => Number(diaSeleccionado.value.split("-")[2]));
+
+// Cuántos minutos tiene ocupados el día abierto
+const minutosDelDia = computed(() => {
+  const marca = marcas.value[diaSeleccionado.value];
+  return marca ? marca.minutos : 0;
+});
+
+// "libre", "parcial" (quedan horas libres) o "completo"
+const estadoDelDia = computed(() => {
+  if (diaVacio.value) {
+    return "libre";
+  }
+  if (minutosDelDia.value >= MINUTOS_DIA_COMPLETO) {
+    return "completo";
+  }
+  return "parcial";
+});
+
+const textoDelEstado = computed(() => {
+  if (estadoDelDia.value === "libre") {
+    return "Día libre";
+  }
+  if (estadoDelDia.value === "completo") {
+    return "Día completo · " + formatearDuracion(minutosDelDia.value) + " ocupadas";
+  }
+  return "Ocupado " + formatearDuracion(minutosDelDia.value) + " · te quedan horas libres";
+});
+
 async function cargarBloques() {
   errorCarga.value = "";
   try {
@@ -173,6 +210,19 @@ function seleccionarDia(dia) {
   diaSeleccionado.value = dia;
   if (dia >= hoy) {
     fecha.value = dia;
+  }
+}
+
+// Deja el día abierto puesto en el formulario y lleva el cursor a la hora de inicio
+async function irAlFormulario() {
+  fecha.value = diaSeleccionado.value;
+  await nextTick();
+  const campo = document.getElementById("bloque-hora-inicio");
+  if (campo) {
+    if (campo.scrollIntoView) {
+      campo.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+    campo.focus();
   }
 }
 
@@ -264,14 +314,30 @@ onMounted(() => {
       </div>
 
       <section class="calendario__detalle" aria-live="polite">
-        <h2 class="calendario__titulo-lista">{{ formatearFecha(diaSeleccionado) }}</h2>
+        <header class="calendario__cabecera-dia">
+          <span class="calendario__numero-dia" aria-hidden="true">{{ numeroDelDia }}</span>
+          <div>
+            <h2 class="calendario__titulo-lista">{{ fechaEnLetras(diaSeleccionado) }}</h2>
+            <div class="calendario__etiquetas">
+              <span v-if="diaSeleccionado === hoy" class="calendario__etiqueta calendario__etiqueta--hoy">Hoy</span>
+              <span
+                v-if="!cargando && !errorCarga"
+                class="calendario__etiqueta"
+                :class="'calendario__etiqueta--' + estadoDelDia"
+              >
+                {{ textoDelEstado }}
+              </span>
+            </div>
+          </div>
+        </header>
 
         <p v-if="cargando" class="calendario__vacio">Cargando tu calendario...</p>
         <p v-if="errorCarga" class="calendario__error" role="alert">{{ errorCarga }}</p>
         <p v-if="errorServicios" class="calendario__aviso-servicios" role="alert">{{ errorServicios }}</p>
-        <p v-if="!cargando && !errorCarga && diaVacio" class="calendario__vacio">
-          No tienes nada apuntado este día.
-        </p>
+        <div v-if="!cargando && !errorCarga && diaVacio" class="calendario__vacio-caja">
+          <span class="calendario__vacio-icono" aria-hidden="true">🌿</span>
+          <p class="calendario__vacio">No tienes nada apuntado este día.</p>
+        </div>
 
         <ul class="calendario__lista">
           <li v-for="servicio in serviciosDelDia" :key="'s' + servicio.id" class="calendario__servicio">
@@ -298,6 +364,15 @@ onMounted(() => {
             </button>
           </li>
         </ul>
+
+        <button
+          v-if="diaSeleccionado >= hoy"
+          type="button"
+          class="btn btn--primary calendario__apuntar"
+          @click="irAlFormulario"
+        >
+          Añadir un rato ocupado este día
+        </button>
       </section>
 
       <div class="calendario__box calendario__box--formulario">
@@ -422,9 +497,97 @@ onMounted(() => {
   margin: 16px 0;
 }
 
+/* Panel del día abierto: una tarjeta con el día en grande, su estado y lo que hay apuntado */
+.calendario__detalle {
+  margin-top: 20px;
+  padding: 20px 24px 24px;
+  background-color: var(--color-white);
+  border-radius: var(--radius-card);
+  border-top: 4px solid var(--color-accent);
+  box-shadow: var(--shadow-card);
+}
+
+.calendario__cabecera-dia {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.calendario__numero-dia {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: var(--radius-input);
+  background-color: var(--color-accent);
+  color: var(--color-white);
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
 .calendario__titulo-lista {
-  font-size: 1.25rem;
-  margin: 28px 0 12px;
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+.calendario__etiquetas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.calendario__etiqueta {
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.calendario__etiqueta--hoy {
+  background-color: var(--color-accent-bg);
+  color: var(--color-accent-dark);
+}
+
+.calendario__etiqueta--libre {
+  background-color: var(--color-secondary-bg);
+  color: var(--color-secondary);
+}
+
+.calendario__etiqueta--parcial {
+  background-color: var(--color-info-bg);
+  color: var(--color-info);
+}
+
+.calendario__etiqueta--completo {
+  background-color: var(--color-info);
+  color: var(--color-white);
+}
+
+.calendario__vacio-caja {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 16px 0;
+  text-align: center;
+}
+
+.calendario__vacio-icono {
+  font-size: 2rem;
+}
+
+.calendario__vacio-caja .calendario__vacio {
+  margin: 0;
+}
+
+.calendario__apuntar {
+  width: 100%;
+  margin-top: 16px;
+  padding: 12px;
 }
 
 .calendario__vacio {
