@@ -570,11 +570,24 @@ const avisoDireccion = computed(
   display: flex;
   margin-top: 12px;
 
+  /* Verde suave de la paleta para que el chat se note más que un botón gris */
   & .btn {
     flex: 1;
     padding: 12px;
     text-align: center;
     text-decoration: none;
+    background-color: var(--color-secondary-bg);
+    border: 1px solid var(--color-secondary);
+    color: var(--color-secondary);
+    font-weight: bold;
+    transition:
+      background-color var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out);
+  }
+
+  & .btn:hover {
+    background-color: var(--color-secondary);
+    color: var(--color-white);
   }
 }
 

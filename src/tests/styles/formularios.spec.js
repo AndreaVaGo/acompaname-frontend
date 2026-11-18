@@ -36,3 +36,11 @@ describe("SolicitudCard · diseño", () => {
     expect(bloque).toContain("animation: none");
   });
 });
+
+describe("SolicitudCard · botón del chat", () => {
+  test("el botón del chat usa el verde de la paleta y cambia al pasar el ratón", () => {
+    expect(tarjeta).toContain(".solicitudes__chat-fila");
+    expect(tarjeta).toContain("background-color: var(--color-secondary-bg)");
+    expect(tarjeta).toContain("& .btn:hover");
+  });
+});
