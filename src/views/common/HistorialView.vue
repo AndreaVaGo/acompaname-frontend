@@ -5,7 +5,7 @@ import SolicitudRepository from "@/repositories/SolicitudRepository";
 import ValoracionRepository from "@/repositories/ValoracionRepository";
 import { nombreCuidado } from "@/utils/catalogoCuidados";
 import { nombreGrupo } from "@/utils/catalogoGrupos";
-import { formatearFecha } from "@/utils/formatearFecha";
+import { formatearMomento } from "@/utils/formatearHora";
 import { mensajeDeError } from "@/utils/mensajeDeError";
 
 const solicitudRepository = new SolicitudRepository();
@@ -30,6 +30,8 @@ onMounted(async () => {
         tipoCuidado: s.tipoCuidado,
         fechaInicio: s.fechaCuidado,
         fechaFin: s.fechaFin,
+        horaInicio: s.horaInicio,
+        horaFin: s.horaFin,
         necesidades: s.necesidades || [],
         notas: s.notas,
         direccion: s.direccion,
@@ -95,10 +97,12 @@ function textoEstado(estado) {
             {{ nombreGrupo(item.grupoEdad) }}
           </li>
           <li>
-            📅 <strong>Inicio:</strong> {{ formatearFecha(item.fechaInicio) }}
+            📅 <strong>Inicio:</strong>
+            {{ formatearMomento(item.fechaInicio, item.horaInicio) }}
           </li>
-          <li v-if="item.fechaFin">
-            📅 <strong>Fin:</strong> {{ formatearFecha(item.fechaFin) }}
+          <li v-if="item.fechaFin || item.horaFin">
+            📅 <strong>Fin:</strong>
+            {{ formatearMomento(item.fechaFin || item.fechaInicio, item.horaFin) }}
           </li>
           <li v-if="item.direccion && item.estado === 'completada'">
             📍
