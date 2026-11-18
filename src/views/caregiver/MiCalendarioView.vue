@@ -6,6 +6,7 @@ import CalendarioMensual from "@/components/CalendarioMensual.vue";
 import LineaDelDia from "@/components/LineaDelDia.vue";
 import { mensajeDeError } from "@/utils/mensajeDeError";
 import { formatearFecha } from "@/utils/formatearFecha";
+import { nombresDePersonas } from "@/utils/personasSolicitud";
 import { formatearHora, formatearMomento } from "@/utils/formatearHora";
 import {
   hoyEnFormatoISO,
@@ -135,7 +136,7 @@ const tramosDelDia = computed(() => {
     tramos.push({
       inicio: tramo.inicio,
       fin: tramo.fin,
-      texto: "Servicio aceptado · Cuidado de " + servicio.nombrePaciente,
+      texto: "Servicio aceptado · Cuidado de " + nombresDePersonas(servicio),
     });
   }
   for (const bloque of bloquesDelDia.value) {
@@ -398,7 +399,7 @@ onMounted(() => {
             <span class="calendario__tipo">Servicio aceptado</span>
             <span class="calendario__bloque-fecha">{{ cuandoEs(servicio) }}</span>
             <span class="calendario__bloque-motivo">
-              Cuidado de {{ servicio.nombrePaciente }} · Familia {{ servicio.familiaNombre }}
+              Cuidado de {{ nombresDePersonas(servicio) }} · Familia {{ servicio.familiaNombre }}
             </span>
           </li>
           <li v-for="bloque in bloquesDelDia" :key="'b' + bloque.id" class="calendario__bloque">
