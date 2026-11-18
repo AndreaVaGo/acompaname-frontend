@@ -3,19 +3,35 @@ import { ref, onMounted } from "vue";
 import SolicitudCard from "../../components/SolicitudCard.vue";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
 import PagoRepository from "@/repositories/PagoRepository";
+import MensajeRepository from "@/repositories/MensajeRepository";
 import ValoracionRepository from "@/repositories/ValoracionRepository";
 import { mensajeDeError } from "@/utils/mensajeDeError";
 
 const solicitudRepository = new SolicitudRepository();
 const pagoRepository = new PagoRepository();
 const valoracionRepository = new ValoracionRepository();
+const mensajeRepository = new MensajeRepository();
 const solicitudes = ref([]);
 const idsPagados = ref([]);
 const idsValoradas = ref([]);
+// Mensajes sin leer por solicitud: { idSolicitud: cantidad }
+const sinLeerPorSolicitud = ref({});
 const cargando = ref(true);
 const error = ref("");
 
+// Se pide aparte y sin esperar: si falla o tarda, la lista se ve igual y solo no sale el contador
+async function cargarMensajesSinLeer() {
+  try {
+    const respuesta = await mensajeRepository.getNoLeidos();
+    sinLeerPorSolicitud.value = respuesta.porSolicitud || {};
+  } catch (err) {
+    sinLeerPorSolicitud.value = {};
+  }
+}
+
 onMounted(async () => {
+  cargarMensajesSinLeer();
+
   try {
     solicitudes.value = await solicitudRepository.getMisSolicitudes();
   } catch (err) {
@@ -66,6 +82,7 @@ onMounted(async () => {
         :mostrarAcciones="false"
         :pagado="idsPagados.includes(solicitud.id)"
         :valorada="idsValoradas.includes(solicitud.id)"
+        :mensajesSinLeer="sinLeerPorSolicitud[solicitud.id]"
       />
     </div>
   </div>

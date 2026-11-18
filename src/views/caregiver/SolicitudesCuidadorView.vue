@@ -2,14 +2,30 @@
 import { ref, onMounted } from "vue";
 import SolicitudCard from "../../components/SolicitudCard.vue";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
+import MensajeRepository from "@/repositories/MensajeRepository";
 import { mensajeDeError } from "@/utils/mensajeDeError";
 
 const solicitudRepository = new SolicitudRepository();
+const mensajeRepository = new MensajeRepository();
 const solicitudes = ref([]);
 const cargando = ref(true);
+// Mensajes sin leer por solicitud: { idSolicitud: cantidad }
+const sinLeerPorSolicitud = ref({});
 const error = ref("");
 
+// Se pide aparte y sin esperar: si falla o tarda, la lista se ve igual y solo no sale el contador
+async function cargarMensajesSinLeer() {
+  try {
+    const respuesta = await mensajeRepository.getNoLeidos();
+    sinLeerPorSolicitud.value = respuesta.porSolicitud || {};
+  } catch (err) {
+    sinLeerPorSolicitud.value = {};
+  }
+}
+
 onMounted(async () => {
+  cargarMensajesSinLeer();
+
   try {
     solicitudes.value = await solicitudRepository.getMisSolicitudes();
   } catch (err) {
@@ -75,6 +91,7 @@ async function completar(id) {
         :aceptar="aceptar"
         :rechazar="rechazar"
         :completar="completar"
+        :mensajesSinLeer="sinLeerPorSolicitud[solicitud.id]"
       />
     </div>
   </div>
