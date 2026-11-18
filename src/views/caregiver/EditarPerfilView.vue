@@ -23,6 +23,8 @@ const titulaciones = ref([]);
 const otrasTitulaciones = ref("");
 const anosExperiencia = ref(0);
 const tarifaHora = ref(0);
+// Recargo por persona extra en porcentaje. Vacío = se usa el de por defecto de la aplicación
+const recargoPersonaExtra = ref("");
 const bio = ref("");
 const foto = ref("");
 const tieneVehiculo = ref(false);
@@ -45,6 +47,7 @@ onMounted(async () => {
     otrasTitulaciones.value = perfil.value.otrasTitulaciones || "";
     anosExperiencia.value = perfil.value.anosExperiencia;
     tarifaHora.value = perfil.value.tarifaHora;
+    recargoPersonaExtra.value = perfil.value.recargoPersonaExtra ?? "";
     bio.value = perfil.value.bio;
     foto.value = perfil.value.foto || "";
     tieneVehiculo.value = perfil.value.tieneVehiculo;
@@ -93,6 +96,14 @@ async function guardar() {
     error.value = "La tarifa por hora debe ser mayor que 0.";
     return;
   }
+  // El recargo es opcional, pero si se pone tiene que ser un número entero entre 0 y 100
+  if (recargoPersonaExtra.value !== "" && recargoPersonaExtra.value !== null) {
+    const recargo = Number(recargoPersonaExtra.value);
+    if (!Number.isInteger(recargo) || recargo < 0 || recargo > 100) {
+      error.value = "El recargo por persona extra debe ser un número entero entre 0 y 100.";
+      return;
+    }
+  }
   error.value = "";
 
   try {
@@ -100,6 +111,11 @@ async function guardar() {
       especialidad: especialidad.value.trim(),
       anosExperiencia: Number(anosExperiencia.value),
       tarifaHora: Number(tarifaHora.value),
+      // Vacío = null: el back vuelve a usar el recargo de por defecto
+      recargoPersonaExtra:
+        recargoPersonaExtra.value === "" || recargoPersonaExtra.value === null
+          ? null
+          : Number(recargoPersonaExtra.value),
       bio: bio.value.trim(),
       tieneVehiculo: tieneVehiculo.value,
       disponibleAhora: disponibleAhora.value,
@@ -313,6 +329,21 @@ async function guardar() {
                 />
               </div>
             </div>
+
+            <label for="recargo">Recargo por persona extra (%)</label>
+            <input
+              type="number"
+              id="recargo"
+              v-model="recargoPersonaExtra"
+              min="0"
+              max="100"
+              step="1"
+              placeholder="25 (por defecto)"
+            />
+            <p class="editar__ayuda">
+              Si cuidas a varias personas a la vez, cada persona extra suma este porcentaje de tu
+              tarifa. Déjalo vacío para usar el 25 % por defecto.
+            </p>
 
             <label for="bio">Sobre ti</label>
             <textarea

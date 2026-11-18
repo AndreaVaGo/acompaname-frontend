@@ -164,6 +164,7 @@ describe("EditarPerfilView", () => {
       especialidad: "Geriatría",
       anosExperiencia: 4,
       tarifaHora: 20,
+      recargoPersonaExtra: null,
       bio: "Cuido personas mayores desde hace años",
       tieneVehiculo: true,
       disponibleAhora: true,
@@ -665,5 +666,47 @@ describe("EditarPerfilView", () => {
       3,
       expect.objectContaining({ sexo: "HOMBRE" })
     );
+  });
+
+  test("carga el recargo propio y lo deja vacío si no tiene", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue({
+      ...perfil,
+      recargoPersonaExtra: 40,
+    });
+    const wrapper = await montarVista();
+    expect(wrapper.find("#recargo").element.value).toBe("40");
+
+    vi.restoreAllMocks();
+    vi.spyOn(window, "scrollTo").mockImplementation(() => {});
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue(perfil);
+    const otraVista = await montarVista();
+    expect(otraVista.find("#recargo").element.value).toBe("");
+  });
+
+  test("guarda el recargo propio como número", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue(perfil);
+    const updateSpy = vi
+      .spyOn(CuidadorRepository.prototype, "update")
+      .mockResolvedValue({});
+
+    const wrapper = await montarVista();
+    await wrapper.find("#recargo").setValue("30");
+    await enviar(wrapper);
+
+    expect(updateSpy.mock.calls[0][1].recargoPersonaExtra).toBe(30);
+  });
+
+  test("un recargo fuera de 0 a 100 no se envía y avisa", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getMiPerfil").mockResolvedValue(perfil);
+    const updateSpy = vi
+      .spyOn(CuidadorRepository.prototype, "update")
+      .mockResolvedValue({});
+
+    const wrapper = await montarVista();
+    await wrapper.find("#recargo").setValue("150");
+    await enviar(wrapper);
+
+    expect(updateSpy).not.toHaveBeenCalled();
+    expect(wrapper.text()).toContain("entre 0 y 100");
   });
 });
