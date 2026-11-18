@@ -72,4 +72,35 @@ describe("LineaDelDia", () => {
     expect(leyenda).toContain("Libre");
     expect(leyenda).toContain("Ocupado");
   });
+
+  test("pinta una rayita por cada hora, de las 0 a las 24", () => {
+    const wrapper = montar([]);
+
+    expect(wrapper.findAll(".linea-dia__rayita").length).toBe(25);
+  });
+
+  test("las rayitas de las 0, 6, 12, 18 y 24 son grandes y las de las 3, 9, 15 y 21 medianas", () => {
+    const wrapper = montar([]);
+
+    expect(wrapper.findAll(".linea-dia__rayita--grande").length).toBe(5);
+    expect(wrapper.findAll(".linea-dia__rayita--mediana").length).toBe(4);
+  });
+
+  test("cada rayita está en su sitio según la hora", () => {
+    const wrapper = montar([]);
+
+    const rayitas = wrapper.findAll(".linea-dia__rayita");
+    expect(rayitas[0].attributes("style")).toContain("left: 0%");
+    expect(rayitas[12].attributes("style")).toContain("left: 50%");
+    expect(rayitas[24].attributes("style")).toContain("left: 100%");
+  });
+
+  test("los números van bajo sus rayitas y el primero y el último quedan dentro de la línea", () => {
+    const wrapper = montar([]);
+
+    const numeros = wrapper.findAll(".linea-dia__horas span");
+    expect(numeros[0].classes()).toContain("linea-dia__hora--inicio");
+    expect(numeros[2].attributes("style")).toContain("left: 50%");
+    expect(numeros[4].classes()).toContain("linea-dia__hora--fin");
+  });
 });

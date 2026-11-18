@@ -11,6 +11,12 @@ const props = defineProps({
 const MINUTOS_DEL_DIA = 1440;
 // Los números que salen debajo de la línea
 const HORAS_MARCADAS = [0, 6, 12, 18, 24];
+
+// Una rayita por cada hora, de las 0 a las 24 (son 25 rayitas)
+const RAYITAS = [];
+for (let hora = 0; hora <= 24; hora++) {
+  RAYITAS.push(hora);
+}
 // Si el tramo dura 4 horas o más, la hora se escribe dentro (si no, no cabe)
 const MINUTOS_PARA_ESCRIBIR_DENTRO = 240;
 
@@ -39,6 +45,22 @@ function estiloDe(tramo) {
   };
 }
 
+// Dónde va una rayita o un número: las 0 h a la izquierda del todo y las 24 h a la derecha
+function posicionDe(hora) {
+  return { left: (hora / 24) * 100 + "%" };
+}
+
+// Las rayitas de las 0, 6, 12, 18 y 24 son grandes, las de las 3, 9, 15 y 21 medianas y el resto pequeñas
+function claseDeRayita(hora) {
+  if (hora % 6 === 0) {
+    return "linea-dia__rayita--grande";
+  }
+  if (hora % 3 === 0) {
+    return "linea-dia__rayita--mediana";
+  }
+  return "";
+}
+
 function rangoDe(tramo) {
   return minutosAHora(tramo.inicio) + " – " + minutosAHora(tramo.fin);
 }
@@ -62,8 +84,25 @@ function cabeTexto(tramo) {
       </span>
     </div>
 
+    <div class="linea-dia__rayitas" aria-hidden="true">
+      <span
+        v-for="hora in RAYITAS"
+        :key="hora"
+        class="linea-dia__rayita"
+        :class="claseDeRayita(hora)"
+        :style="posicionDe(hora)"
+      ></span>
+    </div>
+
     <div class="linea-dia__horas" aria-hidden="true">
-      <span v-for="hora in HORAS_MARCADAS" :key="hora">{{ hora }} h</span>
+      <span
+        v-for="hora in HORAS_MARCADAS"
+        :key="hora"
+        :class="{ 'linea-dia__hora--inicio': hora === 0, 'linea-dia__hora--fin': hora === 24 }"
+        :style="posicionDe(hora)"
+      >
+        {{ hora }} h
+      </span>
     </div>
 
     <p class="linea-dia__libres">{{ textoLibres }}</p>
@@ -116,12 +155,52 @@ function cabeTexto(tramo) {
   white-space: nowrap;
 }
 
+/* La regla: una rayita por cada hora, pegada a la línea */
+.linea-dia__rayitas {
+  position: relative;
+  height: 12px;
+}
+
+.linea-dia__rayita {
+  position: absolute;
+  top: 0;
+  width: 1px;
+  height: 5px;
+  background-color: var(--color-text-muted);
+  transform: translateX(-50%);
+}
+
+.linea-dia__rayita--mediana {
+  height: 8px;
+}
+
+.linea-dia__rayita--grande {
+  height: 12px;
+  width: 2px;
+  background-color: var(--color-text);
+}
+
+/* Los números van centrados bajo su rayita; el primero y el último se quedan dentro de la línea */
 .linea-dia__horas {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 4px;
-  font-size: 0.75rem;
+  position: relative;
+  height: 18px;
+  font-size: 0.8rem;
   color: var(--color-text-muted);
+}
+
+.linea-dia__horas span {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.linea-dia__horas .linea-dia__hora--inicio {
+  transform: none;
+}
+
+.linea-dia__horas .linea-dia__hora--fin {
+  transform: translateX(-100%);
 }
 
 .linea-dia__libres {
