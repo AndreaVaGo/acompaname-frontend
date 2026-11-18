@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue";
 import { RouterLink, useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "../stores/auth";
 import CuidadorRepository from "@/repositories/CuidadorRepository";
@@ -17,6 +17,22 @@ const solicitudRepository = new SolicitudRepository();
 const pagoRepository = new PagoRepository();
 
 const menuAbierto = ref(false);
+
+// La barra se queda fija arriba. Cuando se ha bajado un poco la página, se le pone una sombra
+const conSombra = ref(false);
+
+function actualizarSombra() {
+  conSombra.value = window.scrollY > 8;
+}
+
+onMounted(() => {
+  actualizarSombra();
+  window.addEventListener("scroll", actualizarSombra, { passive: true });
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("scroll", actualizarSombra);
+});
 const nombre = ref("");
 const avisos = ref(0);
 
@@ -154,6 +170,7 @@ function irAMiPerfil() {
 </script>
 
 <template>
+  <header class="navbar-barra" :class="{ 'navbar-barra--sombra': conSombra }">
   <nav class="navbar">
     <RouterLink to="/" class="navbar__logo">
       <span class="navbar__logo-icon">
@@ -317,9 +334,29 @@ function irAMiPerfil() {
       <RouterLink to="/registro" class="navbar__cta">Registrarme</RouterLink>
     </div>
   </nav>
+  </header>
 </template>
 
 <style scoped>
+/* La barra ocupa todo el ancho, se queda fija arriba y deja ver un poco el contenido que pasa por detrás */
+.navbar-barra {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background-color: color-mix(in srgb, var(--color-bg) 85%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid transparent;
+  transition:
+    box-shadow var(--dur-med) var(--ease-out),
+    border-color var(--dur-med) var(--ease-out);
+}
+
+/* Al bajar la página aparece una línea y una sombra suave que separan la barra del contenido */
+.navbar-barra--sombra {
+  border-bottom-color: var(--color-border);
+  box-shadow: 0 4px 16px rgba(26, 46, 42, 0.08);
+}
+
 .navbar {
   position: relative;
   display: flex;
@@ -350,6 +387,12 @@ function irAMiPerfil() {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  transition: transform var(--dur-med) var(--ease-out);
+}
+
+/* Al pasar el ratón por el logo, el icono se inclina un poco */
+.navbar__logo:hover .navbar__logo-icon {
+  transform: rotate(-10deg) scale(1.1);
 }
 
 .navbar__links {
@@ -365,6 +408,9 @@ function irAMiPerfil() {
   font-weight: 600;
   padding: 8px 16px;
   border-radius: var(--radius-pill);
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
 }
 
 .navbar__link:hover {
@@ -387,6 +433,15 @@ function irAMiPerfil() {
   color: var(--color-white);
   font-size: 0.8rem;
   text-align: center;
+  /* Cuando aparece un aviso nuevo, sale con un pequeño salto */
+  animation: aviso-aparece var(--dur-med) var(--ease-out) both;
+}
+
+@keyframes aviso-aparece {
+  from {
+    opacity: 0;
+    scale: 0.5;
+  }
 }
 
 .navbar__cta {
@@ -422,6 +477,9 @@ function irAMiPerfil() {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
 }
 
 .navbar__nombre {
@@ -471,8 +529,19 @@ function irAMiPerfil() {
   background-color: var(--color-white);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-card-hover);
   padding: 8px;
+  /* El menú se despliega desde la esquina del avatar */
+  transform-origin: top right;
+  animation: menu-aparece var(--dur-fast) var(--ease-out) both;
+}
+
+@keyframes menu-aparece {
+  from {
+    opacity: 0;
+    translate: 0 -6px;
+    scale: 0.97;
+  }
 }
 
 .navbar__menu-header {
@@ -504,6 +573,9 @@ function irAMiPerfil() {
   font-size: 1rem;
   color: var(--color-text);
   cursor: pointer;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
 }
 
 /* Al pasar el ratón (o al llegar con el teclado) la opción se pone en naranja suave */
@@ -516,6 +588,18 @@ function irAMiPerfil() {
   .navbar__menu-item:hover {
     background-color: var(--color-accent-bg);
     color: var(--color-accent-dark);
+  }
+}
+
+/* Quien prefiere menos movimiento no ve el salto del aviso, el menú desplegándose ni el logo inclinándose */
+@media (prefers-reduced-motion: reduce) {
+  .navbar__aviso,
+  .navbar__menu {
+    animation: none;
+  }
+
+  .navbar__logo:hover .navbar__logo-icon {
+    transform: none;
   }
 }
 
