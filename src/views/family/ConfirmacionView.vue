@@ -2,7 +2,7 @@
 import { ref, onMounted } from "vue";
 import { useRoute, RouterLink } from "vue-router";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
-import { formatearFecha } from "@/utils/formatearFecha";
+import { formatearMomento } from "@/utils/formatearHora";
 import { mensajeDeError } from "@/utils/mensajeDeError";
 import { nombreGrupo } from "@/utils/catalogoGrupos";
 
@@ -46,11 +46,21 @@ onMounted(async () => {
         </div>
         <div class="confirmacion__fila">
           <span>Fecha de inicio</span>
-          <strong>{{ formatearFecha(solicitud.fechaCuidado) }}</strong>
+          <strong>{{
+            formatearMomento(solicitud.fechaCuidado, solicitud.horaInicio)
+          }}</strong>
         </div>
-        <div v-if="solicitud.fechaFin" class="confirmacion__fila">
+        <div
+          v-if="solicitud.fechaFin || solicitud.horaFin"
+          class="confirmacion__fila"
+        >
           <span>Fecha de fin</span>
-          <strong>{{ formatearFecha(solicitud.fechaFin) }}</strong>
+          <strong>{{
+            formatearMomento(
+              solicitud.fechaFin || solicitud.fechaCuidado,
+              solicitud.horaFin,
+            )
+          }}</strong>
         </div>
         <div v-if="solicitud.grupoEdad" class="confirmacion__fila">
           <span>Grupo de edad</span>
