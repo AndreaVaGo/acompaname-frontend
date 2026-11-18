@@ -47,6 +47,11 @@ async function montarVista(bloques = [], solicitudes = []) {
   return wrapper;
 }
 
+// Las horas libres que enseña el panel, una por etiqueta
+function huecosLibres(wrapper) {
+  return wrapper.findAll(".linea-dia__hueco-rango").map((r) => r.text());
+}
+
 // El día N de diciembre de 2026 en el calendario
 function dia(wrapper, numero) {
   return wrapper.findAll(".calendario-mensual__dia")[numero - 1];
@@ -504,7 +509,7 @@ describe("MiCalendarioView: línea de horas del día", () => {
     // El bloque de prueba va de 08:00 a 15:00
     expect(wrapper.findAll(".linea-dia__tramo").length).toBe(1);
     expect(wrapper.find(".linea-dia__tramo").attributes("title")).toBe("08:00 – 15:00 · Rato ocupado · Turno");
-    expect(wrapper.find(".linea-dia__libres").text()).toBe("Horas libres: 00:00 – 08:00 · 15:00 – 24:00");
+    expect(huecosLibres(wrapper)).toEqual(["00:00 – 08:00", "15:00 – 24:00"]);
   });
 
   test("un servicio de un día sale en la línea con sus horas", async () => {
@@ -523,13 +528,13 @@ describe("MiCalendarioView: línea de horas del día", () => {
     ]);
 
     await dia(wrapper, 20).trigger("click");
-    expect(wrapper.find(".linea-dia__libres").text()).toBe("Horas libres: 00:00 – 22:00");
+    expect(huecosLibres(wrapper)).toEqual(["00:00 – 22:00"]);
 
     await dia(wrapper, 21).trigger("click");
     expect(wrapper.find(".linea-dia__libres").text()).toBe("No te queda ninguna hora libre este día.");
 
     await dia(wrapper, 22).trigger("click");
-    expect(wrapper.find(".linea-dia__libres").text()).toBe("Horas libres: 08:00 – 24:00");
+    expect(huecosLibres(wrapper)).toEqual(["08:00 – 24:00"]);
   });
 
   test("un servicio y un bloque en el mismo día salen los dos en la línea", async () => {
