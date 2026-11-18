@@ -3,6 +3,12 @@ import { computed, ref } from "vue";
 import { RouterLink } from "vue-router";
 import { nombreCuidado } from "@/utils/catalogoCuidados";
 import { nombreGrupo } from "@/utils/catalogoGrupos";
+import {
+  listaDePersonas,
+  nombresDePersonas,
+  resumenDePersonas,
+  hayVariasPersonas,
+} from "@/utils/personasSolicitud";
 import { formatearMomento } from "@/utils/formatearHora";
 
 const props = defineProps([
@@ -70,7 +76,11 @@ const avisoDireccion = computed(
       </span>
     </div>
 
-    <p class="solicitudes__paciente">{{ solicitud.nombrePaciente }}</p>
+    <p class="solicitudes__paciente">{{ nombresDePersonas(solicitud) }}</p>
+    <p v-if="hayVariasPersonas(solicitud)" class="solicitudes__personas">
+      👥 {{ listaDePersonas(solicitud).length }} personas:
+      {{ resumenDePersonas(solicitud) }}
+    </p>
 
     <ul class="solicitudes__detalles">
       <li class="solicitudes__tipo">🏠 {{ solicitud.tipoCuidado }}</li>
@@ -115,7 +125,7 @@ const avisoDireccion = computed(
         <div class="solicitudes__modal-top" v-if="mostrarAcciones">
           <div>
             <h3>{{ nombreMostrado }}</h3>
-            <p class="solicitudes__paciente">{{ solicitud.nombrePaciente }}</p>
+            <p class="solicitudes__paciente">{{ nombresDePersonas(solicitud) }}</p>
           </div>
           <button
             class="solicitudes__cerrar"
@@ -305,6 +315,14 @@ const avisoDireccion = computed(
   color: var(--color-text);
   font-weight: bold;
   margin-bottom: 14px;
+}
+
+/* Cuántas personas se cuidan y su edad, cuando son varias */
+.solicitudes__personas {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  margin: -8px 0 14px;
+  overflow-wrap: anywhere;
 }
 
 /* Los datos van dentro de un recuadro; su color depende del estado */
