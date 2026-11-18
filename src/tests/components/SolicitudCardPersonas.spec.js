@@ -125,4 +125,56 @@ describe('SolicitudCard: varias personas', () => {
     expect(wrapper.find('.solicitudes__modal').exists()).toBe(false)
     expect(wrapper.find('.solicitudes__lista-personas').exists()).toBe(false)
   })
+
+  const mixta = [
+    { nombre: 'Zoe', edad: 5, grupoEdad: 'NINOS' },
+    { nombre: 'Abuelo', edad: 80, grupoEdad: 'MAYORES' },
+  ]
+
+  test('con grupos distintos la tarjeta dice Grupos de edad y los nombra todos', () => {
+    const wrapper = montarTarjeta(crearSolicitud({ grupoEdad: 'NINOS', personas: mixta }), false)
+
+    expect(wrapper.text()).toContain('Grupos de edad:')
+    expect(wrapper.text()).toContain('Niñas y niños, Personas mayores')
+  })
+
+  test('con un solo grupo la tarjeta dice Grupo de edad en singular', () => {
+    const wrapper = montarTarjeta(
+      crearSolicitud({
+        grupoEdad: 'NINOS',
+        personas: [{ nombre: 'Zoe', edad: 5, grupoEdad: 'NINOS' }],
+      }),
+      false,
+    )
+
+    expect(wrapper.text()).toContain('Grupo de edad:')
+    expect(wrapper.text()).not.toContain('Grupos de edad:')
+  })
+
+  test('la ventana de detalles enseña el grupo de cada persona si hay varios grupos', async () => {
+    const wrapper = montarTarjeta(crearSolicitud({ grupoEdad: 'NINOS', personas: mixta }), true)
+
+    await wrapper.find('.solicitudes__ver').trigger('click')
+
+    const items = wrapper.find('.solicitudes__modal').findAll('.solicitudes__lista-personas li')
+    expect(items[0].text()).toContain('Niñas y niños')
+    expect(items[1].text()).toContain('Personas mayores')
+  })
+
+  test('la ventana de detalles no repite el grupo en cada persona si todos son iguales', async () => {
+    const wrapper = montarTarjeta(
+      crearSolicitud({
+        grupoEdad: 'NINOS',
+        personas: [
+          { nombre: 'Zoe', edad: 5, grupoEdad: 'NINOS' },
+          { nombre: 'Ada', edad: 9, grupoEdad: 'NINOS' },
+        ],
+      }),
+      true,
+    )
+
+    await wrapper.find('.solicitudes__ver').trigger('click')
+
+    expect(wrapper.find('.solicitudes__grupo-persona').exists()).toBe(false)
+  })
 })

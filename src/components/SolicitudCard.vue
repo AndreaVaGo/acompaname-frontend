@@ -8,6 +8,8 @@ import {
   nombresDePersonas,
   resumenDePersonas,
   hayVariasPersonas,
+  textoGrupos,
+  hayVariosGrupos,
 } from "@/utils/personasSolicitud";
 import { formatearMomento } from "@/utils/formatearHora";
 
@@ -84,9 +86,12 @@ const avisoDireccion = computed(
 
     <ul class="solicitudes__detalles">
       <li class="solicitudes__tipo">🏠 {{ solicitud.tipoCuidado }}</li>
-      <li v-if="solicitud.grupoEdad" class="solicitudes__grupo">
-        👥 <strong>Grupo de edad:</strong>
-        {{ nombreGrupo(solicitud.grupoEdad) }}
+      <li v-if="textoGrupos(solicitud)" class="solicitudes__grupo">
+        👥
+        <strong>{{
+          hayVariosGrupos(solicitud) ? "Grupos de edad:" : "Grupo de edad:"
+        }}</strong>
+        {{ textoGrupos(solicitud) }}
       </li>
       <li>
         📅 <strong>Inicio:</strong>
@@ -150,15 +155,24 @@ const avisoDireccion = computed(
               <span v-if="persona.edad !== undefined && persona.edad !== null">
                 · {{ persona.edad }} años
               </span>
+              <span
+                v-if="hayVariosGrupos(solicitud) && persona.grupoEdad"
+                class="solicitudes__grupo-persona"
+              >
+                · {{ nombreGrupo(persona.grupoEdad) }}
+              </span>
             </li>
           </ul>
 
           <p class="solicitudes__bloque-titulo">📅 Cuándo y qué tipo</p>
           <ul class="solicitudes__detalles solicitudes__detalles--modal">
             <li>🏠 {{ solicitud.tipoCuidado }}</li>
-            <li v-if="solicitud.grupoEdad">
-              👥 <strong>Grupo de edad:</strong>
-              {{ nombreGrupo(solicitud.grupoEdad) }}
+            <li v-if="textoGrupos(solicitud)">
+              👥
+              <strong>{{
+                hayVariosGrupos(solicitud) ? "Grupos de edad:" : "Grupo de edad:"
+              }}</strong>
+              {{ textoGrupos(solicitud) }}
             </li>
             <li>
               📅 <strong>Inicio:</strong>
