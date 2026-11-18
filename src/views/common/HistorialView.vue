@@ -184,7 +184,16 @@ function textoEstado(estado) {
   border-left: 6px solid var(--color-border);
   padding: 24px 24px 24px 22px;
   box-shadow: var(--shadow-card);
-  transition: transform 0.15s;
+  animation: historial-entra var(--dur-med) var(--ease-out) backwards;
+  transition:
+    transform var(--dur-med) var(--ease-out),
+    box-shadow var(--dur-med) var(--ease-out);
+}
+
+@keyframes historial-entra {
+  from {
+    opacity: 0;
+  }
 }
 
 /* El color del borde lateral cambia según el estado de la solicitud */
@@ -199,6 +208,14 @@ function textoEstado(estado) {
 @media (hover: hover) {
   .historial__card:hover {
     transform: translateY(-3px);
+    box-shadow: var(--shadow-card-hover);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .historial__card {
+    animation: none;
+    transition: none;
   }
 }
 
