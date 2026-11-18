@@ -5,6 +5,7 @@ import {
   NOMBRES_DIAS,
   celdasDelMes,
   hoyEnFormatoISO,
+  MINUTOS_DIA_COMPLETO,
 } from "@/utils/calendario";
 
 // marcas: qué días tienen algo. Por ejemplo { "2026-12-15": { servicios: 1, bloques: 0, minutos: 180 } }
@@ -20,9 +21,6 @@ const props = defineProps({
 const emit = defineEmits(["seleccionar"]);
 
 const hoy = hoyEnFormatoISO();
-
-// A partir de 8 horas apuntadas en un día se considera un día completo
-const MINUTOS_DIA_COMPLETO = 480;
 
 // El mes que se está viendo (el mes va de 0 a 11)
 const partesIniciales = (props.mesInicial || hoy).split("-").map(Number);
