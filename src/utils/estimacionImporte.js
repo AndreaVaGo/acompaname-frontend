@@ -30,8 +30,22 @@ export function horasDeCuidado(fechaInicio, horaInicio, fechaFin, horaFin) {
   return horas;
 }
 
-// Devuelve el desglose del precio, o null si todavía no se puede calcular
-export function estimarImporte(tarifaHora, horas, numeroDePersonas) {
+// Recargo que se aplica: el propio de la persona cuidadora (en porcentaje, 0 a 100) si lo ha puesto,
+// y si no, el de por defecto. Devuelve una fracción (30 -> 0.3)
+export function recargoAplicable(recargoPropioPorcentaje) {
+  if (recargoPropioPorcentaje === null || recargoPropioPorcentaje === undefined || recargoPropioPorcentaje === "") {
+    return RECARGO_PERSONA_EXTRA;
+  }
+  const porcentaje = Number(recargoPropioPorcentaje);
+  if (isNaN(porcentaje) || porcentaje < 0 || porcentaje > 100) {
+    return RECARGO_PERSONA_EXTRA;
+  }
+  return porcentaje / 100;
+}
+
+// Devuelve el desglose del precio, o null si todavía no se puede calcular.
+// El recargo propio de la persona cuidadora es opcional (en porcentaje)
+export function estimarImporte(tarifaHora, horas, numeroDePersonas, recargoPropioPorcentaje = null) {
   const tarifa = Number(tarifaHora);
   if (!tarifa || tarifa <= 0 || !horas || horas <= 0) {
     return null;
@@ -42,14 +56,15 @@ export function estimarImporte(tarifaHora, horas, numeroDePersonas) {
     personasExtra = 0;
   }
 
+  const recargoPersonaExtra = recargoAplicable(recargoPropioPorcentaje);
   const base = redondear(tarifa * horas);
-  const total = redondear(tarifa * horas * (1 + RECARGO_PERSONA_EXTRA * personasExtra));
+  const total = redondear(tarifa * horas * (1 + recargoPersonaExtra * personasExtra));
 
   return {
     tarifaHora: tarifa,
     horas: horas,
     personasExtra: personasExtra,
-    recargoPorcentaje: Math.round(RECARGO_PERSONA_EXTRA * 100),
+    recargoPorcentaje: Math.round(recargoPersonaExtra * 100),
     base: base,
     recargo: redondear(total - base),
     total: total,
