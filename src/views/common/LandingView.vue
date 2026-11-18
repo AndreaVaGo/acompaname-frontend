@@ -123,15 +123,17 @@ const botones = computed(() => {
             >{{ boton.texto }}</RouterLink
           >
         </div>
-        <!-- "Solo mirar" y la invitación a profesionales son para quien todavía no tiene cuenta -->
-        <p v-if="!authStore.estaAutenticado" class="landing__hint">
-          ¿Solo quieres mirar?
+        <!-- "Solo mirar" es para quien todavía no tiene cuenta: una tarjeta con enlace a la búsqueda -->
+        <div v-if="!authStore.estaAutenticado" class="landing__hint">
           <RouterLink to="/buscar" class="landing__link">
             <AvataresPersonas class="landing__avatares" />
-            <span class="landing__texto">Ver personas cuidadoras disponibles</span>
+            <span class="landing__mirar-textos">
+              <span class="landing__mirar-pregunta">¿Solo quieres mirar?</span>
+              <span class="landing__texto">Ver personas cuidadoras disponibles</span>
+            </span>
             <span class="landing__flecha" aria-hidden="true">→</span>
           </RouterLink>
-        </p>
+        </div>
       </div>
       <div class="landing__hero-image">
         <!-- Animación de 15 segundos que explica cómo funciona la web (sustituye a la foto) -->
@@ -279,27 +281,55 @@ const botones = computed(() => {
 }
 
 .landing__hint {
-  color: var(--color-text-muted);
-  font-size: 1rem;
-  font-weight: bold;
   margin: 0;
 }
 
-/* El enlace va en su propia línea, con tres personas delante y una flecha detrás */
+/* Tarjeta en forma de píldora: tres personas, dos líneas de texto y una flecha en un círculo.
+   Al pasar el ratón sube, el borde se vuelve verde y la flecha se llena */
 .landing__link {
   display: flex;
   width: fit-content;
+  max-width: 100%;
   align-items: center;
-  gap: 10px;
-  margin-top: 8px;
-  color: var(--color-secondary);
-  font-size: 1.1rem;
-  font-weight: bold;
+  gap: 14px;
+  padding: 10px 14px 10px 12px;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-card);
+  color: var(--color-text);
   text-decoration: none;
+  transition:
+    transform var(--dur-med) var(--ease-out),
+    box-shadow var(--dur-med) var(--ease-out),
+    border-color var(--dur-med) var(--ease-out);
 }
 
-/* Solo el texto va subrayado; las personas y la flecha no */
+.landing__link:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-card-hover);
+  border-color: var(--color-secondary);
+}
+
+.landing__mirar-textos {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+.landing__mirar-pregunta {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+/* La acción va en verde y en negrita; se subraya al pasar el ratón */
 .landing__texto {
+  font-size: 1.05rem;
+  font-weight: bold;
+  color: var(--color-secondary);
+}
+
+.landing__link:hover .landing__texto {
   text-decoration: underline;
 }
 
@@ -311,15 +341,29 @@ const botones = computed(() => {
   animation: latido 3s ease-out infinite;
 }
 
-/* La flecha es más grande que el texto para que se vea bien */
+/* La flecha va dentro de un círculo verde claro; al pasar el ratón se llena y se desplaza */
 .landing__flecha {
-  font-size: 1.7rem;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background-color: var(--color-secondary-bg);
+  color: var(--color-secondary);
+  font-size: 1.3rem;
   line-height: 1;
-  transition: transform var(--dur-med) var(--ease-out);
+  transition:
+    transform var(--dur-med) var(--ease-out),
+    background-color var(--dur-med) var(--ease-out),
+    color var(--dur-med) var(--ease-out);
 }
 
 .landing__link:hover .landing__flecha {
-  transform: translateX(5px);
+  transform: translateX(4px);
+  background-color: var(--color-secondary);
+  color: var(--color-white);
 }
 
 /* Dos manchas de color muy suaves (coral y verde) detrás de la portada, para dar profundidad */
@@ -367,8 +411,9 @@ const botones = computed(() => {
 }
 
 .landing__hero h1 {
-  font-size: 2.5rem;
-  line-height: 1.2;
+  font-size: clamp(2.3rem, 4.2vw, 3.3rem);
+  line-height: 1.1;
+  letter-spacing: -0.015em;
   margin-bottom: 16px;
 }
 
@@ -634,6 +679,7 @@ const botones = computed(() => {
   .landing__cta,
   .landing__cta-icon,
   .landing__avatares,
+  .landing__link,
   .landing__flecha {
     transition: none;
     animation: none;
@@ -661,7 +707,7 @@ const botones = computed(() => {
   }
 
   .landing__hero h1 {
-    font-size: 1.8rem;
+    font-size: 2rem;
   }
 
   .landing__hero-image {

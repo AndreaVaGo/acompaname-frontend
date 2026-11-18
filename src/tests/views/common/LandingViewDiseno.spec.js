@@ -77,4 +77,27 @@ describe("LandingView · diseño", () => {
 
     expect(bloque).toContain(".landing__palabra");
   });
+
+  test("el enlace para mirar es una tarjeta con la pregunta y la acción en dos líneas", () => {
+    const enlace = montar().find(".landing__link");
+
+    expect(enlace.find(".landing__mirar-pregunta").text()).toBe(
+      "¿Solo quieres mirar?",
+    );
+    expect(enlace.find(".landing__texto").text()).toBe(
+      "Ver personas cuidadoras disponibles",
+    );
+  });
+
+  test("la tarjeta de mirar sube al pasar el ratón y la flecha se llena", () => {
+    expect(archivo).toContain(".landing__link:hover {");
+    expect(archivo).toContain("translateY(-3px)");
+    expect(archivo).toContain(".landing__link:hover .landing__flecha");
+  });
+
+  test("con reducir movimiento se apaga el movimiento de la tarjeta de mirar", () => {
+    const bloque = archivo.slice(archivo.indexOf("@media (prefers-reduced-motion: reduce)"));
+
+    expect(bloque).toContain(".landing__link");
+  });
 });
