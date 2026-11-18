@@ -225,3 +225,30 @@ describe("CalendarioMensual: leyenda", () => {
     expect(wrapper.find(".calendario-mensual__muestra--completo .calendario-mensual__muestra-barra--llena").exists()).toBe(true);
   });
 });
+
+describe("CalendarioMensual: el mes sigue al día seleccionado", () => {
+  test("si el día seleccionado cambia a otro mes, el calendario se va a ese mes", async () => {
+    const wrapper = montar({ seleccionado: "2026-12-31" });
+
+    await wrapper.setProps({ seleccionado: "2027-01-01" });
+
+    expect(titulo(wrapper)).toBe("Enero 2027");
+  });
+
+  test("si el día seleccionado cambia dentro del mismo mes, no se mueve", async () => {
+    const wrapper = montar({ seleccionado: "2026-12-10" });
+
+    await wrapper.setProps({ seleccionado: "2026-12-11" });
+
+    expect(titulo(wrapper)).toBe("Diciembre 2026");
+  });
+
+  test("pasar de mes con las flechas del calendario no cambia el día seleccionado", async () => {
+    const wrapper = montar({ seleccionado: "2026-12-10" });
+
+    await wrapper.find("#mes-siguiente").trigger("click");
+
+    expect(titulo(wrapper)).toBe("Enero 2027");
+    expect(wrapper.emitted("seleccionar")).toBeUndefined();
+  });
+});

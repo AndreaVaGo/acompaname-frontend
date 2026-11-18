@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import {
   NOMBRES_MESES,
   NOMBRES_DIAS,
@@ -26,6 +26,19 @@ const hoy = hoyEnFormatoISO();
 const partesIniciales = (props.mesInicial || hoy).split("-").map(Number);
 const anio = ref(partesIniciales[0]);
 const mes = ref(partesIniciales[1] - 1);
+
+// Si el día seleccionado cambia desde fuera (por ejemplo con las flechas de día) y es de otro mes,
+// el calendario se va a ese mes para que el día se vea
+watch(
+  () => props.seleccionado,
+  (nuevo) => {
+    if (nuevo) {
+      const partes = nuevo.split("-").map(Number);
+      anio.value = partes[0];
+      mes.value = partes[1] - 1;
+    }
+  },
+);
 
 const titulo = computed(() => `${NOMBRES_MESES[mes.value]} ${anio.value}`);
 const celdas = computed(() => celdasDelMes(anio.value, mes.value));
