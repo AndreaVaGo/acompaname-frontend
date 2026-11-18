@@ -733,5 +733,33 @@ const botones = computed(() => {
     margin: 24px 20px;
     padding: 24px;
   }
+
+  /* En móvil la tarjeta ocupa todo el ancho y las personas se hacen más pequeñas,
+     así el texto cabe sin partirse en mitad de una palabra */
+  .landing__link {
+    width: 100%;
+    gap: 12px;
+    padding: 14px 14px 14px 14px;
+    border-radius: 36px;
+  }
+
+  .landing__avatares {
+    width: 72px;
+  }
+
+  .landing__mirar-textos {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .landing__mirar-pregunta {
+    font-size: 0.9rem;
+  }
+
+  .landing__texto {
+    font-size: 1.15rem;
+    overflow-wrap: normal;
+    word-break: normal;
+  }
 }
 </style>
