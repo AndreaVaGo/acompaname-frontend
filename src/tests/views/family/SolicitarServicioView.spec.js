@@ -143,7 +143,7 @@ describe("SolicitarServicioView", () => {
     expect(createSpy).toHaveBeenCalledWith({
       tipoCuidado: "hospitalario",
       direccion: "Hospital de Cabueñes, Planta 2, habitación 214",
-      personas: [{ nombre: "Antonio Serrano", edad: 81 }],
+      personas: [{ nombre: "Antonio Serrano", edad: 81, grupoEdad: "MAYORES" }],
       grupoEdad: "MAYORES",
       notas: "Alergia a la penicilina",
       fechaCuidado: "2026-10-10",
@@ -606,7 +606,7 @@ describe("SolicitarServicioView", () => {
     expect(createSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         grupoEdad: "BEBES",
-        personas: [{ nombre: "Lucía", edad: 0 }],
+        personas: [{ nombre: "Lucía", edad: 0, grupoEdad: "BEBES" }],
       }),
     );
   });

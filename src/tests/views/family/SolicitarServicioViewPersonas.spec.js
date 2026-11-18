@@ -137,8 +137,8 @@ describe("SolicitarServicioView · varias personas", () => {
     expect(createSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         personas: [
-          { nombre: "Carmen", edad: 82 },
-          { nombre: "Antonio", edad: 85 },
+          { nombre: "Carmen", edad: 82, grupoEdad: "MAYORES" },
+          { nombre: "Antonio", edad: 85, grupoEdad: "MAYORES" },
         ],
       }),
     );

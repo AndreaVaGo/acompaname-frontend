@@ -6,7 +6,7 @@ import SolicitudRepository from "@/repositories/SolicitudRepository";
 import CuidadorRepository from "@/repositories/CuidadorRepository";
 import SelectorGrupos from "@/components/SelectorGrupos.vue";
 import { CUIDADOS } from "@/utils/catalogoCuidados";
-import { buscarGrupo, edadValidaParaGrupo } from "@/utils/catalogoGrupos";
+import { GRUPOS, buscarGrupo, edadValidaParaGrupo } from "@/utils/catalogoGrupos";
 import { useAuthStore } from "@/stores/auth";
 import { mensajeDeError } from "@/utils/mensajeDeError";
 
@@ -64,9 +64,24 @@ function faltaDireccion() {
   return !direccion.value.trim();
 }
 
+// Código del grupo de edad de una persona. La primera usa el que se elige arriba;
+// las demás tienen el suyo, así se puede pedir "tres niños y un abuelo" en la misma solicitud
+function codigoDeGrupo(indice) {
+  if (indice === 0) {
+    return grupoEdad.value;
+  }
+  return personas.value[indice].grupoEdad;
+}
+
+// Datos del grupo de una persona (límites de edad y textos de ejemplo)
+function grupoDePersona(indice) {
+  return buscarGrupo(codigoDeGrupo(indice)) || grupo.value;
+}
+
 function anadirPersona() {
   if (personas.value.length < MAX_PERSONAS) {
-    personas.value.push({ nombre: "", edad: "" });
+    // La persona nueva empieza con el mismo grupo que la primera, y se puede cambiar
+    personas.value.push({ nombre: "", edad: "", grupoEdad: grupoEdad.value });
   }
 }
 
@@ -82,31 +97,40 @@ function faltaEdad(persona) {
   return persona.edad === "" || persona.edad === null;
 }
 
-// Alguna persona sin nombre o sin edad
+// Alguna persona sin nombre, sin edad o sin grupo de edad
 function faltanDatosDePersonas() {
-  for (const persona of personas.value) {
-    if (!persona.nombre.trim() || faltaEdad(persona)) {
+  for (let i = 0; i < personas.value.length; i++) {
+    const persona = personas.value[i];
+    if (!persona.nombre.trim() || faltaEdad(persona) || !codigoDeGrupo(i)) {
       return true;
     }
   }
   return false;
 }
 
-// Todas las personas tienen que tener una edad que encaje con el grupo elegido
-function hayEdadFueraDelGrupo() {
-  for (const persona of personas.value) {
-    if (!edadValidaParaGrupo(grupoEdad.value, Number(persona.edad))) {
-      return true;
+// Devuelve el texto de error de la primera persona cuya edad no encaja con SU grupo,
+// o un texto vacío si todas encajan
+function errorDeEdadPorGrupo() {
+  for (let i = 0; i < personas.value.length; i++) {
+    const persona = personas.value[i];
+    if (!edadValidaParaGrupo(codigoDeGrupo(i), Number(persona.edad))) {
+      const datos = buscarGrupo(codigoDeGrupo(i));
+      const quien = personas.value.length > 1 ? `Persona ${i + 1}: para` : "Para";
+      return `${quien} "${datos.nombre}" la edad tiene que estar entre ${datos.edadMin} y ${datos.edadMax} años.`;
     }
   }
-  return false;
+  return "";
 }
 
 // Lista que se envía al back, con la edad como número
 function personasParaEnviar() {
   const lista = [];
   for (const persona of personas.value) {
-    lista.push({ nombre: persona.nombre.trim(), edad: Number(persona.edad) });
+    lista.push({
+      nombre: persona.nombre.trim(),
+      edad: Number(persona.edad),
+      grupoEdad: codigoDeGrupo(lista.length),
+    });
   }
   return lista;
 }
@@ -124,8 +148,9 @@ async function enviarSolicitud() {
     error.value = "Por favor, rellena todos los campos obligatorios.";
     return;
   }
-  if (hayEdadFueraDelGrupo()) {
-    error.value = `Para "${grupo.value.nombre}" la edad tiene que estar entre ${grupo.value.edadMin} y ${grupo.value.edadMax} años.`;
+  const errorEdad = errorDeEdadPorGrupo();
+  if (errorEdad) {
+    error.value = errorEdad;
     return;
   }
   // Las fechas tienen formato AAAA-MM-DD, así que se pueden comparar como texto
@@ -310,7 +335,7 @@ async function enviarSolicitud() {
                   :id="indice === 0 ? 'paciente' : 'paciente-' + (indice + 1)"
                   v-model="persona.nombre"
                   maxlength="100"
-                  :placeholder="grupo.ejemploNombre"
+                  :placeholder="grupoDePersona(indice).ejemploNombre"
                 />
               </div>
               <div>
@@ -321,13 +346,29 @@ async function enviarSolicitud() {
                   type="number"
                   :id="indice === 0 ? 'edad' : 'edad-' + (indice + 1)"
                   v-model="persona.edad"
-                  :min="grupo.edadMin"
-                  :max="grupo.edadMax"
+                  :min="grupoDePersona(indice).edadMin"
+                  :max="grupoDePersona(indice).edadMax"
                   step="1"
-                  :placeholder="grupo.ejemploEdad"
+                  :placeholder="grupoDePersona(indice).ejemploEdad"
                 />
               </div>
             </div>
+
+            <!-- La primera persona usa el grupo de arriba; las demás eligen el suyo -->
+            <div v-if="indice > 0" class="solicitar__grupo-persona">
+              <label :for="'grupo-' + (indice + 1)">Grupo de edad</label>
+              <select :id="'grupo-' + (indice + 1)" v-model="persona.grupoEdad">
+                <option value="">Elige un grupo</option>
+                <option
+                  v-for="opcion in GRUPOS"
+                  :key="opcion.codigo"
+                  :value="opcion.codigo"
+                >
+                  {{ opcion.nombre }} ({{ opcion.edades }})
+                </option>
+              </select>
+            </div>
+
             <button
               v-if="indice > 0"
               type="button"
@@ -337,6 +378,12 @@ async function enviarSolicitud() {
               Quitar a la persona {{ indice + 1 }}
             </button>
           </div>
+
+          <p v-if="personas.length > 1" class="solicitar__ayuda">
+            La primera persona usa el grupo de edad elegido arriba. Cada persona
+            añadida tiene el suyo: así puedes pedir, por ejemplo, tres niños y un
+            abuelo en la misma solicitud.
+          </p>
 
           <button
             v-if="personas.length < 5"
@@ -508,6 +555,12 @@ async function enviarSolicitud() {
 }
 
 .solicitar__persona {
+  margin-bottom: var(--gap-sm);
+}
+
+.solicitar__grupo-persona {
+  display: flex;
+  flex-direction: column;
   margin-bottom: var(--gap-sm);
 }
 
