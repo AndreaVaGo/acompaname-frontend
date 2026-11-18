@@ -77,6 +77,22 @@ h3 {
     margin-bottom: var(--gap-md);
     font-size: 1rem;
     font-family: inherit;
+    transition:
+      border-color var(--dur-fast) var(--ease-out),
+      box-shadow var(--dur-fast) var(--ease-out);
+  }
+
+  /* Al pasar el ratón el borde se oscurece un poco, para saber que se puede escribir */
+  & input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):hover,
+  & select:hover,
+  & textarea:hover {
+    border-color: var(--color-text-muted);
+  }
+
+  /* Las casillas y los círculos de elegir usan el verde de la marca */
+  & input[type="checkbox"],
+  & input[type="radio"] {
+    accent-color: var(--color-secondary);
   }
 
   & input:focus,
