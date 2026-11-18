@@ -100,6 +100,7 @@ function cerrarSesion() {
   border-top: 4px solid var(--color-accent);
   box-shadow: var(--shadow-card);
   overflow: hidden;
+  animation: entra-sube 0.5s var(--ease-out) backwards;
 }
 
 /* Franja de color con la inicial, el nombre y el tipo de cuenta */

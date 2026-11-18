@@ -289,6 +289,7 @@ function estrellas(puntuacion) {
   padding: 28px;
   box-shadow: var(--shadow-card);
   overflow: hidden;
+  animation: entra-sube 0.5s var(--ease-out) backwards;
 
   & h2 {
     margin-top: 24px;
@@ -439,6 +440,8 @@ function estrellas(puntuacion) {
   padding: 28px;
   box-shadow: var(--shadow-card);
   height: fit-content;
+  /* La barra lateral entra un poco después que la información */
+  animation: entra-sube 0.5s var(--ease-out) 120ms backwards;
 }
 
 .perfil__precio {
