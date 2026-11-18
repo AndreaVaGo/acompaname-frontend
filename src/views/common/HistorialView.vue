@@ -5,6 +5,11 @@ import SolicitudRepository from "@/repositories/SolicitudRepository";
 import ValoracionRepository from "@/repositories/ValoracionRepository";
 import { nombreCuidado } from "@/utils/catalogoCuidados";
 import { nombreGrupo } from "@/utils/catalogoGrupos";
+import {
+  nombresDePersonas,
+  detalleDePersonas,
+  hayVariasPersonas,
+} from "@/utils/personasSolicitud";
 import { formatearMomento } from "@/utils/formatearHora";
 import { mensajeDeError } from "@/utils/mensajeDeError";
 
@@ -24,8 +29,10 @@ onMounted(async () => {
       .map((s) => ({
         id: s.id,
         nombre: s.cuidadorNombre,
-        paciente: s.nombrePaciente,
+        paciente: nombresDePersonas(s),
         edad: s.edadPaciente,
+        varias: hayVariasPersonas(s),
+        detallePersonas: detalleDePersonas(s),
         grupoEdad: s.grupoEdad,
         tipoCuidado: s.tipoCuidado,
         fechaInicio: s.fechaCuidado,
@@ -76,7 +83,10 @@ function textoEstado(estado) {
           </span>
         </div>
 
-        <p class="historial__paciente">
+        <p class="historial__paciente" v-if="item.varias">
+          👥 {{ item.detallePersonas }}
+        </p>
+        <p class="historial__paciente" v-else>
           {{ item.paciente }} · {{ item.edad }} años
         </p>
 
