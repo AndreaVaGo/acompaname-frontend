@@ -49,6 +49,8 @@ test("la familia solicita, el cuidador acepta y completa, y la familia paga", as
   await page.fill("#hospital", "Hospital de Cabueñes");
   await page.fill("#ubicacion", "Planta 2, Medicina Interna, habitación 214");
   await page.fill("#fecha", "2030-01-15");
+  await page.fill("#hora-inicio", "09:00");
+  await page.fill("#hora-fin", "12:00");
   await page.fill("#paciente", "Antonio Serrano");
   await page.fill("#edad", "81");
   await page.fill("#notas", "Alergia a la penicilina");
