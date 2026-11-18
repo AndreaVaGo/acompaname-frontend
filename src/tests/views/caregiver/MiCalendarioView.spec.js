@@ -560,3 +560,70 @@ describe("MiCalendarioView: línea de horas del día", () => {
     expect(wrapper.find(".linea-dia__libres").text()).toBe("Libre todo el día.");
   });
 });
+
+describe("MiCalendarioView: flechas para pasar de día", () => {
+  test("la flecha siguiente pasa al día de después", async () => {
+    const wrapper = await montarVista();
+
+    await wrapper.find("#dia-siguiente").trigger("click");
+
+    expect(wrapper.find(".calendario__titulo-lista").text()).toBe("Viernes 11 de diciembre de 2026");
+    expect(wrapper.find(".calendario__numero-dia").text()).toBe("11");
+    expect(dia(wrapper, 11).classes()).toContain("calendario-mensual__dia--seleccionado");
+  });
+
+  test("la flecha anterior pasa al día de antes", async () => {
+    const wrapper = await montarVista();
+
+    await wrapper.find("#dia-anterior").trigger("click");
+
+    expect(wrapper.find(".calendario__titulo-lista").text()).toBe("Miércoles 9 de diciembre de 2026");
+  });
+
+  test("al pasar de día enseña lo que hay ese día", async () => {
+    const wrapper = await montarVista([bloque(1, "2026-12-11", "Turno")]);
+    expect(wrapper.findAll(".calendario__bloque").length).toBe(0);
+
+    await wrapper.find("#dia-siguiente").trigger("click");
+
+    expect(wrapper.findAll(".calendario__bloque").length).toBe(1);
+    expect(wrapper.find(".linea-dia__tramo").exists()).toBe(true);
+  });
+
+  test("al pasar al primer día del mes siguiente, el calendario cambia de mes", async () => {
+    const wrapper = await montarVista();
+    await dia(wrapper, 31).trigger("click");
+
+    await wrapper.find("#dia-siguiente").trigger("click");
+
+    expect(wrapper.find(".calendario__titulo-lista").text()).toBe("Viernes 1 de enero de 2027");
+    expect(wrapper.find(".calendario-mensual__titulo").text()).toBe("Enero 2027");
+  });
+
+  test("al pasar al último día del mes anterior, el calendario cambia de mes", async () => {
+    const wrapper = await montarVista();
+    await dia(wrapper, 1).trigger("click");
+
+    await wrapper.find("#dia-anterior").trigger("click");
+
+    expect(wrapper.find(".calendario__titulo-lista").text()).toBe("Lunes 30 de noviembre de 2026");
+    expect(wrapper.find(".calendario-mensual__titulo").text()).toBe("Noviembre 2026");
+  });
+
+  test("al pasar a un día de hoy en adelante se deja puesto en el formulario", async () => {
+    const wrapper = await montarVista();
+
+    await wrapper.find("#dia-siguiente").trigger("click");
+
+    expect(wrapper.find("#bloque-fecha").element.value).toBe("2026-12-11");
+  });
+
+  test("se puede volver a un día pasado y no sale el botón de añadir", async () => {
+    const wrapper = await montarVista();
+
+    // Hoy es el 10: allí sí sale el botón, y en el 9 (ya pasado) no
+    expect(wrapper.find(".calendario__apuntar").exists()).toBe(true);
+    await wrapper.find("#dia-anterior").trigger("click");
+    expect(wrapper.find(".calendario__apuntar").exists()).toBe(false);
+  });
+});

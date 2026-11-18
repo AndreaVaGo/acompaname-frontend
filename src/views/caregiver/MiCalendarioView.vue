@@ -10,6 +10,7 @@ import { formatearHora, formatearMomento } from "@/utils/formatearHora";
 import {
   hoyEnFormatoISO,
   fechasEntre,
+  sumarDias,
   minutosDeLaHora,
   fechaEnLetras,
   formatearDuracion,
@@ -241,6 +242,11 @@ function seleccionarDia(dia) {
   }
 }
 
+// Pasa al día siguiente (1) o al anterior (-1)
+function moverDia(cuantos) {
+  seleccionarDia(sumarDias(diaSeleccionado.value, cuantos));
+}
+
 // Deja el día abierto puesto en el formulario y lleva el cursor a la hora de inicio
 async function irAlFormulario() {
   fecha.value = diaSeleccionado.value;
@@ -343,8 +349,17 @@ onMounted(() => {
 
       <section class="calendario__detalle" aria-live="polite">
         <header class="calendario__cabecera-dia">
+          <button
+            type="button"
+            id="dia-anterior"
+            class="calendario__flecha-dia"
+            aria-label="Día anterior"
+            @click="moverDia(-1)"
+          >
+            ‹
+          </button>
           <span class="calendario__numero-dia" aria-hidden="true">{{ numeroDelDia }}</span>
-          <div>
+          <div class="calendario__cabecera-texto">
             <h2 class="calendario__titulo-lista">{{ fechaEnLetras(diaSeleccionado) }}</h2>
             <div class="calendario__etiquetas">
               <span v-if="diaSeleccionado === hoy" class="calendario__etiqueta calendario__etiqueta--hoy">Hoy</span>
@@ -357,6 +372,15 @@ onMounted(() => {
               </span>
             </div>
           </div>
+          <button
+            type="button"
+            id="dia-siguiente"
+            class="calendario__flecha-dia"
+            aria-label="Día siguiente"
+            @click="moverDia(1)"
+          >
+            ›
+          </button>
         </header>
 
         <LineaDelDia v-if="!cargando && !errorCarga" :tramos="tramosDelDia" />
@@ -545,6 +569,29 @@ onMounted(() => {
   margin-bottom: 16px;
 }
 
+/* Las flechas para pasar de día, como las del calendario de arriba */
+.calendario__flecha-dia {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--color-accent);
+  background-color: var(--color-white);
+  color: var(--color-accent);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.calendario__flecha-dia:hover {
+  background-color: var(--color-accent-bg);
+}
+
+.calendario__cabecera-texto {
+  flex: 1;
+  min-width: 0;
+}
+
 .calendario__numero-dia {
   flex-shrink: 0;
   display: flex;
@@ -710,6 +757,16 @@ onMounted(() => {
 
   .calendario__form {
     padding: 24px 20px 28px;
+  }
+
+  .calendario__cabecera-dia {
+    gap: 8px;
+  }
+
+  .calendario__numero-dia {
+    width: 48px;
+    height: 48px;
+    font-size: 1.4rem;
   }
 
   .calendario__horas {
