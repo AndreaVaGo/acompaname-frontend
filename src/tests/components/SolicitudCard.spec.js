@@ -407,4 +407,56 @@ describe('SolicitudCard', () => {
     const enlaces = wrapper.findAllComponents(RouterLinkStub).map((e) => e.props('to'))
     expect(enlaces).toContain('/chat/1')
   })
+
+  test('con mensajes sin leer muestra el número en el botón del chat', () => {
+    const wrapper = mount(SolicitudCard, {
+      props: {
+        solicitud: crearSolicitud('ACEPTADA'),
+        nombreMostrado: 'Familia Serrano',
+        mostrarAcciones: false,
+        mensajesSinLeer: 3,
+      },
+      global: { stubs: { RouterLink: RouterLinkStub } },
+    })
+
+    expect(wrapper.find('.solicitudes__chat-nuevos').text()).toBe('3')
+    expect(wrapper.find('[data-testid="enlace-chat"]').classes()).toContain('solicitudes__chat--nuevo')
+  })
+
+  test('el botón del chat avisa de los mensajes sin leer a los lectores de pantalla', () => {
+    const wrapper = mount(SolicitudCard, {
+      props: {
+        solicitud: crearSolicitud('ACEPTADA'),
+        nombreMostrado: 'Familia Serrano',
+        mostrarAcciones: false,
+        mensajesSinLeer: 2,
+      },
+      global: { stubs: { RouterLink: RouterLinkStub } },
+    })
+
+    expect(wrapper.find('[data-testid="enlace-chat"]').attributes('aria-label')).toBe(
+      'Chat, 2 mensajes sin leer',
+    )
+  })
+
+  test('sin mensajes sin leer no muestra ningún número', () => {
+    const wrapper = montarTarjeta('ACEPTADA', false)
+
+    expect(wrapper.find('.solicitudes__chat-nuevos').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="enlace-chat"]').classes()).not.toContain('solicitudes__chat--nuevo')
+  })
+
+  test('con cero mensajes sin leer tampoco muestra número', () => {
+    const wrapper = mount(SolicitudCard, {
+      props: {
+        solicitud: crearSolicitud('ACEPTADA'),
+        nombreMostrado: 'Familia Serrano',
+        mostrarAcciones: false,
+        mensajesSinLeer: 0,
+      },
+      global: { stubs: { RouterLink: RouterLinkStub } },
+    })
+
+    expect(wrapper.find('.solicitudes__chat-nuevos').exists()).toBe(false)
+  })
 })

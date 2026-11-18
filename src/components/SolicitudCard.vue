@@ -22,7 +22,11 @@ const props = defineProps([
   "aceptar",
   "rechazar",
   "completar",
+  "mensajesSinLeer",
 ]);
+
+// Cuántos mensajes del chat tiene sin leer la persona en esta solicitud
+const sinLeer = computed(() => Number(props.mensajesSinLeer) || 0);
 
 // El cuidador ve la tarjeta resumida y abre los detalles en una ventana con el botón Ver
 const expandido = ref(false);
@@ -304,9 +308,12 @@ const avisoDireccion = computed(
       <RouterLink
         :to="`/chat/${solicitud.id}`"
         class="btn btn--secondary solicitudes__chat"
+        :class="{ 'solicitudes__chat--nuevo': sinLeer > 0 }"
+        :aria-label="sinLeer > 0 ? `Chat, ${sinLeer} mensajes sin leer` : null"
         data-testid="enlace-chat"
       >
         💬 Chat
+        <span v-if="sinLeer > 0" class="solicitudes__chat-nuevos">{{ sinLeer }}</span>
       </RouterLink>
     </div>
   </div>
@@ -589,6 +596,24 @@ const avisoDireccion = computed(
     background-color: var(--color-secondary);
     color: var(--color-white);
   }
+}
+
+/* Con mensajes sin leer el botón se llena de verde y sale un círculo coral con el número */
+.solicitudes__chat-fila .solicitudes__chat--nuevo {
+  background-color: var(--color-secondary);
+  color: var(--color-white);
+}
+
+.solicitudes__chat-nuevos {
+  display: inline-block;
+  min-width: 22px;
+  margin-left: 8px;
+  padding: 1px 7px;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-accent);
+  color: var(--color-white);
+  font-size: 0.85rem;
+  line-height: 1.5;
 }
 
 /* Colores de la paleta: verde para aceptar y borde coral para rechazar */
