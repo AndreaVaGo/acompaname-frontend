@@ -502,7 +502,7 @@ describe("BuscarView", () => {
     await wrapper.find("#filtro-fecha-desde").setValue("2026-11-01");
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    expect(ocupadosFalso).toHaveBeenCalledWith("2026-11-01", "");
+    expect(ocupadosFalso).toHaveBeenCalledWith("2026-11-01", "", "", "");
     expect(wrapper.text()).toContain("Pepe");
     expect(wrapper.text()).toContain("Luis");
     expect(wrapper.text()).not.toContain("Ana");
@@ -519,7 +519,99 @@ describe("BuscarView", () => {
     await wrapper.find("#filtro-fecha-hasta").setValue("2026-11-05");
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    expect(ocupadosFalso).toHaveBeenLastCalledWith("2026-11-01", "2026-11-05");
+    expect(ocupadosFalso).toHaveBeenLastCalledWith("2026-11-01", "2026-11-05", "", "");
+  });
+
+  test("hay campos para filtrar por hora, de tipo hora", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(wrapper.find("#filtro-hora-desde").attributes("type")).toBe("time");
+    expect(wrapper.find("#filtro-hora-hasta").attributes("type")).toBe("time");
+  });
+
+  test("con fecha y horas se consultan también las horas", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper.find("#filtro-fecha-desde").setValue("2026-11-01");
+    await wrapper.find("#filtro-hora-desde").setValue("15:00");
+    await wrapper.find("#filtro-hora-hasta").setValue("18:00");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(ocupadosFalso).toHaveBeenLastCalledWith("2026-11-01", "", "15:00", "18:00");
+  });
+
+  test("al cambiar solo una hora se vuelve a consultar", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper.find("#filtro-fecha-desde").setValue("2026-11-01");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    ocupadosFalso.mockClear();
+    await wrapper.find("#filtro-hora-desde").setValue("09:00");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(ocupadosFalso).toHaveBeenCalledTimes(1);
+    expect(ocupadosFalso).toHaveBeenCalledWith("2026-11-01", "", "09:00", "");
+  });
+
+  test("sin fecha de inicio las horas no consultan nada", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper.find("#filtro-hora-desde").setValue("09:00");
+    await wrapper.find("#filtro-hora-hasta").setValue("12:00");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(ocupadosFalso).not.toHaveBeenCalled();
+    expect(wrapper.text()).toContain("Ana");
+  });
+
+  test("en un solo día, si la hora de fin no es posterior a la de inicio avisa y no consulta", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper.find("#filtro-hora-desde").setValue("18:00");
+    await wrapper.find("#filtro-hora-hasta").setValue("15:00");
+    await wrapper.find("#filtro-fecha-desde").setValue("2026-11-01");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(ocupadosFalso).not.toHaveBeenCalled();
+    expect(wrapper.text()).toContain("La hora de fin tiene que ser posterior a la de inicio");
+    expect(wrapper.text()).toContain("Ana");
+  });
+
+  test("con varios días la hora de fin puede ser anterior a la de inicio", async () => {
+    const wrapper = mount(BuscarView, {
+      global: { plugins: [router] },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await wrapper.find("#filtro-hora-desde").setValue("22:00");
+    await wrapper.find("#filtro-hora-hasta").setValue("08:00");
+    await wrapper.find("#filtro-fecha-hasta").setValue("2026-11-03");
+    await wrapper.find("#filtro-fecha-desde").setValue("2026-11-01");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(ocupadosFalso).toHaveBeenLastCalledWith("2026-11-01", "2026-11-03", "22:00", "08:00");
+    expect(wrapper.text()).not.toContain("La hora de fin tiene que ser posterior");
   });
 
   test("al borrar la fecha de inicio vuelven a salir todos", async () => {
