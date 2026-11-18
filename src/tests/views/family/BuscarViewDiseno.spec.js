@@ -35,4 +35,22 @@ describe("BuscarView · diseño de tarjetas", () => {
   test("la valoración y las etiquetas van agrupadas en el centro de la tarjeta", () => {
     expect(archivo).toContain('class="buscar__card-centro"');
   });
+
+  test("el fondo tiene dos manchas de color que se mueven despacio", () => {
+    expect(archivo).toContain(".buscar::before");
+    expect(archivo).toContain("animation: buscar-mancha-a");
+    expect(archivo).toContain("animation: buscar-mancha-b");
+    expect(archivo).toContain("pointer-events: none");
+  });
+
+  test("las tarjetas pares alternan el color de la franja", () => {
+    expect(archivo).toContain(".buscar__card:nth-child(even) .buscar__card-cabecera");
+  });
+
+  test("con reducir movimiento las manchas del fondo se quedan quietas", () => {
+    const bloque = archivo.slice(archivo.indexOf("@media (prefers-reduced-motion: reduce)"));
+
+    expect(bloque).toContain(".buscar::before");
+    expect(bloque).toContain("animation: none");
+  });
 });

@@ -558,12 +558,55 @@ const cuidadoresFiltrados = computed(() => {
 .buscar {
   width: 100%;
   min-height: 100vh;
-  background-color: var(--color-bg);
+  /* El fondo lo pone el body; las manchas de color van detrás, con isolation */
+  isolation: isolate;
   font-family: var(--font-base);
   color: var(--color-text);
   padding: var(--gap-lg) 60px;
   max-width: 1200px;
   margin: 0 auto;
+}
+
+/* Fondo vivo: dos manchas suaves (verde y coral) que se mueven despacio detrás de la página */
+.buscar::before,
+.buscar::after {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  pointer-events: none;
+  width: 560px;
+  height: 560px;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.55;
+}
+
+.buscar::before {
+  top: -120px;
+  left: -140px;
+  background: radial-gradient(circle, var(--color-secondary-bg), transparent 70%);
+  animation: buscar-mancha-a 22s ease-in-out infinite alternate;
+}
+
+.buscar::after {
+  right: -160px;
+  bottom: -140px;
+  background: radial-gradient(circle, var(--color-accent-bg), transparent 70%);
+  animation: buscar-mancha-b 26s ease-in-out infinite alternate;
+}
+
+@keyframes buscar-mancha-a {
+  to {
+    translate: 320px 220px;
+    scale: 1.25;
+  }
+}
+
+@keyframes buscar-mancha-b {
+  to {
+    translate: -300px -200px;
+    scale: 1.2;
+  }
 }
 
 .buscar__header {
@@ -837,7 +880,17 @@ const cuidadoresFiltrados = computed(() => {
   }
 }
 
+/* Cuidadores alternos: la franja de las tarjetas pares va en verde suave */
+.buscar__card:nth-child(even) .buscar__card-cabecera {
+  background-color: var(--color-secondary-bg);
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .buscar::before,
+  .buscar::after {
+    animation: none;
+  }
+
   .buscar__card {
     animation: none;
     transition: none;
