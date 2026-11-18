@@ -212,4 +212,27 @@ describe("PagosView", () => {
 
     expect(wrapper.find(".pagos__tarjeta").text()).toContain("Persona cuidadora");
   });
+
+  test("enseña el desglose de horas y personas cuando el pago lo trae", async () => {
+    const pago = crearPago(1, "PENDIENTE", 90, "2026-09-11", 7);
+    pago.horas = 4;
+    pago.personas = 3;
+    vi.spyOn(PagoRepository.prototype, "getMisPagos").mockResolvedValue([pago]);
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.find(".pagos__desglose").text()).toBe(
+      "4 horas · 3 personas (2 con recargo)",
+    );
+  });
+
+  test("no enseña desglose en los pagos antiguos sin horas", async () => {
+    vi.spyOn(PagoRepository.prototype, "getMisPagos").mockResolvedValue([
+      crearPago(1, "COMPLETADO", 90, "2026-09-11", 7),
+    ]);
+
+    const wrapper = await montarVista();
+
+    expect(wrapper.find(".pagos__desglose").exists()).toBe(false);
+  });
 });

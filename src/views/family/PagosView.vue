@@ -6,6 +6,7 @@ import { ordenarPagos, sumarImportes } from "@/utils/resumenPagos";
 import { formatearEuros } from "@/utils/formatearEuros";
 import { formatearFecha } from "@/utils/formatearFecha";
 import { nombreTipo } from "@/utils/nombreTipo";
+import { textoDesglose } from "@/utils/desglosePago";
 import { mensajeDeError } from "@/utils/mensajeDeError";
 
 const pagoRepository = new PagoRepository();
@@ -128,6 +129,10 @@ onMounted(async () => {
                 Solicitud nº {{ pago.solicitudId }} ·
                 {{ nombreTipo(pago.tipoCuidado) }} ·
                 {{ formatearFecha(pago.fecha) }}
+              </p>
+              <!-- De dónde sale el importe: horas y personas -->
+              <p v-if="textoDesglose(pago)" class="pagos__desglose">
+                {{ textoDesglose(pago) }}
               </p>
             </div>
 
@@ -283,6 +288,15 @@ onMounted(async () => {
   border: 2px solid transparent;
   box-shadow: var(--shadow-card);
   padding: 18px 24px;
+  transition:
+    transform var(--dur-med) var(--ease-out),
+    box-shadow var(--dur-med) var(--ease-out);
+}
+
+/* Al pasar el ratón la tarjeta sube un poco */
+.pagos__tarjeta:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-card-hover);
 }
 
 /* Los pendientes se distinguen de un vistazo: borde de acento y fondo suave */
@@ -339,6 +353,17 @@ onMounted(async () => {
   font-size: 0.9rem;
 }
 
+.pagos__desglose {
+  display: inline-block;
+  margin: 6px 0 0;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-secondary-bg);
+  color: var(--color-secondary);
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
 .pagos__derecha {
   display: flex;
   align-items: center;
@@ -371,6 +396,16 @@ onMounted(async () => {
 .pagos__estado--cancelado {
   background-color: var(--color-neutral-bg);
   color: var(--color-text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pagos__tarjeta {
+    transition: none;
+  }
+
+  .pagos__tarjeta:hover {
+    transform: none;
+  }
 }
 
 @media (max-width: 768px) {
