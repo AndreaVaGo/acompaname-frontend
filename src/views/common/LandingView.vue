@@ -1,14 +1,63 @@
 <script setup>
-import { computed } from "vue";
+import { computed, ref, onMounted, onBeforeUnmount } from "vue";
 import { RouterLink } from "vue-router";
 import pinia from "../../pinia/pinia";
 import { useAuthStore } from "../../stores/auth";
 import AnimacionComoFunciona from "../../components/animation/AnimacionComoFunciona.vue";
 import AparecerAlVer from "../../components/animation/AparecerAlVer.vue";
 import AvataresPersonas from "../../components/animation/AvataresPersonas.vue";
+import CintaDeCuidados from "../../components/animation/CintaDeCuidados.vue";
+import { progresoDeScroll, pasoDeProgreso } from "../../utils/pasosScroll";
 import IconoManoCorazon from "../../components/animation/IconoManoCorazon.vue";
 
 const authStore = useAuthStore(pinia);
+
+// El título entra palabra a palabra. Cada palabra lleva su número para saber cuándo le toca
+const palabrasTitulo = ["Personas", "cuidadoras", "de", "confianza,"];
+const palabrasResalte = ["cuando", "tu", "familia", "más", "lo", "necesita"];
+
+// "Así de sencillo" se queda fija mientras se baja y los pasos se van encendiendo.
+// Solo en pantallas grandes y si la persona no ha pedido reducir el movimiento
+const TOTAL_PASOS = 3;
+const bloquePasos = ref(null);
+const modoFijo = ref(false);
+const progreso = ref(0);
+const pasoActivo = ref(0);
+let consulta = null;
+
+function actualizarModo() {
+  modoFijo.value = consulta.matches;
+  actualizarScroll();
+}
+
+function actualizarScroll() {
+  if (!modoFijo.value || !bloquePasos.value) {
+    return;
+  }
+  const caja = bloquePasos.value.getBoundingClientRect();
+  progreso.value = progresoDeScroll(caja.top, caja.height, window.innerHeight);
+  pasoActivo.value = pasoDeProgreso(progreso.value, TOTAL_PASOS);
+}
+
+onMounted(() => {
+  // Si el navegador no sabe de pantallas (por ejemplo, en los tests), todo se ve normal
+  if (typeof window.matchMedia !== "function") {
+    return;
+  }
+  consulta = window.matchMedia(
+    "(min-width: 900px) and (prefers-reduced-motion: no-preference)",
+  );
+  consulta.addEventListener("change", actualizarModo);
+  window.addEventListener("scroll", actualizarScroll, { passive: true });
+  actualizarModo();
+});
+
+onBeforeUnmount(() => {
+  if (consulta) {
+    consulta.removeEventListener("change", actualizarModo);
+    window.removeEventListener("scroll", actualizarScroll);
+  }
+});
 
 // Los dos botones del principio cambian según quién entra:
 // una visita puede registrarse o iniciar sesión, y quien ya tiene sesión va a lo suyo
@@ -45,8 +94,19 @@ const botones = computed(() => {
           Nunca sola, nunca solo
         </span>
         <h1>
-          Personas cuidadoras de confianza,
-          <span class="landing__resalte">cuando tu familia más lo necesita</span>
+          <template v-for="(palabra, i) in palabrasTitulo" :key="'t' + i"
+            ><span class="landing__palabra" :style="{ '--i': i }">{{ palabra }}</span
+            >{{ " " }}</template
+          >
+          <span class="landing__resalte">
+            <template v-for="(palabra, i) in palabrasResalte" :key="'r' + i"
+              ><span
+                class="landing__palabra"
+                :style="{ '--i': palabrasTitulo.length + i }"
+                >{{ palabra }}</span
+              >{{ " " }}</template
+            >
+          </span>
         </h1>
         <p class="landing__hero-text">
           Encuentra profesionales para acompañar en el hospital o en casa a
@@ -79,12 +139,28 @@ const botones = computed(() => {
       </div>
     </section>
 
-    <hr class="landing__divider" />
+    <CintaDeCuidados />
 
-    <section class="landing__steps">
+    <!-- En pantallas grandes este bloque es más alto que la ventana: dentro, la sección se queda fija -->
+    <div
+      ref="bloquePasos"
+      class="landing__steps-bloque"
+      :class="{ 'landing__steps-bloque--fijo': modoFijo }"
+    >
+    <section class="landing__steps" :class="{ 'landing__steps--fijo': modoFijo }">
       <h2>Así de sencillo</h2>
+      <div v-if="modoFijo" class="landing__progreso" aria-hidden="true">
+        <div
+          class="landing__progreso-relleno"
+          :style="{ width: progreso * 100 + '%' }"
+        ></div>
+      </div>
       <div class="landing__steps-grid">
-        <AparecerAlVer class="landing__step-card" :retraso="0">
+        <AparecerAlVer
+          class="landing__step-card"
+          :class="{ 'landing__step-card--apagada': modoFijo && pasoActivo < 0 }"
+          :retraso="0"
+        >
           <span class="landing__step-icon">
             <svg
               width="20"
@@ -100,7 +176,11 @@ const botones = computed(() => {
           <h3>1. Cuéntanos qué necesitas</h3>
           <p>Hospital, domicilio o ambos. En un minuto.</p>
         </AparecerAlVer>
-        <AparecerAlVer class="landing__step-card" :retraso="250">
+        <AparecerAlVer
+          class="landing__step-card"
+          :class="{ 'landing__step-card--apagada': modoFijo && pasoActivo < 1 }"
+          :retraso="250"
+        >
           <span class="landing__step-icon">
             <svg
               width="20"
@@ -118,7 +198,11 @@ const botones = computed(() => {
           <h3>2. Elige a la persona</h3>
           <p>Perfiles con experiencia, tarifa y valoraciones reales.</p>
         </AparecerAlVer>
-        <AparecerAlVer class="landing__step-card" :retraso="500">
+        <AparecerAlVer
+          class="landing__step-card"
+          :class="{ 'landing__step-card--apagada': modoFijo && pasoActivo < 2 }"
+          :retraso="500"
+        >
           <span class="landing__step-icon">
             <svg
               width="20"
@@ -136,6 +220,7 @@ const botones = computed(() => {
         </AparecerAlVer>
       </div>
     </section>
+    </div>
 
     <hr v-if="!authStore.estaAutenticado" class="landing__divider" />
 
@@ -326,13 +411,33 @@ const botones = computed(() => {
 }
 
 /* Parte del título lleva un subrayado coral claro que se dibuja de izquierda a derecha */
+/* Cada palabra del título sube y se enfoca, una detrás de otra */
+.landing__palabra {
+  display: inline-block;
+  animation: palabra-sube 700ms var(--ease-out) both;
+  animation-delay: calc(120ms + var(--i) * 70ms);
+}
+
+/* El título entero ya no se anima de golpe: lo hacen sus palabras */
+.landing__hero-content > h1 {
+  animation: none;
+}
+
 .landing__resalte {
   background-image: linear-gradient(var(--color-accent-bg), var(--color-accent-bg));
   background-repeat: no-repeat;
   background-position: 0 92%;
   background-size: 100% 0.4em;
   box-decoration-break: clone;
-  animation: subrayar 700ms var(--ease-out) 600ms both;
+  animation: subrayar 700ms var(--ease-out) 1100ms both;
+}
+
+@keyframes palabra-sube {
+  from {
+    opacity: 0;
+    translate: 0 0.6em;
+    filter: blur(6px);
+  }
 }
 
 @keyframes entrar {
@@ -368,6 +473,38 @@ const botones = computed(() => {
   margin: 0 60px;
 }
 
+/* En pantallas grandes el bloque es más alto que la ventana, y la sección se queda fija dentro de él */
+.landing__steps-bloque--fijo {
+  height: 220vh;
+}
+
+.landing__steps--fijo {
+  position: sticky;
+  top: 90px;
+}
+
+/* Barra que se llena según se avanza por los tres pasos */
+.landing__progreso {
+  max-width: 900px;
+  height: 6px;
+  margin: 0 auto 24px;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-secondary-bg);
+  overflow: hidden;
+}
+
+.landing__progreso-relleno {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-accent);
+  transition: width var(--dur-fast) linear;
+}
+
+/* Los pasos que todavía no han llegado se ven apagados */
+.landing__step-card--apagada {
+  filter: grayscale(1) opacity(0.45);
+}
+
 .landing__steps {
   text-align: center;
   padding: var(--gap-lg) 60px;
@@ -394,7 +531,8 @@ const botones = computed(() => {
   text-align: left;
   transition:
     transform var(--dur-med) var(--ease-out),
-    box-shadow var(--dur-med) var(--ease-out);
+    box-shadow var(--dur-med) var(--ease-out),
+    filter var(--dur-med) var(--ease-out);
 
   & h3 {
     margin-bottom: 6px;
@@ -489,6 +627,7 @@ const botones = computed(() => {
 @media (prefers-reduced-motion: reduce) {
   .landing__hero-content > *,
   .landing__hero-image,
+  .landing__palabra,
   .landing__resalte,
   .landing__step-card,
   .landing__step-icon,

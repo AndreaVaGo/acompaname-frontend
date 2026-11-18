@@ -51,4 +51,30 @@ describe("LandingView · diseño", () => {
     expect(archivo).toContain("var(--dur-med) var(--ease-out)");
     expect(archivo).not.toContain("0.25s ease");
   });
+
+  test("el título se divide en palabras que entran una tras otra", () => {
+    const palabras = montar().findAll("h1 .landing__palabra");
+
+    // 4 palabras del título y 6 del resaltado
+    expect(palabras.length).toBe(10);
+    expect(palabras[0].text()).toBe("Personas");
+    expect(palabras[0].attributes("style")).toContain("--i: 0");
+    expect(palabras[9].attributes("style")).toContain("--i: 9");
+  });
+
+  test("las palabras siguen separadas por espacios al leer el título", () => {
+    expect(montar().find("h1").text()).toBe(
+      "Personas cuidadoras de confianza, cuando tu familia más lo necesita",
+    );
+  });
+
+  test("la cinta de cuidados está en la portada", () => {
+    expect(montar().find(".cinta").exists()).toBe(true);
+  });
+
+  test("con reducir movimiento se apagan las palabras del título", () => {
+    const bloque = archivo.slice(archivo.indexOf("@media (prefers-reduced-motion: reduce)"));
+
+    expect(bloque).toContain(".landing__palabra");
+  });
 });
