@@ -23,4 +23,16 @@ describe("BuscarView · diseño de tarjetas", () => {
     expect(bloque).toContain(".buscar__card");
     expect(bloque).toContain("animation: none");
   });
+
+  test("las tarjetas van de una en una, alargadas en pantallas anchas", () => {
+    const rejilla = archivo.slice(archivo.indexOf(".buscar__grid {"));
+
+    expect(rejilla.slice(0, 120)).toContain("grid-template-columns: 1fr");
+    expect(archivo).toContain("@media (min-width: 901px)");
+    expect(archivo).toContain("grid-template-columns: 300px 1fr 200px");
+  });
+
+  test("la valoración y las etiquetas van agrupadas en el centro de la tarjeta", () => {
+    expect(archivo).toContain('class="buscar__card-centro"');
+  });
 });

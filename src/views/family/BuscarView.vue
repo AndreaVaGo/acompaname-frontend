@@ -478,6 +478,8 @@ const cuidadoresFiltrados = computed(() => {
           </div>
         </div>
 
+        <!-- Valoración y etiquetas: en pantallas anchas ocupan el centro de la fila -->
+        <div class="buscar__card-centro">
         <p class="buscar__card-valoracion">
           <template v-if="cuidador.valoracionMedia !== null">
             <RouterLink
@@ -537,6 +539,8 @@ const cuidadoresFiltrados = computed(() => {
             :key="codigo"
             >{{ nombreCortoTitulacion(codigo) }}</span
           >
+        </div>
+
         </div>
 
         <div class="buscar__card-footer">
@@ -766,9 +770,10 @@ const cuidadoresFiltrados = computed(() => {
   margin-bottom: 16px;
 }
 
+/* Una tarjeta por fila: así caben todas las etiquetas sin apretarse */
 .buscar__grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr;
   gap: var(--gap-md);
 }
 
@@ -967,6 +972,51 @@ const cuidadoresFiltrados = computed(() => {
 .buscar__precio {
   font-size: 1.25rem;
   font-weight: bold;
+}
+
+/* Pantallas anchas: la tarjeta se alarga en tres columnas (persona · detalles · precio y botón) */
+@media (min-width: 901px) {
+  .buscar__card {
+    display: grid;
+    grid-template-columns: 300px 1fr 200px;
+    align-items: stretch;
+    padding: 0;
+    border-top: 1px solid transparent;
+    border-left: 6px solid var(--color-border);
+  }
+
+  .buscar__card--disponible {
+    border-top-color: transparent;
+    border-left-color: var(--color-secondary);
+  }
+
+  .buscar__card--ocupado {
+    border-top-color: transparent;
+    border-left-color: var(--color-error);
+  }
+
+  /* La franja de color pasa a ser la columna de la izquierda, a toda la altura */
+  .buscar__card-cabecera {
+    margin: 0;
+    padding: 24px;
+  }
+
+  .buscar__card-centro {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 20px 24px;
+  }
+
+  .buscar__card-footer {
+    flex-direction: column;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 0;
+    padding: 20px 24px;
+    border-top: none;
+    border-left: 1px solid var(--color-neutral-bg);
+  }
 }
 
 @media (max-width: 900px) {
