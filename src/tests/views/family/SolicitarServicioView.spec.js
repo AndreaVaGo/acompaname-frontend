@@ -52,6 +52,12 @@ async function elegirGrupo(wrapper, codigo) {
     .setValue(true);
 }
 
+// Rellena la hora de inicio y la de fin (por defecto, de 9:00 a 12:00)
+async function elegirHoras(wrapper, inicio = "09:00", fin = "12:00") {
+  await wrapper.find("#hora-inicio").setValue(inicio);
+  await wrapper.find("#hora-fin").setValue(fin);
+}
+
 describe("SolicitarServicioView", () => {
   afterEach(() => {
     vi.restoreAllMocks();
@@ -123,6 +129,7 @@ describe("SolicitarServicioView", () => {
     await opciones[0].trigger("click");
 
     await wrapper.find("#fecha").setValue("2026-10-10");
+    await elegirHoras(wrapper);
     await wrapper.find("#hospital").setValue("Hospital de Cabueñes");
     await wrapper.find("#ubicacion").setValue("Planta 2, habitación 214");
     await elegirGrupo(wrapper, "MAYORES");
@@ -142,6 +149,8 @@ describe("SolicitarServicioView", () => {
       edadPaciente: 81,
       fechaCuidado: "2026-10-10",
       fechaFin: null,
+      horaInicio: "09:00",
+      horaFin: "12:00",
       familiaId: 1,
       cuidadorId: 3,
       necesidades: [],
@@ -164,6 +173,7 @@ describe("SolicitarServicioView", () => {
     await opciones[1].trigger("click");
 
     await wrapper.find("#fecha").setValue("2026-10-10");
+    await elegirHoras(wrapper);
     await wrapper.find("#fecha-fin").setValue("2026-10-17");
     await wrapper.find("#direccion").setValue("Calle Uría 10, Oviedo");
     await elegirGrupo(wrapper, "MAYORES");
@@ -195,6 +205,7 @@ describe("SolicitarServicioView", () => {
     await opciones[0].trigger("click");
 
     await wrapper.find("#fecha").setValue("2026-10-10");
+    await elegirHoras(wrapper);
     await wrapper.find("#fecha-fin").setValue("2026-10-05");
     await wrapper.find("#hospital").setValue("Hospital de Cabueñes");
     await wrapper.find("#ubicacion").setValue("Planta 2, habitación 214");
@@ -224,6 +235,7 @@ describe("SolicitarServicioView", () => {
     await opciones[1].trigger("click");
 
     await wrapper.find("#fecha").setValue("2026-10-10");
+    await elegirHoras(wrapper);
     await wrapper.find("#direccion").setValue("Calle Uría 10, Oviedo");
     await elegirGrupo(wrapper, "MAYORES");
     await wrapper.find("#paciente").setValue("Antonio Serrano");
@@ -251,6 +263,7 @@ describe("SolicitarServicioView", () => {
     await opciones[1].trigger("click");
 
     await wrapper.find("#fecha").setValue("2026-10-10");
+    await elegirHoras(wrapper);
     await wrapper.find("#direccion").setValue("Calle Uría 10, Oviedo");
     await elegirGrupo(wrapper, "MAYORES");
     await wrapper.find("#paciente").setValue("Antonio Serrano");
@@ -294,6 +307,7 @@ describe("SolicitarServicioView", () => {
     await opciones[0].trigger("click");
 
     await wrapper.find("#fecha").setValue("2026-10-10");
+    await elegirHoras(wrapper);
     await wrapper.find("#hospital").setValue("Hospital de Cabueñes");
     await wrapper.find("#ubicacion").setValue("Planta 2, habitación 214");
     await elegirGrupo(wrapper, "MAYORES");
@@ -324,6 +338,7 @@ describe("SolicitarServicioView", () => {
     await opciones[0].trigger("click");
 
     await wrapper.find("#fecha").setValue("2026-10-10");
+    await elegirHoras(wrapper);
     await wrapper.find("#hospital").setValue("Hospital de Cabueñes");
     await wrapper.find("#ubicacion").setValue("Planta 2, habitación 214");
     await elegirGrupo(wrapper, "MAYORES");
@@ -375,6 +390,7 @@ describe("SolicitarServicioView", () => {
     await opciones[0].trigger("click");
 
     await wrapper.find("#fecha").setValue("2026-10-10");
+    await elegirHoras(wrapper);
     await wrapper.find("#hospital").setValue("HUCA");
     await elegirGrupo(wrapper, "MAYORES");
     await wrapper.find("#paciente").setValue("Antonio Serrano");
@@ -402,6 +418,7 @@ describe("SolicitarServicioView", () => {
     await opciones[1].trigger("click");
 
     await wrapper.find("#fecha").setValue("2026-10-10");
+    await elegirHoras(wrapper);
     await wrapper.find("#direccion").setValue("   ");
     await elegirGrupo(wrapper, "MAYORES");
     await wrapper.find("#paciente").setValue("Antonio Serrano");
@@ -529,6 +546,7 @@ describe("SolicitarServicioView", () => {
 
     await wrapper.findAll(".solicitar__opcion")[1].trigger("click");
     await wrapper.find("#fecha").setValue("2026-10-10");
+    await elegirHoras(wrapper);
     await wrapper.find("#direccion").setValue("Calle Uría 10, Oviedo");
 
     await wrapper.find("form").trigger("submit.prevent");
@@ -551,6 +569,7 @@ describe("SolicitarServicioView", () => {
 
     await wrapper.findAll(".solicitar__opcion")[1].trigger("click");
     await wrapper.find("#fecha").setValue("2026-10-10");
+    await elegirHoras(wrapper);
     await wrapper.find("#direccion").setValue("Calle Uría 10, Oviedo");
     await elegirGrupo(wrapper, "BEBES");
     await wrapper.find("#paciente").setValue("Lucía");
@@ -576,6 +595,7 @@ describe("SolicitarServicioView", () => {
 
     await wrapper.findAll(".solicitar__opcion")[1].trigger("click");
     await wrapper.find("#fecha").setValue("2026-10-10");
+    await elegirHoras(wrapper);
     await wrapper.find("#direccion").setValue("Calle Uría 10, Oviedo");
     await elegirGrupo(wrapper, "BEBES");
     await wrapper.find("#paciente").setValue("Lucía");
@@ -586,6 +606,128 @@ describe("SolicitarServicioView", () => {
 
     expect(createSpy).toHaveBeenCalledWith(
       expect.objectContaining({ grupoEdad: "BEBES", edadPaciente: 0 }),
+    );
+  });
+
+  test("pide la hora de inicio y la de fin", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
+      usuarioNombre: "Pepe",
+    });
+
+    const { wrapper } = await montarVista();
+
+    expect(wrapper.find("#hora-inicio").attributes("type")).toBe("time");
+    expect(wrapper.find("#hora-fin").attributes("type")).toBe("time");
+    expect(wrapper.text()).toContain("Hora de inicio");
+    expect(wrapper.text()).toContain("Hora de fin");
+  });
+
+  test("no envía la solicitud si faltan las horas", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
+      usuarioNombre: "Pepe",
+    });
+    const createSpy = vi
+      .spyOn(SolicitudRepository.prototype, "create")
+      .mockResolvedValue({});
+
+    const { wrapper } = await montarVista();
+
+    await wrapper.findAll(".solicitar__opcion")[1].trigger("click");
+    await wrapper.find("#fecha").setValue("2026-10-10");
+    await wrapper.find("#direccion").setValue("Calle Uría 10, Oviedo");
+    await elegirGrupo(wrapper, "MAYORES");
+    await wrapper.find("#paciente").setValue("Antonio Serrano");
+    await wrapper.find("#edad").setValue("81");
+
+    await wrapper.find("form").trigger("submit.prevent");
+
+    expect(wrapper.text()).toContain(
+      "Por favor, rellena todos los campos obligatorios.",
+    );
+    expect(createSpy).not.toHaveBeenCalled();
+  });
+
+  test("en un solo día no envía la solicitud si la hora de fin no es posterior a la de inicio", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
+      usuarioNombre: "Pepe",
+    });
+    const createSpy = vi
+      .spyOn(SolicitudRepository.prototype, "create")
+      .mockResolvedValue({});
+
+    const { wrapper } = await montarVista();
+
+    await wrapper.findAll(".solicitar__opcion")[1].trigger("click");
+    await wrapper.find("#fecha").setValue("2026-10-10");
+    await elegirHoras(wrapper, "15:00", "12:00");
+    await wrapper.find("#direccion").setValue("Calle Uría 10, Oviedo");
+    await elegirGrupo(wrapper, "MAYORES");
+    await wrapper.find("#paciente").setValue("Antonio Serrano");
+    await wrapper.find("#edad").setValue("81");
+
+    await wrapper.find("form").trigger("submit.prevent");
+
+    expect(wrapper.text()).toContain(
+      "La hora de fin tiene que ser posterior a la de inicio.",
+    );
+    expect(createSpy).not.toHaveBeenCalled();
+  });
+
+  test("con fecha de fin igual a la de inicio también comprueba las horas", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
+      usuarioNombre: "Pepe",
+    });
+    const createSpy = vi
+      .spyOn(SolicitudRepository.prototype, "create")
+      .mockResolvedValue({});
+
+    const { wrapper } = await montarVista();
+
+    await wrapper.findAll(".solicitar__opcion")[1].trigger("click");
+    await wrapper.find("#fecha").setValue("2026-10-10");
+    await wrapper.find("#fecha-fin").setValue("2026-10-10");
+    await elegirHoras(wrapper, "12:00", "12:00");
+    await wrapper.find("#direccion").setValue("Calle Uría 10, Oviedo");
+    await elegirGrupo(wrapper, "MAYORES");
+    await wrapper.find("#paciente").setValue("Antonio Serrano");
+    await wrapper.find("#edad").setValue("81");
+
+    await wrapper.find("form").trigger("submit.prevent");
+
+    expect(wrapper.text()).toContain(
+      "La hora de fin tiene que ser posterior a la de inicio.",
+    );
+    expect(createSpy).not.toHaveBeenCalled();
+  });
+
+  test("con varios días la hora de fin puede ser anterior a la de inicio", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
+      usuarioNombre: "Pepe",
+    });
+    const createSpy = vi
+      .spyOn(SolicitudRepository.prototype, "create")
+      .mockResolvedValue({ id: 9 });
+
+    const { wrapper } = await montarVista();
+
+    await wrapper.findAll(".solicitar__opcion")[1].trigger("click");
+    await wrapper.find("#fecha").setValue("2026-10-10");
+    await wrapper.find("#fecha-fin").setValue("2026-10-12");
+    await elegirHoras(wrapper, "22:00", "08:00");
+    await wrapper.find("#direccion").setValue("Calle Uría 10, Oviedo");
+    await elegirGrupo(wrapper, "MAYORES");
+    await wrapper.find("#paciente").setValue("Antonio Serrano");
+    await wrapper.find("#edad").setValue("81");
+
+    await wrapper.find("form").trigger("submit.prevent");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(createSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        fechaFin: "2026-10-12",
+        horaInicio: "22:00",
+        horaFin: "08:00",
+      }),
     );
   });
 });
