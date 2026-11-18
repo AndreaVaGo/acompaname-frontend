@@ -36,11 +36,15 @@ describe("BuscarView · diseño de tarjetas", () => {
     expect(archivo).toContain('class="buscar__card-centro"');
   });
 
-  test("el fondo tiene dos manchas de color que se mueven despacio", () => {
+  test("el fondo es un degradado que se desplaza despacio y una mancha que cruza la pantalla", () => {
     expect(archivo).toContain(".buscar::before");
-    expect(archivo).toContain("animation: buscar-mancha-a");
-    expect(archivo).toContain("animation: buscar-mancha-b");
+    expect(archivo).toContain("animation: buscar-degradado");
+    expect(archivo).toContain("animation: buscar-mancha");
     expect(archivo).toContain("pointer-events: none");
+  });
+
+  test("el panel de filtros es de cristal para que se vea el fondo", () => {
+    expect(archivo).toContain("backdrop-filter: blur(14px)");
   });
 
   test("las tarjetas pares alternan el color de la franja", () => {

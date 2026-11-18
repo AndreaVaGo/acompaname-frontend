@@ -567,45 +567,51 @@ const cuidadoresFiltrados = computed(() => {
   margin: 0 auto;
 }
 
-/* Fondo vivo: dos manchas suaves (verde y coral) que se mueven despacio detrás de la página */
-.buscar::before,
+/* Fondo vivo: un degradado de verde, coral y amarillo suave que se desplaza despacio detrás de la página.
+   Va fijo en la pantalla, así se sigue viendo al hacer scroll */
+.buscar::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(150, 215, 175, 0.75), transparent 45%),
+    radial-gradient(circle at 85% 25%, rgba(250, 175, 150, 0.6), transparent 45%),
+    radial-gradient(circle at 50% 90%, rgba(253, 226, 160, 0.65), transparent 50%);
+  background-size: 160% 160%;
+  animation: buscar-degradado 18s ease-in-out infinite alternate;
+}
+
+/* Una mancha grande extra que cruza la pantalla para dar profundidad */
 .buscar::after {
   content: "";
   position: fixed;
+  top: 30%;
+  left: -10%;
   z-index: -1;
   pointer-events: none;
-  width: 560px;
-  height: 560px;
+  width: 520px;
+  height: 520px;
   border-radius: 50%;
-  filter: blur(70px);
-  opacity: 0.55;
+  filter: blur(60px);
+  background: radial-gradient(circle, rgba(120, 200, 160, 0.55), transparent 70%);
+  animation: buscar-mancha 24s ease-in-out infinite alternate;
 }
 
-.buscar::before {
-  top: -120px;
-  left: -140px;
-  background: radial-gradient(circle, var(--color-secondary-bg), transparent 70%);
-  animation: buscar-mancha-a 22s ease-in-out infinite alternate;
-}
-
-.buscar::after {
-  right: -160px;
-  bottom: -140px;
-  background: radial-gradient(circle, var(--color-accent-bg), transparent 70%);
-  animation: buscar-mancha-b 26s ease-in-out infinite alternate;
-}
-
-@keyframes buscar-mancha-a {
+@keyframes buscar-degradado {
+  from {
+    background-position: 0% 0%;
+  }
   to {
-    translate: 320px 220px;
-    scale: 1.25;
+    background-position: 100% 100%;
   }
 }
 
-@keyframes buscar-mancha-b {
+@keyframes buscar-mancha {
   to {
-    translate: -300px -200px;
-    scale: 1.2;
+    translate: 120vw -20vh;
+    scale: 1.3;
   }
 }
 
@@ -695,7 +701,10 @@ const cuidadoresFiltrados = computed(() => {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 22px 40px;
-  background-color: var(--color-white);
+  /* Cristal: blanco translúcido con desenfoque, para que se vea el fondo moverse detrás */
+  background-color: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
   border-radius: var(--radius-card);
   border-top: 4px solid var(--color-accent);
   padding: 28px;
