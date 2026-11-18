@@ -25,6 +25,9 @@ const soloVehiculo = ref(false);
 const valoracionMinima = ref(0);
 const fechaDesde = ref("");
 const fechaHasta = ref("");
+// Horas opcionales (HH:mm): sin ellas se busca el día completo
+const horaDesde = ref("");
+const horaHasta = ref("");
 const idsOcupados = ref([]);
 const errorFechas = ref("");
 const cargando = ref(true);
@@ -40,8 +43,8 @@ onMounted(async () => {
   }
 });
 
-// Cada vez que cambia una fecha se vuelve a preguntar al servidor
-// qué cuidadores tienen un servicio aceptado en esos días
+// Cada vez que cambia una fecha o una hora se vuelve a preguntar al servidor
+// qué cuidadores tienen un servicio aceptado en esos días y horas
 async function comprobarFechas() {
   errorFechas.value = "";
   idsOcupados.value = [];
@@ -57,17 +60,27 @@ async function comprobarFechas() {
     return;
   }
 
+  // Si se busca un solo día y se dan las dos horas, la de fin tiene que ser posterior
+  // (las horas tienen formato HH:mm, así que también se pueden comparar como texto)
+  const unSoloDia = !fechaHasta.value || fechaHasta.value === fechaDesde.value;
+  if (unSoloDia && horaDesde.value && horaHasta.value && horaHasta.value <= horaDesde.value) {
+    errorFechas.value = "La hora de fin tiene que ser posterior a la de inicio";
+    return;
+  }
+
   try {
     idsOcupados.value = await solicitudRepository.getCuidadoresOcupados(
       fechaDesde.value,
       fechaHasta.value,
+      horaDesde.value,
+      horaHasta.value,
     );
   } catch (err) {
     errorFechas.value = mensajeDeError(err, "No se pudo comprobar la disponibilidad por fechas.");
   }
 }
 
-watch([fechaDesde, fechaHasta], comprobarFechas);
+watch([fechaDesde, fechaHasta, horaDesde, horaHasta], comprobarFechas);
 
 // Un cuidador sin tipo de cuidado se trata como "ambos"
 function tipoDe(cuidador) {
@@ -230,6 +243,26 @@ const cuidadoresFiltrados = computed(() => {
               type="date"
               id="filtro-fecha-hasta"
               v-model="fechaHasta"
+              class="buscar__input buscar__input--fecha"
+            />
+          </div>
+        </div>
+        <div class="buscar__fechas">
+          <div class="buscar__fecha">
+            <label for="filtro-hora-desde">Desde las (opcional)</label>
+            <input
+              type="time"
+              id="filtro-hora-desde"
+              v-model="horaDesde"
+              class="buscar__input buscar__input--fecha"
+            />
+          </div>
+          <div class="buscar__fecha">
+            <label for="filtro-hora-hasta">Hasta las (opcional)</label>
+            <input
+              type="time"
+              id="filtro-hora-hasta"
+              v-model="horaHasta"
               class="buscar__input buscar__input--fecha"
             />
           </div>
@@ -576,11 +609,15 @@ const cuidadoresFiltrados = computed(() => {
   box-sizing: border-box;
 }
 
-/* Las dos fechas van una al lado de la otra */
+/* Las dos fechas (y las dos horas) van una al lado de la otra */
 .buscar__fechas {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
+}
+
+.buscar__fechas + .buscar__fechas {
+  margin-top: 12px;
 }
 
 .buscar__fecha {
