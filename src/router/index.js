@@ -4,6 +4,8 @@ import { useAuthStore } from "../stores/auth";
 import LandingView from "../views/common/LandingView.vue";
 import LoginView from "../views/auth/LoginView.vue";
 import RegisterView from "../views/auth/RegisterView.vue";
+import OlvidePasswordView from "../views/auth/OlvidePasswordView.vue";
+import RestablecerPasswordView from "../views/auth/RestablecerPasswordView.vue";
 import BuscarView from "../views/family/BuscarView.vue";
 import SolicitudesCuidadorView from "../views/caregiver/SolicitudesCuidadorView.vue";
 import EditarPerfilView from "../views/caregiver/EditarPerfilView.vue";
@@ -36,6 +38,8 @@ const router = createRouter({
     { path: "/", name: "landing", component: LandingView },
     { path: "/login", name: "login", component: LoginView, meta: { titulo: "Iniciar sesión", descripcion: "Inicia sesión en Acompáñame para gestionar tus solicitudes de cuidado." } },
     { path: "/registro", name: "registro", component: RegisterView, meta: { titulo: "Crear cuenta", descripcion: "Crea tu cuenta en Acompáñame como familia o como persona cuidadora." } },
+    { path: "/olvide-password", name: "olvide-password", component: OlvidePasswordView, meta: { titulo: "Recuperar contraseña", descripcion: "Pide un enlace para elegir una contraseña nueva en Acompáñame." } },
+    { path: "/restablecer-password", name: "restablecer-password", component: RestablecerPasswordView, meta: { titulo: "Elegir contraseña nueva", descripcion: "Elige una contraseña nueva para tu cuenta de Acompáñame." } },
     { path: "/buscar", name: "buscar", component: BuscarView, meta: { titulo: "Buscar personas cuidadoras", descripcion: "Busca personas cuidadoras de confianza por ciudad, tipo de cuidado y valoraciones." } },
     { path: "/cuidador/:id", name: "perfil-cuidador", component: PerfilCuidadorView, meta: { titulo: "Perfil de la persona cuidadora", descripcion: "Conoce la experiencia, la tarifa y las valoraciones de esta persona cuidadora." } },
     { path: "/aviso-legal", name: "aviso-legal", component: AvisoLegalView, meta: { titulo: "Aviso legal", descripcion: "Información legal de Acompáñame." } },
