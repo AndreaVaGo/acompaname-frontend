@@ -9,6 +9,7 @@ import { CUIDADOS, nombreCuidado } from "@/utils/catalogoCuidados";
 import { nombreGrupo } from "@/utils/catalogoGrupos";
 import { nombreCortoTitulacion } from "@/utils/catalogoTitulaciones";
 import { mensajeDeError } from "@/utils/mensajeDeError";
+import { moverFoco } from "@/utils/focoTarjeta";
 
 const cuidadorRepository = new CuidadorRepository();
 const solicitudRepository = new SolicitudRepository();
@@ -457,8 +458,10 @@ const cuidadoresFiltrados = computed(() => {
             ? 'buscar__card--disponible'
             : 'buscar__card--ocupado'
         "
-        v-for="cuidador in cuidadoresFiltrados"
+        v-for="(cuidador, indice) in cuidadoresFiltrados"
         :key="cuidador.id"
+        :style="{ '--i': Math.min(indice, 8) }"
+        @mousemove="moverFoco"
       >
         <div class="buscar__card-cabecera">
           <FotoCuidador
@@ -779,9 +782,13 @@ const cuidadoresFiltrados = computed(() => {
   padding: 22px;
   box-shadow: var(--shadow-card);
   overflow: hidden;
+  position: relative;
+  /* Entrada escalonada: cada tarjeta aparece un poco después de la anterior */
+  animation: buscar-entra 0.5s var(--ease-out) backwards;
+  animation-delay: calc(var(--i, 0) * 60ms);
   transition:
-    transform 0.2s,
-    box-shadow 0.2s;
+    transform var(--dur-med) var(--ease-out),
+    box-shadow var(--dur-med) var(--ease-out);
 
   & h3 {
     margin: 0 0 4px;
@@ -794,6 +801,49 @@ const cuidadoresFiltrados = computed(() => {
   .buscar__card:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-card-hover);
+  }
+}
+
+@keyframes buscar-entra {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+/* Resplandor verde suave que sigue al ratón dentro de la tarjeta */
+.buscar__card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    240px circle at var(--x, 50%) var(--y, 50%),
+    rgba(46, 125, 91, 0.12),
+    transparent 70%
+  );
+  transition: opacity var(--dur-med) var(--ease-out);
+}
+
+@media (hover: hover) {
+  .buscar__card:hover::after {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .buscar__card {
+    animation: none;
+    transition: none;
+  }
+
+  .buscar__card:hover {
+    transform: none;
+  }
+
+  .buscar__card::after {
+    transition: none;
   }
 }
 
