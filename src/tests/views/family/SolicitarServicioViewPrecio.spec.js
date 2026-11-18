@@ -147,4 +147,21 @@ describe("SolicitarServicioView · precio estimado", () => {
       "Es una estimación",
     );
   });
+
+  test("usa el recargo propio de la persona cuidadora", async () => {
+    const wrapper = await montarVista({
+      usuarioNombre: "Pepe",
+      tarifaHora: 15,
+      recargoPersonaExtra: 50,
+    });
+    await elegirGrupo(wrapper, "MAYORES");
+    await rellenarFechasYHoras(wrapper);
+
+    await wrapper.find(".solicitar__anadir").trigger("click");
+
+    const texto = wrapper.find('[data-testid="precio-estimado"]').text();
+    expect(texto).toContain("1 persona extra (50 % cada una)");
+    // 4 x 15 x 1,5 = 90
+    expect(texto).toContain("Total estimado: 90,00 €");
+  });
 });

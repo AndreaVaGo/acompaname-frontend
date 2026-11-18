@@ -22,6 +22,8 @@ const cuidadorId = route.params.id;
 const cuidadorNombre = ref("");
 // Tarifa por hora de la persona cuidadora, para calcular el precio estimado
 const tarifaHora = ref(0);
+// Recargo por persona extra de esta persona cuidadora, en porcentaje (null = el de por defecto)
+const recargoPersonaExtra = ref(null);
 
 // Código del grupo de edad de la persona cuidada (es lo primero que se elige)
 const grupoEdad = ref("");
@@ -50,7 +52,12 @@ const estimacion = computed(() => {
     fechaFin.value,
     horaFin.value,
   );
-  return estimarImporte(tarifaHora.value, horas, personas.value.length);
+  return estimarImporte(
+    tarifaHora.value,
+    horas,
+    personas.value.length,
+    recargoPersonaExtra.value,
+  );
 });
 
 // El grupo elegido trae los textos de ejemplo y los límites de edad (todo está en catalogoGrupos)
@@ -61,6 +68,7 @@ onMounted(async () => {
     const cuidador = await cuidadorRepository.getById(cuidadorId);
     cuidadorNombre.value = cuidador.usuarioNombre;
     tarifaHora.value = cuidador.tarifaHora;
+    recargoPersonaExtra.value = cuidador.recargoPersonaExtra ?? null;
   } catch (err) {
     error.value = mensajeDeError(err, "No se pudo cargar a la persona cuidadora.");
   }
