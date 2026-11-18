@@ -488,7 +488,7 @@ describe('AdminView', () => {
 
     expect(AdminRepository.prototype.getSugerencias).toHaveBeenCalledTimes(1)
     expect(wrapper.find('.admin-menu__boton--activo').text()).toBe('Sugerencias')
-    expect(wrapper.findAll('.admin-sugerencias tbody tr')).toHaveLength(1)
+    expect(wrapper.findAll('.admin-sugerencias__tarjeta')).toHaveLength(1)
     expect(wrapper.text()).toContain('Me gustaría poder chatear')
     expect(wrapper.find('.admin-usuarios').exists()).toBe(false)
   })
