@@ -2,6 +2,7 @@ import { describe, test, expect, vi, afterEach } from "vitest";
 import { mount, flushPromises } from "@vue/test-utils";
 import MiCalendarioView from "../../../views/caregiver/MiCalendarioView.vue";
 import BloqueOcupadoRepository from "../../../repositories/BloqueOcupadoRepository";
+import SolicitudRepository from "../../../repositories/SolicitudRepository";
 
 // Fechas lejanas para que el test no dependa del día en que se ejecuta
 const FUTURO = "2099-12-01";
@@ -12,8 +13,24 @@ function bloque(id, fecha, motivo) {
   return { id: id, fecha: fecha, horaInicio: "08:00:00", horaFin: "15:00:00", motivo: motivo };
 }
 
-async function montarVista(bloques = []) {
+// Solicitud de la persona cuidadora (por defecto, aceptada y de un solo día)
+function solicitud(id, estado, fechaCuidado, extra = {}) {
+  return {
+    id: id,
+    estado: estado,
+    fechaCuidado: fechaCuidado,
+    fechaFin: null,
+    horaInicio: "09:00:00",
+    horaFin: "12:00:00",
+    nombrePaciente: "Carmen",
+    familiaNombre: "Ana",
+    ...extra,
+  };
+}
+
+async function montarVista(bloques = [], solicitudes = []) {
   vi.spyOn(BloqueOcupadoRepository.prototype, "getMios").mockResolvedValue(bloques);
+  vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue(solicitudes);
   const wrapper = mount(MiCalendarioView);
   await flushPromises();
   return wrapper;
@@ -73,6 +90,7 @@ describe("MiCalendarioView", () => {
 
   test("si no se puede cargar el calendario enseña un aviso", async () => {
     vi.spyOn(BloqueOcupadoRepository.prototype, "getMios").mockRejectedValue(new Error("fallo"));
+    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([]);
     const wrapper = mount(MiCalendarioView);
     await flushPromises();
 
@@ -173,6 +191,74 @@ describe("MiCalendarioView", () => {
     await flushPromises();
 
     expect(wrapper.find(".calendario__error").text()).toContain("No se pudo quitar el bloque.");
+    expect(wrapper.findAll(".calendario__bloque").length).toBe(1);
+  });
+
+  test("sin servicios aceptados dice que no hay ninguno", async () => {
+    const wrapper = await montarVista();
+
+    expect(wrapper.find(".calendario__sin-servicios").text()).toContain("ningún servicio aceptado");
+  });
+
+  test("enseña solo los servicios aceptados que no han acabado", async () => {
+    const wrapper = await montarVista([], [
+      solicitud(1, "ACEPTADA", FUTURO),
+      solicitud(2, "PENDIENTE", FUTURO),
+      solicitud(3, "RECHAZADA", FUTURO),
+      solicitud(4, "COMPLETADA", FUTURO),
+      solicitud(5, "ACEPTADA", PASADO),
+    ]);
+
+    expect(wrapper.findAll(".calendario__servicio").length).toBe(1);
+  });
+
+  test("un servicio de un solo día enseña la fecha y las horas, el paciente y la familia", async () => {
+    const wrapper = await montarVista([], [solicitud(1, "ACEPTADA", FUTURO)]);
+
+    const texto = wrapper.find(".calendario__servicio").text();
+    expect(texto).toContain("01-12-2099 · 09:00 - 12:00");
+    expect(texto).toContain("Cuidado de Carmen");
+    expect(texto).toContain("Familia Ana");
+  });
+
+  test("un servicio de varios días enseña el principio y el final", async () => {
+    const wrapper = await montarVista([], [
+      solicitud(1, "ACEPTADA", FUTURO, { fechaFin: FUTURO_2, horaInicio: "22:00:00", horaFin: "08:00:00" }),
+    ]);
+
+    expect(wrapper.find(".calendario__servicio").text()).toContain("01-12-2099 · 22:00 → 03-12-2099 · 08:00");
+  });
+
+  test("un servicio antiguo sin horas enseña solo la fecha", async () => {
+    const wrapper = await montarVista([], [
+      solicitud(1, "ACEPTADA", FUTURO, { horaInicio: null, horaFin: null }),
+    ]);
+
+    expect(wrapper.find(".calendario__servicio .calendario__bloque-fecha").text()).toBe("01-12-2099");
+  });
+
+  test("los servicios salen por orden de fecha y, el mismo día, de hora", async () => {
+    const wrapper = await montarVista([], [
+      solicitud(1, "ACEPTADA", FUTURO_2),
+      solicitud(2, "ACEPTADA", FUTURO, { horaInicio: "16:00:00", horaFin: "18:00:00" }),
+      solicitud(3, "ACEPTADA", FUTURO, { horaInicio: "08:00:00", horaFin: "10:00:00" }),
+    ]);
+
+    const fechas = wrapper.findAll(".calendario__servicio .calendario__bloque-fecha").map((f) => f.text());
+    expect(fechas).toEqual([
+      "01-12-2099 · 08:00 - 10:00",
+      "01-12-2099 · 16:00 - 18:00",
+      "03-12-2099 · 09:00 - 12:00",
+    ]);
+  });
+
+  test("si no se pueden cargar los servicios enseña un aviso y el resto sigue funcionando", async () => {
+    vi.spyOn(BloqueOcupadoRepository.prototype, "getMios").mockResolvedValue([bloque(1, FUTURO, "Uno")]);
+    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockRejectedValue(new Error("fallo"));
+    const wrapper = mount(MiCalendarioView);
+    await flushPromises();
+
+    expect(wrapper.find(".calendario__aviso-servicios").text()).toContain("No se pudieron cargar tus servicios");
     expect(wrapper.findAll(".calendario__bloque").length).toBe(1);
   });
 });

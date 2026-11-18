@@ -1,11 +1,13 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import BloqueOcupadoRepository from "@/repositories/BloqueOcupadoRepository";
+import SolicitudRepository from "@/repositories/SolicitudRepository";
 import { mensajeDeError } from "@/utils/mensajeDeError";
 import { formatearFecha } from "@/utils/formatearFecha";
-import { formatearHora } from "@/utils/formatearHora";
+import { formatearHora, formatearMomento } from "@/utils/formatearHora";
 
 const bloqueRepository = new BloqueOcupadoRepository();
+const solicitudRepository = new SolicitudRepository();
 
 // Lo mismo que acepta el servidor: el motivo puede tener hasta 100 caracteres
 const MAXIMO_MOTIVO = 100;
@@ -23,6 +25,10 @@ const hoy = hoyEnFormatoISO();
 const bloques = ref([]);
 const cargando = ref(true);
 const errorCarga = ref("");
+
+// Los servicios que ya ha aceptado (también ocupan su calendario)
+const servicios = ref([]);
+const errorServicios = ref("");
 
 const fecha = ref("");
 const horaInicio = ref("");
@@ -52,6 +58,52 @@ async function cargarBloques() {
   } finally {
     cargando.value = false;
   }
+}
+
+// Carga las solicitudes de la persona y se queda con las aceptadas que todavía no han acabado,
+// por orden de fecha y, si es el mismo día, de hora
+async function cargarServicios() {
+  errorServicios.value = "";
+  try {
+    const todas = await solicitudRepository.getMisSolicitudes();
+    const aceptadas = [];
+    for (const solicitud of todas) {
+      const ultimoDia = solicitud.fechaFin || solicitud.fechaCuidado;
+      if (solicitud.estado === "ACEPTADA" && ultimoDia >= hoy) {
+        aceptadas.push(solicitud);
+      }
+    }
+    aceptadas.sort((a, b) => {
+      if (a.fechaCuidado !== b.fechaCuidado) {
+        return a.fechaCuidado < b.fechaCuidado ? -1 : 1;
+      }
+      return (a.horaInicio || "") < (b.horaInicio || "") ? -1 : 1;
+    });
+    servicios.value = aceptadas;
+  } catch (err) {
+    errorServicios.value = mensajeDeError(err, "No se pudieron cargar tus servicios aceptados.");
+  }
+}
+
+// Cuándo es el servicio: un solo día ("10-09-2026 · 09:00 - 12:00") o varios días ("10-09-2026 · 22:00 → 12-09-2026 · 08:00")
+function cuandoEs(servicio) {
+  if (servicio.fechaFin && servicio.fechaFin !== servicio.fechaCuidado) {
+    return (
+      formatearMomento(servicio.fechaCuidado, servicio.horaInicio) +
+      " → " +
+      formatearMomento(servicio.fechaFin, servicio.horaFin)
+    );
+  }
+  if (!servicio.horaInicio) {
+    return formatearFecha(servicio.fechaCuidado);
+  }
+  return (
+    formatearFecha(servicio.fechaCuidado) +
+    " · " +
+    formatearHora(servicio.horaInicio) +
+    " - " +
+    formatearHora(servicio.horaFin)
+  );
 }
 
 // Devuelve el texto del primer fallo que encuentre, o "" si todo está bien
@@ -115,7 +167,10 @@ async function quitarBloque(bloque) {
   }
 }
 
-onMounted(cargarBloques);
+onMounted(() => {
+  cargarBloques();
+  cargarServicios();
+});
 </script>
 
 <template>
@@ -162,6 +217,20 @@ onMounted(cargarBloques);
           </button>
         </form>
       </div>
+
+      <h2 class="calendario__titulo-lista">Servicios aceptados</h2>
+      <p v-if="errorServicios" class="calendario__aviso-servicios" role="alert">{{ errorServicios }}</p>
+      <p v-else-if="servicios.length === 0" class="calendario__sin-servicios">
+        No tienes ningún servicio aceptado pendiente.
+      </p>
+      <ul v-else class="calendario__lista">
+        <li v-for="servicio in servicios" :key="servicio.id" class="calendario__servicio">
+          <span class="calendario__bloque-fecha">{{ cuandoEs(servicio) }}</span>
+          <span class="calendario__bloque-motivo">
+            Cuidado de {{ servicio.nombrePaciente }} · Familia {{ servicio.familiaNombre }}
+          </span>
+        </li>
+      </ul>
 
       <h2 class="calendario__titulo-lista">Próximos ratos ocupados</h2>
 
@@ -277,7 +346,8 @@ onMounted(cargarBloques);
   margin: 32px 0 12px;
 }
 
-.calendario__vacio {
+.calendario__vacio,
+.calendario__sin-servicios {
   color: var(--color-text-muted);
 }
 
@@ -300,6 +370,23 @@ onMounted(cargarBloques);
   border-left: 4px solid var(--color-accent);
   box-shadow: var(--shadow-card);
   padding: 14px 18px;
+}
+
+/* Los servicios aceptados llevan la franja en verde, para distinguirlos de los ratos ocupados */
+.calendario__servicio {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background-color: var(--color-white);
+  border-radius: var(--radius-card);
+  border-left: 4px solid var(--color-secondary);
+  box-shadow: var(--shadow-card);
+  padding: 14px 18px;
+}
+
+.calendario__aviso-servicios {
+  color: var(--color-error);
+  font-size: 0.9rem;
 }
 
 .calendario__bloque-datos {
