@@ -15,6 +15,11 @@ export default class MensajeRepository extends Repository {
     return this.get(ruta);
   }
 
+  // Mensajes sin leer de la persona: { total, porSolicitud: { idSolicitud: cantidad } }
+  async getNoLeidos() {
+    return this.get("/mensajes/no-leidos");
+  }
+
   async enviar(solicitudId, texto) {
     return this.post(`/solicitudes/${solicitudId}/mensajes`, { texto: texto });
   }

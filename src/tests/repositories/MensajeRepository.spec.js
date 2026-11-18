@@ -80,3 +80,16 @@ describe("MensajeRepository", () => {
     await expect(repository.getMensajes(7)).rejects.toBeDefined();
   });
 });
+
+describe("MensajeRepository · mensajes sin leer", () => {
+  test("getNoLeidos pide el recuento a /mensajes/no-leidos con GET", async () => {
+    const fetchFalso = prepararFetch({ total: 3, porSolicitud: { 5: 2, 6: 1 } });
+    const repository = new MensajeRepository();
+
+    const resultado = await repository.getNoLeidos();
+
+    expect(fetchFalso.mock.calls[0][0]).toBe(`${API}/mensajes/no-leidos`);
+    expect(resultado.total).toBe(3);
+    expect(resultado.porSolicitud[5]).toBe(2);
+  });
+});
