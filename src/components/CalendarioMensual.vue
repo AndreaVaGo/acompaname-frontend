@@ -84,6 +84,16 @@ function tipoDe(fecha) {
   return marca.servicios > 0 ? "servicio" : "bloque";
 }
 
+// Cuánto se llena la barra de un día, de 0 a 100 (con 8 horas apuntadas está llena).
+// Si la marca no trae minutos, se enseña a la mitad
+function porcentajeDe(fecha) {
+  const minutos = marcaDe(fecha).minutos;
+  if (minutos === undefined) {
+    return 50;
+  }
+  return Math.min(100, Math.round((minutos / MINUTOS_DIA_COMPLETO) * 100));
+}
+
 // Las clases de color de una casilla (los días libres no llevan color)
 function clasesDeColor(fecha) {
   const estado = estadoDe(fecha);
@@ -163,8 +173,6 @@ function descripcionDe(celda) {
           @click="emit('seleccionar', celda.fecha)"
         >
           <span class="calendario-mensual__numero">{{ celda.dia }}</span>
-          <span v-if="estadoDe(celda.fecha) === 'completo'" class="calendario-mensual__estado">Completo</span>
-          <span v-else-if="estadoDe(celda.fecha) === 'parcial'" class="calendario-mensual__estado">Parcial</span>
           <span class="calendario-mensual__puntos">
             <span
               v-if="marcaDe(celda.fecha).servicios > 0"
@@ -173,6 +181,12 @@ function descripcionDe(celda) {
             <span
               v-if="marcaDe(celda.fecha).bloques > 0"
               class="calendario-mensual__punto calendario-mensual__punto--bloque"
+            ></span>
+          </span>
+          <span v-if="estadoDe(celda.fecha) !== 'libre'" class="calendario-mensual__barra">
+            <span
+              class="calendario-mensual__barra-relleno"
+              :style="{ width: porcentajeDe(celda.fecha) + '%' }"
             ></span>
           </span>
         </button>
@@ -189,12 +203,15 @@ function descripcionDe(celda) {
           <span class="calendario-mensual__punto calendario-mensual__punto--bloque"></span>
           Rato ocupado
         </span>
+        <span class="calendario-mensual__leyenda-item">
+          <span class="calendario-mensual__barra calendario-mensual__barra--muestra">
+            <span class="calendario-mensual__barra-relleno" style="width: 100%"></span>
+          </span>
+          Barra llena: día completo
+        </span>
       </div>
       <button type="button" class="calendario-mensual__hoy" @click="irAHoy">Hoy</button>
     </div>
-    <p class="calendario-mensual__ayuda">
-      Color suave: ese día todavía tienes horas libres. Color fuerte: día completo. Sin color: día libre.
-    </p>
   </div>
 </template>
 
@@ -302,9 +319,42 @@ function descripcionDe(celda) {
   background: linear-gradient(135deg, var(--color-secondary) 50%, var(--color-info) 50%);
 }
 
-.calendario-mensual__estado {
-  font-size: 0.65rem;
-  line-height: 1;
+/* Barrita de abajo: cuánto del día está ocupado (llena con 8 horas) */
+.calendario-mensual__barra {
+  display: block;
+  width: 70%;
+  height: 5px;
+  border-radius: 3px;
+  background-color: rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+}
+
+.calendario-mensual__barra--muestra {
+  display: inline-block;
+  width: 28px;
+}
+
+.calendario-mensual__barra-relleno {
+  display: block;
+  height: 100%;
+  background-color: var(--color-text);
+}
+
+.calendario-mensual__dia--servicio .calendario-mensual__barra-relleno {
+  background-color: var(--color-secondary);
+}
+
+.calendario-mensual__dia--bloque .calendario-mensual__barra-relleno {
+  background-color: var(--color-info);
+}
+
+/* En un día completo el fondo es fuerte, así que la barra va en blanco */
+.calendario-mensual__dia--completo .calendario-mensual__barra {
+  background-color: rgba(255, 255, 255, 0.35);
+}
+
+.calendario-mensual__dia--completo .calendario-mensual__barra-relleno {
+  background-color: var(--color-white);
 }
 
 .calendario-mensual__dia--pasado {
@@ -369,12 +419,6 @@ function descripcionDe(celda) {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-}
-
-.calendario-mensual__ayuda {
-  margin: 12px 0 0;
-  font-size: 0.8rem;
-  color: var(--color-text-muted);
 }
 
 .calendario-mensual__hoy {

@@ -159,14 +159,14 @@ describe("CalendarioMensual", () => {
 });
 
 describe("CalendarioMensual: colores de los días", () => {
-  test("un día sin nada no lleva color ni texto de estado", () => {
+  test("un día sin nada no lleva color ni barra", () => {
     const wrapper = montar();
 
     expect(dia(wrapper, 15).classes()).toContain("calendario-mensual__dia--libre");
-    expect(dia(wrapper, 15).find(".calendario-mensual__estado").exists()).toBe(false);
+    expect(dia(wrapper, 15).find(".calendario-mensual__barra").exists()).toBe(false);
   });
 
-  test("un día con poco apuntado lleva color suave y dice Parcial", () => {
+  test("un día con poco apuntado lleva color suave y la barra a medias", () => {
     const wrapper = montar({
       marcas: {
         "2026-12-15": { servicios: 1, bloques: 0, minutos: 180 },
@@ -179,7 +179,8 @@ describe("CalendarioMensual: colores de los días", () => {
     expect(dia(wrapper, 16).classes()).toContain("calendario-mensual__dia--bloque");
     expect(dia(wrapper, 17).classes()).toContain("calendario-mensual__dia--mixto");
     expect(dia(wrapper, 15).classes()).not.toContain("calendario-mensual__dia--completo");
-    expect(dia(wrapper, 15).find(".calendario-mensual__estado").text()).toBe("Parcial");
+    // 180 minutos de 480 = 38 %
+    expect(dia(wrapper, 15).find(".calendario-mensual__barra-relleno").attributes("style")).toContain("width: 38%");
     expect(dia(wrapper, 15).attributes("aria-label")).toContain("con horas libres");
   });
 
@@ -193,21 +194,28 @@ describe("CalendarioMensual: colores de los días", () => {
     });
 
     expect(dia(wrapper, 15).classes()).toContain("calendario-mensual__dia--completo");
-    expect(dia(wrapper, 15).find(".calendario-mensual__estado").text()).toBe("Completo");
+    expect(dia(wrapper, 15).find(".calendario-mensual__barra-relleno").attributes("style")).toContain("width: 100%");
     expect(dia(wrapper, 15).attributes("aria-label")).toContain("día completo");
     expect(dia(wrapper, 16).classes()).toContain("calendario-mensual__dia--completo");
     expect(dia(wrapper, 17).classes()).not.toContain("calendario-mensual__dia--completo");
   });
 
-  test("si la marca no trae minutos, el día cuenta como parcial", () => {
-    const wrapper = montar({ marcas: { "2026-12-15": { servicios: 1, bloques: 0 } } });
+  test("la barra nunca pasa del 100 % aunque haya más de 8 horas", () => {
+    const wrapper = montar({ marcas: { "2026-12-15": { servicios: 1, bloques: 0, minutos: 1440 } } });
 
-    expect(dia(wrapper, 15).find(".calendario-mensual__estado").text()).toBe("Parcial");
+    expect(dia(wrapper, 15).find(".calendario-mensual__barra-relleno").attributes("style")).toContain("width: 100%");
   });
 
-  test("explica los colores debajo del calendario", () => {
+  test("si la marca no trae minutos, el día cuenta como parcial y la barra va a la mitad", () => {
+    const wrapper = montar({ marcas: { "2026-12-15": { servicios: 1, bloques: 0 } } });
+
+    expect(dia(wrapper, 15).classes()).not.toContain("calendario-mensual__dia--completo");
+    expect(dia(wrapper, 15).find(".calendario-mensual__barra-relleno").attributes("style")).toContain("width: 50%");
+  });
+
+  test("la leyenda explica la barra", () => {
     const wrapper = montar();
 
-    expect(wrapper.find(".calendario-mensual__ayuda").text()).toContain("horas libres");
+    expect(wrapper.find(".calendario-mensual__leyenda").text()).toContain("Barra llena: día completo");
   });
 });
