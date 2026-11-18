@@ -516,6 +516,19 @@ async function enviarSolicitud() {
   margin-bottom: var(--gap-md);
 }
 
+/* "Quitar" va en rojo suave para que se vea que borra a una persona (el selector largo gana a .btn--secondary) */
+.solicitar__form .solicitar__quitar {
+  background-color: var(--color-error-bg);
+  border-color: var(--color-error-border);
+  color: var(--color-error);
+}
+
+@media (hover: hover) {
+  .solicitar__form .solicitar__quitar:hover {
+    border-color: var(--color-error);
+  }
+}
+
 .solicitar__titulo-grupo {
   font-weight: bold;
   font-size: 0.95rem;
