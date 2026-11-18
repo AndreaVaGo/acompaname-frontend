@@ -2,23 +2,17 @@
 import { ref, computed, onMounted } from "vue";
 import BloqueOcupadoRepository from "@/repositories/BloqueOcupadoRepository";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
+import CalendarioMensual from "@/components/CalendarioMensual.vue";
 import { mensajeDeError } from "@/utils/mensajeDeError";
 import { formatearFecha } from "@/utils/formatearFecha";
 import { formatearHora, formatearMomento } from "@/utils/formatearHora";
+import { hoyEnFormatoISO, fechasEntre } from "@/utils/calendario";
 
 const bloqueRepository = new BloqueOcupadoRepository();
 const solicitudRepository = new SolicitudRepository();
 
 // Lo mismo que acepta el servidor: el motivo puede tener hasta 100 caracteres
 const MAXIMO_MOTIVO = 100;
-
-// La fecha de hoy con el formato de los campos de fecha (2026-11-18), con la hora de aquí, no la UTC
-function hoyEnFormatoISO() {
-  const ahora = new Date();
-  const mes = String(ahora.getMonth() + 1).padStart(2, "0");
-  const dia = String(ahora.getDate()).padStart(2, "0");
-  return `${ahora.getFullYear()}-${mes}-${dia}`;
-}
 
 const hoy = hoyEnFormatoISO();
 
@@ -30,6 +24,9 @@ const errorCarga = ref("");
 const servicios = ref([]);
 const errorServicios = ref("");
 
+// El día del calendario que está abierto: abajo se ven sus servicios y sus bloques
+const diaSeleccionado = ref(hoy);
+
 const fecha = ref("");
 const horaInicio = ref("");
 const horaFin = ref("");
@@ -38,16 +35,54 @@ const guardando = ref(false);
 const error = ref("");
 const aviso = ref("");
 
-// Solo se enseñan los bloques de hoy en adelante: los de días pasados ya no sirven
-const proximos = computed(() => {
+// Lo que se pinta en el calendario: por cada día, cuántos servicios y cuántos bloques tiene.
+// Un servicio de varios días marca todos los días que dura
+const marcas = computed(() => {
+  const resultado = {};
+
+  function marcar(dia, tipo) {
+    if (!resultado[dia]) {
+      resultado[dia] = { servicios: 0, bloques: 0 };
+    }
+    resultado[dia][tipo] = resultado[dia][tipo] + 1;
+  }
+
+  for (const bloque of bloques.value) {
+    marcar(bloque.fecha, "bloques");
+  }
+  for (const servicio of servicios.value) {
+    const ultimoDia = servicio.fechaFin || servicio.fechaCuidado;
+    for (const dia of fechasEntre(servicio.fechaCuidado, ultimoDia)) {
+      marcar(dia, "servicios");
+    }
+  }
+  return resultado;
+});
+
+const bloquesDelDia = computed(() => {
   const lista = [];
   for (const bloque of bloques.value) {
-    if (bloque.fecha >= hoy) {
+    if (bloque.fecha === diaSeleccionado.value) {
       lista.push(bloque);
     }
   }
   return lista;
 });
+
+const serviciosDelDia = computed(() => {
+  const lista = [];
+  for (const servicio of servicios.value) {
+    const ultimoDia = servicio.fechaFin || servicio.fechaCuidado;
+    if (servicio.fechaCuidado <= diaSeleccionado.value && diaSeleccionado.value <= ultimoDia) {
+      lista.push(servicio);
+    }
+  }
+  return lista;
+});
+
+const diaVacio = computed(
+  () => bloquesDelDia.value.length === 0 && serviciosDelDia.value.length === 0,
+);
 
 async function cargarBloques() {
   errorCarga.value = "";
@@ -60,7 +95,7 @@ async function cargarBloques() {
   }
 }
 
-// Carga las solicitudes de la persona y se queda con las aceptadas que todavía no han acabado,
+// Carga las solicitudes de la persona y se queda con las aceptadas,
 // por orden de fecha y, si es el mismo día, de hora
 async function cargarServicios() {
   errorServicios.value = "";
@@ -68,8 +103,7 @@ async function cargarServicios() {
     const todas = await solicitudRepository.getMisSolicitudes();
     const aceptadas = [];
     for (const solicitud of todas) {
-      const ultimoDia = solicitud.fechaFin || solicitud.fechaCuidado;
-      if (solicitud.estado === "ACEPTADA" && ultimoDia >= hoy) {
+      if (solicitud.estado === "ACEPTADA") {
         aceptadas.push(solicitud);
       }
     }
@@ -106,6 +140,14 @@ function cuandoEs(servicio) {
   );
 }
 
+// Al pulsar un día se abre y, si no es pasado, se deja puesto en el formulario para añadir un bloque
+function seleccionarDia(dia) {
+  diaSeleccionado.value = dia;
+  if (dia >= hoy) {
+    fecha.value = dia;
+  }
+}
+
 // Devuelve el texto del primer fallo que encuentre, o "" si todo está bien
 function comprobarFormulario() {
   if (!fecha.value || !horaInicio.value || !horaFin.value) {
@@ -137,6 +179,8 @@ async function guardarBloque() {
       horaFin: horaFin.value,
       motivo: motivo.value.trim(),
     });
+    // Se abre el día que se acaba de apuntar, para ver el bloque nuevo
+    diaSeleccionado.value = fecha.value;
     fecha.value = "";
     horaInicio.value = "";
     horaFin.value = "";
@@ -178,11 +222,57 @@ onMounted(() => {
     <div class="calendario__wrapper">
       <h1>Mi calendario</h1>
       <p class="calendario__subtitle">
-        Apunta los ratos en los que no puedes trabajar (tu turno en el hospital, una cita...). Las familias
-        no verán que estás disponible en esas horas y no podrás aceptar servicios que coincidan.
+        Aquí ves tus servicios aceptados y los ratos en los que no puedes trabajar (tu turno en el hospital,
+        una cita...). Las familias no verán que estás disponible en esas horas y no podrás aceptar servicios
+        que coincidan.
       </p>
 
       <div class="calendario__box">
+        <CalendarioMensual
+          :marcas="marcas"
+          :seleccionado="diaSeleccionado"
+          @seleccionar="seleccionarDia"
+        />
+      </div>
+
+      <section class="calendario__detalle" aria-live="polite">
+        <h2 class="calendario__titulo-lista">{{ formatearFecha(diaSeleccionado) }}</h2>
+
+        <p v-if="cargando" class="calendario__vacio">Cargando tu calendario...</p>
+        <p v-if="errorCarga" class="calendario__error" role="alert">{{ errorCarga }}</p>
+        <p v-if="errorServicios" class="calendario__aviso-servicios" role="alert">{{ errorServicios }}</p>
+        <p v-if="!cargando && !errorCarga && diaVacio" class="calendario__vacio">
+          No tienes nada apuntado este día.
+        </p>
+
+        <ul class="calendario__lista">
+          <li v-for="servicio in serviciosDelDia" :key="'s' + servicio.id" class="calendario__servicio">
+            <span class="calendario__bloque-fecha">{{ cuandoEs(servicio) }}</span>
+            <span class="calendario__bloque-motivo">
+              Cuidado de {{ servicio.nombrePaciente }} · Familia {{ servicio.familiaNombre }}
+            </span>
+          </li>
+          <li v-for="bloque in bloquesDelDia" :key="'b' + bloque.id" class="calendario__bloque">
+            <div class="calendario__bloque-datos">
+              <span class="calendario__bloque-fecha">Rato ocupado</span>
+              <span class="calendario__bloque-horas">
+                {{ formatearHora(bloque.horaInicio) }} - {{ formatearHora(bloque.horaFin) }}
+              </span>
+              <span v-if="bloque.motivo" class="calendario__bloque-motivo">{{ bloque.motivo }}</span>
+            </div>
+            <button
+              type="button"
+              class="calendario__quitar"
+              :aria-label="'Quitar el bloque del ' + formatearFecha(bloque.fecha)"
+              @click="quitarBloque(bloque)"
+            >
+              Quitar
+            </button>
+          </li>
+        </ul>
+      </section>
+
+      <div class="calendario__box calendario__box--formulario">
         <form class="formulario calendario__form" @submit.prevent="guardarBloque">
           <h2 class="titulo-seccion" data-icono="📅">Añadir un rato ocupado</h2>
 
@@ -217,47 +307,6 @@ onMounted(() => {
           </button>
         </form>
       </div>
-
-      <h2 class="calendario__titulo-lista">Servicios aceptados</h2>
-      <p v-if="errorServicios" class="calendario__aviso-servicios" role="alert">{{ errorServicios }}</p>
-      <p v-else-if="servicios.length === 0" class="calendario__sin-servicios">
-        No tienes ningún servicio aceptado pendiente.
-      </p>
-      <ul v-else class="calendario__lista">
-        <li v-for="servicio in servicios" :key="servicio.id" class="calendario__servicio">
-          <span class="calendario__bloque-fecha">{{ cuandoEs(servicio) }}</span>
-          <span class="calendario__bloque-motivo">
-            Cuidado de {{ servicio.nombrePaciente }} · Familia {{ servicio.familiaNombre }}
-          </span>
-        </li>
-      </ul>
-
-      <h2 class="calendario__titulo-lista">Próximos ratos ocupados</h2>
-
-      <p v-if="cargando" class="calendario__vacio">Cargando tu calendario...</p>
-      <p v-else-if="errorCarga" class="calendario__error" role="alert">{{ errorCarga }}</p>
-      <p v-else-if="proximos.length === 0" class="calendario__vacio">
-        No tienes ningún rato ocupado apuntado.
-      </p>
-      <ul v-else class="calendario__lista">
-        <li v-for="bloque in proximos" :key="bloque.id" class="calendario__bloque">
-          <div class="calendario__bloque-datos">
-            <span class="calendario__bloque-fecha">{{ formatearFecha(bloque.fecha) }}</span>
-            <span class="calendario__bloque-horas">
-              {{ formatearHora(bloque.horaInicio) }} - {{ formatearHora(bloque.horaFin) }}
-            </span>
-            <span v-if="bloque.motivo" class="calendario__bloque-motivo">{{ bloque.motivo }}</span>
-          </div>
-          <button
-            type="button"
-            class="calendario__quitar"
-            :aria-label="'Quitar el bloque del ' + formatearFecha(bloque.fecha)"
-            @click="quitarBloque(bloque)"
-          >
-            Quitar
-          </button>
-        </li>
-      </ul>
     </div>
   </div>
 </template>
@@ -275,7 +324,7 @@ onMounted(() => {
 }
 
 .calendario__wrapper {
-  max-width: 560px;
+  max-width: 620px;
   width: 100%;
 }
 
@@ -295,6 +344,10 @@ onMounted(() => {
   border-top: 4px solid var(--color-accent);
   box-shadow: var(--shadow-card);
   overflow: hidden;
+}
+
+.calendario__box--formulario {
+  margin-top: 32px;
 }
 
 /* Etiquetas, campos y títulos de sección vienen de base.css (clases "formulario" y "titulo-seccion") */
@@ -343,11 +396,10 @@ onMounted(() => {
 
 .calendario__titulo-lista {
   font-size: 1.25rem;
-  margin: 32px 0 12px;
+  margin: 28px 0 12px;
 }
 
-.calendario__vacio,
-.calendario__sin-servicios {
+.calendario__vacio {
   color: var(--color-text-muted);
 }
 
@@ -367,7 +419,7 @@ onMounted(() => {
   gap: 16px;
   background-color: var(--color-white);
   border-radius: var(--radius-card);
-  border-left: 4px solid var(--color-accent);
+  border-left: 4px solid #e8890c;
   box-shadow: var(--shadow-card);
   padding: 14px 18px;
 }
