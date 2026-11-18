@@ -213,3 +213,15 @@ describe("CalendarioMensual: colores de los días", () => {
   });
 
 });
+
+describe("CalendarioMensual: leyenda", () => {
+  test("cada estado de la leyenda lleva su cuadradito y los de con algo apuntado y completo llevan su barrita", () => {
+    const wrapper = montar();
+
+    expect(wrapper.findAll(".calendario-mensual__leyenda-item").length).toBe(3);
+    expect(wrapper.find(".calendario-mensual__muestra--libre").exists()).toBe(true);
+    expect(wrapper.find(".calendario-mensual__muestra--libre .calendario-mensual__muestra-barra").exists()).toBe(false);
+    expect(wrapper.find(".calendario-mensual__muestra--ocupado .calendario-mensual__muestra-barra--media").exists()).toBe(true);
+    expect(wrapper.find(".calendario-mensual__muestra--completo .calendario-mensual__muestra-barra--llena").exists()).toBe(true);
+  });
+});

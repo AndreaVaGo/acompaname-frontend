@@ -179,11 +179,15 @@ function descripcionDe(celda) {
           Día libre
         </span>
         <span class="calendario-mensual__leyenda-item">
-          <span class="calendario-mensual__muestra calendario-mensual__muestra--ocupado"></span>
+          <span class="calendario-mensual__muestra calendario-mensual__muestra--ocupado">
+            <span class="calendario-mensual__muestra-barra calendario-mensual__muestra-barra--media"></span>
+          </span>
           Con algo apuntado
         </span>
         <span class="calendario-mensual__leyenda-item">
-          <span class="calendario-mensual__muestra calendario-mensual__muestra--completo"></span>
+          <span class="calendario-mensual__muestra calendario-mensual__muestra--completo">
+            <span class="calendario-mensual__muestra-barra calendario-mensual__muestra-barra--llena"></span>
+          </span>
           Día completo
         </span>
       </div>
@@ -320,12 +324,32 @@ function descripcionDe(celda) {
 }
 
 /* Cuadraditos de la leyenda: se ven igual que los días del calendario */
+/* Cuadraditos de la leyenda: son un día en pequeño, con su barrita de horas ocupadas */
 .calendario-mensual__muestra {
+  position: relative;
   display: inline-block;
-  width: 16px;
-  height: 16px;
-  border-radius: 4px;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
   border: 1px solid var(--color-border);
+}
+
+.calendario-mensual__muestra-barra {
+  position: absolute;
+  left: 4px;
+  bottom: 4px;
+  height: 4px;
+  border-radius: 2px;
+  background-color: var(--color-info);
+}
+
+.calendario-mensual__muestra-barra--media {
+  width: 9px;
+}
+
+.calendario-mensual__muestra-barra--llena {
+  width: 16px;
+  background-color: var(--color-white);
 }
 
 .calendario-mensual__muestra--libre {
@@ -354,16 +378,16 @@ function descripcionDe(celda) {
 
 .calendario-mensual__leyenda {
   display: flex;
-  gap: 16px;
+  gap: 8px 20px;
   flex-wrap: wrap;
-  font-size: 0.85rem;
-  color: var(--color-text-muted);
+  font-size: 0.95rem;
+  color: var(--color-text);
 }
 
 .calendario-mensual__leyenda-item {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .calendario-mensual__hoy {
