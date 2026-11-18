@@ -5,6 +5,10 @@ import SolicitudRepository from "@/repositories/SolicitudRepository";
 import { formatearMomento } from "@/utils/formatearHora";
 import { mensajeDeError } from "@/utils/mensajeDeError";
 import { nombreGrupo } from "@/utils/catalogoGrupos";
+import {
+  detalleDePersonas,
+  hayVariasPersonas,
+} from "@/utils/personasSolicitud";
 
 const route = useRoute();
 const solicitudRepository = new SolicitudRepository();
@@ -67,8 +71,8 @@ onMounted(async () => {
           <strong>{{ nombreGrupo(solicitud.grupoEdad) }}</strong>
         </div>
         <div class="confirmacion__fila">
-          <span>Persona cuidada</span>
-          <strong>{{ solicitud.nombrePaciente }}, {{ solicitud.edadPaciente }} años</strong>
+          <span>{{ hayVariasPersonas(solicitud) ? "Personas cuidadas" : "Persona cuidada" }}</span>
+          <strong>{{ detalleDePersonas(solicitud) }}</strong>
         </div>
       </div>
 
