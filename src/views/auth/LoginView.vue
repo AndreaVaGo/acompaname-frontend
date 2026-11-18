@@ -75,6 +75,10 @@ async function handleSubmit() {
             v-model="password"
           />
 
+          <p class="login__olvide">
+            <RouterLink to="/olvide-password">¿Has olvidado tu contraseña?</RouterLink>
+          </p>
+
           <p role="alert" v-if="error" class="login__error">{{ error }}</p>
 
           <button type="submit" class="btn btn--primary">Entrar</button>
@@ -170,6 +174,24 @@ async function handleSubmit() {
   padding: 10px 14px;
   border-radius: var(--radius-input);
   margin: -4px 0 16px;
+}
+
+/* Enlace pequeño bajo la contraseña */
+.login__olvide {
+  margin: -8px 0 16px;
+  font-size: 0.9rem;
+  text-align: right;
+
+  & a {
+    color: var(--color-accent-dark);
+    text-decoration: none;
+  }
+}
+
+@media (hover: hover) {
+  .login__olvide a:hover {
+    text-decoration: underline;
+  }
 }
 
 .login__switch {
