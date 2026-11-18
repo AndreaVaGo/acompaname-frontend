@@ -291,8 +291,8 @@ const botones = computed(() => {
   width: fit-content;
   max-width: 100%;
   align-items: center;
-  gap: 14px;
-  padding: 10px 14px 10px 12px;
+  gap: 20px;
+  padding: 16px 20px 16px 18px;
   background-color: var(--color-white);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-pill);
@@ -318,13 +318,13 @@ const botones = computed(() => {
 }
 
 .landing__mirar-pregunta {
-  font-size: 0.85rem;
+  font-size: 1rem;
   color: var(--color-text-muted);
 }
 
 /* La acción va en verde y en negrita; se subraya al pasar el ratón */
 .landing__texto {
-  font-size: 1.05rem;
+  font-size: 1.4rem;
   font-weight: bold;
   color: var(--color-secondary);
 }
@@ -336,6 +336,9 @@ const botones = computed(() => {
 /* Los círculos laten con suavidad (misma animación que los iconos de las tarjetas) */
 .landing__avatares {
   flex-shrink: 0;
+  /* Más grandes que el tamaño original del dibujo (84 x 36) */
+  width: 126px;
+  height: auto;
   border-radius: 999px;
   --halo: rgba(46, 125, 91, 0.2);
   animation: latido 3s ease-out infinite;
@@ -347,12 +350,12 @@ const botones = computed(() => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background-color: var(--color-secondary-bg);
   color: var(--color-secondary);
-  font-size: 1.3rem;
+  font-size: 1.7rem;
   line-height: 1;
   transition:
     transform var(--dur-med) var(--ease-out),

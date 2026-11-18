@@ -100,4 +100,10 @@ describe("LandingView · diseño", () => {
 
     expect(bloque).toContain(".landing__link");
   });
+
+  test("la tarjeta de mirar es grande para que se vea a primera vista", () => {
+    expect(archivo).toContain("font-size: 1.4rem");
+    expect(archivo).toContain("width: 126px");
+    expect(archivo).toContain("width: 48px");
+  });
 });
