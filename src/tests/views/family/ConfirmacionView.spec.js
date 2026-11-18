@@ -86,6 +86,24 @@ describe("ConfirmacionView", () => {
     expect(wrapper.text()).toContain("17-10-2026");
   });
 
+  test("muestra la hora de inicio y la de fin junto a las fechas", async () => {
+    vi.spyOn(SolicitudRepository.prototype, "getById").mockResolvedValue({
+      cuidadorNombre: "Pepe",
+      tipoCuidado: "domicilio",
+      fechaCuidado: "2026-10-10",
+      horaInicio: "09:00:00",
+      horaFin: "12:00:00",
+      nombrePaciente: "Antonio Serrano",
+      edadPaciente: 81,
+    });
+
+    const { wrapper } = await montarVista();
+
+    expect(wrapper.text()).toContain("10-10-2026 · 09:00");
+    expect(wrapper.text()).toContain("Fecha de fin");
+    expect(wrapper.text()).toContain("10-10-2026 · 12:00");
+  });
+
   test("no muestra la fila de fecha de fin si la solicitud no la tiene", async () => {
     vi.spyOn(SolicitudRepository.prototype, "getById").mockResolvedValue({
       cuidadorNombre: "Pepe",
