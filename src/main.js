@@ -1,4 +1,7 @@
 import { createApp } from "vue";
+// Tipografías propias, servidas desde la propia web (sin llamar a Google Fonts)
+import "@fontsource-variable/fraunces/index.css";
+import "@fontsource-variable/dm-sans/index.css";
 import "./style.css";
 import "./styles/variables.css";
 import "./styles/base.css";
