@@ -45,7 +45,8 @@ const botones = computed(() => {
           Nunca sola, nunca solo
         </span>
         <h1>
-          Personas cuidadoras de confianza, cuando tu familia más lo necesita
+          Personas cuidadoras de confianza,
+          <span class="landing__resalte">cuando tu familia más lo necesita</span>
         </h1>
         <p class="landing__hero-text">
           Encuentra profesionales para acompañar en el hospital o en casa a
@@ -158,6 +159,10 @@ const botones = computed(() => {
   font-family: var(--font-base);
   color: var(--color-text);
   background-color: var(--color-bg);
+  /* El fondo con manchas de color va detrás del contenido, pero delante del color de fondo */
+  position: relative;
+  isolation: isolate;
+  overflow-x: clip;
 
   & h1,
   & h2,
@@ -225,11 +230,24 @@ const botones = computed(() => {
 .landing__flecha {
   font-size: 1.7rem;
   line-height: 1;
-  transition: transform 0.25s ease;
+  transition: transform var(--dur-med) var(--ease-out);
 }
 
 .landing__link:hover .landing__flecha {
   transform: translateX(5px);
+}
+
+/* Dos manchas de color muy suaves (coral y verde) detrás de la portada, para dar profundidad */
+.landing::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 720px;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(242, 137, 107, 0.2), transparent 45%),
+    radial-gradient(circle at 88% 62%, rgba(46, 125, 91, 0.18), transparent 50%);
 }
 
 /* El texto a la izquierda y la animación a la derecha, centrada en vertical */
@@ -281,6 +299,63 @@ const botones = computed(() => {
   margin-bottom: 32px;
 }
 
+/* Al cargar la página, cada pieza del texto de la portada sube y aparece, una tras otra */
+.landing__hero-content > * {
+  animation: entrar var(--dur-slow) var(--ease-out) both;
+}
+
+.landing__hero-content > :nth-child(2) {
+  animation-delay: 90ms;
+}
+
+.landing__hero-content > :nth-child(3) {
+  animation-delay: 180ms;
+}
+
+.landing__hero-content > :nth-child(4) {
+  animation-delay: 270ms;
+}
+
+.landing__hero-content > :nth-child(5) {
+  animation-delay: 360ms;
+}
+
+/* La animación de la derecha entra desde el lado */
+.landing__hero-image {
+  animation: entrar-lado 800ms var(--ease-out) 200ms both;
+}
+
+/* Parte del título lleva un subrayado coral claro que se dibuja de izquierda a derecha */
+.landing__resalte {
+  background-image: linear-gradient(var(--color-accent-bg), var(--color-accent-bg));
+  background-repeat: no-repeat;
+  background-position: 0 92%;
+  background-size: 100% 0.4em;
+  box-decoration-break: clone;
+  animation: subrayar 700ms var(--ease-out) 600ms both;
+}
+
+@keyframes entrar {
+  from {
+    opacity: 0;
+    translate: 0 24px;
+  }
+}
+
+@keyframes entrar-lado {
+  from {
+    opacity: 0;
+    translate: 40px 0;
+    scale: 0.96;
+  }
+}
+
+@keyframes subrayar {
+  from {
+    background-size: 0 0.4em;
+  }
+}
+
 /* La animación es cuadrada y ocupa el mismo hueco que tenía la foto */
 .landing__hero-image {
   flex-shrink: 0;
@@ -318,8 +393,8 @@ const botones = computed(() => {
   box-shadow: var(--shadow-card);
   text-align: left;
   transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease;
+    transform var(--dur-med) var(--ease-out),
+    box-shadow var(--dur-med) var(--ease-out);
 
   & h3 {
     margin-bottom: 6px;
@@ -334,7 +409,7 @@ const botones = computed(() => {
   align-items: center;
   justify-content: center;
   margin-bottom: 10px;
-  transition: transform 0.25s ease;
+  transition: transform var(--dur-med) var(--ease-out);
   /* Latido suave: un halo coral que se expande y se apaga */
   --halo: rgba(242, 137, 107, 0.45);
   animation: latido 3s ease-out infinite;
@@ -381,8 +456,8 @@ const botones = computed(() => {
   text-align: center;
   box-shadow: var(--shadow-card);
   transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease;
+    transform var(--dur-med) var(--ease-out),
+    box-shadow var(--dur-med) var(--ease-out);
 
   & h2 {
     margin-bottom: 12px;
@@ -400,7 +475,7 @@ const botones = computed(() => {
   height: 46px;
   border-radius: 50%;
   margin-bottom: 12px;
-  transition: transform 0.25s ease;
+  transition: transform var(--dur-med) var(--ease-out);
   --halo: rgba(242, 137, 107, 0.45);
   animation: latido 3s ease-out infinite;
 }
@@ -412,6 +487,9 @@ const botones = computed(() => {
 
 /* Quien prefiere menos movimiento no ve ni el latido ni los efectos al pasar el ratón */
 @media (prefers-reduced-motion: reduce) {
+  .landing__hero-content > *,
+  .landing__hero-image,
+  .landing__resalte,
   .landing__step-card,
   .landing__step-icon,
   .landing__cta,
