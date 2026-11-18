@@ -136,6 +136,56 @@ const avisoDireccion = computed(
           </button>
         </div>
 
+        <!-- Resumen completo dentro de la ventana, para decidir sin cerrarla -->
+        <template v-if="mostrarAcciones">
+          <p class="solicitudes__bloque-titulo">
+            👥 {{ hayVariasPersonas(solicitud) ? "Personas a cuidar" : "Persona a cuidar" }}
+          </p>
+          <ul class="solicitudes__lista-personas">
+            <li
+              v-for="(persona, indice) in listaDePersonas(solicitud)"
+              :key="indice"
+            >
+              <strong>{{ persona.nombre }}</strong>
+              <span v-if="persona.edad !== undefined && persona.edad !== null">
+                · {{ persona.edad }} años
+              </span>
+            </li>
+          </ul>
+
+          <p class="solicitudes__bloque-titulo">📅 Cuándo y qué tipo</p>
+          <ul class="solicitudes__detalles solicitudes__detalles--modal">
+            <li>🏠 {{ solicitud.tipoCuidado }}</li>
+            <li v-if="solicitud.grupoEdad">
+              👥 <strong>Grupo de edad:</strong>
+              {{ nombreGrupo(solicitud.grupoEdad) }}
+            </li>
+            <li>
+              📅 <strong>Inicio:</strong>
+              {{ formatearMomento(solicitud.fechaCuidado, solicitud.horaInicio) }}
+            </li>
+            <li v-if="solicitud.fechaFin || solicitud.horaFin">
+              📅 <strong>Fin:</strong>
+              {{
+                formatearMomento(
+                  solicitud.fechaFin || solicitud.fechaCuidado,
+                  solicitud.horaFin,
+                )
+              }}
+            </li>
+          </ul>
+        </template>
+
+        <p
+          class="solicitudes__bloque-titulo"
+          v-if="
+            mostrarAcciones &&
+            solicitud.necesidades &&
+            solicitud.necesidades.length > 0
+          "
+        >
+          🩺 Necesidades
+        </p>
         <div
           class="solicitudes__necesidades"
           v-if="solicitud.necesidades && solicitud.necesidades.length > 0"
@@ -149,6 +199,15 @@ const avisoDireccion = computed(
           </span>
         </div>
 
+        <p
+          class="solicitudes__bloque-titulo"
+          v-if="
+            mostrarAcciones &&
+            (solicitud.direccion || solicitud.notas || avisoDireccion)
+          "
+        >
+          🗒️ Más datos
+        </p>
         <ul
           class="solicitudes__detalles"
           v-if="solicitud.direccion || solicitud.notas || avisoDireccion"
@@ -344,6 +403,10 @@ const avisoDireccion = computed(
   }
 }
 
+.solicitudes__detalles--modal {
+  margin-bottom: 4px;
+}
+
 .solicitudes__card--pendiente .solicitudes__detalles {
   background-color: var(--color-accent-bg);
 }
@@ -386,6 +449,32 @@ const avisoDireccion = computed(
   max-height: 85vh;
   overflow-y: auto;
   box-shadow: var(--shadow-card);
+}
+
+/* Títulos pequeños que separan los bloques de la ventana de detalles */
+.solicitudes__bloque-titulo {
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  margin: 18px 0 8px;
+}
+
+.solicitudes__lista-personas {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  & li {
+    background-color: var(--color-accent-bg);
+    border-radius: var(--radius-input);
+    padding: 8px 12px;
+    overflow-wrap: anywhere;
+  }
 }
 
 .solicitudes__modal-top {
