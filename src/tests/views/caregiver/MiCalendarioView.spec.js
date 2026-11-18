@@ -86,27 +86,27 @@ describe("MiCalendarioView: calendario", () => {
     expect(wrapper.findAll(".calendario__servicio").length).toBe(0);
   });
 
-  test("los días con un rato ocupado llevan punto azul", async () => {
+  test("los días con un rato ocupado salen marcados como ocupados", async () => {
     const wrapper = await montarVista([bloque(1, FUTURO, "Turno")]);
 
-    expect(dia(wrapper, 15).find(".calendario-mensual__punto--bloque").exists()).toBe(true);
-    expect(dia(wrapper, 16).find(".calendario-mensual__punto--bloque").exists()).toBe(false);
+    expect(dia(wrapper, 15).classes()).toContain("calendario-mensual__dia--ocupado");
+    expect(dia(wrapper, 16).classes()).not.toContain("calendario-mensual__dia--ocupado");
   });
 
-  test("los días con un servicio aceptado llevan punto verde", async () => {
+  test("los días con un servicio aceptado salen marcados como ocupados", async () => {
     const wrapper = await montarVista([], [solicitud(1, "ACEPTADA", FUTURO)]);
 
-    expect(dia(wrapper, 15).find(".calendario-mensual__punto--servicio").exists()).toBe(true);
+    expect(dia(wrapper, 15).classes()).toContain("calendario-mensual__dia--ocupado");
   });
 
   test("un servicio de varios días marca todos los días que dura", async () => {
     const wrapper = await montarVista([], [solicitud(1, "ACEPTADA", "2026-12-20", { fechaFin: "2026-12-22" })]);
 
-    expect(dia(wrapper, 19).find(".calendario-mensual__punto--servicio").exists()).toBe(false);
-    expect(dia(wrapper, 20).find(".calendario-mensual__punto--servicio").exists()).toBe(true);
-    expect(dia(wrapper, 21).find(".calendario-mensual__punto--servicio").exists()).toBe(true);
-    expect(dia(wrapper, 22).find(".calendario-mensual__punto--servicio").exists()).toBe(true);
-    expect(dia(wrapper, 23).find(".calendario-mensual__punto--servicio").exists()).toBe(false);
+    expect(dia(wrapper, 19).classes()).not.toContain("calendario-mensual__dia--ocupado");
+    expect(dia(wrapper, 20).classes()).toContain("calendario-mensual__dia--ocupado");
+    expect(dia(wrapper, 21).classes()).toContain("calendario-mensual__dia--ocupado");
+    expect(dia(wrapper, 22).classes()).toContain("calendario-mensual__dia--ocupado");
+    expect(dia(wrapper, 23).classes()).not.toContain("calendario-mensual__dia--ocupado");
   });
 
   test("solo las solicitudes aceptadas marcan el calendario", async () => {
@@ -116,7 +116,7 @@ describe("MiCalendarioView: calendario", () => {
       solicitud(3, "COMPLETADA", FUTURO),
     ]);
 
-    expect(dia(wrapper, 15).find(".calendario-mensual__punto").exists()).toBe(false);
+    expect(dia(wrapper, 15).classes()).not.toContain("calendario-mensual__dia--ocupado");
   });
 
   test("al pulsar un día enseña sus bloques con las horas y el motivo", async () => {
@@ -291,7 +291,7 @@ describe("MiCalendarioView: formulario", () => {
     expect(cargar).toHaveBeenCalled();
     expect(wrapper.find(".calendario__titulo-lista").text()).toBe("Domingo 20 de diciembre de 2026");
     expect(wrapper.findAll(".calendario__bloque").length).toBe(1);
-    expect(dia(wrapper, 20).find(".calendario-mensual__punto--bloque").exists()).toBe(true);
+    expect(dia(wrapper, 20).classes()).toContain("calendario-mensual__dia--ocupado");
   });
 
   test("si el servidor falla al guardar enseña el error y no vacía el formulario", async () => {
@@ -322,10 +322,10 @@ describe("MiCalendarioView: quitar bloques", () => {
     const tarjetas = wrapper.findAll(".calendario__bloque");
     expect(tarjetas.length).toBe(1);
     expect(tarjetas[0].text()).toContain("Dos");
-    expect(dia(wrapper, 15).find(".calendario-mensual__punto--bloque").exists()).toBe(true);
+    expect(dia(wrapper, 15).classes()).toContain("calendario-mensual__dia--ocupado");
   });
 
-  test("al quitar el último bloque del día se quita también el punto del calendario", async () => {
+  test("al quitar el último bloque del día se quita también la marca del calendario", async () => {
     vi.spyOn(BloqueOcupadoRepository.prototype, "remove").mockResolvedValue();
     const wrapper = await montarVista([bloque(1, FUTURO, "Uno")]);
     await dia(wrapper, 15).trigger("click");
@@ -333,7 +333,7 @@ describe("MiCalendarioView: quitar bloques", () => {
     await wrapper.find(".calendario__quitar").trigger("click");
     await flushPromises();
 
-    expect(dia(wrapper, 15).find(".calendario-mensual__punto--bloque").exists()).toBe(false);
+    expect(dia(wrapper, 15).classes()).not.toContain("calendario-mensual__dia--ocupado");
     expect(wrapper.find(".calendario__vacio").text()).toContain("No tienes nada apuntado este día");
   });
 
@@ -354,7 +354,7 @@ describe("MiCalendarioView: colores según las horas ocupadas", () => {
   test("un bloque corto deja el día en parcial", async () => {
     const wrapper = await montarVista([bloque(1, FUTURO, "Turno")]);
 
-    expect(dia(wrapper, 15).classes()).toContain("calendario-mensual__dia--bloque");
+    expect(dia(wrapper, 15).classes()).toContain("calendario-mensual__dia--ocupado");
     expect(dia(wrapper, 15).classes()).not.toContain("calendario-mensual__dia--completo");
   });
 
@@ -376,7 +376,7 @@ describe("MiCalendarioView: colores según las horas ocupadas", () => {
   test("un servicio de pocas horas deja el día en parcial", async () => {
     const wrapper = await montarVista([], [solicitud(1, "ACEPTADA", FUTURO)]);
 
-    expect(dia(wrapper, 15).classes()).toContain("calendario-mensual__dia--servicio");
+    expect(dia(wrapper, 15).classes()).toContain("calendario-mensual__dia--ocupado");
     expect(dia(wrapper, 15).classes()).not.toContain("calendario-mensual__dia--completo");
   });
 
@@ -397,10 +397,10 @@ describe("MiCalendarioView: colores según las horas ocupadas", () => {
     expect(dia(wrapper, 22).classes()).toContain("calendario-mensual__dia--completo");
   });
 
-  test("un día con servicio y bloque sale con el color mixto", async () => {
+  test("un día con servicio y bloque sale marcado como ocupado", async () => {
     const wrapper = await montarVista([bloque(1, FUTURO, "Cita")], [solicitud(1, "ACEPTADA", FUTURO)]);
 
-    expect(dia(wrapper, 15).classes()).toContain("calendario-mensual__dia--mixto");
+    expect(dia(wrapper, 15).classes()).toContain("calendario-mensual__dia--ocupado");
   });
 });
 
@@ -473,5 +473,16 @@ describe("MiCalendarioView: panel del día", () => {
     await dia(wrapper, 5).trigger("click");
 
     expect(wrapper.find(".calendario__apuntar").exists()).toBe(false);
+  });
+});
+
+describe("MiCalendarioView: etiquetas de las tarjetas", () => {
+  test("cada tarjeta dice si es un servicio aceptado o un rato ocupado", async () => {
+    const wrapper = await montarVista([bloque(1, FUTURO, "Cita")], [solicitud(1, "ACEPTADA", FUTURO)]);
+
+    await dia(wrapper, 15).trigger("click");
+
+    expect(wrapper.find(".calendario__servicio .calendario__tipo").text()).toBe("Servicio aceptado");
+    expect(wrapper.find(".calendario__bloque .calendario__tipo").text()).toBe("Rato ocupado");
   });
 });

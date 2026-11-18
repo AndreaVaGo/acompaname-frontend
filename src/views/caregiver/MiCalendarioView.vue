@@ -341,6 +341,7 @@ onMounted(() => {
 
         <ul class="calendario__lista">
           <li v-for="servicio in serviciosDelDia" :key="'s' + servicio.id" class="calendario__servicio">
+            <span class="calendario__tipo">Servicio aceptado</span>
             <span class="calendario__bloque-fecha">{{ cuandoEs(servicio) }}</span>
             <span class="calendario__bloque-motivo">
               Cuidado de {{ servicio.nombrePaciente }} · Familia {{ servicio.familiaNombre }}
@@ -348,7 +349,7 @@ onMounted(() => {
           </li>
           <li v-for="bloque in bloquesDelDia" :key="'b' + bloque.id" class="calendario__bloque">
             <div class="calendario__bloque-datos">
-              <span class="calendario__bloque-fecha">Rato ocupado</span>
+              <span class="calendario__tipo">Rato ocupado</span>
               <span class="calendario__bloque-horas">
                 {{ formatearHora(bloque.horaInicio) }} - {{ formatearHora(bloque.horaFin) }}
               </span>
@@ -615,16 +616,27 @@ onMounted(() => {
   padding: 14px 18px;
 }
 
-/* Los servicios aceptados llevan la franja en verde, para distinguirlos de los ratos ocupados */
+/* Los servicios aceptados y los ratos ocupados llevan la misma franja; los distingue su etiqueta */
 .calendario__servicio {
   display: flex;
   flex-direction: column;
   gap: 2px;
   background-color: var(--color-white);
   border-radius: var(--radius-card);
-  border-left: 4px solid var(--color-secondary);
+  border-left: 4px solid var(--color-info);
   box-shadow: var(--shadow-card);
   padding: 14px 18px;
+}
+
+/* Etiqueta que dice qué es cada tarjeta: servicio aceptado o rato ocupado */
+.calendario__tipo {
+  align-self: flex-start;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background-color: var(--color-info-bg);
+  color: var(--color-info);
+  font-size: 0.75rem;
+  font-weight: bold;
 }
 
 .calendario__aviso-servicios {
