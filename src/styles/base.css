@@ -1,3 +1,10 @@
+/* Los títulos usan la tipografía de títulos */
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+}
+
 .btn {
   border: none;
   padding: 12px 24px;
@@ -5,6 +12,21 @@
   font-weight: bold;
   cursor: pointer;
   font-family: inherit;
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out);
+}
+
+/* Al pasar el ratón el botón sube un poco y al pulsarlo vuelve a su sitio */
+.btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: none;
 }
 
 .btn--primary {
@@ -79,6 +101,38 @@
   & textarea {
     min-height: 120px;
     resize: vertical;
+  }
+}
+
+/* Cambio de página: la antigua se desvanece (rápido) y la nueva sube un poco mientras aparece */
+.pagina-enter-active {
+  transition:
+    opacity var(--dur-med) var(--ease-out),
+    translate var(--dur-med) var(--ease-out);
+}
+
+.pagina-leave-active {
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+.pagina-enter-from {
+  opacity: 0;
+  translate: 0 12px;
+}
+
+.pagina-leave-to {
+  opacity: 0;
+}
+
+/* Quien tiene activado "reducir movimiento" no ve ninguna animación ni transición */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 

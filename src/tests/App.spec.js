@@ -39,4 +39,20 @@ describe("App", () => {
     expect(posicionEnlace).toBeLessThan(posicionBarra);
     expect(posicionBarra).toBeLessThan(posicionMain);
   });
+
+  test("la página de la ruta se muestra dentro del main", () => {
+    const Pagina = { template: '<div class="pagina-de-prueba">Hola</div>' };
+    const RouterViewFalso = {
+      setup(props, { slots }) {
+        return () => slots.default({ Component: Pagina, route: { path: "/prueba" } });
+      },
+    };
+    const wrapper = mount(App, {
+      global: {
+        stubs: { NavBar: true, AppFooter: true, RouterView: RouterViewFalso },
+      },
+    });
+
+    expect(wrapper.find("main .pagina-de-prueba").exists()).toBe(true);
+  });
 });
