@@ -14,17 +14,17 @@
   "dependencies": {
     "@fontsource-variable/dm-sans": "^5.3.0",
     "@fontsource-variable/fraunces": "^5.3.0",
-    "pinia": "^4.0.2",
+    "pinia": "^4.1.0",
     "vue": "^3.5.40",
-    "vue-router": "^5.2.0"
+    "vue-router": "^5.5.1"
   },
   "devDependencies": {
-    "@playwright/test": "^1.64.0",
-    "@vitejs/plugin-vue": "^6.0.8",
-    "@vitest/coverage-v8": "^4.1.12",
-    "@vue/test-utils": "^2.4.11",
-    "jsdom": "^30.0.1",
+    "@playwright/test": "^1.65.1",
+    "@vitejs/plugin-vue": "^6.0.11",
+    "@vitest/coverage-v8": "^5.1.0",
+    "@vue/test-utils": "^2.6.0",
+    "jsdom": "^31.0.1",
     "vite": "^8.2.0",
-    "vitest": "^4.1.12"
+    "vitest": "^5.1.0"
   }
 }
