@@ -30,8 +30,9 @@ const fechaFin = ref("");
 // Horas en formato HH:mm. La de inicio cuenta el primer día y la de fin el último
 const horaInicio = ref("");
 const horaFin = ref("");
-const nombrePaciente = ref("");
-const edadPaciente = ref("");
+// Personas que van a recibir el cuidado: como mínimo una y como máximo cinco
+const MAX_PERSONAS = 5;
+const personas = ref([{ nombre: "", edad: "" }]);
 const necesidades = ref([]);
 const notas = ref("");
 const error = ref("");
@@ -63,9 +64,51 @@ function faltaDireccion() {
   return !direccion.value.trim();
 }
 
-// La edad 0 es válida (un bebé), así que no se puede comprobar con "!edadPaciente"
-function faltaEdad() {
-  return edadPaciente.value === "" || edadPaciente.value === null;
+function anadirPersona() {
+  if (personas.value.length < MAX_PERSONAS) {
+    personas.value.push({ nombre: "", edad: "" });
+  }
+}
+
+// La primera persona no se puede quitar: siempre hay al menos una
+function quitarPersona(indice) {
+  if (indice > 0) {
+    personas.value.splice(indice, 1);
+  }
+}
+
+// La edad 0 es válida (un bebé), así que no se puede comprobar con "!edad"
+function faltaEdad(persona) {
+  return persona.edad === "" || persona.edad === null;
+}
+
+// Alguna persona sin nombre o sin edad
+function faltanDatosDePersonas() {
+  for (const persona of personas.value) {
+    if (!persona.nombre.trim() || faltaEdad(persona)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// Todas las personas tienen que tener una edad que encaje con el grupo elegido
+function hayEdadFueraDelGrupo() {
+  for (const persona of personas.value) {
+    if (!edadValidaParaGrupo(grupoEdad.value, Number(persona.edad))) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// Lista que se envía al back, con la edad como número
+function personasParaEnviar() {
+  const lista = [];
+  for (const persona of personas.value) {
+    lista.push({ nombre: persona.nombre.trim(), edad: Number(persona.edad) });
+  }
+  return lista;
 }
 
 async function enviarSolicitud() {
@@ -76,13 +119,12 @@ async function enviarSolicitud() {
     !fechaInicio.value ||
     !horaInicio.value ||
     !horaFin.value ||
-    !nombrePaciente.value ||
-    faltaEdad()
+    faltanDatosDePersonas()
   ) {
     error.value = "Por favor, rellena todos los campos obligatorios.";
     return;
   }
-  if (!edadValidaParaGrupo(grupoEdad.value, Number(edadPaciente.value))) {
+  if (hayEdadFueraDelGrupo()) {
     error.value = `Para "${grupo.value.nombre}" la edad tiene que estar entre ${grupo.value.edadMin} y ${grupo.value.edadMax} años.`;
     return;
   }
@@ -104,10 +146,9 @@ async function enviarSolicitud() {
     const solicitudCreada = await solicitudRepository.create({
       tipoCuidado: tipoCuidado.value,
       direccion: direccionCompleta(),
-      nombrePaciente: nombrePaciente.value,
+      personas: personasParaEnviar(),
       grupoEdad: grupoEdad.value,
       notas: notas.value,
-      edadPaciente: Number(edadPaciente.value),
       fechaCuidado: fechaInicio.value,
       fechaFin: fechaFin.value || null,
       horaInicio: horaInicio.value,
@@ -241,7 +282,9 @@ async function enviarSolicitud() {
           y la de fin la del último.
         </p>
 
-        <h2 class="titulo-seccion" data-icono="👤">La persona cuidada</h2>
+        <h2 class="titulo-seccion" data-icono="👤">
+          {{ personas.length > 1 ? "Las personas cuidadas" : "La persona cuidada" }}
+        </h2>
 
         <p v-if="!grupo" class="solicitar__ayuda">
           Elige arriba quién necesita cuidados y te pediremos los datos que hacen
@@ -249,29 +292,63 @@ async function enviarSolicitud() {
         </p>
 
         <template v-else>
-          <div class="solicitar__row">
-            <div>
-              <label for="paciente">Nombre de la persona cuidada</label>
-              <input
-                type="text"
-                id="paciente"
-                v-model="nombrePaciente"
-                :placeholder="grupo.ejemploNombre"
-              />
+          <div
+            v-for="(persona, indice) in personas"
+            :key="indice"
+            class="solicitar__persona"
+          >
+            <p v-if="personas.length > 1" class="solicitar__titulo-grupo">
+              Persona {{ indice + 1 }}
+            </p>
+            <div class="solicitar__row">
+              <div>
+                <label :for="indice === 0 ? 'paciente' : 'paciente-' + (indice + 1)"
+                  >Nombre de la persona cuidada</label
+                >
+                <input
+                  type="text"
+                  :id="indice === 0 ? 'paciente' : 'paciente-' + (indice + 1)"
+                  v-model="persona.nombre"
+                  maxlength="100"
+                  :placeholder="grupo.ejemploNombre"
+                />
+              </div>
+              <div>
+                <label :for="indice === 0 ? 'edad' : 'edad-' + (indice + 1)"
+                  >Edad de la persona cuidada</label
+                >
+                <input
+                  type="number"
+                  :id="indice === 0 ? 'edad' : 'edad-' + (indice + 1)"
+                  v-model="persona.edad"
+                  :min="grupo.edadMin"
+                  :max="grupo.edadMax"
+                  step="1"
+                  :placeholder="grupo.ejemploEdad"
+                />
+              </div>
             </div>
-            <div>
-              <label for="edad">Edad de la persona cuidada</label>
-              <input
-                type="number"
-                id="edad"
-                v-model="edadPaciente"
-                :min="grupo.edadMin"
-                :max="grupo.edadMax"
-                step="1"
-                :placeholder="grupo.ejemploEdad"
-              />
-            </div>
+            <button
+              v-if="indice > 0"
+              type="button"
+              class="btn btn--secondary solicitar__quitar"
+              @click="quitarPersona(indice)"
+            >
+              Quitar a la persona {{ indice + 1 }}
+            </button>
           </div>
+
+          <button
+            v-if="personas.length < 5"
+            type="button"
+            class="btn btn--secondary solicitar__anadir"
+            @click="anadirPersona"
+          >
+            + Añadir otra persona
+          </button>
+          <p v-else class="solicitar__ayuda">
+            Puedes indicar hasta 5 personas en una misma solicitud.
+          </p>
 
           <p class="solicitar__titulo-grupo">
             Necesidades de la persona cuidada (opcional)
@@ -428,6 +505,15 @@ async function enviarSolicitud() {
     display: flex;
     flex-direction: column;
   }
+}
+
+.solicitar__persona {
+  margin-bottom: var(--gap-sm);
+}
+
+.solicitar__anadir,
+.solicitar__quitar {
+  margin-bottom: var(--gap-md);
 }
 
 .solicitar__titulo-grupo {

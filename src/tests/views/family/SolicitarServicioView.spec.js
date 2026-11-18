@@ -143,10 +143,9 @@ describe("SolicitarServicioView", () => {
     expect(createSpy).toHaveBeenCalledWith({
       tipoCuidado: "hospitalario",
       direccion: "Hospital de Cabueñes, Planta 2, habitación 214",
-      nombrePaciente: "Antonio Serrano",
+      personas: [{ nombre: "Antonio Serrano", edad: 81 }],
       grupoEdad: "MAYORES",
       notas: "Alergia a la penicilina",
-      edadPaciente: 81,
       fechaCuidado: "2026-10-10",
       fechaFin: null,
       horaInicio: "09:00",
@@ -605,7 +604,10 @@ describe("SolicitarServicioView", () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(createSpy).toHaveBeenCalledWith(
-      expect.objectContaining({ grupoEdad: "BEBES", edadPaciente: 0 }),
+      expect.objectContaining({
+        grupoEdad: "BEBES",
+        personas: [{ nombre: "Lucía", edad: 0 }],
+      }),
     );
   });
 
