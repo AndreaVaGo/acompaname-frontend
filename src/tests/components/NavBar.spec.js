@@ -269,6 +269,25 @@ describe('NavBar', () => {
     expect(wrapper.find('.navbar__menu').exists()).toBe(false)
   })
 
+  test('el menú del cuidador tiene la opción Mi calendario y lleva a su página', async () => {
+    const push = vi.spyOn(router, 'push').mockResolvedValue()
+    const wrapper = await montarNavBarComoCuidador()
+    await wrapper.find('.navbar__avatar').trigger('click')
+
+    expect(wrapper.find('#mi-calendario').text()).toBe('Mi calendario')
+    await wrapper.find('#mi-calendario').trigger('click')
+
+    expect(push).toHaveBeenCalledWith('/mi-calendario')
+    expect(wrapper.find('.navbar__menu').exists()).toBe(false)
+  })
+
+  test('el menú de la familia no tiene la opción Mi calendario', async () => {
+    const wrapper = await montarNavBarComoFamilia()
+    await wrapper.find('.navbar__avatar').trigger('click')
+
+    expect(wrapper.find('#mi-calendario').exists()).toBe(false)
+  })
+
   test('el menú del cuidador tiene la opción Enviar una sugerencia', async () => {
     const wrapper = await montarNavBarComoCuidador()
     await wrapper.find('.navbar__avatar').trigger('click')

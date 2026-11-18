@@ -118,6 +118,11 @@ function irAEditarPerfil() {
   router.push("/editar-perfil");
 }
 
+function irAMiCalendario() {
+  menuAbierto.value = false;
+  router.push("/mi-calendario");
+}
+
 function irAEditarDatos() {
   menuAbierto.value = false;
   router.push("/editar-datos");
@@ -254,6 +259,15 @@ function irAMiPerfil() {
               @click="irAEditarPerfil"
             >
               Editar mi perfil
+            </button>
+            <button
+              v-if="authStore.rol === 'CUIDADOR'"
+              type="button"
+              class="navbar__menu-item"
+              id="mi-calendario"
+              @click="irAMiCalendario"
+            >
+              Mi calendario
             </button>
             <button
               v-if="authStore.rol !== 'ADMIN'"
