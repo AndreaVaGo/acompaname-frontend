@@ -4,10 +4,11 @@ import { useRoute, RouterLink } from "vue-router";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
 import { formatearMomento } from "@/utils/formatearHora";
 import { mensajeDeError } from "@/utils/mensajeDeError";
-import { nombreGrupo } from "@/utils/catalogoGrupos";
 import {
   detalleDePersonas,
   hayVariasPersonas,
+  textoGrupos,
+  hayVariosGrupos,
 } from "@/utils/personasSolicitud";
 
 const route = useRoute();
@@ -66,9 +67,9 @@ onMounted(async () => {
             )
           }}</strong>
         </div>
-        <div v-if="solicitud.grupoEdad" class="confirmacion__fila">
-          <span>Grupo de edad</span>
-          <strong>{{ nombreGrupo(solicitud.grupoEdad) }}</strong>
+        <div v-if="textoGrupos(solicitud)" class="confirmacion__fila">
+          <span>{{ hayVariosGrupos(solicitud) ? "Grupos de edad" : "Grupo de edad" }}</span>
+          <strong>{{ textoGrupos(solicitud) }}</strong>
         </div>
         <div class="confirmacion__fila">
           <span>{{ hayVariasPersonas(solicitud) ? "Personas cuidadas" : "Persona cuidada" }}</span>

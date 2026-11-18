@@ -59,4 +59,31 @@ describe("ConfirmacionView: varias personas", () => {
     expect(wrapper.text()).not.toContain("Personas cuidadas");
     expect(wrapper.text()).toContain("Manuel, 80 años");
   });
+
+  test("con grupos distintos dice Grupos de edad y los nombra todos", async () => {
+    const wrapper = await montarVista(
+      crearSolicitud({
+        grupoEdad: "NINOS",
+        personas: [
+          { nombre: "Zoe", edad: 5, grupoEdad: "NINOS" },
+          { nombre: "Abuelo", edad: 80, grupoEdad: "MAYORES" },
+        ],
+      }),
+    );
+
+    expect(wrapper.text()).toContain("Grupos de edad");
+    expect(wrapper.text()).toContain("Niñas y niños, Personas mayores");
+  });
+
+  test("con un solo grupo dice Grupo de edad en singular", async () => {
+    const wrapper = await montarVista(
+      crearSolicitud({
+        grupoEdad: "MAYORES",
+        personas: [{ nombre: "Carmen", edad: 82, grupoEdad: "MAYORES" }],
+      }),
+    );
+
+    expect(wrapper.text()).toContain("Grupo de edad");
+    expect(wrapper.text()).not.toContain("Grupos de edad");
+  });
 });
