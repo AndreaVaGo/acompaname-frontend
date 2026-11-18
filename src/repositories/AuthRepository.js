@@ -22,4 +22,32 @@ export default class AuthRepository extends Repository {
   async register(usuarioData) {
     return this.post("/usuarios", usuarioData);
   }
+
+  // Pide el enlace para recuperar la contraseña. El servidor contesta siempre lo mismo,
+  // exista o no el correo, y devuelve un texto (no un JSON)
+  async olvidePassword(email) {
+    const response = await fetch(`${this.uri}/olvide-password`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    // true: es una ruta pública, un 401 aquí nunca es una sesión caducada
+    if (!response.ok) {
+      await lanzarError(response, "No se pudo pedir el enlace", true);
+    }
+    return await response.text();
+  }
+
+  // Pone la contraseña nueva usando el token del enlace. Si va bien, el servidor
+  // contesta 204 (sin cuerpo), así que no hay nada que leer
+  async restablecerPassword(token, passwordNueva) {
+    const response = await fetch(`${this.uri}/restablecer-password`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token, passwordNueva }),
+    });
+    if (!response.ok) {
+      await lanzarError(response, "No se pudo cambiar la contraseña", true);
+    }
+  }
 }
