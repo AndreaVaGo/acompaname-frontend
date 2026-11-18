@@ -139,6 +139,43 @@ describe('SolicitudCard', () => {
     expect(wrapper.text()).not.toContain('2026-08-12')
   })
 
+  test('muestra la hora de inicio y la de fin junto a las fechas', () => {
+    const wrapper = mount(SolicitudCard, {
+      props: {
+        solicitud: { ...crearSolicitud('PENDIENTE'), horaInicio: '09:00:00', horaFin: '12:00:00' },
+        nombreMostrado: 'Familia Serrano',
+        mostrarAcciones: false,
+      },
+      global: {
+        stubs: { RouterLink: RouterLinkStub },
+      },
+    })
+
+    expect(wrapper.text()).toContain('Inicio: 12-08-2026 · 09:00')
+    expect(wrapper.text()).toContain('Fin: 12-08-2026 · 12:00')
+  })
+
+  test('con varios días la hora de fin va con la fecha de fin', () => {
+    const wrapper = mount(SolicitudCard, {
+      props: {
+        solicitud: {
+          ...crearSolicitud('PENDIENTE'),
+          fechaFin: '2026-08-14',
+          horaInicio: '22:00:00',
+          horaFin: '08:00:00',
+        },
+        nombreMostrado: 'Familia Serrano',
+        mostrarAcciones: false,
+      },
+      global: {
+        stubs: { RouterLink: RouterLinkStub },
+      },
+    })
+
+    expect(wrapper.text()).toContain('Inicio: 12-08-2026 · 22:00')
+    expect(wrapper.text()).toContain('Fin: 14-08-2026 · 08:00')
+  })
+
   test('no muestra la línea de fin si la solicitud no tiene fecha de fin', () => {
     const wrapper = montarTarjeta('PENDIENTE', false)
 
