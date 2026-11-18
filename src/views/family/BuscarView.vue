@@ -187,6 +187,8 @@ const cuidadoresFiltrados = computed(() => {
 
 <template>
   <div class="buscar">
+    <RouterLink to="/" class="buscar__volver">← Volver al inicio</RouterLink>
+
     <header class="buscar__header">
       <h1>Personas cuidadoras disponibles</h1>
       <p>
@@ -613,6 +615,21 @@ const cuidadoresFiltrados = computed(() => {
     translate: 120vw -20vh;
     scale: 1.3;
   }
+}
+
+/* Enlace para volver a la portada; la flecha se mueve un poco al pasar el ratón */
+.buscar__volver {
+  display: inline-block;
+  margin-bottom: 16px;
+  color: var(--color-text);
+  font-weight: bold;
+  text-decoration: none;
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.buscar__volver:hover {
+  transform: translateX(-4px);
+  text-decoration: underline;
 }
 
 .buscar__header {

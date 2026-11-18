@@ -62,4 +62,8 @@ describe("BuscarView · diseño de tarjetas", () => {
     expect(bloque).toContain(".buscar::before");
     expect(bloque).toContain("animation: none");
   });
+
+  test("hay un enlace para volver al inicio", () => {
+    expect(archivo).toContain('<RouterLink to="/" class="buscar__volver">← Volver al inicio</RouterLink>');
+  });
 });
