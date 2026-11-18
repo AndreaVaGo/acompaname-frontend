@@ -440,7 +440,7 @@ describe('NavBar', () => {
     expect(wrapper.html()).toContain('href="/solicitudes-cuidador"')
   })
 
-  test('Cerrar sesión cierra la sesión y lleva al login', async () => {
+  test('Cerrar sesión cierra la sesión y lleva a la portada', async () => {
     const push = vi.spyOn(router, 'push').mockResolvedValue()
     const wrapper = await montarNavBarComoFamilia()
     await wrapper.find('.navbar__avatar').trigger('click')
@@ -448,8 +448,30 @@ describe('NavBar', () => {
     await pulsarOpcion(wrapper, 'Cerrar sesión')
 
     expect(useAuthStore().estaAutenticado).toBe(false)
-    expect(push).toHaveBeenCalledWith('/login')
+    expect(push).toHaveBeenCalledWith('/')
     expect(wrapper.find('.navbar__menu').exists()).toBe(false)
+  })
+
+  test('Cerrar sesión no lleva al login', async () => {
+    const push = vi.spyOn(router, 'push').mockResolvedValue()
+    const wrapper = await montarNavBarComoFamilia()
+    await wrapper.find('.navbar__avatar').trigger('click')
+
+    await pulsarOpcion(wrapper, 'Cerrar sesión')
+
+    expect(push).not.toHaveBeenCalledWith('/login')
+  })
+
+  test('el cuidador, al cerrar sesión, también vuelve a la portada y se borra su sesión', async () => {
+    const push = vi.spyOn(router, 'push').mockResolvedValue()
+    const wrapper = await montarNavBarComoCuidador()
+    await wrapper.find('.navbar__avatar').trigger('click')
+
+    await pulsarOpcion(wrapper, 'Cerrar sesión')
+
+    expect(push).toHaveBeenCalledWith('/')
+    expect(useAuthStore().estaAutenticado).toBe(false)
+    expect(sessionStorage.getItem('token')).toBeNull()
   })
 
   test('la familia: Mi perfil lleva a su perfil', async () => {

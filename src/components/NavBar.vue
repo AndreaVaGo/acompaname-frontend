@@ -105,7 +105,8 @@ watch(() => route.path, cargarAvisos, { immediate: true });
 function handleLogout() {
   menuAbierto.value = false;
   authStore.logout();
-  router.push("/login");
+  // Quien cierra la sesión ha terminado: se le lleva a la portada, no al formulario de login
+  router.push("/");
 }
 
 async function verMiPerfilPublico() {
