@@ -702,7 +702,7 @@ const cuidadoresFiltrados = computed(() => {
   grid-template-columns: repeat(2, 1fr);
   gap: 22px 40px;
   /* Cristal: blanco translúcido con desenfoque, para que se vea el fondo moverse detrás */
-  background-color: rgba(255, 255, 255, 0.7);
+  background-color: rgba(226, 244, 233, 0.55);
   backdrop-filter: blur(14px);
   border: 1px solid rgba(255, 255, 255, 0.9);
   border-radius: var(--radius-card);
@@ -832,7 +832,9 @@ const cuidadoresFiltrados = computed(() => {
 .buscar__card {
   display: flex;
   flex-direction: column;
-  background-color: var(--color-white);
+  /* Tarjeta de cristal: casi blanca, pero deja pasar un poco del fondo */
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
   border-radius: var(--radius-card);
   border: 1px solid transparent;
   border-top: 4px solid var(--color-border);

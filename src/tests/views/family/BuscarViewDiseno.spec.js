@@ -47,6 +47,11 @@ describe("BuscarView · diseño de tarjetas", () => {
     expect(archivo).toContain("backdrop-filter: blur(14px)");
   });
 
+  test("las tarjetas son de cristal para no ser un bloque blanco", () => {
+    expect(archivo).toContain("background-color: rgba(255, 255, 255, 0.8)");
+    expect(archivo).toContain("backdrop-filter: blur(10px)");
+  });
+
   test("las tarjetas pares alternan el color de la franja", () => {
     expect(archivo).toContain(".buscar__card:nth-child(even) .buscar__card-cabecera");
   });
