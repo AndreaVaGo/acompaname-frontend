@@ -3,7 +3,7 @@ import { computed, ref } from "vue";
 import { RouterLink } from "vue-router";
 import { nombreCuidado } from "@/utils/catalogoCuidados";
 import { nombreGrupo } from "@/utils/catalogoGrupos";
-import { formatearFecha } from "@/utils/formatearFecha";
+import { formatearMomento } from "@/utils/formatearHora";
 
 const props = defineProps([
   "solicitud",
@@ -79,10 +79,17 @@ const avisoDireccion = computed(
         {{ nombreGrupo(solicitud.grupoEdad) }}
       </li>
       <li>
-        📅 <strong>Inicio:</strong> {{ formatearFecha(solicitud.fechaCuidado) }}
+        📅 <strong>Inicio:</strong>
+        {{ formatearMomento(solicitud.fechaCuidado, solicitud.horaInicio) }}
       </li>
-      <li v-if="solicitud.fechaFin">
-        📅 <strong>Fin:</strong> {{ formatearFecha(solicitud.fechaFin) }}
+      <li v-if="solicitud.fechaFin || solicitud.horaFin">
+        📅 <strong>Fin:</strong>
+        {{
+          formatearMomento(
+            solicitud.fechaFin || solicitud.fechaCuidado,
+            solicitud.horaFin,
+          )
+        }}
       </li>
     </ul>
 
