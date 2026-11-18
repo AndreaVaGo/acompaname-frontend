@@ -6,6 +6,7 @@ import CuidadorRepository from "@/repositories/CuidadorRepository";
 import UsuarioRepository from "@/repositories/UsuarioRepository";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
 import PagoRepository from "@/repositories/PagoRepository";
+import MensajeRepository from "@/repositories/MensajeRepository";
 import FotoCuidador from "@/components/FotoCuidador.vue";
 
 const authStore = useAuthStore();
@@ -15,6 +16,7 @@ const cuidadorRepository = new CuidadorRepository();
 const usuarioRepository = new UsuarioRepository();
 const solicitudRepository = new SolicitudRepository();
 const pagoRepository = new PagoRepository();
+const mensajeRepository = new MensajeRepository();
 
 const menuAbierto = ref(false);
 
@@ -25,16 +27,25 @@ function actualizarSombra() {
   conSombra.value = window.scrollY > 8;
 }
 
+// Cada cuánto se pregunta si hay mensajes nuevos en el chat
+const INTERVALO_MENSAJES_MS = 30000;
+let temporizadorMensajes = null;
+
 onMounted(() => {
   actualizarSombra();
   window.addEventListener("scroll", actualizarSombra, { passive: true });
+  temporizadorMensajes = setInterval(cargarMensajesSinLeer, INTERVALO_MENSAJES_MS);
 });
 
 onBeforeUnmount(() => {
   window.removeEventListener("scroll", actualizarSombra);
+  clearInterval(temporizadorMensajes);
 });
 const nombre = ref("");
 const avisos = ref(0);
+// Mensajes del chat que la persona todavía no ha leído (se suman al número del menú)
+const mensajesSinLeer = ref(0);
+const avisosTotal = computed(() => avisos.value + mensajesSinLeer.value);
 
 const esPantallaAcceso = computed(
   () => route.path === "/login" || route.path === "/registro",
@@ -114,9 +125,31 @@ async function cargarAvisos() {
   }
 }
 
+// Pregunta al servidor cuántos mensajes sin leer hay. Si falla, simplemente no se enseña el número
+async function cargarMensajesSinLeer() {
+  // El administrador no usa el chat y sin sesión no hay mensajes
+  if (!authStore.estaAutenticado || authStore.rol === "ADMIN") {
+    mensajesSinLeer.value = 0;
+    return;
+  }
+
+  // Con la pestaña en segundo plano no hace falta preguntar
+  if (document.hidden) {
+    return;
+  }
+
+  try {
+    const respuesta = await mensajeRepository.getNoLeidos();
+    mensajesSinLeer.value = respuesta.total;
+  } catch (err) {
+    mensajesSinLeer.value = 0;
+  }
+}
+
 // Se vuelve a cargar al cambiar de página (por ejemplo, después de editar la foto)
 watch(() => route.path, cargarDatosCuenta, { immediate: true });
 watch(() => route.path, cargarAvisos, { immediate: true });
+watch(() => route.path, cargarMensajesSinLeer, { immediate: true });
 
 function handleLogout() {
   menuAbierto.value = false;
@@ -211,7 +244,7 @@ function irAMiPerfil() {
         class="navbar__link"
       >
         Solicitudes
-        <span v-if="avisos > 0" class="navbar__aviso">{{ avisos }}</span>
+        <span v-if="avisosTotal > 0" class="navbar__aviso">{{ avisosTotal }}</span>
       </RouterLink>
       <RouterLink
         v-if="authStore.rol === 'FAMILIA'"
@@ -225,7 +258,7 @@ function irAMiPerfil() {
         class="navbar__link"
       >
         Solicitudes
-        <span v-if="avisos > 0" class="navbar__aviso">{{ avisos }}</span>
+        <span v-if="avisosTotal > 0" class="navbar__aviso">{{ avisosTotal }}</span>
       </RouterLink>
       <RouterLink
         v-if="authStore.rol === 'ADMIN'"
