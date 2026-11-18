@@ -9,6 +9,8 @@ import { CUIDADOS } from "@/utils/catalogoCuidados";
 import { GRUPOS, buscarGrupo, edadValidaParaGrupo } from "@/utils/catalogoGrupos";
 import { useAuthStore } from "@/stores/auth";
 import { mensajeDeError } from "@/utils/mensajeDeError";
+import { formatearEuros } from "@/utils/formatearEuros";
+import { horasDeCuidado, estimarImporte } from "@/utils/estimacionImporte";
 
 const route = useRoute();
 const router = useRouter();
@@ -18,6 +20,8 @@ const cuidadorRepository = new CuidadorRepository();
 
 const cuidadorId = route.params.id;
 const cuidadorNombre = ref("");
+// Tarifa por hora de la persona cuidadora, para calcular el precio estimado
+const tarifaHora = ref(0);
 
 // Código del grupo de edad de la persona cuidada (es lo primero que se elige)
 const grupoEdad = ref("");
@@ -37,6 +41,18 @@ const necesidades = ref([]);
 const notas = ref("");
 const error = ref("");
 
+// Precio estimado: horas x tarifa, con recargo por cada persona extra.
+// Es null mientras falten datos (fechas, horas o tarifa)
+const estimacion = computed(() => {
+  const horas = horasDeCuidado(
+    fechaInicio.value,
+    horaInicio.value,
+    fechaFin.value,
+    horaFin.value,
+  );
+  return estimarImporte(tarifaHora.value, horas, personas.value.length);
+});
+
 // El grupo elegido trae los textos de ejemplo y los límites de edad (todo está en catalogoGrupos)
 const grupo = computed(() => buscarGrupo(grupoEdad.value));
 
@@ -44,6 +60,7 @@ onMounted(async () => {
   try {
     const cuidador = await cuidadorRepository.getById(cuidadorId);
     cuidadorNombre.value = cuidador.usuarioNombre;
+    tarifaHora.value = cuidador.tarifaHora;
   } catch (err) {
     error.value = mensajeDeError(err, "No se pudo cargar a la persona cuidadora.");
   }
@@ -442,6 +459,28 @@ async function enviarSolicitud() {
           ></textarea>
         </template>
 
+        <div v-if="estimacion" class="solicitar__precio" data-testid="precio-estimado">
+          <p class="solicitar__titulo-grupo">Precio estimado</p>
+          <p class="solicitar__precio-linea">
+            {{ estimacion.horas }} {{ estimacion.horas === 1 ? "hora" : "horas" }}
+            × {{ formatearEuros(estimacion.tarifaHora) }}/hora =
+            {{ formatearEuros(estimacion.base) }}
+          </p>
+          <p v-if="estimacion.personasExtra > 0" class="solicitar__precio-linea">
+            + {{ estimacion.personasExtra }}
+            {{ estimacion.personasExtra === 1 ? "persona extra" : "personas extra" }}
+            ({{ estimacion.recargoPorcentaje }} % cada una) =
+            {{ formatearEuros(estimacion.recargo) }}
+          </p>
+          <p class="solicitar__precio-total">
+            Total estimado: {{ formatearEuros(estimacion.total) }}
+          </p>
+          <p class="solicitar__ayuda">
+            Es una estimación. El importe final se calcula cuando la persona
+            cuidadora completa el servicio y lo pagas desde "Mis pagos".
+          </p>
+        </div>
+
         <p role="alert" v-if="error" class="solicitar__error">{{ error }}</p>
 
         <button type="submit" class="btn btn--primary">Enviar solicitud</button>
@@ -602,6 +641,24 @@ async function enviarSolicitud() {
 }
 
 /* Aviso mientras no se ha elegido el grupo de edad */
+.solicitar__precio {
+  background-color: var(--color-secondary-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: var(--gap-sm) var(--gap-md);
+  margin: var(--gap-md) 0;
+}
+
+.solicitar__precio-linea {
+  margin: 0 0 4px;
+}
+
+.solicitar__precio-total {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin: var(--gap-sm) 0 4px;
+}
+
 .solicitar__ayuda {
   color: var(--color-text-muted);
   font-size: 0.95rem;
