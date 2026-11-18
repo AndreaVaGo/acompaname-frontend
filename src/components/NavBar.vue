@@ -24,9 +24,13 @@ const esPantallaAcceso = computed(
   () => route.path === "/login" || route.path === "/registro",
 );
 
-const inicial = computed(() =>
-  authStore.email ? authStore.email.charAt(0).toUpperCase() : "?",
-);
+// La inicial del avatar sale del nombre y, mientras no se haya cargado, del correo
+const inicial = computed(() => {
+  if (nombre.value) {
+    return nombre.value.trim().charAt(0).toUpperCase();
+  }
+  return authStore.email ? authStore.email.charAt(0).toUpperCase() : "?";
+});
 
 const tipoCuenta = computed(() => {
   if (authStore.rol === "FAMILIA") {

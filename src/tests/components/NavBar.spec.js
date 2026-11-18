@@ -139,6 +139,25 @@ describe('NavBar', () => {
     expect(wrapper.find('.navbar__inicial').text()).toBe('A')
   })
 
+  test('la inicial del avatar sale del nombre cuando ya se ha cargado', async () => {
+    vi.spyOn(UsuarioRepository.prototype, 'getById').mockResolvedValue({
+      nombre: 'lucía Gómez',
+    })
+    const authStore = useAuthStore()
+    authStore.login(1, 'ana@test.com', '12345678', 'FAMILIA')
+
+    const wrapper = await montarNavBar()
+
+    expect(wrapper.find('.navbar__inicial').text()).toBe('L')
+  })
+
+  test('una persona cuidadora sin foto ve la inicial de su nombre en el avatar', async () => {
+    const wrapper = await montarNavBarComoCuidador()
+
+    expect(wrapper.find('.navbar__avatar .foto-cuidador__inicial').text()).toBe('P')
+    expect(wrapper.find('.navbar__avatar svg').exists()).toBe(false)
+  })
+
   test('muestra el nombre en el menú en vez del correo', async () => {
     vi.spyOn(UsuarioRepository.prototype, 'getById').mockResolvedValue({
       nombre: 'Ana',
