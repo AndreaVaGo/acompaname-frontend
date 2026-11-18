@@ -73,4 +73,32 @@ describe("HistorialView: varias personas", () => {
 
     expect(wrapper.find(".historial__paciente").text()).toBe("Manuel · 80 años");
   });
+
+  test("con grupos distintos enseña todos los grupos", async () => {
+    const wrapper = await montarVista(
+      crearSolicitud({
+        nombrePaciente: "Zoe",
+        edadPaciente: 5,
+        grupoEdad: "NINOS",
+        personas: [
+          { nombre: "Zoe", edad: 5, grupoEdad: "NINOS" },
+          { nombre: "Abuelo", edad: 80, grupoEdad: "MAYORES" },
+        ],
+      }),
+    );
+
+    expect(wrapper.find(".historial__grupo").text()).toContain("Grupos de edad:");
+    expect(wrapper.find(".historial__grupo").text()).toContain(
+      "Niñas y niños, Personas mayores",
+    );
+  });
+
+  test("con un solo grupo dice Grupo de edad en singular", async () => {
+    const wrapper = await montarVista(
+      crearSolicitud({ nombrePaciente: "Manuel", edadPaciente: 80, grupoEdad: "MAYORES" }),
+    );
+
+    expect(wrapper.find(".historial__grupo").text()).toContain("Grupo de edad:");
+    expect(wrapper.find(".historial__grupo").text()).toContain("Personas mayores");
+  });
 });
