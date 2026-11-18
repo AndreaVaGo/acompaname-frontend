@@ -3,6 +3,7 @@ import { ref, computed, onMounted, nextTick } from "vue";
 import BloqueOcupadoRepository from "@/repositories/BloqueOcupadoRepository";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
 import CalendarioMensual from "@/components/CalendarioMensual.vue";
+import LineaDelDia from "@/components/LineaDelDia.vue";
 import { mensajeDeError } from "@/utils/mensajeDeError";
 import { formatearFecha } from "@/utils/formatearFecha";
 import { formatearHora, formatearMomento } from "@/utils/formatearHora";
@@ -44,27 +45,33 @@ const aviso = ref("");
 
 const MINUTOS_DEL_DIA = 1440;
 
-// Cuántos minutos ocupa un servicio en un día concreto.
+// De qué hora a qué hora ocupa un servicio un día concreto (en minutos desde las 00:00).
 // Un servicio sin horas (antiguo) se cuenta como día entero.
 // En uno de varios días: el primer día va desde su hora de inicio hasta medianoche,
 // los del medio son enteros y el último va desde medianoche hasta su hora de fin
-function minutosDelServicioEnElDia(servicio, dia) {
+function tramoDelServicioEnElDia(servicio, dia) {
   if (!servicio.horaInicio || !servicio.horaFin) {
-    return MINUTOS_DEL_DIA;
+    return { inicio: 0, fin: MINUTOS_DEL_DIA };
   }
   const inicio = minutosDeLaHora(servicio.horaInicio);
   const fin = minutosDeLaHora(servicio.horaFin);
   const ultimoDia = servicio.fechaFin || servicio.fechaCuidado;
   if (ultimoDia === servicio.fechaCuidado) {
-    return fin - inicio;
+    return { inicio: inicio, fin: fin };
   }
   if (dia === servicio.fechaCuidado) {
-    return MINUTOS_DEL_DIA - inicio;
+    return { inicio: inicio, fin: MINUTOS_DEL_DIA };
   }
   if (dia === ultimoDia) {
-    return fin;
+    return { inicio: 0, fin: fin };
   }
-  return MINUTOS_DEL_DIA;
+  return { inicio: 0, fin: MINUTOS_DEL_DIA };
+}
+
+// Cuántos minutos ocupa un servicio en un día concreto
+function minutosDelServicioEnElDia(servicio, dia) {
+  const tramo = tramoDelServicioEnElDia(servicio, dia);
+  return tramo.fin - tramo.inicio;
 }
 
 // Lo que se pinta en el calendario: por cada día, cuántos servicios y bloques tiene
@@ -118,6 +125,27 @@ const serviciosDelDia = computed(() => {
 const diaVacio = computed(
   () => bloquesDelDia.value.length === 0 && serviciosDelDia.value.length === 0,
 );
+
+// Lo que se pinta en la línea de horas del día abierto
+const tramosDelDia = computed(() => {
+  const tramos = [];
+  for (const servicio of serviciosDelDia.value) {
+    const tramo = tramoDelServicioEnElDia(servicio, diaSeleccionado.value);
+    tramos.push({
+      inicio: tramo.inicio,
+      fin: tramo.fin,
+      texto: "Servicio aceptado · Cuidado de " + servicio.nombrePaciente,
+    });
+  }
+  for (const bloque of bloquesDelDia.value) {
+    tramos.push({
+      inicio: minutosDeLaHora(bloque.horaInicio),
+      fin: minutosDeLaHora(bloque.horaFin),
+      texto: bloque.motivo ? "Rato ocupado · " + bloque.motivo : "Rato ocupado",
+    });
+  }
+  return tramos;
+});
 
 // El número grande del panel (el día del mes)
 const numeroDelDia = computed(() => Number(diaSeleccionado.value.split("-")[2]));
@@ -330,6 +358,8 @@ onMounted(() => {
             </div>
           </div>
         </header>
+
+        <LineaDelDia v-if="!cargando && !errorCarga" :tramos="tramosDelDia" />
 
         <p v-if="cargando" class="calendario__vacio">Cargando tu calendario...</p>
         <p v-if="errorCarga" class="calendario__error" role="alert">{{ errorCarga }}</p>

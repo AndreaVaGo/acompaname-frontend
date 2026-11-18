@@ -486,3 +486,77 @@ describe("MiCalendarioView: etiquetas de las tarjetas", () => {
     expect(wrapper.find(".calendario__bloque .calendario__tipo").text()).toBe("Rato ocupado");
   });
 });
+
+describe("MiCalendarioView: línea de horas del día", () => {
+  test("un día sin nada enseña la línea con todo el día libre", async () => {
+    const wrapper = await montarVista();
+
+    expect(wrapper.find(".linea-dia").exists()).toBe(true);
+    expect(wrapper.findAll(".linea-dia__tramo").length).toBe(0);
+    expect(wrapper.find(".linea-dia__libres").text()).toBe("Libre todo el día.");
+  });
+
+  test("un bloque sale en la línea y deja las horas libres a los lados", async () => {
+    const wrapper = await montarVista([bloque(1, FUTURO, "Turno")]);
+
+    await dia(wrapper, 15).trigger("click");
+
+    // El bloque de prueba va de 08:00 a 15:00
+    expect(wrapper.findAll(".linea-dia__tramo").length).toBe(1);
+    expect(wrapper.find(".linea-dia__tramo").attributes("title")).toBe("08:00 – 15:00 · Rato ocupado · Turno");
+    expect(wrapper.find(".linea-dia__libres").text()).toBe("Horas libres: 00:00 – 08:00 · 15:00 – 24:00");
+  });
+
+  test("un servicio de un día sale en la línea con sus horas", async () => {
+    const wrapper = await montarVista([], [solicitud(1, "ACEPTADA", FUTURO)]);
+
+    await dia(wrapper, 15).trigger("click");
+
+    expect(wrapper.find(".linea-dia__tramo").attributes("title")).toBe(
+      "09:00 – 12:00 · Servicio aceptado · Cuidado de Carmen",
+    );
+  });
+
+  test("en un servicio de varios días la línea del primer y del último día cubre solo esa parte", async () => {
+    const wrapper = await montarVista([], [
+      solicitud(1, "ACEPTADA", "2026-12-20", { fechaFin: "2026-12-22", horaInicio: "22:00:00", horaFin: "08:00:00" }),
+    ]);
+
+    await dia(wrapper, 20).trigger("click");
+    expect(wrapper.find(".linea-dia__libres").text()).toBe("Horas libres: 00:00 – 22:00");
+
+    await dia(wrapper, 21).trigger("click");
+    expect(wrapper.find(".linea-dia__libres").text()).toBe("No te queda ninguna hora libre este día.");
+
+    await dia(wrapper, 22).trigger("click");
+    expect(wrapper.find(".linea-dia__libres").text()).toBe("Horas libres: 08:00 – 24:00");
+  });
+
+  test("un servicio y un bloque en el mismo día salen los dos en la línea", async () => {
+    const wrapper = await montarVista([bloque(1, FUTURO, "Cita")], [solicitud(1, "ACEPTADA", FUTURO)]);
+
+    await dia(wrapper, 15).trigger("click");
+
+    expect(wrapper.findAll(".linea-dia__tramo").length).toBe(2);
+  });
+
+  test("mientras carga no enseña la línea", () => {
+    vi.spyOn(BloqueOcupadoRepository.prototype, "getMios").mockReturnValue(new Promise(() => {}));
+    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockReturnValue(new Promise(() => {}));
+    const wrapper = mount(MiCalendarioView);
+
+    expect(wrapper.find(".linea-dia").exists()).toBe(false);
+  });
+
+  test("al quitar un bloque la línea se actualiza", async () => {
+    vi.spyOn(BloqueOcupadoRepository.prototype, "remove").mockResolvedValue();
+    const wrapper = await montarVista([bloque(1, FUTURO, "Turno")]);
+    await dia(wrapper, 15).trigger("click");
+
+    await wrapper.find(".calendario__quitar").trigger("click");
+    await flushPromises();
+
+    expect(wrapper.findAll(".linea-dia__tramo").length).toBe(0);
+    expect(wrapper.find(".linea-dia__libres").text()).toBe("Libre todo el día.");
+  });
+});
