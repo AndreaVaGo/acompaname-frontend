@@ -119,7 +119,7 @@ describe("CalendarioMensual", () => {
     expect(dia(wrapper, 11).classes()).not.toContain("calendario-mensual__dia--pasado");
   });
 
-  test("pinta un punto verde si hay servicio y uno azul si hay un rato ocupado", () => {
+  test("los días con un servicio o con un rato ocupado salen marcados como ocupados", () => {
     const wrapper = montar({
       marcas: {
         "2026-12-15": { servicios: 1, bloques: 0 },
@@ -128,12 +128,10 @@ describe("CalendarioMensual", () => {
       },
     });
 
-    expect(dia(wrapper, 15).find(".calendario-mensual__punto--servicio").exists()).toBe(true);
-    expect(dia(wrapper, 15).find(".calendario-mensual__punto--bloque").exists()).toBe(false);
-    expect(dia(wrapper, 16).find(".calendario-mensual__punto--servicio").exists()).toBe(false);
-    expect(dia(wrapper, 16).find(".calendario-mensual__punto--bloque").exists()).toBe(true);
-    expect(dia(wrapper, 17).findAll(".calendario-mensual__punto").length).toBe(2);
-    expect(dia(wrapper, 18).findAll(".calendario-mensual__punto").length).toBe(0);
+    expect(dia(wrapper, 15).classes()).toContain("calendario-mensual__dia--ocupado");
+    expect(dia(wrapper, 16).classes()).toContain("calendario-mensual__dia--ocupado");
+    expect(dia(wrapper, 17).classes()).toContain("calendario-mensual__dia--ocupado");
+    expect(dia(wrapper, 18).classes()).not.toContain("calendario-mensual__dia--ocupado");
   });
 
   test("el texto para lectores de pantalla dice qué hay en el día", () => {
@@ -149,12 +147,13 @@ describe("CalendarioMensual", () => {
     expect(dia(wrapper, 17).attributes("aria-label")).toBe("17 de Diciembre");
   });
 
-  test("enseña la leyenda de los dos tipos de punto", () => {
+  test("la leyenda explica los tres estados de un día", () => {
     const wrapper = montar();
 
     const leyenda = wrapper.find(".calendario-mensual__leyenda").text();
-    expect(leyenda).toContain("Servicio aceptado");
-    expect(leyenda).toContain("Rato ocupado");
+    expect(leyenda).toContain("Día libre");
+    expect(leyenda).toContain("Con algo apuntado");
+    expect(leyenda).toContain("Día completo");
   });
 });
 
@@ -175,9 +174,9 @@ describe("CalendarioMensual: colores de los días", () => {
       },
     });
 
-    expect(dia(wrapper, 15).classes()).toContain("calendario-mensual__dia--servicio");
-    expect(dia(wrapper, 16).classes()).toContain("calendario-mensual__dia--bloque");
-    expect(dia(wrapper, 17).classes()).toContain("calendario-mensual__dia--mixto");
+    expect(dia(wrapper, 15).classes()).toContain("calendario-mensual__dia--ocupado");
+    expect(dia(wrapper, 16).classes()).toContain("calendario-mensual__dia--ocupado");
+    expect(dia(wrapper, 17).classes()).toContain("calendario-mensual__dia--ocupado");
     expect(dia(wrapper, 15).classes()).not.toContain("calendario-mensual__dia--completo");
     // 180 minutos de 480 = 38 %
     expect(dia(wrapper, 15).find(".calendario-mensual__barra-relleno").attributes("style")).toContain("width: 38%");
@@ -213,9 +212,4 @@ describe("CalendarioMensual: colores de los días", () => {
     expect(dia(wrapper, 15).find(".calendario-mensual__barra-relleno").attributes("style")).toContain("width: 50%");
   });
 
-  test("la leyenda explica la barra", () => {
-    const wrapper = montar();
-
-    expect(wrapper.find(".calendario-mensual__leyenda").text()).toContain("Barra llena: día completo");
-  });
 });

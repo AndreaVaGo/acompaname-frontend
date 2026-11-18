@@ -73,15 +73,6 @@ function estadoDe(fecha) {
   return "parcial";
 }
 
-// "servicio", "bloque" o "mixto" (las dos cosas), para elegir el color de la casilla
-function tipoDe(fecha) {
-  const marca = marcaDe(fecha);
-  if (marca.servicios > 0 && marca.bloques > 0) {
-    return "mixto";
-  }
-  return marca.servicios > 0 ? "servicio" : "bloque";
-}
-
 // Cuánto se llena la barra de un día, de 0 a 100 (con 8 horas apuntadas está llena).
 // Si la marca no trae minutos, se enseña a la mitad
 function porcentajeDe(fecha) {
@@ -98,7 +89,7 @@ function clasesDeColor(fecha) {
   if (estado === "libre") {
     return ["calendario-mensual__dia--libre"];
   }
-  const clases = ["calendario-mensual__dia--" + tipoDe(fecha)];
+  const clases = ["calendario-mensual__dia--ocupado"];
   if (estado === "completo") {
     clases.push("calendario-mensual__dia--completo");
   }
@@ -171,16 +162,6 @@ function descripcionDe(celda) {
           @click="emit('seleccionar', celda.fecha)"
         >
           <span class="calendario-mensual__numero">{{ celda.dia }}</span>
-          <span class="calendario-mensual__puntos">
-            <span
-              v-if="marcaDe(celda.fecha).servicios > 0"
-              class="calendario-mensual__punto calendario-mensual__punto--servicio"
-            ></span>
-            <span
-              v-if="marcaDe(celda.fecha).bloques > 0"
-              class="calendario-mensual__punto calendario-mensual__punto--bloque"
-            ></span>
-          </span>
           <span v-if="estadoDe(celda.fecha) !== 'libre'" class="calendario-mensual__barra">
             <span
               class="calendario-mensual__barra-relleno"
@@ -194,21 +175,19 @@ function descripcionDe(celda) {
     <div class="calendario-mensual__pie">
       <div class="calendario-mensual__leyenda">
         <span class="calendario-mensual__leyenda-item">
-          <span class="calendario-mensual__punto calendario-mensual__punto--servicio"></span>
-          Servicio aceptado
+          <span class="calendario-mensual__muestra calendario-mensual__muestra--libre"></span>
+          Día libre
         </span>
         <span class="calendario-mensual__leyenda-item">
-          <span class="calendario-mensual__punto calendario-mensual__punto--bloque"></span>
-          Rato ocupado
+          <span class="calendario-mensual__muestra calendario-mensual__muestra--ocupado"></span>
+          Con algo apuntado
         </span>
         <span class="calendario-mensual__leyenda-item">
-          <span class="calendario-mensual__barra calendario-mensual__barra--muestra">
-            <span class="calendario-mensual__barra-relleno" style="width: 100%"></span>
-          </span>
-          Barra llena: día completo
+          <span class="calendario-mensual__muestra calendario-mensual__muestra--completo"></span>
+          Día completo
         </span>
       </div>
-      <button type="button" class="calendario-mensual__hoy" @click="irAHoy">Hoy</button>
+            <button type="button" class="calendario-mensual__hoy" @click="irAHoy">Hoy</button>
     </div>
   </div>
 </template>
@@ -279,42 +258,26 @@ function descripcionDe(celda) {
   cursor: pointer;
 }
 
-.calendario-mensual__dia--libre:hover {
-  background-color: var(--color-accent-bg);
+/* Día libre: verde suave de la paleta */
+.calendario-mensual__dia--libre {
+  background-color: var(--color-secondary-bg);
 }
 
-/* Día con algo apuntado y horas libres: color suave */
-.calendario-mensual__dia--servicio {
-  background-color: var(--color-secondary-bg);
+.calendario-mensual__dia--libre:hover {
   border-color: var(--color-secondary);
 }
 
-.calendario-mensual__dia--bloque {
+/* Día con algo apuntado y horas libres: azul suave */
+.calendario-mensual__dia--ocupado {
   background-color: var(--color-info-bg);
   border-color: var(--color-info);
 }
 
-.calendario-mensual__dia--mixto {
-  background: linear-gradient(135deg, var(--color-secondary-bg) 50%, var(--color-info-bg) 50%);
-  border-color: var(--color-info);
-}
-
-/* Día completo: color fuerte y letra blanca */
+/* Día completo: azul fuerte y letra blanca */
 .calendario-mensual__dia--completo {
+  background-color: var(--color-info);
   color: var(--color-white);
   font-weight: bold;
-}
-
-.calendario-mensual__dia--servicio.calendario-mensual__dia--completo {
-  background: var(--color-secondary);
-}
-
-.calendario-mensual__dia--bloque.calendario-mensual__dia--completo {
-  background: var(--color-info);
-}
-
-.calendario-mensual__dia--mixto.calendario-mensual__dia--completo {
-  background: linear-gradient(135deg, var(--color-secondary) 50%, var(--color-info) 50%);
 }
 
 /* Barrita de abajo: cuánto del día está ocupado (llena con 8 horas) */
@@ -327,26 +290,12 @@ function descripcionDe(celda) {
   overflow: hidden;
 }
 
-.calendario-mensual__barra--muestra {
-  display: inline-block;
-  width: 28px;
-}
-
 .calendario-mensual__barra-relleno {
   display: block;
   height: 100%;
-  background-color: var(--color-text);
-}
-
-.calendario-mensual__dia--servicio .calendario-mensual__barra-relleno {
-  background-color: var(--color-secondary);
-}
-
-.calendario-mensual__dia--bloque .calendario-mensual__barra-relleno {
   background-color: var(--color-info);
 }
 
-/* En un día completo el fondo es fuerte, así que la barra va en blanco */
 .calendario-mensual__dia--completo .calendario-mensual__barra {
   background-color: rgba(255, 255, 255, 0.35);
 }
@@ -370,30 +319,28 @@ function descripcionDe(celda) {
   font-weight: bold;
 }
 
-.calendario-mensual__dia--libre.calendario-mensual__dia--seleccionado {
-  background-color: var(--color-accent-bg);
-}
-
-.calendario-mensual__puntos {
-  display: flex;
-  gap: 3px;
-  min-height: 8px;
-}
-
-.calendario-mensual__punto {
+/* Cuadraditos de la leyenda: se ven igual que los días del calendario */
+.calendario-mensual__muestra {
   display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  box-shadow: 0 0 0 1px var(--color-white);
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
 }
 
-.calendario-mensual__punto--servicio {
-  background-color: var(--color-secondary);
+.calendario-mensual__muestra--libre {
+  background-color: var(--color-secondary-bg);
+  border-color: var(--color-secondary);
 }
 
-.calendario-mensual__punto--bloque {
+.calendario-mensual__muestra--ocupado {
+  background-color: var(--color-info-bg);
+  border-color: var(--color-info);
+}
+
+.calendario-mensual__muestra--completo {
   background-color: var(--color-info);
+  border-color: var(--color-info);
 }
 
 .calendario-mensual__pie {
