@@ -22,6 +22,7 @@ import EnviarSugerenciaView from "../views/common/EnviarSugerenciaView.vue";
 import SolicitudesFamiliaView from "../views/family/SolicitudesFamiliaView.vue";
 import CheckoutView from "../views/family/CheckoutView.vue";
 import PagosView from "../views/family/PagosView.vue";
+import ChatView from "../views/common/ChatView.vue";
 import AvisoLegalView from "../views/common/AvisoLegalView.vue";
 import PrivacidadView from "../views/common/PrivacidadView.vue";
 import TerminosView from "../views/common/TerminosView.vue";
@@ -57,6 +58,7 @@ const router = createRouter({
     { path: "/cambiar-password", name: "cambiar-password", component: CambiarPasswordView, meta: { titulo: "Cambiar contraseña", requiereLogin: true } },
     { path: "/sugerencias", name: "sugerencias", component: EnviarSugerenciaView, meta: { titulo: "Enviar una sugerencia", requiereLogin: true, roles: ["FAMILIA", "CUIDADOR"] } },
     { path: "/solicitudes", name: "solicitudes", component: SolicitudesFamiliaView, meta: { titulo: "Mis solicitudes", requiereLogin: true, rol: "FAMILIA" } },
+    { path: "/chat/:id", name: "chat", component: ChatView, meta: { titulo: "Chat de la solicitud", requiereLogin: true, roles: ["FAMILIA", "CUIDADOR"] } },
     { path: "/pagos", name: "pagos", component: PagosView, meta: { titulo: "Mis pagos", requiereLogin: true, rol: "FAMILIA" } },
     { path: "/pagar/:id", name: "pagar", component: CheckoutView, meta: { titulo: "Pagar", requiereLogin: true, rol: "FAMILIA" } },
     { path: "/admin", name: "admin", component: AdminView, meta: { titulo: "Administración", requiereLogin: true, rol: "ADMIN" } },
