@@ -140,6 +140,14 @@ h3 {
   opacity: 0;
 }
 
+/* Bloques grandes de una pantalla (perfil, etc.): suben un poco mientras aparecen */
+@keyframes entra-sube {
+  from {
+    opacity: 0;
+    translate: 0 16px;
+  }
+}
+
 /* Quien tiene activado "reducir movimiento" no ve ninguna animación ni transición */
 @media (prefers-reduced-motion: reduce) {
   *,
