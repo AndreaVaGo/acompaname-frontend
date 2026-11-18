@@ -7,6 +7,7 @@ import {
   diasEnElMes,
   celdasDelMes,
   fechasEntre,
+  minutosDeLaHora,
 } from "../../utils/calendario";
 
 afterEach(() => {
@@ -108,5 +109,18 @@ describe("fechasEntre", () => {
 
   test("si el final es anterior al principio devuelve una lista vacía", () => {
     expect(fechasEntre("2026-12-10", "2026-12-05")).toEqual([]);
+  });
+});
+
+describe("minutosDeLaHora", () => {
+  test("pasa una hora a minutos desde medianoche", () => {
+    expect(minutosDeLaHora("00:00")).toBe(0);
+    expect(minutosDeLaHora("09:30")).toBe(570);
+    expect(minutosDeLaHora("23:59:00")).toBe(1439);
+  });
+
+  test("sin hora devuelve 0", () => {
+    expect(minutosDeLaHora(null)).toBe(0);
+    expect(minutosDeLaHora("")).toBe(0);
   });
 });

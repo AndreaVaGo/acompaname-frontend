@@ -68,3 +68,12 @@ export function fechasEntre(inicio, fin) {
   }
   return lista;
 }
+
+// Pasa una hora ("09:30" o "09:30:00") a minutos desde las 00:00 (570). Si no hay hora, devuelve 0
+export function minutosDeLaHora(hora) {
+  if (!hora) {
+    return 0;
+  }
+  const partes = hora.split(":");
+  return Number(partes[0]) * 60 + Number(partes[1]);
+}
