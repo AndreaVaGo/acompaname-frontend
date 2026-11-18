@@ -588,4 +588,39 @@ describe("PerfilCuidadorView", () => {
     expect(resenas[0].find(".perfil__resena-comentario").exists()).toBe(false);
     expect(resenas[1].find(".perfil__resena-comentario").exists()).toBe(true);
   });
+
+  test("muestra el recargo propio por persona extra", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
+      usuarioNombre: "Pepe",
+      especialidad: "Geriatría",
+      anosExperiencia: 4,
+      tarifaHora: 18,
+      disponibleAhora: true,
+      bio: "Cuidador con experiencia",
+      recargoPersonaExtra: 40,
+    });
+
+    const wrapper = await montarVista("FAMILIA");
+
+    expect(wrapper.find('[data-testid="recargo-persona-extra"]').text()).toContain(
+      "+40 % por cada persona extra",
+    );
+  });
+
+  test("sin recargo propio muestra el 25 % por defecto", async () => {
+    vi.spyOn(CuidadorRepository.prototype, "getById").mockResolvedValue({
+      usuarioNombre: "Pepe",
+      especialidad: "Geriatría",
+      anosExperiencia: 4,
+      tarifaHora: 18,
+      disponibleAhora: true,
+      bio: "Cuidador con experiencia",
+    });
+
+    const wrapper = await montarVista("FAMILIA");
+
+    expect(wrapper.find('[data-testid="recargo-persona-extra"]').text()).toContain(
+      "+25 % por cada persona extra",
+    );
+  });
 });

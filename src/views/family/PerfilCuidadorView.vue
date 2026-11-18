@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { useAuthStore } from "../../stores/auth";
 import { RouterLink } from "vue-router";
@@ -10,6 +10,7 @@ import { nombreCuidado } from "@/utils/catalogoCuidados";
 import { nombreTitulacion } from "@/utils/catalogoTitulaciones";
 import { formatearFecha } from "@/utils/formatearFecha";
 import { mensajeDeError } from "@/utils/mensajeDeError";
+import { recargoAplicable } from "@/utils/estimacionImporte";
 
 const route = useRoute();
 const cuidadorId = route.params.id;
@@ -18,6 +19,14 @@ const cuidadorRepository = new CuidadorRepository();
 const valoracionRepository = new ValoracionRepository();
 
 const cuidador = ref(null);
+
+// Recargo por persona extra en porcentaje: el propio de la persona cuidadora o el de por defecto
+const recargoMostrado = computed(() => {
+  if (!cuidador.value) {
+    return 0;
+  }
+  return Math.round(recargoAplicable(cuidador.value.recargoPersonaExtra) * 100);
+});
 const cargando = ref(true);
 const error = ref("");
 
@@ -175,6 +184,10 @@ function estrellas(puntuacion) {
       <div class="perfil__sidebar">
         <p class="perfil__precio">
           {{ cuidador.tarifaHora }} €<span>/hora</span>
+        </p>
+        <!-- Cuánto se suma por cada persona extra que reciba el cuidado -->
+        <p class="perfil__recargo" data-testid="recargo-persona-extra">
+          +{{ recargoMostrado }} % por cada persona extra
         </p>
         <RouterLink
           v-if="authStore.rol === 'FAMILIA'"
@@ -442,6 +455,18 @@ function estrellas(puntuacion) {
   height: fit-content;
   /* La barra lateral entra un poco después que la información */
   animation: entra-sube 0.5s var(--ease-out) 120ms backwards;
+}
+
+/* Etiqueta verde bien visible bajo el precio, para que se vea a primera vista */
+.perfil__recargo {
+  display: inline-block;
+  margin: -4px 0 16px;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-secondary-bg);
+  color: var(--color-secondary);
+  font-size: 1rem;
+  font-weight: bold;
 }
 
 .perfil__precio {
