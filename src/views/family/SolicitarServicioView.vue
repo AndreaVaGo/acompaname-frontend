@@ -27,6 +27,9 @@ const hospital = ref("");
 const ubicacionHospital = ref("");
 const fechaInicio = ref("");
 const fechaFin = ref("");
+// Horas en formato HH:mm. La de inicio cuenta el primer día y la de fin el último
+const horaInicio = ref("");
+const horaFin = ref("");
 const nombrePaciente = ref("");
 const edadPaciente = ref("");
 const necesidades = ref([]);
@@ -71,6 +74,8 @@ async function enviarSolicitud() {
     !tipoCuidado.value ||
     faltaDireccion() ||
     !fechaInicio.value ||
+    !horaInicio.value ||
+    !horaFin.value ||
     !nombrePaciente.value ||
     faltaEdad()
   ) {
@@ -86,6 +91,13 @@ async function enviarSolicitud() {
     error.value = "La fecha de fin no puede ser anterior a la de inicio.";
     return;
   }
+  // Si el cuidado dura un solo día, la hora de fin tiene que ser posterior a la de inicio
+  // (las horas tienen formato HH:mm, así que también se pueden comparar como texto)
+  const variosDias = fechaFin.value && fechaFin.value > fechaInicio.value;
+  if (!variosDias && horaFin.value <= horaInicio.value) {
+    error.value = "La hora de fin tiene que ser posterior a la de inicio.";
+    return;
+  }
   error.value = "";
 
   try {
@@ -98,6 +110,8 @@ async function enviarSolicitud() {
       edadPaciente: Number(edadPaciente.value),
       fechaCuidado: fechaInicio.value,
       fechaFin: fechaFin.value || null,
+      horaInicio: horaInicio.value,
+      horaFin: horaFin.value,
       familiaId: authStore.id,
       cuidadorId: Number(cuidadorId),
       necesidades: necesidades.value,
@@ -211,6 +225,21 @@ async function enviarSolicitud() {
             />
           </div>
         </div>
+
+        <div class="solicitar__row">
+          <div>
+            <label for="hora-inicio">Hora de inicio</label>
+            <input type="time" id="hora-inicio" v-model="horaInicio" />
+          </div>
+          <div>
+            <label for="hora-fin">Hora de fin</label>
+            <input type="time" id="hora-fin" v-model="horaFin" />
+          </div>
+        </div>
+        <p class="solicitar__ayuda">
+          Si el cuidado dura varios días, la hora de inicio es la del primer día
+          y la de fin la del último.
+        </p>
 
         <h2 class="titulo-seccion" data-icono="👤">La persona cuidada</h2>
 
