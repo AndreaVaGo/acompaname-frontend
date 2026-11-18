@@ -1,9 +1,39 @@
 <script setup>
+import { computed } from "vue";
 import { RouterLink } from "vue-router";
+import pinia from "../../pinia/pinia";
+import { useAuthStore } from "../../stores/auth";
 import AnimacionComoFunciona from "../../components/animation/AnimacionComoFunciona.vue";
 import AparecerAlVer from "../../components/animation/AparecerAlVer.vue";
 import AvataresPersonas from "../../components/animation/AvataresPersonas.vue";
 import IconoManoCorazon from "../../components/animation/IconoManoCorazon.vue";
+
+const authStore = useAuthStore(pinia);
+
+// Los dos botones del principio cambian según quién entra:
+// una visita puede registrarse o iniciar sesión, y quien ya tiene sesión va a lo suyo
+const botones = computed(() => {
+  if (!authStore.estaAutenticado) {
+    return [
+      { texto: "Registrarme", ruta: "/registro" },
+      { texto: "Iniciar sesión", ruta: "/login" },
+    ];
+  }
+  if (authStore.rol === "CUIDADOR") {
+    return [
+      { texto: "Ver mis solicitudes", ruta: "/solicitudes-cuidador" },
+      { texto: "Mi calendario", ruta: "/mi-calendario" },
+    ];
+  }
+  if (authStore.rol === "ADMIN") {
+    return [{ texto: "Ir al panel de administración", ruta: "/admin" }];
+  }
+  // Familia
+  return [
+    { texto: "Buscar personas cuidadoras", ruta: "/buscar" },
+    { texto: "Mis solicitudes", ruta: "/solicitudes" },
+  ];
+});
 </script>
 
 <template>
@@ -23,14 +53,17 @@ import IconoManoCorazon from "../../components/animation/IconoManoCorazon.vue";
           Sin llamadas interminables ni papeleo.
         </p>
         <div class="landing__hero-actions">
-          <RouterLink to="/registro" class="btn btn--primary"
-            >Registrarme</RouterLink
-          >
-          <RouterLink to="/login" class="btn btn--secondary"
-            >Iniciar sesión</RouterLink
+          <RouterLink
+            v-for="(boton, posicion) in botones"
+            :key="boton.ruta"
+            :to="boton.ruta"
+            class="btn"
+            :class="posicion === 0 ? 'btn--primary' : 'btn--secondary'"
+            >{{ boton.texto }}</RouterLink
           >
         </div>
-        <p class="landing__hint">
+        <!-- "Solo mirar" y la invitación a profesionales son para quien todavía no tiene cuenta -->
+        <p v-if="!authStore.estaAutenticado" class="landing__hint">
           ¿Solo quieres mirar?
           <RouterLink to="/buscar" class="landing__link">
             <AvataresPersonas class="landing__avatares" />
@@ -103,9 +136,9 @@ import IconoManoCorazon from "../../components/animation/IconoManoCorazon.vue";
       </div>
     </section>
 
-    <hr class="landing__divider" />
+    <hr v-if="!authStore.estaAutenticado" class="landing__divider" />
 
-    <AparecerAlVer class="landing__cta">
+    <AparecerAlVer v-if="!authStore.estaAutenticado" class="landing__cta">
       <div class="landing__cta-icon"><IconoManoCorazon /></div>
       <h2>¿Eres persona cuidadora profesional?</h2>
       <p>
