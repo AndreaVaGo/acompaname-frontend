@@ -310,7 +310,17 @@ const avisoDireccion = computed(
   border-left: 6px solid var(--color-border);
   padding: 24px 24px 24px 22px;
   box-shadow: var(--shadow-card);
-  transition: transform 0.15s;
+  /* Entrada solo con opacidad: con "transform" la ventana de dentro (position: fixed) fallaría */
+  animation: solicitud-entra var(--dur-med) var(--ease-out) backwards;
+  transition:
+    transform var(--dur-med) var(--ease-out),
+    box-shadow var(--dur-med) var(--ease-out);
+}
+
+@keyframes solicitud-entra {
+  from {
+    opacity: 0;
+  }
 }
 
 /* El color del borde lateral cambia según el estado de la solicitud */
@@ -340,6 +350,14 @@ const avisoDireccion = computed(
 @media (hover: hover) {
   .solicitudes__card:not(.solicitudes__card--abierta):hover {
     transform: translateY(-3px);
+    box-shadow: var(--shadow-card-hover);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .solicitudes__card {
+    animation: none;
+    transition: none;
   }
 }
 
