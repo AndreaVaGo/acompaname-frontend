@@ -78,6 +78,16 @@ function grupoDePersona(indice) {
   return buscarGrupo(codigoDeGrupo(indice)) || grupo.value;
 }
 
+// Cambia el grupo de una persona. El de la primera es el mismo que se elige arriba,
+// así que los dos selectores siempre enseñan lo mismo
+function cambiarGrupo(indice, codigo) {
+  if (indice === 0) {
+    grupoEdad.value = codigo;
+  } else {
+    personas.value[indice].grupoEdad = codigo;
+  }
+}
+
 function anadirPersona() {
   if (personas.value.length < MAX_PERSONAS) {
     // La persona nueva empieza con el mismo grupo que la primera, y se puede cambiar
@@ -354,10 +364,14 @@ async function enviarSolicitud() {
               </div>
             </div>
 
-            <!-- La primera persona usa el grupo de arriba; las demás eligen el suyo -->
-            <div v-if="indice > 0" class="solicitar__grupo-persona">
+            <!-- Con varias personas, cada una enseña su grupo (el de la primera es el de arriba) -->
+            <div v-if="personas.length > 1" class="solicitar__grupo-persona">
               <label :for="'grupo-' + (indice + 1)">Grupo de edad</label>
-              <select :id="'grupo-' + (indice + 1)" v-model="persona.grupoEdad">
+              <select
+                :id="'grupo-' + (indice + 1)"
+                :value="codigoDeGrupo(indice)"
+                @change="cambiarGrupo(indice, $event.target.value)"
+              >
                 <option value="">Elige un grupo</option>
                 <option
                   v-for="opcion in GRUPOS"
@@ -380,9 +394,8 @@ async function enviarSolicitud() {
           </div>
 
           <p v-if="personas.length > 1" class="solicitar__ayuda">
-            La primera persona usa el grupo de edad elegido arriba. Cada persona
-            añadida tiene el suyo: así puedes pedir, por ejemplo, tres niños y un
-            abuelo en la misma solicitud.
+            Cada persona tiene su propio grupo de edad: así puedes pedir, por
+            ejemplo, tres niños y un abuelo en la misma solicitud.
           </p>
 
           <button

@@ -57,12 +57,36 @@ describe("SolicitarServicioView · grupo de edad por persona", () => {
     vi.restoreAllMocks();
   });
 
-  test("la primera persona no tiene selector de grupo propio", async () => {
+  test("con una sola persona no hay selector de grupo propio", async () => {
     const wrapper = await montarVista();
     await elegirGrupo(wrapper, "NINOS");
 
     expect(wrapper.find("#grupo-1").exists()).toBe(false);
     expect(wrapper.find("#grupo-2").exists()).toBe(false);
+  });
+
+  test("con varias personas la primera también tiene su selector, con el grupo de arriba", async () => {
+    const wrapper = await montarVista();
+    await elegirGrupo(wrapper, "NINOS");
+
+    await wrapper.find(".solicitar__anadir").trigger("click");
+
+    expect(wrapper.find("#grupo-1").exists()).toBe(true);
+    expect(wrapper.find("#grupo-1").element.value).toBe("NINOS");
+  });
+
+  test("cambiar el grupo de la primera persona cambia el selector de arriba y sus límites", async () => {
+    const wrapper = await montarVista();
+    await elegirGrupo(wrapper, "NINOS");
+    await wrapper.find(".solicitar__anadir").trigger("click");
+
+    await wrapper.find("#grupo-1").setValue("MAYORES");
+
+    expect(
+      wrapper.find('input[name="grupo-solicitud"][value="MAYORES"]').element.checked,
+    ).toBe(true);
+    expect(wrapper.find("#edad").attributes("min")).toBe("65");
+    expect(wrapper.find("#edad-2").attributes("min")).toBe("4");
   });
 
   test("la persona añadida tiene su selector, con el mismo grupo que la primera", async () => {
