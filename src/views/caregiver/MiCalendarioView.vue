@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, nextTick } from "vue";
+import { ref, computed, watch, onMounted, nextTick } from "vue";
 import BloqueOcupadoRepository from "@/repositories/BloqueOcupadoRepository";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
 import CalendarioMensual from "@/components/CalendarioMensual.vue";
@@ -10,6 +10,16 @@ import { nombresDePersonas } from "@/utils/personasSolicitud";
 import { formatearHora, formatearMomento } from "@/utils/formatearHora";
 import { resumenDeImportacion } from "@/utils/importacionCalendario";
 import { leerTexto } from "@/utils/leerArchivo";
+import {
+  TURNOS,
+  DIAS_SEMANA,
+  LUNES_A_VIERNES,
+  TODOS_LOS_DIAS,
+  MAXIMO_DIAS_REPETICION,
+  diaDeLaSemana,
+  esTurnoDeNoche,
+  resumenDeRepeticion,
+} from "@/utils/turnos";
 import {
   hoyEnFormatoISO,
   fechasEntre,
@@ -46,6 +56,10 @@ const fecha = ref("");
 const horaInicio = ref("");
 const horaFin = ref("");
 const motivo = ref("");
+// Repetir el mismo rato (un turno) varios días de la semana hasta una fecha
+const repetir = ref(false);
+const repetirHasta = ref("");
+const diasElegidos = ref([]);
 const guardando = ref(false);
 const error = ref("");
 const aviso = ref("");
@@ -56,6 +70,27 @@ const avisoImportar = ref("");
 const errorImportar = ref("");
 
 const MINUTOS_DEL_DIA = 1440;
+
+// Al activar "Repetir" se dejan marcados de lunes a viernes, que es lo más normal en un turno
+watch(repetir, (activado) => {
+  if (activado && diasElegidos.value.length === 0) {
+    diasElegidos.value = [...LUNES_A_VIERNES];
+  }
+});
+
+// Un turno de noche acaba al día siguiente: se avisa de que se apuntará en dos partes
+const esNoche = computed(() => esTurnoDeNoche(horaInicio.value, horaFin.value));
+
+// Pone en el formulario las horas y el motivo de un turno rápido (mañana, tarde o noche)
+function elegirTurno(turno) {
+  horaInicio.value = turno.horaInicio;
+  horaFin.value = turno.horaFin;
+  motivo.value = turno.motivo;
+}
+
+function elegirDias(dias) {
+  diasElegidos.value = [...dias];
+}
 
 // De qué hora a qué hora ocupa un servicio un día concreto (en minutos desde las 00:00).
 // Un servicio sin horas (antiguo) se cuenta como día entero.
@@ -279,9 +314,38 @@ function comprobarFormulario() {
   if (fecha.value < hoy) {
     return "La fecha no puede estar en el pasado.";
   }
-  // Las horas tienen el formato 08:00, así que se pueden comparar como texto
-  if (horaFin.value <= horaInicio.value) {
-    return "La hora de fin tiene que ser posterior a la de inicio.";
+  if (horaFin.value === horaInicio.value) {
+    return "La hora de fin no puede ser igual a la de inicio. Si el turno acaba al día siguiente (noche), pon la hora a la que acaba.";
+  }
+  if (repetir.value) {
+    return comprobarRepeticion();
+  }
+  return "";
+}
+
+// Las comprobaciones de "Repetir": hasta cuándo, qué días y que no sea demasiado tiempo
+function comprobarRepeticion() {
+  if (!repetirHasta.value) {
+    return "Elige hasta qué día se repite.";
+  }
+  if (repetirHasta.value < fecha.value) {
+    return "El último día tiene que ser el mismo que el primero o uno posterior.";
+  }
+  if (diasElegidos.value.length === 0) {
+    return "Elige al menos un día de la semana.";
+  }
+  const dias = fechasEntre(fecha.value, repetirHasta.value);
+  if (dias.length - 1 > MAXIMO_DIAS_REPETICION) {
+    return "Solo puedes repetir un rato durante unos 6 meses seguidos. Elige un último día más cercano.";
+  }
+  let hayDiaValido = false;
+  for (const dia of dias) {
+    if (diasElegidos.value.includes(diaDeLaSemana(dia))) {
+      hayDiaValido = true;
+    }
+  }
+  if (!hayDiaValido) {
+    return "Ninguno de los días de la semana que has elegido cae entre esas fechas.";
   }
   return "";
 }
@@ -296,22 +360,39 @@ async function guardarBloque() {
   }
   guardando.value = true;
   try {
-    await bloqueRepository.create({
-      fecha: fecha.value,
-      horaInicio: horaInicio.value,
-      horaFin: horaFin.value,
-      motivo: motivo.value.trim(),
-    });
+    // Un turno de noche (acaba al día siguiente) o un rato repetido van por "repetir";
+    // un rato normal de un solo día, por "crear"
+    if (repetir.value || esNoche.value) {
+      const resumen = await bloqueRepository.repetir({
+        desde: fecha.value,
+        hasta: repetir.value ? repetirHasta.value : fecha.value,
+        diasSemana: repetir.value ? [...diasElegidos.value] : [diaDeLaSemana(fecha.value)],
+        horaInicio: horaInicio.value,
+        horaFin: horaFin.value,
+        motivo: motivo.value.trim(),
+      });
+      aviso.value = resumenDeRepeticion(resumen);
+    } else {
+      await bloqueRepository.create({
+        fecha: fecha.value,
+        horaInicio: horaInicio.value,
+        horaFin: horaFin.value,
+        motivo: motivo.value.trim(),
+      });
+      aviso.value = "Listo, hemos añadido ese rato a tu calendario.";
+    }
     // Se abre el día que se acaba de apuntar, para ver el bloque nuevo
     diaSeleccionado.value = fecha.value;
     fecha.value = "";
     horaInicio.value = "";
     horaFin.value = "";
     motivo.value = "";
-    aviso.value = "Listo, hemos añadido ese rato a tu calendario.";
+    repetir.value = false;
+    repetirHasta.value = "";
+    diasElegidos.value = [];
     await cargarBloques();
   } catch (err) {
-    error.value = mensajeDeError(err, "No se pudo guardar el bloque.");
+    error.value = repetir.value || esNoche.value ? textoDelErrorDeRepetir(err) : mensajeDeError(err, "No se pudo guardar el bloque.");
   } finally {
     guardando.value = false;
   }
@@ -319,13 +400,22 @@ async function guardarBloque() {
 
 // Si el servidor explica por qué el archivo no vale ("no parece un calendario", "demasiados eventos"),
 // se enseña esa explicación. Si no, el mensaje de siempre según el código del error
-function textoDelErrorDeImportar(err) {
+function detalleDelServidor(err) {
   const detalle = err && err.detalle ? err.detalle.trim() : "";
   const esTexto = detalle !== "" && !detalle.startsWith("{") && !detalle.startsWith("[");
   if (err && err.status === 400 && esTexto) {
     return detalle;
   }
-  return mensajeDeError(err, "No se pudo importar el calendario.");
+  return "";
+}
+
+function textoDelErrorDeImportar(err) {
+  return detalleDelServidor(err) || mensajeDeError(err, "No se pudo importar el calendario.");
+}
+
+// Igual al repetir: si el servidor explica el problema (fechas, demasiado tiempo...), se enseña
+function textoDelErrorDeRepetir(err) {
+  return detalleDelServidor(err) || mensajeDeError(err, "No se pudo guardar el turno.");
 }
 
 // Al elegir un archivo .ics se lee y se manda al servidor, que crea los ratos ocupados
@@ -496,6 +586,20 @@ onMounted(() => {
           <label for="bloque-fecha">Día</label>
           <input id="bloque-fecha" v-model="fecha" type="date" :min="hoy" />
 
+          <p class="calendario__etiqueta-turnos" id="turnos-rapidos-titulo">Turnos rápidos</p>
+          <div class="calendario__turnos" role="group" aria-labelledby="turnos-rapidos-titulo">
+            <button
+              v-for="turno in TURNOS"
+              :key="turno.id"
+              type="button"
+              class="btn btn--secondary calendario__turno"
+              :data-testid="'turno-' + turno.id"
+              @click="elegirTurno(turno)"
+            >
+              {{ turno.nombre }} · {{ turno.horaInicio }} - {{ turno.horaFin }}
+            </button>
+          </div>
+
           <div class="calendario__horas">
             <div>
               <label for="bloque-hora-inicio">Desde las</label>
@@ -515,6 +619,42 @@ onMounted(() => {
             :maxlength="MAXIMO_MOTIVO"
             placeholder="Por ejemplo: Turno en el hospital"
           />
+
+          <p v-if="esNoche" class="calendario__ayuda" data-testid="aviso-noche">
+            Este turno acaba al día siguiente: se apuntará en dos partes (hasta medianoche y desde medianoche).
+          </p>
+
+          <label class="calendario__repetir" for="bloque-repetir">
+            <input id="bloque-repetir" v-model="repetir" type="checkbox" />
+            Repetir en más días (por ejemplo, todos mis turnos de un mes)
+          </label>
+
+          <div v-if="repetir" class="calendario__repeticion" data-testid="opciones-repetir">
+            <label for="bloque-repetir-hasta">Repetir hasta el día</label>
+            <input id="bloque-repetir-hasta" v-model="repetirHasta" type="date" :min="fecha || hoy" />
+
+            <p class="calendario__etiqueta-turnos" id="dias-semana-titulo">Estos días de la semana</p>
+            <div class="calendario__dias" role="group" aria-labelledby="dias-semana-titulo">
+              <label v-for="dia in DIAS_SEMANA" :key="dia.valor" class="calendario__dia" :title="dia.nombre">
+                <input
+                  v-model="diasElegidos"
+                  type="checkbox"
+                  :value="dia.valor"
+                  :data-testid="'dia-' + dia.valor"
+                  :aria-label="dia.nombre"
+                />
+                {{ dia.corto }}
+              </label>
+            </div>
+            <div class="calendario__atajos">
+              <button type="button" class="calendario__atajo" id="dias-laborables" @click="elegirDias(LUNES_A_VIERNES)">
+                Lunes a viernes
+              </button>
+              <button type="button" class="calendario__atajo" id="dias-todos" @click="elegirDias(TODOS_LOS_DIAS)">
+                Todos los días
+              </button>
+            </div>
+          </div>
 
           <p v-if="aviso" class="calendario__ok" role="status">{{ aviso }}</p>
           <p v-if="error" class="calendario__error" role="alert">{{ error }}</p>
@@ -617,6 +757,80 @@ onMounted(() => {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
+}
+
+/* Turnos rápidos: tres botones que rellenan las horas y el motivo */
+.calendario__etiqueta-turnos {
+  font-weight: bold;
+  font-size: 0.95rem;
+  margin: 0 0 6px;
+}
+
+.calendario__turnos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: var(--gap-md);
+}
+
+.calendario__turno {
+  padding: 8px 14px;
+  font-size: 0.9rem;
+}
+
+/* Repetir: la casilla, la fecha de fin y los días de la semana (el aspecto de "label" de base.css se anula) */
+.formulario .calendario__repetir {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: normal;
+  margin: 4px 0 var(--gap-md);
+}
+
+.calendario__repeticion {
+  display: flex;
+  flex-direction: column;
+  padding: 14px 16px 6px;
+  margin-bottom: var(--gap-md);
+  background-color: var(--color-accent-bg);
+  border-radius: var(--radius-input);
+}
+
+.calendario__dias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.formulario .calendario__dia {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 6px 12px;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.calendario__atajos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.calendario__atajo {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-accent-dark);
+  text-decoration: underline;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.9rem;
 }
 
 .calendario__importar {

@@ -259,18 +259,17 @@ describe("MiCalendarioView: formulario", () => {
     expect(crear).not.toHaveBeenCalled();
   });
 
-  test("con la hora de fin igual o anterior a la de inicio avisa y no guarda", async () => {
+  test("con la hora de fin igual a la de inicio avisa y no guarda", async () => {
     const crear = vi.spyOn(BloqueOcupadoRepository.prototype, "create").mockResolvedValue({ id: 1 });
+    const repetir = vi.spyOn(BloqueOcupadoRepository.prototype, "repetir").mockResolvedValue({ creados: 1, duplicados: 0 });
     const wrapper = await montarVista();
-
-    await rellenar(wrapper, FUTURO, "15:00", "08:00");
-    await wrapper.find("form").trigger("submit.prevent");
-    expect(wrapper.find(".calendario__error").text()).toContain("posterior a la de inicio");
 
     await rellenar(wrapper, FUTURO, "08:00", "08:00");
     await wrapper.find("form").trigger("submit.prevent");
-    expect(wrapper.find(".calendario__error").text()).toContain("posterior a la de inicio");
+
+    expect(wrapper.find(".calendario__error").text()).toContain("no puede ser igual a la de inicio");
     expect(crear).not.toHaveBeenCalled();
+    expect(repetir).not.toHaveBeenCalled();
   });
 
   test("al guardar manda el bloque sin espacios en el motivo, avisa, vacía el formulario y abre ese día", async () => {
