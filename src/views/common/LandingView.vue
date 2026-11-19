@@ -230,15 +230,41 @@ const botones = computed(() => {
     <hr v-if="!authStore.estaAutenticado" class="landing__divider" />
 
     <AparecerAlVer v-if="!authStore.estaAutenticado" class="landing__cta">
-      <div class="landing__cta-icon"><IconoManoCorazon /></div>
-      <h2>¿Eres persona cuidadora profesional?</h2>
-      <p>
-        Publica tu perfil, recibe solicitudes de familias cercanas y gestiona tu
-        agenda desde un único sitio.
-      </p>
-      <RouterLink to="/registro?rol=cuidador" class="btn btn--primary"
-        >Crear mi perfil profesional</RouterLink
-      >
+      <div class="landing__cta-texto">
+        <div class="landing__cta-icon"><IconoManoCorazon /></div>
+        <h2>¿Eres persona cuidadora profesional?</h2>
+        <p>
+          Publica tu perfil, recibe solicitudes de familias cercanas y gestiona tu
+          agenda desde un único sitio.
+        </p>
+        <ul class="landing__cta-ventajas">
+          <li>Tú pones tu tarifa</li>
+          <li>Tú eliges tus horarios</li>
+          <li>Familias cerca de ti</li>
+        </ul>
+        <RouterLink to="/registro?rol=cuidador" class="btn btn--primary landing__cta-boton">
+          Crear mi perfil profesional
+          <span class="landing__cta-flecha" aria-hidden="true">→</span>
+        </RouterLink>
+      </div>
+
+      <!-- Vista previa de ejemplo de cómo se vería un perfil: es solo decoración, sin datos de nadie -->
+      <div class="landing__cta-vista" aria-hidden="true" data-testid="vista-previa-perfil">
+        <div class="landing__cta-perfil">
+          <div class="landing__cta-perfil-cabecera">
+            <span class="landing__cta-perfil-foto"><IconoManoCorazon /></span>
+            <span>
+              <strong class="landing__cta-perfil-nombre">Tu nombre</strong>
+              <span class="landing__cta-perfil-especialidad">Tu especialidad</span>
+            </span>
+          </div>
+          <p class="landing__cta-perfil-estrellas">★★★★★</p>
+          <div class="landing__cta-perfil-pie">
+            <span class="landing__cta-perfil-precio">18 €/hora</span>
+            <span class="landing__cta-perfil-estado">Disponible</span>
+          </div>
+        </div>
+      </div>
     </AparecerAlVer>
 
   </div>
@@ -687,12 +713,22 @@ const botones = computed(() => {
 }
 
 .landing__cta {
-  background-color: var(--color-white);
-  max-width: 600px;
+  /* Dos columnas: el mensaje a la izquierda y la vista previa de un perfil a la derecha */
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  align-items: center;
+  gap: 24px;
+  position: relative;
+  overflow: hidden;
+  /* Coral suave que se aclara hacia la derecha, y un halo verde en la esquina */
+  background:
+    radial-gradient(circle at 100% 0%, rgba(46, 125, 91, 0.18), transparent 45%),
+    linear-gradient(135deg, var(--color-accent-bg) 0%, var(--color-white) 60%);
+  max-width: 900px;
   margin: 32px auto;
-  padding: 32px;
+  padding: 36px 40px;
   border-radius: var(--radius-card);
-  text-align: center;
+  text-align: left;
   box-shadow: var(--shadow-card);
   transition:
     transform var(--dur-med) var(--ease-out),
@@ -724,6 +760,134 @@ const botones = computed(() => {
   height: 24px;
 }
 
+/* Tres ventajas en etiquetas */
+.landing__cta-ventajas {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0 20px;
+  padding: 0;
+}
+
+.landing__cta-ventajas li {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-secondary-bg);
+  color: var(--color-secondary);
+  border-radius: var(--radius-pill);
+  padding: 6px 14px;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.landing__cta-ventajas li::before {
+  content: "✓";
+  margin-right: 6px;
+}
+
+/* El botón lleva una flecha que se desliza al pasar el ratón */
+.landing__cta-boton {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.landing__cta-flecha {
+  display: inline-block;
+  transition: transform var(--dur-med) var(--ease-out);
+}
+
+.landing__cta-boton:hover .landing__cta-flecha {
+  transform: translateX(5px);
+}
+
+/* Vista previa de un perfil: una tarjeta que flota despacio */
+.landing__cta-vista {
+  display: flex;
+  justify-content: center;
+}
+
+.landing__cta-perfil {
+  width: 100%;
+  max-width: 260px;
+  background-color: var(--color-white);
+  border-top: 4px solid var(--color-secondary);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card-hover);
+  padding: 18px;
+  transform: rotate(2deg);
+  animation: cta-flota 5s ease-in-out infinite;
+}
+
+@keyframes cta-flota {
+  0%,
+  100% {
+    transform: translateY(0) rotate(2deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(2deg);
+  }
+}
+
+.landing__cta-perfil-cabecera {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.landing__cta-perfil-foto {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background-color: var(--color-secondary-bg);
+}
+
+.landing__cta-perfil-foto svg {
+  width: 24px;
+  height: 24px;
+}
+
+.landing__cta-perfil-nombre,
+.landing__cta-perfil-especialidad {
+  display: block;
+}
+
+.landing__cta-perfil-especialidad {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.landing__cta-perfil-estrellas {
+  margin: 12px 0;
+  color: var(--color-accent);
+  letter-spacing: 2px;
+}
+
+.landing__cta-perfil-pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.landing__cta-perfil-precio {
+  font-weight: bold;
+}
+
+.landing__cta-perfil-estado {
+  background-color: var(--color-secondary-bg);
+  color: var(--color-secondary);
+  border-radius: var(--radius-pill);
+  padding: 3px 12px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
 /* Quien prefiere menos movimiento no ve ni el latido ni los efectos al pasar el ratón */
 @media (prefers-reduced-motion: reduce) {
   .landing__hero-content > *,
@@ -735,6 +899,8 @@ const botones = computed(() => {
   .landing__step-numero,
   .landing__cta,
   .landing__cta-icon,
+  .landing__cta-flecha,
+  .landing__cta-perfil,
   .landing__avatares,
   .landing__link,
   .landing__flecha {
@@ -747,6 +913,7 @@ const botones = computed(() => {
   .landing__step-card:hover .landing__step-icon,
   .landing__step-card:hover .landing__step-numero,
   .landing__cta:hover .landing__cta-icon,
+  .landing__cta-boton:hover .landing__cta-flecha,
   .landing__link:hover .landing__flecha {
     transform: none;
   }
@@ -785,8 +952,14 @@ const botones = computed(() => {
   }
 
   .landing__cta {
+    grid-template-columns: 1fr;
     margin: 24px 20px;
     padding: 24px;
+    text-align: center;
+  }
+
+  .landing__cta-ventajas {
+    justify-content: center;
   }
 
   /* En móvil la tarjeta ocupa todo el ancho y las personas se hacen más pequeñas,
