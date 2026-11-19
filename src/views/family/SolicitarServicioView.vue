@@ -483,6 +483,9 @@ async function enviarSolicitud() {
           <p class="solicitar__precio-total">
             Total estimado: {{ formatearEuros(estimacion.total) }}
           </p>
+          <p class="solicitar__ayuda" data-testid="desplazamiento-incluido">
+            La tarifa incluye el desplazamiento de la persona cuidadora.
+          </p>
           <p class="solicitar__ayuda">
             Es una estimación. El importe final se calcula cuando la persona
             cuidadora completa el servicio y lo pagas desde "Mis pagos".
