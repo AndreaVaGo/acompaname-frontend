@@ -8,6 +8,8 @@ import { mensajeDeError } from "@/utils/mensajeDeError";
 import { formatearFecha } from "@/utils/formatearFecha";
 import { nombresDePersonas } from "@/utils/personasSolicitud";
 import { formatearHora, formatearMomento } from "@/utils/formatearHora";
+import { resumenDeImportacion } from "@/utils/importacionCalendario";
+import { leerTexto } from "@/utils/leerArchivo";
 import {
   hoyEnFormatoISO,
   fechasEntre,
@@ -23,6 +25,9 @@ const solicitudRepository = new SolicitudRepository();
 
 // Lo mismo que acepta el servidor: el motivo puede tener hasta 100 caracteres
 const MAXIMO_MOTIVO = 100;
+
+// Tamaño máximo del archivo .ics que se puede importar (el servidor acepta hasta 500000 caracteres)
+const MAXIMO_ARCHIVO = 500000;
 
 const hoy = hoyEnFormatoISO();
 
@@ -44,6 +49,11 @@ const motivo = ref("");
 const guardando = ref(false);
 const error = ref("");
 const aviso = ref("");
+
+// Importar un calendario externo (.ics): tiene sus propios avisos para no mezclarse con los del formulario
+const importando = ref(false);
+const avisoImportar = ref("");
+const errorImportar = ref("");
 
 const MINUTOS_DEL_DIA = 1440;
 
@@ -307,6 +317,54 @@ async function guardarBloque() {
   }
 }
 
+// Si el servidor explica por qué el archivo no vale ("no parece un calendario", "demasiados eventos"),
+// se enseña esa explicación. Si no, el mensaje de siempre según el código del error
+function textoDelErrorDeImportar(err) {
+  const detalle = err && err.detalle ? err.detalle.trim() : "";
+  const esTexto = detalle !== "" && !detalle.startsWith("{") && !detalle.startsWith("[");
+  if (err && err.status === 400 && esTexto) {
+    return detalle;
+  }
+  return mensajeDeError(err, "No se pudo importar el calendario.");
+}
+
+// Al elegir un archivo .ics se lee y se manda al servidor, que crea los ratos ocupados
+async function importarCalendario(evento) {
+  avisoImportar.value = "";
+  errorImportar.value = "";
+  const entrada = evento.target;
+  const archivo = entrada.files && entrada.files[0];
+  if (!archivo) {
+    return;
+  }
+  if (!archivo.name.toLowerCase().endsWith(".ics")) {
+    errorImportar.value = "Elige un archivo con la extensión .ics.";
+    entrada.value = "";
+    return;
+  }
+  if (archivo.size > MAXIMO_ARCHIVO) {
+    errorImportar.value = "El archivo es demasiado grande (máximo 500 KB). Exporta solo los próximos meses.";
+    entrada.value = "";
+    return;
+  }
+  importando.value = true;
+  try {
+    const contenido = await leerTexto(archivo);
+    if (contenido.trim() === "") {
+      errorImportar.value = "El archivo está vacío.";
+      return;
+    }
+    const resumen = await bloqueRepository.importar(contenido);
+    avisoImportar.value = resumenDeImportacion(resumen);
+    await cargarBloques();
+  } catch (err) {
+    errorImportar.value = textoDelErrorDeImportar(err);
+  } finally {
+    importando.value = false;
+    entrada.value = "";
+  }
+}
+
 async function quitarBloque(bloque) {
   error.value = "";
   aviso.value = "";
@@ -466,6 +524,34 @@ onMounted(() => {
           </button>
         </form>
       </div>
+
+      <div class="calendario__box calendario__box--formulario">
+        <section class="formulario calendario__importar">
+          <h2 class="titulo-seccion" data-icono="📥">Importar desde otro calendario</h2>
+          <p class="calendario__ayuda">
+            Si ya apuntas tus turnos y citas en Google Calendar, Outlook o el calendario del móvil, exporta tu
+            calendario como archivo .ics y súbelo aquí: se añadirán como ratos ocupados.
+          </p>
+          <ul class="calendario__ayuda-lista">
+            <li>Solo se guardan las fechas y las horas. El título y los detalles de tus citas no se leen ni se guardan.</li>
+            <li>Si importas el mismo archivo otra vez, no se duplica nada.</li>
+            <li>Los eventos que se repiten (por ejemplo, un turno cada semana) todavía no se importan: añádelos a mano.</li>
+          </ul>
+
+          <label for="calendario-archivo">Archivo de calendario (.ics)</label>
+          <input
+            id="calendario-archivo"
+            type="file"
+            accept=".ics,text/calendar"
+            :disabled="importando"
+            @change="importarCalendario"
+          />
+
+          <p v-if="importando" class="calendario__ayuda" role="status">Importando tu calendario...</p>
+          <p v-if="avisoImportar" class="calendario__ok" role="status">{{ avisoImportar }}</p>
+          <p v-if="errorImportar" class="calendario__error" role="alert">{{ errorImportar }}</p>
+        </section>
+      </div>
     </div>
   </div>
 </template>
@@ -531,6 +617,27 @@ onMounted(() => {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
+}
+
+.calendario__importar {
+  padding: 28px 32px 32px;
+
+  & .titulo-seccion:first-child {
+    margin-top: 0;
+  }
+}
+
+.calendario__ayuda {
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+  margin: 0 0 12px;
+}
+
+.calendario__ayuda-lista {
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+  margin: 0 0 16px;
+  padding-left: 20px;
 }
 
 .calendario__ok {
