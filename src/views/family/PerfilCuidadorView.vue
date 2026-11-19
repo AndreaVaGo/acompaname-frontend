@@ -189,6 +189,10 @@ function estrellas(puntuacion) {
         <p class="perfil__recargo" data-testid="recargo-persona-extra">
           +{{ recargoMostrado }} % por cada persona extra
         </p>
+        <!-- La tarifa ya incluye el desplazamiento: no se cobra aparte -->
+        <p class="perfil__recargo" data-testid="desplazamiento-incluido">
+          🚗 La tarifa incluye el desplazamiento
+        </p>
         <RouterLink
           v-if="authStore.rol === 'FAMILIA'"
           :to="`/solicitar/${cuidadorId}`"
