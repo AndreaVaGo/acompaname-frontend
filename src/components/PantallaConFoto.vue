@@ -84,7 +84,8 @@ import fotoManos from "@/assets/hero-manos.jpg";
     position: absolute;
     left: 32px;
     right: 32px;
-    bottom: 40px;
+    /* Arriba, para que se vea siempre aunque el formulario sea largo y la foto llegue más abajo de la pantalla */
+    top: 40px;
     margin: 0;
     color: var(--color-white);
     font-family: var(--font-display);
