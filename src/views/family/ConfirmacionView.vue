@@ -34,7 +34,13 @@ onMounted(async () => {
 <template>
   <div class="confirmacion">
     <div class="confirmacion__box">
-      <div class="confirmacion__icon">✓</div>
+      <!-- Un círculo y un tic que se dibujan al llegar. Es solo decoración: el título ya dice que se ha enviado -->
+      <div class="confirmacion__icon" aria-hidden="true" data-testid="confirmacion-icono">
+        <svg viewBox="0 0 52 52" width="64" height="64" fill="none">
+          <circle class="confirmacion__circulo" cx="26" cy="26" r="24" />
+          <path class="confirmacion__tic" d="M15 27l8 8 15-16" />
+        </svg>
+      </div>
 
       <h1>Solicitud enviada</h1>
       <p v-if="solicitud" class="confirmacion__texto">
@@ -112,16 +118,96 @@ onMounted(async () => {
 }
 
 .confirmacion__icon {
-  width: 56px;
-  height: 56px;
-  background-color: var(--color-accent-bg);
-  color: var(--color-accent-dark);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.6rem;
+  width: 64px;
+  height: 64px;
   margin: 0 auto 16px;
+  border-radius: 50%;
+  /* Un aro suave que se expande una sola vez cuando el tic termina de dibujarse */
+  --halo: rgba(242, 137, 107, 0.45);
+  animation: confirmacion-halo 0.9s ease-out 1s 1 both;
+}
+
+.confirmacion__icon svg {
+  display: block;
+}
+
+/* Las longitudes (151 y 34) son lo que mide cada trazo: así se dibujan "de a poco" */
+.confirmacion__circulo {
+  fill: var(--color-accent-bg);
+  stroke: var(--color-accent-dark);
+  stroke-width: 2.5;
+  stroke-dasharray: 151;
+  animation: confirmacion-dibuja-circulo 0.7s ease-out both;
+}
+
+.confirmacion__tic {
+  stroke: var(--color-accent-dark);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 34;
+  animation: confirmacion-dibuja-tic 0.4s ease-out 0.55s both;
+}
+
+@keyframes confirmacion-dibuja-circulo {
+  from {
+    stroke-dashoffset: 151;
+    fill-opacity: 0;
+  }
+}
+
+@keyframes confirmacion-dibuja-tic {
+  from {
+    stroke-dashoffset: 34;
+  }
+}
+
+@keyframes confirmacion-halo {
+  0% {
+    box-shadow: 0 0 0 0 var(--halo);
+  }
+  100% {
+    box-shadow: 0 0 0 18px transparent;
+  }
+}
+
+/* Las filas del resumen entran una tras otra, después del tic */
+.confirmacion__fila {
+  animation: confirmacion-fila 0.45s var(--ease-out) both;
+  animation-delay: 0.9s;
+}
+
+.confirmacion__fila:nth-child(2) {
+  animation-delay: 1s;
+}
+
+.confirmacion__fila:nth-child(3) {
+  animation-delay: 1.1s;
+}
+
+.confirmacion__fila:nth-child(4) {
+  animation-delay: 1.2s;
+}
+
+.confirmacion__fila:nth-child(5) {
+  animation-delay: 1.3s;
+}
+
+@keyframes confirmacion-fila {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+/* Quien prefiere menos movimiento lo ve todo ya dibujado y en su sitio */
+@media (prefers-reduced-motion: reduce) {
+  .confirmacion__icon,
+  .confirmacion__circulo,
+  .confirmacion__tic,
+  .confirmacion__fila {
+    animation: none;
+  }
 }
 
 .confirmacion h1 {
