@@ -7,6 +7,8 @@ import { mensajeDeError } from "@/utils/mensajeDeError";
 import { mensajePassword } from "@/utils/validarPassword";
 import CampoPassword from "@/components/CampoPassword.vue";
 import PantallaConFoto from "@/components/PantallaConFoto.vue";
+import CaptchaTurnstile from "@/components/CaptchaTurnstile.vue";
+import { captchaActivo } from "@/utils/captcha";
 
 const route = useRoute();
 // Si la dirección trae ?rol=cuidador, ese rol ya viene marcado
@@ -20,6 +22,10 @@ const password = ref("");
 const passwordRepetida = ref("");
 const telefono = ref("");
 const error = ref("");
+// CAPTCHA: solo se muestra y se exige si hay clave de Turnstile configurada
+const conCaptcha = captchaActivo();
+const captchaToken = ref("");
+const captchaRef = ref(null);
 
 const authRepository = new AuthRepository();
 const router = useRouter();
@@ -53,22 +59,34 @@ async function handleSubmit() {
     error.value = "Las contraseñas no coinciden.";
     return;
   }
+  if (conCaptcha && !captchaToken.value) {
+    error.value = "Completa el CAPTCHA para continuar.";
+    return;
+  }
   error.value = "";
 
+  const datos = {
+    nombre: nombre.value,
+    email: email.value,
+    telefono: telefono.value,
+    password: password.value,
+    rolesIds: [
+      rolesDisponibles.value.find(
+        (r) => r.name === rolSeleccionado.value.toUpperCase(),
+      )?.id,
+    ],
+  };
+  // El token solo se envía si el CAPTCHA está activado
+  if (conCaptcha) {
+    datos.captchaToken = captchaToken.value;
+  }
+
   try {
-    await authRepository.register({
-      nombre: nombre.value,
-      email: email.value,
-      telefono: telefono.value,
-      password: password.value,
-      rolesIds: [
-        rolesDisponibles.value.find(
-          (r) => r.name === rolSeleccionado.value.toUpperCase(),
-        )?.id,
-      ],
-    });
+    await authRepository.register(datos);
     router.push("/login");
   } catch (err) {
+    // El token del CAPTCHA ya se ha usado: se pide uno nuevo
+    captchaRef.value?.reiniciar();
     error.value = mensajeDeError(err, "No se pudo completar el registro.");
   }
 }
@@ -202,6 +220,12 @@ async function handleSubmit() {
                 <span class="register__role-desc">Ofrezco servicios</span>
               </button>
             </div>
+
+            <CaptchaTurnstile
+              v-if="conCaptcha"
+              ref="captchaRef"
+              v-model="captchaToken"
+            />
 
             <p role="alert" v-if="error" class="register__error">{{ error }}</p>
 
