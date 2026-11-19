@@ -54,4 +54,11 @@ describe("TerminosView", () => {
       "mailto:" + EMAIL_CONTACTO,
     );
   });
+
+  test("aclara que la tarifa incluye el desplazamiento", () => {
+    const wrapper = montarVista();
+
+    expect(wrapper.text()).toContain("incluye su desplazamiento");
+    expect(wrapper.text()).toContain("ningún importe aparte");
+  });
 });

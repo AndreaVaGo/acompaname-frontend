@@ -51,6 +51,11 @@ const emailContacto = EMAIL_CONTACTO;
         los pagos son <strong>simulados</strong>: no se cobra ningún dinero
         real.
       </p>
+      <p>
+        La tarifa por hora que fija cada persona cuidadora
+        <strong>incluye su desplazamiento</strong>: no se cobra ningún
+        importe aparte por ir al domicilio o al hospital.
+      </p>
     </section>
 
     <section>
