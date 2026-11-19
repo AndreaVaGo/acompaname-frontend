@@ -6,10 +6,16 @@ import { useAuthStore } from "@/stores/auth";
 import { mensajeDeError } from "@/utils/mensajeDeError";
 import CampoPassword from "@/components/CampoPassword.vue";
 import PantallaConFoto from "@/components/PantallaConFoto.vue";
+import CaptchaTurnstile from "@/components/CaptchaTurnstile.vue";
+import { captchaActivo } from "@/utils/captcha";
 
 const email = ref("");
 const password = ref("");
 const error = ref("");
+// CAPTCHA: solo se muestra y se exige si hay clave de Turnstile configurada
+const conCaptcha = captchaActivo();
+const captchaToken = ref("");
+const captchaRef = ref(null);
 
 const authRepository = new AuthRepository();
 const authStore = useAuthStore();
@@ -20,10 +26,16 @@ async function handleSubmit() {
     error.value = "Por favor, rellena todos los campos.";
     return;
   }
+  if (conCaptcha && !captchaToken.value) {
+    error.value = "Completa el CAPTCHA para continuar.";
+    return;
+  }
   error.value = "";
 
   try {
-    const data = await authRepository.login(email.value, password.value);
+    const data = conCaptcha
+      ? await authRepository.login(email.value, password.value, captchaToken.value)
+      : await authRepository.login(email.value, password.value);
     authStore.login(data.id, data.username, data.token, data.roles);
     // El administrador entra directamente en su panel
     if (data.roles === "ADMIN") {
@@ -32,6 +44,8 @@ async function handleSubmit() {
       router.push("/");
     }
   } catch (err) {
+    // El token del CAPTCHA ya se ha usado: se pide uno nuevo
+    captchaRef.value?.reiniciar();
     // 401: el servidor no reconoce el email o la contraseña, o la cuenta está bloqueada
     if (err.status === 401) {
       error.value = "Email o contraseña incorrectos, o tu cuenta está bloqueada.";
@@ -80,6 +94,12 @@ async function handleSubmit() {
             <p class="login__olvide">
               <RouterLink to="/olvide-password">¿Has olvidado tu contraseña?</RouterLink>
             </p>
+
+            <CaptchaTurnstile
+              v-if="conCaptcha"
+              ref="captchaRef"
+              v-model="captchaToken"
+            />
 
             <p role="alert" v-if="error" class="login__error">{{ error }}</p>
 
