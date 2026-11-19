@@ -21,6 +21,13 @@ export default class BloqueOcupadoRepository extends Repository {
     return this.post("/bloques-ocupados/importar", { contenido: contenido });
   }
 
+  // Repite un rato ocupado varios días de la semana entre dos fechas (turnos).
+  // datos: { desde, hasta, diasSemana: ["MONDAY", ...], horaInicio, horaFin, motivo }
+  // Si la hora de fin es anterior a la de inicio es un turno de noche. Devuelve { creados, duplicados }
+  async repetir(datos) {
+    return this.post("/bloques-ocupados/repetir", datos);
+  }
+
   // Borra un bloque (solo puede hacerlo su dueña o dueño)
   async remove(id) {
     return this.delete(`/bloques-ocupados/${id}`);
