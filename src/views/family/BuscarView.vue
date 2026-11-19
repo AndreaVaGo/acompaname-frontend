@@ -10,6 +10,7 @@ import { nombreGrupo } from "@/utils/catalogoGrupos";
 import { nombreCortoTitulacion } from "@/utils/catalogoTitulaciones";
 import { mensajeDeError } from "@/utils/mensajeDeError";
 import { moverFoco } from "@/utils/focoTarjeta";
+import { textoDistancia } from "@/utils/textoDistancia";
 
 const cuidadorRepository = new CuidadorRepository();
 const solicitudRepository = new SolicitudRepository();
@@ -34,6 +35,15 @@ const errorFechas = ref("");
 const cargando = ref(true);
 const error = ref("");
 
+// Ordenar por cercanía: la familia escribe su ciudad o código postal y se ordena de la más cerca a la más lejos
+const lugarCerca = ref("");
+// Kilómetros de cada persona cuidadora, por id: { 3: 25.1, 7: 400 }
+const distancias = ref({});
+const ordenadoPorCercania = ref(false);
+const lugarOrdenado = ref("");
+const buscandoCerca = ref(false);
+const errorCerca = ref("");
+
 onMounted(async () => {
   try {
     cuidadores.value = await cuidadorRepository.getAll();
@@ -43,6 +53,47 @@ onMounted(async () => {
     cargando.value = false;
   }
 });
+
+// Pide al servidor las distancias. Solo se hace al pulsar el botón (no al escribir),
+// para no preguntar por cada letra
+async function ordenarPorCercania() {
+  errorCerca.value = "";
+  const lugar = lugarCerca.value.trim();
+
+  if (lugar === "") {
+    errorCerca.value = "Escribe tu ciudad o tu código postal";
+    return;
+  }
+
+  buscandoCerca.value = true;
+  try {
+    const respuesta = await cuidadorRepository.getCerca(lugar);
+
+    if (!respuesta.lugarEncontrado) {
+      quitarOrdenPorCercania();
+      errorCerca.value = "No hemos encontrado ese lugar. Prueba con el nombre de la ciudad o con el código postal";
+      return;
+    }
+
+    const nuevas = {};
+    for (const distancia of respuesta.distancias) {
+      nuevas[distancia.cuidadorId] = distancia.km;
+    }
+    distancias.value = nuevas;
+    lugarOrdenado.value = lugar;
+    ordenadoPorCercania.value = true;
+  } catch (err) {
+    errorCerca.value = mensajeDeError(err, "No se pudo calcular la cercanía.");
+  } finally {
+    buscandoCerca.value = false;
+  }
+}
+
+function quitarOrdenPorCercania() {
+  distancias.value = {};
+  ordenadoPorCercania.value = false;
+  lugarOrdenado.value = "";
+}
 
 // Cada vez que cambia una fecha o una hora se vuelve a preguntar al servidor
 // qué cuidadores tienen un servicio aceptado en esos días y horas
@@ -183,6 +234,26 @@ const cuidadoresFiltrados = computed(() => {
     );
   });
 });
+
+// Lo que se enseña: los filtrados y, si se ha pedido, ordenados de la persona más cerca a la más lejos.
+// Quien no tiene distancia (no ha puesto ciudad o no se encuentra) va al final, en su orden de siempre
+const cuidadoresMostrados = computed(() => {
+  if (!ordenadoPorCercania.value) {
+    return cuidadoresFiltrados.value;
+  }
+
+  const conDistancia = [];
+  const sinDistancia = [];
+  for (const cuidador of cuidadoresFiltrados.value) {
+    if (distancias.value[cuidador.id] !== undefined) {
+      conDistancia.push(cuidador);
+    } else {
+      sinDistancia.push(cuidador);
+    }
+  }
+  conDistancia.sort((a, b) => distancias.value[a.id] - distancias.value[b.id]);
+  return [...conDistancia, ...sinDistancia];
+});
 </script>
 
 <template>
@@ -226,6 +297,33 @@ const cuidadoresFiltrados = computed(() => {
           placeholder="Oviedo, Gijón, Madrid..."
           class="buscar__input buscar__input--ciudad"
         />
+      </div>
+
+      <div class="buscar__filter-group">
+        <label for="cerca-lugar">Ordenar por cercanía</label>
+        <div class="buscar__cerca">
+          <input
+            type="text"
+            id="cerca-lugar"
+            v-model="lugarCerca"
+            placeholder="Tu ciudad o código postal"
+            class="buscar__input buscar__input--ciudad"
+            @keydown.enter.prevent="ordenarPorCercania"
+          />
+          <button
+            type="button"
+            id="cerca-buscar"
+            class="btn btn--secondary"
+            :disabled="buscandoCerca"
+            @click="ordenarPorCercania"
+          >
+            {{ buscandoCerca ? "Calculando…" : "Ver quién está más cerca" }}
+          </button>
+        </div>
+        <p class="buscar__cerca-nota">
+          Solo sirve para medir la distancia hasta la ciudad de cada persona cuidadora; no se guarda.
+        </p>
+        <p role="alert" v-if="errorCerca" class="buscar__error">{{ errorCerca }}</p>
       </div>
 
       <div class="buscar__filter-group">
@@ -448,8 +546,15 @@ const cuidadoresFiltrados = computed(() => {
     <p role="alert" v-if="error" class="buscar__error">{{ error }}</p>
 
     <p class="buscar__count">
-      {{ cuidadoresFiltrados.length }}
-      {{ cuidadoresFiltrados.length === 1 ? "persona cuidadora" : "personas cuidadoras" }} para ti
+      {{ cuidadoresMostrados.length }}
+      {{ cuidadoresMostrados.length === 1 ? "persona cuidadora" : "personas cuidadoras" }} para ti
+    </p>
+
+    <p v-if="ordenadoPorCercania" class="buscar__cerca-estado">
+      Ordenadas de la más cerca a la más lejos desde «{{ lugarOrdenado }}».
+      <button type="button" id="cerca-quitar" class="buscar__cerca-quitar" @click="quitarOrdenPorCercania">
+        Quitar orden
+      </button>
     </p>
 
     <div class="buscar__grid">
@@ -460,7 +565,7 @@ const cuidadoresFiltrados = computed(() => {
             ? 'buscar__card--disponible'
             : 'buscar__card--ocupado'
         "
-        v-for="(cuidador, indice) in cuidadoresFiltrados"
+        v-for="(cuidador, indice) in cuidadoresMostrados"
         :key="cuidador.id"
         :style="{ '--i': Math.min(indice, 8) }"
         @mousemove="moverFoco"
@@ -476,6 +581,9 @@ const cuidadoresFiltrados = computed(() => {
             <p class="buscar__card-especialidad">{{ cuidador.especialidad }}</p>
             <p v-if="cuidador.ciudad" class="buscar__card-ciudad">
               📍 {{ cuidador.ciudad }}
+            </p>
+            <p v-if="ordenadoPorCercania && textoDistancia(distancias[cuidador.id])" class="buscar__card-distancia">
+              📏 {{ textoDistancia(distancias[cuidador.id]) }}
             </p>
           </div>
         </div>
@@ -656,6 +764,51 @@ const cuidadoresFiltrados = computed(() => {
   width: 100%;
   max-width: 320px;
   box-sizing: border-box;
+}
+
+/* Ordenar por cercanía: el campo y el botón en una fila */
+.buscar__cerca {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.buscar__cerca-nota {
+  margin: 6px 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+}
+
+.buscar__cerca-estado {
+  margin: 0 0 12px;
+  color: var(--color-secondary);
+  font-weight: bold;
+  font-size: 0.95rem;
+}
+
+.buscar__cerca-quitar {
+  margin-left: 8px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  font-weight: bold;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* A cuántos kilómetros está: una pastilla verde suave bajo la ciudad */
+.buscar__card-distancia {
+  display: inline-block;
+  margin: 6px 0 0;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-secondary-bg);
+  color: var(--color-secondary);
+  font-size: 0.85rem;
+  font-weight: bold;
 }
 
 /* Las dos fechas (y las dos horas) van una al lado de la otra */
