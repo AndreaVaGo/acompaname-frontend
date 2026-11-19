@@ -459,4 +459,58 @@ describe('SolicitudCard', () => {
 
     expect(wrapper.find('.solicitudes__chat-nuevos').exists()).toBe(false)
   })
+
+  // Tarjeta del cuidador con dirección, con la ventana de detalles ya abierta
+  async function abrirDetallesConDireccion(estado, mostrarAcciones, direccion = 'Calle Uría 10, Oviedo') {
+    const wrapper = mount(SolicitudCard, {
+      props: {
+        solicitud: { ...crearSolicitud(estado), direccion: direccion },
+        nombreMostrado: 'Familia Serrano',
+        mostrarAcciones: mostrarAcciones,
+      },
+      global: { stubs: { RouterLink: RouterLinkStub } },
+    })
+    if (mostrarAcciones) {
+      await wrapper.find('.solicitudes__ver').trigger('click')
+    }
+    return wrapper
+  }
+
+  test('el cuidador ve el enlace al mapa cuando la solicitud está aceptada', async () => {
+    const wrapper = await abrirDetallesConDireccion('ACEPTADA', true)
+
+    const enlace = wrapper.find('.solicitudes__mapa')
+    expect(enlace.exists()).toBe(true)
+    expect(enlace.attributes('href')).toBe(
+      'https://www.google.com/maps/search/?api=1&query=Calle%20Ur%C3%ADa%2010%2C%20Oviedo',
+    )
+  })
+
+  test('el enlace al mapa se abre en otra pestaña sin dar acceso a la página de origen', async () => {
+    const wrapper = await abrirDetallesConDireccion('ACEPTADA', true)
+
+    const enlace = wrapper.find('.solicitudes__mapa')
+    expect(enlace.attributes('target')).toBe('_blank')
+    expect(enlace.attributes('rel')).toContain('noopener')
+    expect(enlace.attributes('rel')).toContain('noreferrer')
+  })
+
+  test('el cuidador no ve el enlace al mapa mientras la solicitud está pendiente', async () => {
+    const wrapper = await abrirDetallesConDireccion('PENDIENTE', true)
+
+    expect(wrapper.find('.solicitudes__mapa').exists()).toBe(false)
+  })
+
+  test('la familia no ve el enlace al mapa en sus propias solicitudes', async () => {
+    const wrapper = await abrirDetallesConDireccion('ACEPTADA', false)
+
+    expect(wrapper.text()).toContain('Calle Uría 10, Oviedo')
+    expect(wrapper.find('.solicitudes__mapa').exists()).toBe(false)
+  })
+
+  test('sin dirección no hay enlace al mapa', async () => {
+    const wrapper = await abrirDetallesConDireccion('ACEPTADA', true, '')
+
+    expect(wrapper.find('.solicitudes__mapa').exists()).toBe(false)
+  })
 })

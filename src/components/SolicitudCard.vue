@@ -12,6 +12,7 @@ import {
   hayVariosGrupos,
 } from "@/utils/personasSolicitud";
 import { formatearMomento } from "@/utils/formatearHora";
+import { enlaceMapa } from "@/utils/enlaceMapa";
 
 const props = defineProps([
   "solicitud",
@@ -235,6 +236,17 @@ const avisoDireccion = computed(
             <strong class="solicitudes__direccion">{{
               solicitud.direccion
             }}</strong>
+            <!-- El cuidador puede abrir la dirección en el mapa (en otra pestaña) para saber cómo llegar -->
+            <a
+              v-if="mostrarAcciones"
+              :href="enlaceMapa(solicitud.direccion)"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="solicitudes__mapa"
+              aria-label="Ver la dirección en el mapa (se abre en otra pestaña)"
+            >
+              🗺️ Ver en el mapa
+            </a>
           </li>
           <li v-else-if="avisoDireccion" class="solicitudes__aviso">
             📍 La dirección se mostrará cuando aceptes la solicitud
@@ -548,6 +560,28 @@ const avisoDireccion = computed(
 
 .solicitudes__cerrar-btn {
   width: 100%;
+}
+
+/* Enlace al mapa: una pastilla verde que se llena al pasar el ratón */
+.solicitudes__mapa {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 6px 14px;
+  border: 1px solid var(--color-secondary);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-secondary-bg);
+  color: var(--color-secondary);
+  font-weight: bold;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.solicitudes__mapa:hover {
+  background-color: var(--color-secondary);
+  color: var(--color-white);
 }
 
 .solicitudes__aviso {
