@@ -5,6 +5,7 @@ import AuthRepository from "@/repositories/AuthRepository";
 import { useAuthStore } from "@/stores/auth";
 import { mensajeDeError } from "@/utils/mensajeDeError";
 import CampoPassword from "@/components/CampoPassword.vue";
+import PantallaConFoto from "@/components/PantallaConFoto.vue";
 
 const email = ref("");
 const password = ref("");
@@ -42,55 +43,57 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <div class="login">
-    <div class="login__wrapper">
-      <h1>Iniciar sesión</h1>
-      <p class="login__subtitle">
-        Bienvenida de nuevo. Nos alegra verte por aquí.
-      </p>
+  <PantallaConFoto>
+    <div class="login">
+      <div class="login__wrapper">
+        <h1>Iniciar sesión</h1>
+        <p class="login__subtitle">
+          Bienvenida de nuevo. Nos alegra verte por aquí.
+        </p>
 
-      <div class="login__box">
-        <div class="login__cabecera">
-          <span class="login__icono">👋</span>
-          <span class="login__aviso">
-            Entra con tu email y tu contraseña.
-          </span>
+        <div class="login__box">
+          <div class="login__cabecera">
+            <span class="login__icono">👋</span>
+            <span class="login__aviso">
+              Entra con tu email y tu contraseña.
+            </span>
+          </div>
+
+          <form class="formulario login__form" @submit.prevent="handleSubmit">
+            <h2 class="titulo-seccion" data-icono="🔑">Tus datos de acceso</h2>
+
+            <label for="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              placeholder="tu@correo.com"
+              v-model="email"
+            />
+
+            <label for="password">Contraseña</label>
+            <CampoPassword
+              id="password"
+              placeholder="••••••"
+              v-model="password"
+            />
+
+            <p class="login__olvide">
+              <RouterLink to="/olvide-password">¿Has olvidado tu contraseña?</RouterLink>
+            </p>
+
+            <p role="alert" v-if="error" class="login__error">{{ error }}</p>
+
+            <button type="submit" class="btn btn--primary">Entrar</button>
+          </form>
         </div>
 
-        <form class="formulario login__form" @submit.prevent="handleSubmit">
-          <h2 class="titulo-seccion" data-icono="🔑">Tus datos de acceso</h2>
-
-          <label for="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            placeholder="tu@correo.com"
-            v-model="email"
-          />
-
-          <label for="password">Contraseña</label>
-          <CampoPassword
-            id="password"
-            placeholder="••••••"
-            v-model="password"
-          />
-
-          <p class="login__olvide">
-            <RouterLink to="/olvide-password">¿Has olvidado tu contraseña?</RouterLink>
-          </p>
-
-          <p role="alert" v-if="error" class="login__error">{{ error }}</p>
-
-          <button type="submit" class="btn btn--primary">Entrar</button>
-        </form>
+        <p class="login__switch">
+          ¿Todavía no tienes cuenta?
+          <RouterLink to="/registro">Registrarme</RouterLink>
+        </p>
       </div>
-
-      <p class="login__switch">
-        ¿Todavía no tienes cuenta?
-        <RouterLink to="/registro">Registrarme</RouterLink>
-      </p>
     </div>
-  </div>
+  </PantallaConFoto>
 </template>
 
 <style scoped>

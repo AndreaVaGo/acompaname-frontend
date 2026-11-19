@@ -6,6 +6,7 @@ import RoleRepository from "../../repositories/RoleRepository";
 import { mensajeDeError } from "@/utils/mensajeDeError";
 import { mensajePassword } from "@/utils/validarPassword";
 import CampoPassword from "@/components/CampoPassword.vue";
+import PantallaConFoto from "@/components/PantallaConFoto.vue";
 
 const route = useRoute();
 // Si la dirección trae ?rol=cuidador, ese rol ya viene marcado
@@ -74,146 +75,148 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <div class="register">
-    <div class="register__wrapper">
-      <h1>Crear cuenta</h1>
-      <p class="register__subtitle">
-        Solo necesitamos cuatro datos para empezar.
-      </p>
+  <PantallaConFoto>
+    <div class="register">
+      <div class="register__wrapper">
+        <h1>Crear cuenta</h1>
+        <p class="register__subtitle">
+          Solo necesitamos cuatro datos para empezar.
+        </p>
 
-      <div class="register__box">
-        <div class="register__cabecera">
-          <span class="register__icono">🌱</span>
-          <span class="register__aviso"> Crea tu cuenta en un minuto. </span>
-        </div>
-
-        <form class="formulario register__form" @submit.prevent="handleSubmit">
-          <h2 class="titulo-seccion" data-icono="👤">Tus datos</h2>
-
-          <label for="nombre">Nombre completo</label>
-          <input
-            type="text"
-            id="nombre"
-            placeholder="María López"
-            v-model="nombre"
-          />
-
-          <label for="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            placeholder="nombre@correo.com"
-            v-model="email"
-          />
-
-          <label for="password">Contraseña</label>
-          <CampoPassword
-            id="password"
-            placeholder="Mínimo 8 caracteres"
-            v-model="password"
-          />
-          <p class="register__ayuda">
-            Con mayúscula, minúscula, número y un carácter especial.
-          </p>
-
-          <label for="password-repetida">Repite la contraseña</label>
-          <CampoPassword
-            id="password-repetida"
-            placeholder="••••••••"
-            v-model="passwordRepetida"
-          />
-
-          <label for="telefono">Teléfono</label>
-          <input
-            type="tel"
-            id="telefono"
-            placeholder="600 123 456"
-            v-model="telefono"
-          />
-
-          <h2 class="titulo-seccion" data-icono="🧭">
-            ¿Cómo vas a usar Acompáñame?
-          </h2>
-          <div class="register__roles">
-            <button
-              type="button"
-              class="register__role"
-              :class="{
-                'register__role--active': rolSeleccionado === 'familia',
-              }"
-              @click="rolSeleccionado = 'familia'"
-            >
-              <span class="register__role-icon">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="var(--color-accent)"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                  <circle cx="9" cy="7" r="4" />
-                  <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                </svg>
-              </span>
-              <span class="register__role-title"
-                >Busco una persona cuidadora</span
-              >
-              <span class="register__role-desc"
-                >Para mí o para alguien de mi familia</span
-              >
-            </button>
-            <button
-              type="button"
-              class="register__role"
-              :class="{
-                'register__role--active': rolSeleccionado === 'cuidador',
-              }"
-              @click="rolSeleccionado = 'cuidador'"
-            >
-              <span class="register__role-icon">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="var(--color-accent)"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path
-                    d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"
-                  />
-                  <path
-                    d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"
-                  />
-                  <path d="m18 15-2-2" />
-                  <path d="m15 18-2-2" />
-                </svg>
-              </span>
-              <span class="register__role-title">Persona cuidadora</span>
-              <span class="register__role-desc">Ofrezco servicios</span>
-            </button>
+        <div class="register__box">
+          <div class="register__cabecera">
+            <span class="register__icono">🌱</span>
+            <span class="register__aviso"> Crea tu cuenta en un minuto. </span>
           </div>
 
-          <p role="alert" v-if="error" class="register__error">{{ error }}</p>
+          <form class="formulario register__form" @submit.prevent="handleSubmit">
+            <h2 class="titulo-seccion" data-icono="👤">Tus datos</h2>
 
-          <button type="submit" class="btn btn--primary">
-            Crear mi cuenta
-          </button>
-        </form>
+            <label for="nombre">Nombre completo</label>
+            <input
+              type="text"
+              id="nombre"
+              placeholder="María López"
+              v-model="nombre"
+            />
+
+            <label for="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              placeholder="nombre@correo.com"
+              v-model="email"
+            />
+
+            <label for="password">Contraseña</label>
+            <CampoPassword
+              id="password"
+              placeholder="Mínimo 8 caracteres"
+              v-model="password"
+            />
+            <p class="register__ayuda">
+              Con mayúscula, minúscula, número y un carácter especial.
+            </p>
+
+            <label for="password-repetida">Repite la contraseña</label>
+            <CampoPassword
+              id="password-repetida"
+              placeholder="••••••••"
+              v-model="passwordRepetida"
+            />
+
+            <label for="telefono">Teléfono</label>
+            <input
+              type="tel"
+              id="telefono"
+              placeholder="600 123 456"
+              v-model="telefono"
+            />
+
+            <h2 class="titulo-seccion" data-icono="🧭">
+              ¿Cómo vas a usar Acompáñame?
+            </h2>
+            <div class="register__roles">
+              <button
+                type="button"
+                class="register__role"
+                :class="{
+                  'register__role--active': rolSeleccionado === 'familia',
+                }"
+                @click="rolSeleccionado = 'familia'"
+              >
+                <span class="register__role-icon">
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="var(--color-accent)"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                  </svg>
+                </span>
+                <span class="register__role-title"
+                  >Busco una persona cuidadora</span
+                >
+                <span class="register__role-desc"
+                  >Para mí o para alguien de mi familia</span
+                >
+              </button>
+              <button
+                type="button"
+                class="register__role"
+                :class="{
+                  'register__role--active': rolSeleccionado === 'cuidador',
+                }"
+                @click="rolSeleccionado = 'cuidador'"
+              >
+                <span class="register__role-icon">
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="var(--color-accent)"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path
+                      d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"
+                    />
+                    <path
+                      d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"
+                    />
+                    <path d="m18 15-2-2" />
+                    <path d="m15 18-2-2" />
+                  </svg>
+                </span>
+                <span class="register__role-title">Persona cuidadora</span>
+                <span class="register__role-desc">Ofrezco servicios</span>
+              </button>
+            </div>
+
+            <p role="alert" v-if="error" class="register__error">{{ error }}</p>
+
+            <button type="submit" class="btn btn--primary">
+              Crear mi cuenta
+            </button>
+          </form>
+        </div>
+
+        <p class="register__switch">
+          ¿Ya tienes cuenta? <RouterLink to="/login">Iniciar sesión</RouterLink>
+        </p>
       </div>
-
-      <p class="register__switch">
-        ¿Ya tienes cuenta? <RouterLink to="/login">Iniciar sesión</RouterLink>
-      </p>
     </div>
-  </div>
+  </PantallaConFoto>
 </template>
 
 <style scoped>
