@@ -6,11 +6,12 @@ export default class AuthRepository extends Repository {
   }
 
   // Devuelve los datos de la persona y el token que enviará en cada petición
-  async login(email, password) {
+  // captchaToken solo se envía si el CAPTCHA está activado (si es undefined, JSON.stringify lo omite)
+  async login(email, password, captchaToken) {
     const response = await fetch(`${this.uri}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, captchaToken }),
     });
     // true: el 401 del login es "email o contraseña mal", no una sesión caducada
     if (!response.ok) {
