@@ -163,6 +163,7 @@ const botones = computed(() => {
           :class="{ 'landing__step-card--apagada': modoFijo && pasoActivo < 0 }"
           :retraso="0"
         >
+          <span class="landing__step-numero" aria-hidden="true">01</span>
           <span class="landing__step-icon">
             <svg
               width="20"
@@ -183,6 +184,7 @@ const botones = computed(() => {
           :class="{ 'landing__step-card--apagada': modoFijo && pasoActivo < 1 }"
           :retraso="250"
         >
+          <span class="landing__step-numero" aria-hidden="true">02</span>
           <span class="landing__step-icon">
             <svg
               width="20"
@@ -205,6 +207,7 @@ const botones = computed(() => {
           :class="{ 'landing__step-card--apagada': modoFijo && pasoActivo < 2 }"
           :retraso="500"
         >
+          <span class="landing__step-numero" aria-hidden="true">03</span>
           <span class="landing__step-icon">
             <svg
               width="20"
@@ -571,8 +574,15 @@ const botones = computed(() => {
   margin: 0 auto;
 }
 
+/* Cada paso tiene su color: coral, verde y azul. Lo usan la franja de arriba, el fondo suave,
+   el icono, el halo del latido y el número grande */
 .landing__step-card {
-  background-color: var(--color-white);
+  --paso-color: var(--color-accent);
+  --paso-fondo: var(--color-accent-bg);
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--paso-fondo) 0%, var(--color-white) 60%);
+  border-top: 4px solid var(--paso-color);
   border-radius: var(--radius-card);
   padding: var(--gap-md);
   box-shadow: var(--shadow-card);
@@ -587,18 +597,56 @@ const botones = computed(() => {
   }
 }
 
+.landing__step-card:nth-child(2) {
+  --paso-color: var(--color-secondary);
+  --paso-fondo: var(--color-secondary-bg);
+}
+
+.landing__step-card:nth-child(3) {
+  --paso-color: var(--color-info);
+  --paso-fondo: var(--color-info-bg);
+}
+
+/* Número grande de fondo: decora y ayuda a ver el orden de los pasos */
+.landing__step-numero {
+  position: absolute;
+  top: 6px;
+  right: 16px;
+  font-family: var(--font-display);
+  font-size: 3.6rem;
+  font-weight: bold;
+  line-height: 1;
+  color: var(--paso-color);
+  opacity: 0.2;
+  transition:
+    transform var(--dur-med) var(--ease-out),
+    opacity var(--dur-med) var(--ease-out);
+  pointer-events: none;
+}
+
 .landing__step-icon {
-  background-color: var(--color-accent-bg);
+  /* Círculo blanco con borde del color del paso (el latido usa la sombra, por eso el borde no es una sombra) */
+  background-color: var(--color-white);
+  border: 2px solid var(--paso-color);
+  color: var(--paso-color);
   border-radius: 50%;
-  padding: 10px;
+  width: 52px;
+  height: 52px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   transition: transform var(--dur-med) var(--ease-out);
-  /* Latido suave: un halo coral que se expande y se apaga */
-  --halo: rgba(242, 137, 107, 0.45);
+  /* Latido suave: un halo del color del paso que se expande y se apaga */
+  --halo: color-mix(in srgb, var(--paso-color) 45%, transparent);
   animation: latido 3s ease-out infinite;
+}
+
+/* El dibujo hereda el color del paso (el color escrito en el svg se anula) */
+.landing__step-icon svg {
+  width: 24px;
+  height: 24px;
+  stroke: currentColor;
 }
 
 /* Cada tarjeta late un poco después que la anterior */
@@ -631,6 +679,11 @@ const botones = computed(() => {
 .landing__cta:hover .landing__cta-icon {
   transform: rotate(-10deg) scale(1.12);
   animation: none;
+}
+
+.landing__step-card:hover .landing__step-numero {
+  transform: scale(1.12);
+  opacity: 0.3;
 }
 
 .landing__cta {
@@ -679,6 +732,7 @@ const botones = computed(() => {
   .landing__resalte,
   .landing__step-card,
   .landing__step-icon,
+  .landing__step-numero,
   .landing__cta,
   .landing__cta-icon,
   .landing__avatares,
@@ -691,6 +745,7 @@ const botones = computed(() => {
   .landing__step-card:hover,
   .landing__cta:hover,
   .landing__step-card:hover .landing__step-icon,
+  .landing__step-card:hover .landing__step-numero,
   .landing__cta:hover .landing__cta-icon,
   .landing__link:hover .landing__flecha {
     transform: none;
