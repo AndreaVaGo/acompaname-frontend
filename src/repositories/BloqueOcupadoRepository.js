@@ -15,6 +15,12 @@ export default class BloqueOcupadoRepository extends Repository {
     return this.post("/bloques-ocupados", bloque);
   }
 
+  // Importa los ratos ocupados de un calendario externo. contenido es el texto del archivo .ics
+  // Devuelve { importados, duplicados, omitidos }
+  async importar(contenido) {
+    return this.post("/bloques-ocupados/importar", { contenido: contenido });
+  }
+
   // Borra un bloque (solo puede hacerlo su dueña o dueño)
   async remove(id) {
     return this.delete(`/bloques-ocupados/${id}`);
