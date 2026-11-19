@@ -329,6 +329,10 @@ async function guardar() {
                 />
               </div>
             </div>
+            <p class="editar__ayuda" data-testid="ayuda-desplazamiento">
+              Esta tarifa incluye tu desplazamiento: no se cobra aparte a la familia. Tenlo en
+              cuenta al fijar el precio si sueles ir lejos.
+            </p>
 
             <label for="recargo">Recargo por persona extra (%)</label>
             <input
