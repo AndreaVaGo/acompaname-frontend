@@ -3,7 +3,7 @@ import { RouterLink } from "vue-router";
 </script>
 
 <template>
-  <div class="no-encontrado">
+  <div class="no-encontrado pantalla">
     <span class="no-encontrado__icono" aria-hidden="true">🧭</span>
     <p class="no-encontrado__codigo">404</p>
     <h1>No encontramos esta página</h1>
@@ -40,15 +40,31 @@ import { RouterLink } from "vue-router";
   }
 }
 
+/* La brújula se balancea despacio, como buscando el camino */
 .no-encontrado__icono {
   font-size: 3rem;
+  animation: brujula 3s ease-in-out infinite alternate;
 }
 
+@keyframes brujula {
+  from {
+    rotate: -14deg;
+  }
+  to {
+    rotate: 14deg;
+  }
+}
+
+/* El 404 va con un degradado coral y verde */
 .no-encontrado__codigo {
-  font-size: 4rem;
+  font-size: 5rem;
   font-weight: bold;
   line-height: 1;
   color: var(--color-accent-dark) !important;
+  background: linear-gradient(135deg, var(--color-accent), var(--color-secondary));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .no-encontrado h1 {
