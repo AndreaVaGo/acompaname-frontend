@@ -32,8 +32,11 @@ defineEmits(["cambiar"]);
   display: flex;
   flex-direction: column;
   gap: 6px;
-  background-color: var(--color-white);
+  /* Cristal, como las tarjetas del resto de pantallas */
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
   border-radius: var(--radius-card);
+  border-top: 4px solid var(--color-secondary);
   box-shadow: var(--shadow-card);
   padding: 12px;
   font-family: var(--font-base);
