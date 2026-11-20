@@ -32,8 +32,8 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="confirmacion">
-    <div class="confirmacion__box">
+  <div class="confirmacion pantalla">
+    <div class="confirmacion__box tarjeta-cristal">
       <!-- Un círculo y un tic que se dibujan al llegar. Es solo decoración: el título ya dice que se ha enviado -->
       <div class="confirmacion__icon" aria-hidden="true" data-testid="confirmacion-icono">
         <svg viewBox="0 0 52 52" width="64" height="64" fill="none">
@@ -98,7 +98,6 @@ onMounted(async () => {
 <style scoped>
 .confirmacion {
   min-height: 100vh;
-  background-color: var(--color-bg);
   font-family: var(--font-base);
   color: var(--color-text);
   display: flex;
@@ -107,14 +106,24 @@ onMounted(async () => {
   padding: 20px;
 }
 
+/* El cristal, la sombra y la entrada vienen de la clase global tarjeta-cristal.
+   El aro del tic se expande fuera de la tarjeta, así que no se recorta (overflow: visible) */
 .confirmacion__box {
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
+  --borde-tarjeta: var(--color-secondary);
   padding: 40px;
   max-width: 440px;
   width: 100%;
   text-align: center;
+  overflow: visible;
+}
+
+.confirmacion__box:hover {
+  transform: none;
   box-shadow: var(--shadow-card);
+}
+
+.confirmacion__box::after {
+  display: none;
 }
 
 .confirmacion__icon {
