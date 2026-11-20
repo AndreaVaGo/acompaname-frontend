@@ -68,14 +68,14 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <div class="editar-datos">
+  <div class="editar-datos pantalla">
     <div class="editar-datos__wrapper">
       <h1>Editar mis datos</h1>
       <p class="editar-datos__subtitle">
         Cambia tu nombre, tu email o tu teléfono.
       </p>
 
-      <div class="editar-datos__box">
+      <div class="editar-datos__box tarjeta-cristal">
         <p v-if="cargando" class="editar-datos__cargando">Cargando...</p>
 
         <template v-else>
@@ -118,7 +118,6 @@ async function handleSubmit() {
 
 <style scoped>
 .editar-datos {
-  background-color: var(--color-bg);
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -143,12 +142,20 @@ async function handleSubmit() {
   margin: 0 0 24px;
 }
 
+/* El cristal, la sombra y la entrada vienen de la clase global tarjeta-cristal */
 .editar-datos__box {
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
-  border-top: 4px solid var(--color-accent);
+  --borde-tarjeta: var(--color-accent);
+  padding: 0;
+}
+
+/* Dentro hay un formulario: la tarjeta no se levanta ni brilla al pasar el ratón */
+.editar-datos__box:hover {
+  transform: none;
   box-shadow: var(--shadow-card);
-  overflow: hidden;
+}
+
+.editar-datos__box::after {
+  display: none;
 }
 
 .editar-datos__cargando {
@@ -161,7 +168,10 @@ async function handleSubmit() {
   align-items: center;
   gap: 16px;
   padding: 24px 32px;
-  background-color: var(--color-accent-bg);
+  background:
+    radial-gradient(circle at 10% 20%, rgba(242, 137, 107, 0.35), transparent 60%),
+    radial-gradient(circle at 90% 80%, rgba(46, 125, 91, 0.25), transparent 60%),
+    var(--color-accent-bg);
 }
 
 .editar-datos__avatar {
