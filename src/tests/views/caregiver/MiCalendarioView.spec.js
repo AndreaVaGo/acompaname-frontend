@@ -171,7 +171,11 @@ describe("MiCalendarioView: calendario", () => {
 
     await dia(wrapper, 21).trigger("click");
 
-    expect(wrapper.find(".calendario__servicio").text()).toContain("20-12-2026 · 22:00 → 22-12-2026 · 08:00");
+    // El inicio y el fin van en dos líneas: "Desde ..." y "hasta ..."
+    const texto = wrapper.find(".calendario__servicio").text();
+
+    expect(texto).toContain("Desde 20-12-2026 · 22:00");
+    expect(texto).toContain("hasta 22-12-2026 · 08:00");
   });
 
   test("un servicio antiguo sin horas enseña solo la fecha", async () => {
