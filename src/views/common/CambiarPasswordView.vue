@@ -59,14 +59,14 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <div class="cambiar-password">
+  <div class="cambiar-password pantalla">
     <div class="cambiar-password__wrapper">
       <h1>Cambiar contraseña</h1>
       <p class="cambiar-password__subtitle">
         Por seguridad, necesitamos tu contraseña actual.
       </p>
 
-      <div class="cambiar-password__box">
+      <div class="cambiar-password__box tarjeta-cristal">
         <div class="cambiar-password__cabecera">
           <span class="cambiar-password__icono">🔒</span>
           <span class="cambiar-password__aviso">
@@ -118,7 +118,6 @@ async function handleSubmit() {
 
 <style scoped>
 .cambiar-password {
-  background-color: var(--color-bg);
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -143,12 +142,20 @@ async function handleSubmit() {
   margin: 0 0 24px;
 }
 
+/* El cristal, la sombra y la entrada vienen de la clase global tarjeta-cristal */
 .cambiar-password__box {
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
-  border-top: 4px solid var(--color-accent);
+  --borde-tarjeta: var(--color-accent);
+  padding: 0;
+}
+
+/* Dentro hay un formulario: la tarjeta no se levanta ni brilla al pasar el ratón */
+.cambiar-password__box:hover {
+  transform: none;
   box-shadow: var(--shadow-card);
-  overflow: hidden;
+}
+
+.cambiar-password__box::after {
+  display: none;
 }
 
 /* Franja de color con el candado y un aviso corto */
@@ -157,7 +164,10 @@ async function handleSubmit() {
   align-items: center;
   gap: 16px;
   padding: 24px 32px;
-  background-color: var(--color-accent-bg);
+  background:
+    radial-gradient(circle at 10% 20%, rgba(242, 137, 107, 0.35), transparent 60%),
+    radial-gradient(circle at 90% 80%, rgba(46, 125, 91, 0.25), transparent 60%),
+    var(--color-accent-bg);
 }
 
 .cambiar-password__icono {
