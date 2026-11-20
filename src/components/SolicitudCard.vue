@@ -59,7 +59,7 @@ const avisoDireccion = computed(
 
 <template>
   <div
-    class="solicitudes__card"
+    class="solicitudes__card tarjeta-cristal"
     :class="[
       'solicitudes__card--' + solicitud.estado.toLowerCase(),
       { 'solicitudes__card--abierta': mostrarAcciones && expandido },
@@ -332,63 +332,47 @@ const avisoDireccion = computed(
 </template>
 
 <style scoped>
+/* El aspecto de cristal (fondo, sombra, entrada y resplandor del ratón) viene de la clase global
+   "tarjeta-cristal" (base.css). Aquí solo se ajusta lo propio de esta tarjeta.
+   La ventana de detalles (position: fixed) está DENTRO de la tarjeta, y tanto "backdrop-filter" como
+   "overflow: hidden" harían que se colocara respecto a la tarjeta y se recortara. Por eso se quitan. */
 .solicitudes__card {
   display: flex;
   flex-direction: column;
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
-  border-left: 6px solid var(--color-border);
-  padding: 24px 24px 24px 22px;
-  box-shadow: var(--shadow-card);
-  /* Entrada solo con opacidad: con "transform" la ventana de dentro (position: fixed) fallaría */
-  animation: solicitud-entra var(--dur-med) var(--ease-out) backwards;
-  transition:
-    transform var(--dur-med) var(--ease-out),
-    box-shadow var(--dur-med) var(--ease-out);
+  backdrop-filter: none;
+  overflow: visible;
 }
 
-@keyframes solicitud-entra {
-  from {
-    opacity: 0;
-  }
+/* Sin overflow oculto, el resplandor tiene que redondear sus esquinas como la tarjeta */
+.solicitudes__card::after {
+  border-radius: inherit;
 }
 
-/* El color del borde lateral cambia según el estado de la solicitud */
+/* El color de la línea de arriba cambia según el estado de la solicitud */
 .solicitudes__card--pendiente {
-  border-left-color: var(--color-accent);
+  --borde-tarjeta: var(--color-accent);
 }
 
 .solicitudes__card--aceptada {
-  border-left-color: var(--color-secondary);
+  --borde-tarjeta: var(--color-secondary);
 }
 
 .solicitudes__card--completada {
-  border-left-color: var(--color-info);
+  --borde-tarjeta: var(--color-info);
 }
 
 .solicitudes__card--rechazada {
-  border-left-color: var(--color-border);
+  --borde-tarjeta: var(--color-border);
 }
 
 /* Una tarjeta con "transform" hace que la ventana de dentro (position: fixed) se coloque
    respecto a la tarjeta y no respecto a la pantalla, y parpadea. Con la ventana abierta
-   la tarjeta no se mueve y no tiene transición. */
-.solicitudes__card--abierta {
+   la tarjeta no se mueve, ni siquiera al pasar el ratón, y no tiene transición.
+   (La animación de entrada no se toca: si se quitara y se volviera a poner, se repetiría al cerrar.) */
+.solicitudes__card.solicitudes__card--abierta,
+.solicitudes__card.solicitudes__card--abierta:hover {
+  transform: none;
   transition: none;
-}
-
-@media (hover: hover) {
-  .solicitudes__card:not(.solicitudes__card--abierta):hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-card-hover);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .solicitudes__card {
-    animation: none;
-    transition: none;
-  }
 }
 
 .solicitudes__card-top {
