@@ -2,257 +2,350 @@
 
 # 🤝 Acompáñame — Frontend
 
-**Acompáñame** es una plataforma de marketplace que conecta a familias que necesitan cuidados para un ser querido con cuidadores profesionales verificados. Nace para cubrir el hueco entre la atención residencial a tiempo completo y las listas de espera de la atención formal.
+**Acompáñame** is a marketplace that connects families who need care for a loved one with professional caregivers. It was born to fill the gap between full-time residential care and the waiting lists of formal care services.
 
-Este repositorio contiene la **aplicación web** del proyecto, desarrollada con **Vue 3**. La API REST (Spring Boot) vive en un repositorio independiente, enlazado más abajo.
+This repository contains the **web application**, built with **Vue 3**. The REST API (Spring Boot) lives in a separate repository, linked [below](#-project-links).
 
-Proyecto final del bootcamp de Desarrollo Web Full Stack (850h) en **Factoría F5 — Digital Academy**.
+Final project of the Full Stack Web Development bootcamp (850 h) at **Factoría F5 — Digital Academy**.
 
-![Vue](https://img.shields.io/badge/Vue-3-42b883) ![Vite](https://img.shields.io/badge/Vite-8-646CFF) ![Pinia](https://img.shields.io/badge/Pinia-estado-yellow) ![Vitest](https://img.shields.io/badge/tests-540-success) ![Responsive](https://img.shields.io/badge/responsive-768px-blue)
+![Vue](https://img.shields.io/badge/Vue-3-42b883) ![Vite](https://img.shields.io/badge/Vite-8-646CFF) ![Pinia](https://img.shields.io/badge/Pinia-state-yellow) ![Vitest](https://img.shields.io/badge/tests-Vitest-success) ![E2E](https://img.shields.io/badge/e2e-Playwright-45ba4b) ![Responsive](https://img.shields.io/badge/responsive-768px-blue)
 
 > [!TIP]
-> 📚 **Documentación completa en la [wiki del proyecto](https://github.com/AndreaVaGo/acompaname-frontend/wiki).** Aquí está lo imprescindible para entender, arrancar y probar el frontend; el detalle (decisiones, diseño, diagramas y tests) está en la wiki.
+> 📚 **Full documentation is in the [project wiki](https://github.com/AndreaVaGo/acompaname-frontend/wiki).** This README has what you need to understand, run and test the frontend; the details (decisions, design, diagrams and tests) are in the wiki.
 
 ---
 
-## 📑 Tabla de contenidos
+## 📑 Table of contents
 
-- [Descripción del proyecto](#-descripción-del-proyecto)
-- [Tecnologías utilizadas](#-tecnologías-utilizadas)
-- [Instalación y uso](#-instalación-y-uso)
-- [Estructura del proyecto](#-estructura-del-proyecto)
-- [Pantallas y rutas](#-pantallas-y-rutas)
-- [Panel de administración](#-panel-de-administración)
-- [Decisiones técnicas](#-decisiones-técnicas)
-- [Diseño y capturas](#-diseño-y-capturas)
-- [Diagramas técnicos](#-diagramas-técnicos)
+- [What the app does](#-what-the-app-does)
+- [Tech stack](#-tech-stack)
+- [Getting started](#-getting-started)
+- [Configuration](#-configuration)
+- [Project structure](#-project-structure)
+- [Screens and routes](#-screens-and-routes)
+- [Caregiver calendar](#-caregiver-calendar)
+- [Admin panel](#-admin-panel)
+- [Technical decisions](#-technical-decisions)
+- [Design and screenshots](#-design-and-screenshots)
+- [Technical diagrams](#-technical-diagrams)
 - [Tests](#-tests)
-- [Herramientas](#-herramientas)
-- [Enlaces del proyecto](#-enlaces-del-proyecto)
-- [Problemas conocidos](#-problemas-conocidos)
-- [Próximos pasos](#-próximos-pasos)
-- [Autora](#-autora)
+- [Tools](#-tools)
+- [Project links](#-project-links)
+- [Known limitations](#-known-limitations)
+- [Roadmap](#-roadmap)
+- [Credits](#-credits)
+- [Author](#-author)
 
 ---
 
-## 📖 Descripción del proyecto
+## 📖 What the app does
 
-**Acompáñame** resuelve un problema real: encontrar apoyo puntual y de confianza para el cuidado de personas mayores o dependientes, sin necesidad de contratar servicios residenciales completos.
+**Acompáñame** solves a real problem: finding occasional, trustworthy support for the care of older or dependent people, without having to hire a full residential service.
 
-Las **familias** pueden:
-- 📝 Registrarse e iniciar sesión
-- 🔎 Buscar cuidadores con filtros (ciudad, tipo de cuidado, sexo, servicios, disponibilidad, vehículo, valoración mínima y fechas libres) y consultar su perfil y sus reseñas
-- 📋 Enviar solicitudes de servicio y seguir su estado
-- 💳 Pagar el servicio una vez que el cuidador lo ha completado (el pago se marca como completado en el backend, se muestra una confirmación y la solicitud pasa a verse como pagada; los datos de la tarjeta son de prueba)
-- ⭐ Valorar el servicio una vez completado y ver en el historial qué servicios ya están valorados
-- 👤 Editar sus datos de contacto y cambiar la contraseña
+**Families** can:
+- 📝 Sign up and log in (with a CAPTCHA), and recover their password by email
+- 🔎 Search caregivers by city, care type, gender, services, availability, vehicle, minimum rating, free dates and **distance** ("caregivers near me"), and read their profile and reviews
+- 📋 Send service requests for **up to 5 people** (each with their own age group) and see an estimated price before sending
+- 💬 Chat with the caregiver about a request, with an unread-messages badge
+- 📍 Open the service address in a map from the request card
+- 💳 Pay for a completed service (payments are simulated, see [limitations](#-known-limitations)) and review their payment history
+- ⭐ Rate a completed service, once
+- 👤 Edit their contact data, change their password and send suggestions to the team
 
-Los **cuidadores** pueden:
-- 🧑‍⚕️ Registrarse y gestionar su perfil profesional
-- 📥 Recibir solicitudes y aceptarlas o rechazarlas
-- 👤 Editar sus datos de contacto y cambiar la contraseña
+**Caregivers** can:
+- 🧑‍⚕️ Sign up and manage their professional profile (photo, specialty, care types, rate, vehicle, availability, travel distance)
+- 📥 Receive requests and accept or reject them
+- 🗓️ Keep a **calendar of busy time** so families only see them when they are really free (see [Caregiver calendar](#-caregiver-calendar))
+- 💬 Chat with families about their requests
 
-El **administrador** puede:
-- 📊 Ver un panel con el resumen de la actividad (familias, cuidadores, solicitudes, ingresos y valoración media), gráficos de barras y los avisos que requieren atención
-- 🚫 Bloquear y desbloquear cuentas de usuario
-- 🗑️ Eliminar valoraciones inadecuadas
-- 📋 Consultar todas las solicitudes, filtradas por estado
-- 💶 Analizar los pagos: cuánto se ha cobrado y cuánto está pendiente, con gráficos por mes, por estado, por tipo de cuidado y por cuidador, y una tabla con filtro y buscador
+The **administrator** can:
+- 📊 See a dashboard with the platform activity (families, caregivers, requests, income, average rating), charts and alerts
+- 🚫 Block and unblock accounts
+- 🗑️ Delete inappropriate reviews
+- 📋 Browse all requests filtered by status, and analyse payments
+- 💡 Read the suggestions sent by users
 
-Cualquier visitante puede consultar el **aviso legal** y la **política de privacidad** desde el pie de página.
+Any visitor can read the **legal notice**, the **privacy policy** and the **terms and conditions** from the footer.
 
 ---
 
-## 🛠 Tecnologías utilizadas
+## 🛠 Tech stack
 
-| Categoría | Tecnología |
+| Category | Technology |
 |---|---|
-| 🖖 Framework | Vue 3 (Composition API, <mark>&lt;script setup&gt;</mark>) |
+| 🖖 Framework | Vue 3 (Composition API, `<script setup>`) |
 | ⚡ Build tool | Vite 8 |
-| 🍍 Estado | Pinia |
-| 🧭 Rutas | Vue Router 5 |
-| 🔌 Consumo de API | Repository Pattern sobre <mark>fetch</mark> con Basic Auth |
-| 🎨 Estilos | CSS puro, BEM y variables CSS |
-| 🧪 Tests | Vitest, Vue Test Utils, jsdom |
+| 🍍 State | Pinia |
+| 🧭 Routing | Vue Router 5 |
+| 🔌 API access | Repository Pattern over `fetch`, with a JWT sent as a `Bearer` token |
+| 🛡️ CAPTCHA | Cloudflare Turnstile (optional, driven by an environment variable) |
+| 🎨 Styles | Plain CSS, BEM naming and CSS variables (fonts: DM Sans and Fraunces) |
+| 🧪 Tests | Vitest, Vue Test Utils, jsdom; Playwright for e2e |
 
 ---
 
-## 🚀 Instalación y uso
+## 🚀 Getting started
 
 ```bash
-# Clonar el repositorio
+# Clone the repository
 git clone https://github.com/AndreaVaGo/acompaname-frontend.git
 
-# Entrar en la carpeta del proyecto
+# Enter the project folder
 cd acompaname-frontend
 
-# Instalar las dependencias
+# Install dependencies
 npm install
 
-# Arrancar el servidor de desarrollo
+# Start the development server
 npm run dev
 ```
 
-La aplicación quedará disponible en <mark>http://localhost:5173</mark> 🎉.
+The app is available at `http://localhost:5173` 🎉.
 
 > [!IMPORTANT]
-> Para que funcione completamente, el backend debe estar arrancado en <mark>http://localhost:8080</mark> (ver el README del repositorio de backend). Para entrar como administrador, el backend tiene que haberse arrancado con las variables <mark>ADMIN_EMAIL</mark> y <mark>ADMIN_PASSWORD</mark>; en ese README se explica cómo.
+> To work fully, the backend must be running at `http://localhost:8080` (see the backend README). To log in as administrator, the backend must have been started with the `ADMIN_EMAIL` and `ADMIN_PASSWORD` variables; that README explains how.
 
-| Comando | Descripción |
+| Command | Description |
 |---|---|
-| <mark>npm run dev</mark> | Servidor de desarrollo |
-| <mark>npm run build</mark> | Build de producción |
-| <mark>npm run preview</mark> | Previsualizar el build |
-| <mark>npm run test:unit</mark> | Ejecutar los tests |
+| `npm run dev` | Development server |
+| `npm run build` | Production build (output in `dist/`) |
+| `npm run preview` | Preview the production build |
+| `npm run test:unit` | Unit tests (watch mode) |
+| `npm run test:coverage` | Unit tests with a coverage report (`coverage/index.html`) |
+| `npm run test:e2e` | End-to-end tests (backend must be running) |
 
 ---
 
-## 📁 Estructura del proyecto
+## ⚙️ Configuration
+
+Copy `.env.example` to `.env.local` and adjust it if you need to. Both variables are optional in development.
+
+| Variable | Default | What it does |
+|---|---|---|
+| `VITE_API_URL` | `http://localhost:8080/api/v1` | Address of the backend API |
+| `VITE_TURNSTILE_SITE_KEY` | *(empty)* | **Public** Cloudflare Turnstile site key. If empty, no CAPTCHA is shown on the sign-up and login forms |
+
+Vite embeds these values at build time, so they must be set when running `npm run build`.
+
+### CAPTCHA
+
+The CAPTCHA protects the sign-up and login forms and must be enabled on **both** sides:
+
+1. **Frontend:** set `VITE_TURNSTILE_SITE_KEY`.
+2. **Backend:** set `CAPTCHA_ENABLED=true` and `CAPTCHA_SECRET`.
+
+To try it locally without a Cloudflare account, use Cloudflare's test keys: site key `1x00000000000000000000AA` in the frontend and secret `1x0000000000000000000000000000000AA` in the backend (both always pass). In production, create a real Turnstile site and keep the secret key only in the backend.
+
+---
+
+## 📁 Project structure
 
 ```
 src/
-├── assets/          Imágenes, bocetos y diagramas
-├── components/      NavBar, AppFooter, SolicitudCard, FotoCuidador (reutilizables)
-│   └── admin/       Piezas del panel: Menu, Avisos, Tarjetas, Barras, Pagos, Cuidadores, Valoraciones, Usuarios, Solicitudes y cuatro piezas de la sección Pagos
-├── pinia/           Configuración de Pinia
-├── repositories/    Admin, Auth, Cuidador, Pago, Role, Solicitud, Usuario, Valoracion + Repository base
-├── router/          Definición de rutas
-├── stores/          auth.js (estado de sesión)
-├── styles/          variables.css, base.css, style.css
-├── tests/           Tests de componentes, vistas, rutas, store y repositorios
-├── utils/           catalogoCuidados.js, formatearEuros.js, formatearFecha.js, mensajeDeError.js, reducirImagen.js
-├── views/           Una vista por pantalla, en carpetas: admin, auth, caregiver, common, family
+├── assets/          Images, sketches and diagrams
+├── components/      Reusable pieces (NavBar, AppFooter, SolicitudCard, CalendarioMensual, LineaDelDia, CaptchaTurnstile...)
+│   ├── admin/       Admin panel pieces (menu, alerts, cards, bars, payments, users, reviews, suggestions...)
+│   └── animation/   Landing page animations
+├── pinia/           Pinia setup
+├── repositories/    One class per API resource, all extending a base Repository
+├── router/          Route definitions and navigation guards
+├── stores/          auth.js (session state)
+├── styles/          variables.css, base.css and shared styles
+├── tests/           Unit tests (components, views, router, store, repositories, utils)
+├── utils/           Pure helper functions (calendar, shifts, price estimate, catalogs, formatting...)
+├── views/           One view per screen, grouped in folders: admin, auth, caregiver, common, family
 ├── App.vue
 └── main.js
+e2e/                 Playwright end-to-end tests
+docs/                Banner, screenshots, design images and project PDFs
 ```
 
-Esta estructura separa claramente responsabilidades: las **vistas** (<mark>views/</mark>) representan pantallas completas, los **componentes** (<mark>components/</mark>) contienen piezas reutilizables entre vistas, los **repositorios** (<mark>repositories/</mark>) encapsulan toda la comunicación con la API, el **store** (<mark>stores/</mark>) centraliza el estado de sesión, y los **estilos globales** (<mark>styles/</mark>) evitan duplicar valores de diseño (colores, espaciados) en cada archivo.
+The structure separates responsibilities: **views** are full screens, **components** are pieces reused across views, **repositories** wrap all communication with the API, the **store** keeps the session state, **utils** hold small pure functions that are easy to test, and the **global styles** avoid repeating design values (colours, spacing).
 
 ---
 
-## 📱 Pantallas y rutas
+## 📱 Screens and routes
 
-| # | Pantalla | Ruta | Descripción |
-|---|---|---|---|
-| 1 | 🏠 **Landing** | <mark>/</mark> | Página pública de bienvenida, con propuesta de valor y accesos a registro/login |
-| 2 | ✍️ **Registro** | <mark>/registro</mark> | Formulario con selección de rol (Familia / Cuidador), cargado dinámicamente desde la API |
-| 3 | 🔑 **Inicio de sesión** | <mark>/login</mark> | Acceso con email y contraseña; el administrador entra directamente en su panel |
-| 4 | 🔍 **Búsqueda de cuidadores** | <mark>/buscar</mark> | Listado con filtros por ciudad, tipo de cuidado, sexo, servicios, disponibilidad, vehículo propio, valoración mínima y fechas (oculta a los cuidadores que ya tienen un servicio aceptado esos días) |
-| 5 | 🧑‍⚕️ **Perfil de cuidador** (público) | <mark>/cuidador/:id</mark> | Datos profesionales, valoración media y ventana con las reseñas de las familias |
-| 6 | 📝 **Solicitud de servicio** | <mark>/solicitar/:id</mark> | Formulario para pedir el acompañamiento a un cuidador concreto (tipo de cuidado, dirección u hospital, fechas, paciente y necesidades) |
-| 7 | ✅ **Confirmación de solicitud** | <mark>/confirmacion</mark> | Aviso de solicitud enviada |
-| 8 | 📜 **Historial de solicitudes** | <mark>/historial</mark> | Estado final de cada acompañamiento; la familia puede valorar y ve cuáles ya están valoradas |
-| 9 | 📨 **Solicitudes enviadas** (Familia) | <mark>/solicitudes</mark> | Estado de las solicitudes enviadas a distintos cuidadores |
-| 10 | 💳 **Checkout** (Familia) | <mark>/pagar/:id</mark> | Pago de un servicio (tarjeta de prueba) con pantalla de confirmación |
-| 11 | ⭐ **Formulario de valoración** (Familia) | <mark>/valorar/:id</mark> | Puntuación de 1 a 5 estrellas y comentario |
-| 12 | 📥 **Solicitudes recibidas** (Cuidador) | <mark>/solicitudes-cuidador</mark> | Gestión de aceptar/rechazar |
-| 13 | 👤 **Mi perfil** (Familia) | <mark>/mi-perfil</mark> | Datos de la cuenta |
-| 14 | ✏️ **Editar perfil** (Cuidador) | <mark>/editar-perfil</mark> | Foto (se elige desde el ordenador), especialidad, ciudad, tipo y servicios de cuidado, sexo, experiencia, tarifa, descripción, vehículo y disponibilidad |
-| 15 | 🧾 **Editar datos** | <mark>/editar-datos</mark> | Cambiar nombre, email y teléfono |
-| 16 | 🔐 **Cambiar contraseña** | <mark>/cambiar-password</mark> | Contraseña actual, nueva y repetida |
-| 17 | ⚖️ **Aviso legal** | <mark>/aviso-legal</mark> | Datos del titular y condiciones de uso (público) |
-| 18 | 🛡️ **Política de privacidad** | <mark>/privacidad</mark> | Cómo se tratan los datos personales (público) |
-| 19 | 📊 **Panel de administración** (Administrador) | <mark>/admin</mark> | Menú lateral con cuatro secciones: Resumen, Solicitudes, Pagos y Usuarios |
+Private routes check in the router that there is a session and, when needed, the role (`FAMILIA`, `CUIDADOR` or `ADMIN`). If the user is not logged in they are redirected to the login; with the wrong role, to the home page. Any unknown address shows a "page not found" screen. Every page sets its own title and description.
 
-Las rutas privadas comprueban en el router que haya sesión y, cuando hace falta, el rol (<mark>FAMILIA</mark>, <mark>CUIDADOR</mark> o <mark>ADMIN</mark>); si no se cumple, redirigen al login.
+### Public
 
-Cada vista incluye sus correspondientes estados vacíos (por ejemplo, "Aún no tienes solicitudes") y mensajes de error ante fallos de carga o de envío, para que la interfaz nunca se muestre rota ni en blanco.
-
----
-
-## 🛡 Panel de administración
-
-Pantalla **/admin**, solo para el rol <mark>ADMIN</mark>. El administrador **observa y modera**: no edita solicitudes ni pagos, no borra usuarios y no puede hacerse pasar por otra cuenta.
-
-| Bloque | Qué muestra |
-|---|---|
-| ⚠️ Avisos | Qué requiere atención (por ejemplo, solicitudes pendientes) y un botón que abre la sección Solicitudes ya filtrada |
-| 🔢 Tarjetas | Familias, cuidadores (y cuántos están disponibles ahora), solicitudes, ingresos cobrados y valoración media |
-| 📊 Barras | Solicitudes por estado y por tipo de cuidado, con el tiempo medio hasta aceptar una solicitud |
-| 💶 Pagos | Importe pagado y pendiente |
-| ⭐ Valoraciones | Cuidadores mejor valorados y últimas valoraciones, con botón **Eliminar** y confirmación en la propia fila |
-| 👥 Usuarios | Tabla con rol y estado, botones por rol con contador, buscador y botón **Bloquear / Desbloquear** (en su propia fila se ve «Tú», porque no puede bloquearse a sí mismo) |
-| 📋 Solicitudes | Tabla con botones de estado de colores |
-| 💶 Pagos (sección) | Tarjetas de cobrado y pendiente, gráfico de pagos por mes, barras por estado, por tipo de cuidado y de los cuidadores que más han cobrado, y tabla de detalle con botones de estado, días sin cobrar destacados y buscador |
-
-Detalles de diseño:
-
-- El menú del administrador solo tiene **Panel**, **Cambiar contraseña** y **Cerrar sesión**: no lleva «Mi perfil» ni «Editar mis datos», para que el email del administrador (que se crea desde el backend) no pueda cambiar desde la web.
-- El panel se divide en **cuatro secciones** con un menú lateral (en móvil, una fila de pestañas): **Resumen**, **Solicitudes**, **Pagos** y **Usuarios**. Solo se ve una a la vez y los datos se cargan una sola vez al entrar.
-- Los gráficos son solo texto y CSS, sin librerías de gráficos.
-- En **móvil** (menos de 640 px), las tablas de usuarios y solicitudes se convierten en tarjetas con etiqueta y valor, para que el botón Bloquear siempre esté a la vista.
-- Si una cuenta está bloqueada, el login muestra «Email o contraseña incorrectos, o tu cuenta está bloqueada.» (el backend responde igual que con una contraseña mala).
-
----
-
-## 🧩 Decisiones técnicas
-
-📄 Documento completo con el proceso y los problemas encontrados: [docs/decisiones-tecnicas.pdf](docs/decisiones-tecnicas.pdf)
-
-Algunas de las decisiones principales:
-
-- 🎨 **BEM + variables CSS globales** para colores, radios y espaciados.
-- 🔌 **Repository Pattern** para el consumo de la API: cada entidad tiene su repositorio, que extiende una clase base.
-- 🍍 **Estado de sesión con Pinia** (<mark>useAuthStore</mark>), persistido en <mark>sessionStorage</mark>.
-- 🧭 **<mark>NavBar</mark> compartido**, que muestra enlaces distintos según el rol (familia, cuidador o administrador).
-- 🔎 **Filtros de búsqueda en el navegador** y **filtro por fechas con ayuda del backend** (<mark>GET /solicitudes/cuidadores-ocupados</mark>).
-- 📱 **Diseño responsive** con media queries (punto de corte de 768 px).
-- 🛡️ **Panel de administración dividido en componentes** pequeños (uno por bloque) que reciben los datos por <mark>props</mark> y avisan con eventos; la vista <mark>AdminView</mark> es la única que habla con la API.
-- 📊 **Gráficos hechos con CSS**, sin librerías, para no añadir dependencias.
-- 🗑️ **Confirmación en la propia fila** al eliminar una valoración, en vez de una ventana emergente.
-- 📱 **Tablas que se convierten en tarjetas en móvil**, con CSS y atributos <mark>data-label</mark>, sin duplicar el contenido.
-- 🔒 **El administrador no puede bloquearse a sí mismo**, ni en el backend ni en el frontend.
-
-👉 Todas las decisiones y la metodología de trabajo: [Decisiones técnicas](https://github.com/AndreaVaGo/acompaname-frontend/wiki/Decisiones-tecnicas).
-
----
-
-## 🎨 Diseño y capturas
-
-Proceso de diseño: bocetos → wireframes → mockups → prototipo, para móvil, tablet y escritorio.
-
-| Landing | Buscar | Solicitar |
+| Screen | Route | Description |
 |---|---|---|
-| ![landing](docs/screenshots/landing.png) | ![buscar](docs/screenshots/buscar.png) | ![solicitar](docs/screenshots/solicitar.png) |
+| 🏠 Landing | `/` | Welcome page with the value proposition, an animated "how it works" and links to sign up and log in |
+| ✍️ Sign up | `/registro` | Form with role selection (family / caregiver), password strength check and CAPTCHA |
+| 🔑 Login | `/login` | Email and password with CAPTCHA; the administrator goes straight to the panel |
+| 📧 Forgot password | `/olvide-password` | Asks for a reset link by email |
+| 🔐 Reset password | `/restablecer-password` | Choose a new password with the link from the email (single use) |
+| 🔍 Caregiver search | `/buscar` | List with filters and distance; hides caregivers who are busy on the chosen dates |
+| 🧑‍⚕️ Caregiver profile | `/cuidador/:id` | Professional data, average rating and reviews |
+| ⚖️ Legal notice, 🛡️ Privacy, 📃 Terms | `/aviso-legal`, `/privacidad`, `/terminos` | Legal pages |
 
-| Panel de administración (escritorio) | Panel de administración (móvil) |
-|---|---|
-| ![panel de administración en escritorio](docs/screenshots/admin-escritorio.png) | ![panel de administración en móvil](docs/screenshots/admin-movil.png) |
+### Families (`FAMILIA`)
 
-👉 Bocetos, mockups y todas las capturas de la app: [Diseño y capturas](https://github.com/AndreaVaGo/acompaname-frontend/wiki/Diseno-y-capturas).
+| Screen | Route | Description |
+|---|---|---|
+| 📝 Request a service | `/solicitar/:id` | Care type, address or hospital, dates and hours, up to 5 people with their age group, needs and estimated price |
+| ✅ Confirmation | `/confirmacion` | Request sent |
+| 📨 My requests | `/solicitudes` | Status of every request, with chat and map link |
+| 💳 Checkout | `/pagar/:id` | Payment of a completed service (simulated) |
+| 💶 My payments | `/pagos` | Paid and pending amounts |
+| ⭐ Rate | `/valorar/:id` | 1–5 stars and a comment, once per completed request |
+| 👤 My profile | `/mi-perfil` | Account data |
+
+### Caregivers (`CUIDADOR`)
+
+| Screen | Route | Description |
+|---|---|---|
+| 📥 Received requests | `/solicitudes-cuidador` | Accept or reject, with chat |
+| ✏️ Edit profile | `/editar-perfil` | Photo (JPG, PNG or WebP, shrunk in the browser), specialty, city, care types and services, rate, description, vehicle, availability and travel distance |
+| 🗓️ My calendar | `/mi-calendario` | Busy time, shifts, repeat and `.ics` import (see below) |
+
+### Families and caregivers
+
+| Screen | Route | Description |
+|---|---|---|
+| 💬 Chat | `/chat/:id` | Conversation about a request |
+| 💡 Suggestions | `/sugerencias` | Send an idea or a problem to the team |
+
+### Any logged-in user
+
+| Screen | Route | Description |
+|---|---|---|
+| 📜 History | `/historial` | Final status of every request |
+| 🧾 Edit my data | `/editar-datos` | Name, email and phone |
+| 🔑 Change password | `/cambiar-password` | Current, new and repeated |
+
+### Administrator (`ADMIN`)
+
+| Screen | Route | Description |
+|---|---|---|
+| 📊 Admin panel | `/admin` | Side menu with sections for summary, requests, payments, users and suggestions |
+
+Every view has its own empty states (for example, "You have no requests yet") and error messages, so the interface is never broken or blank.
 
 ---
 
-## 📊 Diagramas técnicos
+## 🗓️ Caregiver calendar
 
-Arquitectura del frontend, flujo de navegación, casos de uso, diagramas de secuencia (registro y login, solicitar un servicio), diagrama entidad-relación y diagrama de clases, todos en Mermaid y visibles directamente en GitHub.
+The `/mi-calendario` screen lets caregivers say when they are **not** available, so families never send them requests for those times. It is built from a monthly calendar (`CalendarioMensual`) and a timeline of the selected day (`LineaDelDia`).
 
-👉 [Diagramas técnicos](https://github.com/AndreaVaGo/acompaname-frontend/wiki/Diagramas-tecnicos)
+**Day colours**
+
+| Colour | Meaning |
+|---|---|
+| Soft green | Free: nothing noted |
+| Light blue | Partly busy: there are busy slots or accepted services, but free hours remain |
+| Solid blue, white text | **Full day**: 8 hours or more are busy |
+
+Accepted services count as busy time too. Below the calendar, each day lists its accepted services and its busy slots as cards with a label ("Accepted service" or "Busy"). Each day cell also has a small bar that fills as the day gets busier and is full at 8 hours (480 minutes), and an accessible description ("busy slot", "accepted service", "full day").
+
+**What caregivers can do**
+
+- ➕ **Add a busy slot** for a day, with start time, end time and an optional reason.
+- ⏱️ **Quick shifts**: one button each for Morning (07:00–15:00), Afternoon (15:00–23:00) and Night (23:00–07:00). The hours can be changed afterwards. A shift that ends earlier than it starts is a night shift and continues into the next day.
+- 🔁 **Repeat** a slot on chosen weekdays (Monday to Friday, every day, or any combination) up to a date, for at most 183 days (about six months). The app tells you how many slots were added and how many already existed.
+- 📥 **Import an `.ics` calendar** (Google Calendar, Outlook, Apple Calendar...). Events that are recurring, cancelled, marked as free or already in the past are left out, and a summary says how many were imported, duplicated and skipped.
+- 🗑️ Remove a slot at any time.
+- 🕒 The timeline of a day shows the **free gaps** between busy slots.
+
+The busy slots are used by the backend in the search filter and when a request is sent. Date and time maths lives in pure functions (`utils/calendario.js` and `utils/turnos.js`) with their own unit tests.
+
+---
+
+## 🛡 Admin panel
+
+The `/admin` screen is only for the `ADMIN` role. The administrator **observes and moderates**: cannot edit requests or payments, delete users or impersonate other accounts.
+
+| Block | What it shows |
+|---|---|
+| ⚠️ Alerts | What needs attention (for example, pending requests), with a button that opens the Requests section already filtered |
+| 🔢 Cards | Families, caregivers (and how many are available now), requests, income collected and average rating |
+| 📊 Bars | Requests by status and by care type, with the average time to accept a request |
+| ⭐ Reviews | Best-rated caregivers and latest reviews, with a **Delete** button and inline confirmation |
+| 👥 Users | Table with role and status, role filter buttons with counters, search box and **Block / Unblock** (in their own row the admin sees "You": it cannot block itself) |
+| 📋 Requests | Table with coloured status buttons |
+| 💶 Payments | Collected and pending cards, payments per month, bars by status, care type and top-earning caregivers, and a detail table with search and highlighted days unpaid |
+| 💡 Suggestions | Suggestions sent by families and caregivers |
+
+Design details:
+
+- The admin menu only has **Panel**, **Change password** and **Log out**: no "My profile" or "Edit my data", so the admin email (created from the backend) cannot be changed from the web.
+- The panel is split into sections with a side menu (on mobile, a row of tabs). Only one is shown at a time and data is loaded once on entering.
+- Charts are plain text and CSS, with no charting library.
+- On **mobile** (under 640 px) the tables turn into cards with label and value, so the Block button is always visible.
+- If an account is blocked, the login shows "Wrong email or password, or your account is blocked." (the backend answers the same as with a wrong password).
+
+---
+
+## 🧩 Technical decisions
+
+📄 Full document with the process and the problems found: [docs/decisiones-tecnicas.pdf](docs/decisiones-tecnicas.pdf)
+
+Some of the main decisions:
+
+- 🎨 **BEM + global CSS variables** for colours, radii and spacing.
+- 🔌 **Repository Pattern** for API access: every resource has its own repository extending a base class that adds the `Bearer` token and handles errors.
+- 🔑 **JWT session**: the token is stored in `sessionStorage` (cleared when the tab closes) and sent in every request. If the server answers 401 with a session open, the session is cleared and the user goes back to the login.
+- 🍍 **Session state with Pinia** (`useAuthStore`); the profile photo is kept in memory only because it can be large.
+- 🧭 **Shared `NavBar`** that shows different links per role, plus an unread-messages badge.
+- 🔎 **Search**: filters run in the browser, the date filter and the distance sort use the backend.
+- 🗓️ **Calendar logic in pure functions** (`utils/`), separated from the components so it is easy to test.
+- 🖼️ **Photos are shrunk in the browser** (`reducirImagen.js`) before upload.
+- 🛡️ **CAPTCHA as an optional component**: with no site key, nothing is shown and the forms work as before.
+- 📱 **Responsive design** with media queries (768 px breakpoint).
+- 🛡️ **Admin panel split into small components** that receive data through `props` and notify with events; `AdminView` is the only one that talks to the API.
+- 📊 **CSS-only charts**, no extra dependencies.
+- 🗑️ **Inline confirmation** when deleting a review, instead of a pop-up.
+- ♿ **Accessibility**: labels, `aria-label` on calendar cells, focus handling and motion-aware animations (covered by tests).
+
+👉 All the decisions and the way of working: [Technical decisions](https://github.com/AndreaVaGo/acompaname-frontend/wiki/Decisiones-tecnicas).
+
+---
+
+## 🎨 Design and screenshots
+
+Design process: sketches → wireframes → mockups → prototype, for mobile, tablet and desktop.
+
+| Landing | Search | Request |
+|---|---|---|
+| ![landing](docs/screenshots/landing.png) | ![search](docs/screenshots/buscar.png) | ![request](docs/screenshots/solicitar.png) |
+
+| Admin panel (desktop) | Admin panel (mobile) |
+|---|---|
+| ![admin panel on desktop](docs/screenshots/admin-escritorio.png) | ![admin panel on mobile](docs/screenshots/admin-movil.png) |
+
+👉 Sketches, mockups and all the app screenshots: [Design and screenshots](https://github.com/AndreaVaGo/acompaname-frontend/wiki/Diseno-y-capturas).
+
+---
+
+## 📊 Technical diagrams
+
+Frontend architecture, navigation flow, use cases, sequence diagrams (sign up and login, requesting a service), entity-relationship diagram and class diagram, all in Mermaid and rendered directly on GitHub.
+
+👉 [Technical diagrams](https://github.com/AndreaVaGo/acompaname-frontend/wiki/Diagramas-tecnicos)
 
 ---
 
 ## ✅ Tests
 
-El proyecto tiene **540 tests unitarios** en 51 archivos (Vitest + Vue Test Utils) y **16 tests e2e** (Playwright). Los unitarios mockean el repositorio correspondiente para no depender del backend; los e2e abren un navegador de verdad y **necesitan el backend arrancado**.
-
-El panel de administración tiene **116 tests unitarios** (13 componentes, incluido el menú lateral, el formateo de euros y la vista completa), además de los del repositorio, el router, el login y el menú.
+- **Unit tests** (Vitest + Vue Test Utils): **1,466 tests in 139 files** covering components, views, router, store, repositories and utils. They mock the repository, so they do not need the backend. Coverage: about **98 %** of statements, lines and functions and **97 %** of branches.
+- **End-to-end tests** (Playwright): open a real browser and go through the main flows (sign up and login, search and request, admin panel, visitor and the photo panel on the auth screens). They **need the backend running**, run one after another because they share the database, and start the frontend by themselves if it is not already running.
 
 ```bash
-npm run test:unit      # tests unitarios
-npm run test:coverage  # cobertura (informe en coverage/index.html)
-npm run test:e2e       # tests e2e (con el backend en marcha)
+npm run test:unit      # unit tests
+npm run test:coverage  # coverage (report in coverage/index.html)
+npm run test:e2e       # e2e tests (with the backend running)
 ```
 
-Cobertura actual: **98 % de líneas**, **98 % de ramas**, **98 % de sentencias** y **98 % de funciones** (el mínimo pedido era el 70 %).
+![Frontend test results](docs/screenshots/tests-frontend.png)
+![Frontend test coverage](docs/screenshots/cobertura-frontend.png)
 
-![Resultado de los tests del frontend](docs/screenshots/tests-frontend.png)
-![Cobertura de los tests del frontend](docs/screenshots/cobertura-frontend.png)
-
-👉 Qué comprueba cada carpeta de tests y los tests e2e: [Tests](https://github.com/AndreaVaGo/acompaname-frontend/wiki/Tests).
+👉 What each test folder checks, and the e2e tests: [Tests](https://github.com/AndreaVaGo/acompaname-frontend/wiki/Tests).
 
 ---
 
-## 🧰 Herramientas
+## 🧰 Tools
 
 - 💻 Visual Studio Code
 - 🖖 Vue 3 (Composition API)
@@ -260,51 +353,65 @@ Cobertura actual: **98 % de líneas**, **98 % de ramas**, **98 % de sentencias**
 - 🧭 Vue Router
 - ⚡ Vite
 - ✅ Vitest + Vue Test Utils
-- 🎭 Playwright (tests e2e)
-- 📮 Postman (pruebas de integración con el backend)
-- 🗄️ DBeaver (inspección de la base de datos durante el desarrollo)
-- 📋 JIRA (gestión del proyecto)
+- 🎭 Playwright (e2e tests)
+- 📮 Postman (integration tests against the backend)
+- 🗄️ DBeaver (database inspection during development)
+- 📋 JIRA (project management)
 
 ---
 
-## 🔗 Enlaces del proyecto
+## 🔗 Project links
 
-| Recurso | Enlace |
+| Resource | Link |
 |---|---|
-| 🍃 Repositorio backend | https://github.com/AndreaVaGo/acompaname-backend |
-| 🖥️ Repositorio frontend | https://github.com/AndreaVaGo/acompaname-frontend |
-| 📊 Gestión del proyecto (JIRA) | https://saludosalamanecer-1780468848301.atlassian.net/jira/software/projects/ACOM/boards/34/timeline?rangeMode=MONTHS |
-| 🎨 Diseño en Figma | https://www.figma.com/design/iNrrCJOe6CkQXTxhGzK7rj/Acomp%C3%A1%C3%B1ame |
-| 💜 Prototipo (Lovable) | https://care-connection-hub-18.lovable.app |
-| 🎤 Presentación | [docs/presentacion.pdf](docs/presentacion.pdf) |
+| 🍃 Backend repository | https://github.com/AndreaVaGo/acompaname-backend |
+| 🖥️ Frontend repository | https://github.com/AndreaVaGo/acompaname-frontend |
+| 📊 Project management (JIRA) | https://saludosalamanecer-1780468848301.atlassian.net/jira/software/projects/ACOM/boards/34/timeline?rangeMode=MONTHS |
+| 🎨 Design in Figma | https://www.figma.com/design/iNrrCJOe6CkQXTxhGzK7rj/Acomp%C3%A1%C3%B1ame |
+| 💜 Prototype (Lovable) | https://care-connection-hub-18.lovable.app |
+| 🎤 Presentation | [docs/presentacion.pdf](docs/presentacion.pdf) |
 
 ---
 
-## 🐞 Problemas conocidos
+## 🐞 Known limitations
 
 > [!NOTE]
-> Estos son los puntos identificados como mejorables en la versión actual (MVP).
+> These are the points identified as improvable in the current version (MVP).
 
-- 💳 El checkout (<mark>/pagar/:id</mark>) llama al endpoint <mark>PATCH /pagos/{id}/pagar</mark> del backend y el pago queda como completado, pero los datos de la tarjeta son de prueba: no se cobra nada ni hay pasarela de pago real.
-- 🔑 La autenticación es Basic Auth: las credenciales viajan en cada petición.
-- 🎨 Algunas vistas todavía tienen colores escritos a mano en el CSS en vez de usar las variables de la paleta (pendiente de <mark>refactorizar</mark>).
-- 🚫 Una persona con la cuenta bloqueada no sabe el motivo: el login le muestra el mismo mensaje que con una contraseña incorrecta.
-
----
-
-## 🗺️ Próximos pasos
-
-- 🔐 Implementar autenticación basada en JWT (actualmente Basic Auth)
-- 🌐 Revisar la configuración de CORS tras la migración a JWT
-- 💳 Conectar el checkout con una pasarela de pago real (por ejemplo Stripe en modo test)
-- 🖼️ Guardar las fotos de perfil como archivos en un almacenamiento externo (ahora se envían reducidas a 300 px y se guardan como texto)
-- 🚀 Desplegar frontend y backend
+- 💳 **Payments are simulated.** The checkout (`/pagar/:id`) marks the payment as completed in the backend, but card data is test data: nothing is charged and there is no real payment gateway.
+- 🖼️ Profile photos are sent shrunk and stored as text (Base64) in the database, not as files.
+- 📄 Lists (requests, search results) are not paginated yet.
+- 🌍 The app is in Spanish only.
+- 📲 It is not an installable app (PWA) yet; that needs HTTPS.
+- 🔐 No two-factor authentication yet.
+- 🎨 Some views still have hand-written colours in their CSS instead of the palette variables.
+- 🚫 A person with a blocked account is not told why: the login shows the same message as for a wrong password.
 
 ---
 
-## 👩‍💻 Autora
+## 🗺️ Roadmap
 
-**Andrea Vallina González** — Proyecto Final, Bootcamp Desarrollo Web Full Stack, Factoría F5.
+- 💳 Connect the checkout to a real payment gateway (for example Stripe in test mode)
+- 🚀 Deploy frontend and backend (with HTTPS and the production environment variables)
+- 📄 Paginate long lists
+- 🖼️ Store profile photos as files in external storage
+- 📲 Turn the app into a PWA
+- 🔐 Two-factor authentication
+- 🎞️ Review the animations with real users and add screenshots of the new screens to the wiki
+
+---
+
+## 🙏 Credits
+
+- Landing and login photo: *Woman and man holding hands* by Roman Kraft on [Unsplash](https://unsplash.com/es/fotos/mujer-y-hombre-tomados-de-la-mano-0EVKn3-5JSU).
+- CAPTCHA: [Cloudflare Turnstile](https://www.cloudflare.com/products/turnstile/).
+- Fonts: [DM Sans](https://fontsource.org/fonts/dm-sans) and [Fraunces](https://fontsource.org/fonts/fraunces), through Fontsource.
+
+---
+
+## 👩‍💻 Author
+
+**Andrea Vallina González** — Final project, Full Stack Web Development bootcamp, Factoría F5.
 
 - GitHub: [@AndreaVaGo](https://github.com/AndreaVaGo)
 - LinkedIn: [Andrea Vallina González](https://www.linkedin.com/in/andrea-vallina-gonzalez/)
