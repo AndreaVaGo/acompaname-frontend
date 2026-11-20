@@ -105,8 +105,12 @@ function cerrarSesion() {
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  padding: 32px 24px;
-  background-color: var(--color-accent-bg);
+  padding: 36px 24px;
+  /* Franja con las manchas coral y verde de la marca */
+  background:
+    radial-gradient(circle at 15% 20%, rgba(242, 137, 107, 0.35), transparent 55%),
+    radial-gradient(circle at 85% 80%, rgba(46, 125, 91, 0.28), transparent 55%),
+    var(--color-accent-bg);
 
   & h2 {
     margin: 0;
@@ -114,39 +118,63 @@ function cerrarSesion() {
   }
 }
 
+/* Círculo con la inicial: degradado, aro blanco y una entrada con "rebote" */
 .mi-perfil__avatar {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 88px;
-  height: 88px;
+  width: 96px;
+  height: 96px;
   border-radius: 50%;
-  background-color: var(--color-accent-dark);
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-dark));
   color: var(--color-white);
-  font-size: 2.4rem;
+  font-size: 2.6rem;
   font-weight: bold;
+  box-shadow:
+    0 0 0 6px rgba(255, 255, 255, 0.7),
+    var(--shadow-card);
+  animation: avatar-entra 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s backwards;
+}
+
+@keyframes avatar-entra {
+  from {
+    opacity: 0;
+    scale: 0.4;
+  }
 }
 
 .mi-perfil__tipo {
   background-color: var(--color-white);
-  color: var(--color-accent-dark);
-  padding: 4px 14px;
+  color: var(--color-secondary);
+  border: 1px solid var(--color-secondary);
+  padding: 4px 16px;
   border-radius: var(--radius-pill);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: bold;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .mi-perfil__datos {
-  padding: 12px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px 28px 8px;
 }
 
+/* Cada dato va en su propia pastilla, que se resalta al pasar el ratón */
 .mi-perfil__fila {
   display: flex;
   justify-content: space-between;
   gap: 16px;
-  padding: 18px 0;
-  border-bottom: 1px solid var(--color-neutral-bg);
+  padding: 14px 18px;
+  background-color: var(--color-neutral-bg);
+  border-left: 4px solid var(--color-accent);
+  border-radius: var(--radius-input);
   font-size: 1rem;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
 
   & span {
     color: var(--color-text-muted);
@@ -158,16 +186,43 @@ function cerrarSesion() {
   }
 }
 
-.mi-perfil__fila:last-child {
-  border-bottom: none;
+.mi-perfil__fila:nth-child(even) {
+  border-left-color: var(--color-secondary);
+}
+
+@media (hover: hover) {
+  .mi-perfil__fila:hover {
+    background-color: var(--color-accent-bg);
+    transform: translateX(4px);
+  }
 }
 
 .mi-perfil__acciones {
-  padding: 8px 32px 32px;
+  padding: 16px 28px 28px;
 
   & .btn {
     width: 100%;
   }
+}
+
+/* Cerrar sesión: borde coral que se rellena al pasar el ratón (el icono va puesto con CSS) */
+.mi-perfil__acciones .btn--secondary {
+  background-color: var(--color-white);
+  border: 2px solid var(--color-accent);
+  color: var(--color-accent-dark);
+  font-weight: bold;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.mi-perfil__acciones .btn--secondary::before {
+  content: "🚪 ";
+}
+
+.mi-perfil__acciones .btn--secondary:hover {
+  background-color: var(--color-accent);
+  color: var(--color-white);
 }
 
 @media (max-width: 768px) {
