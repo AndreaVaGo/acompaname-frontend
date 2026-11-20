@@ -185,12 +185,21 @@ function textoEstado(estado) {
 }
 
 /* El color de la línea de arriba cambia según el estado de la solicitud */
+/* Además de la línea de arriba, cada estado tiene su velo de color */
 .historial__card--completada {
   --borde-tarjeta: var(--color-info);
+  --tinte-tarjeta: color-mix(in srgb, var(--color-info) 16%, transparent);
 }
 
 .historial__card--rechazada {
   --borde-tarjeta: var(--color-border);
+  --tinte-tarjeta: color-mix(in srgb, var(--color-text-muted) 12%, transparent);
+}
+
+/* Las rechazadas se ven apagadas: ya no hay nada que hacer con ellas */
+.historial__card--rechazada h3,
+.historial__card--rechazada .historial__paciente {
+  color: var(--color-text-muted);
 }
 
 .historial__card-top {
@@ -205,11 +214,13 @@ function textoEstado(estado) {
   }
 }
 
+/* La etiqueta de estado lleva un icono (puesto con CSS, así el texto sigue siendo solo el estado) */
 .historial__estado {
-  padding: 4px 12px;
+  padding: 5px 14px;
   border-radius: var(--radius-pill);
   font-size: 0.8rem;
   font-weight: bold;
+  border: 1px solid currentColor;
 }
 
 .historial__estado--completada {
@@ -217,9 +228,17 @@ function textoEstado(estado) {
   color: var(--color-info);
 }
 
+.historial__estado--completada::before {
+  content: "🎉 ";
+}
+
 .historial__estado--rechazada {
   background-color: var(--color-neutral-bg);
   color: var(--color-text-muted);
+}
+
+.historial__estado--rechazada::before {
+  content: "✕ ";
 }
 
 .historial__paciente {
