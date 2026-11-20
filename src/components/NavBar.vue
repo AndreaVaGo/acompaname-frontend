@@ -405,9 +405,11 @@ function irAMiPerfil() {
 .navbar__logo {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-weight: bold;
-  font-size: 1.1rem;
+  gap: 12px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.6rem;
+  letter-spacing: -0.01em;
   text-decoration: none;
   color: var(--color-text);
 }
@@ -415,12 +417,18 @@ function irAMiPerfil() {
 .navbar__logo-icon {
   background-color: var(--color-accent-bg);
   border-radius: 50%;
-  width: 36px;
-  height: 36px;
+  width: 46px;
+  height: 46px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   transition: transform var(--dur-med) var(--ease-out);
+}
+
+/* El corazón crece junto con el círculo */
+.navbar__logo-icon svg {
+  width: 26px;
+  height: 26px;
 }
 
 /* Al pasar el ratón por el logo, el icono se inclina un poco */
@@ -637,6 +645,10 @@ function irAMiPerfil() {
 }
 
 @media (max-width: 768px) {
+  .navbar__logo {
+    font-size: 1.4rem;
+  }
+
   .navbar {
     flex-direction: column;
     gap: 12px;
