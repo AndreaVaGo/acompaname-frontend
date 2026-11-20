@@ -81,12 +81,12 @@ function estrellas(puntuacion) {
 </script>
 
 <template>
-  <div class="perfil" v-if="cuidador">
+  <div class="perfil pantalla" v-if="cuidador">
     <RouterLink to="/buscar" class="perfil__back">← Volver</RouterLink>
 
     <div class="perfil__main">
       <div
-        class="perfil__info"
+        class="perfil__info tarjeta-cristal"
         :class="
           cuidador.disponibleAhora
             ? 'perfil__info--disponible'
@@ -181,7 +181,7 @@ function estrellas(puntuacion) {
         <p class="perfil__bio">{{ cuidador.bio }}</p>
       </div>
 
-      <div class="perfil__sidebar">
+      <div class="perfil__sidebar tarjeta-cristal" style="--i: 1">
         <p class="perfil__precio">
           {{ cuidador.tarifaHora }} €<span>/hora</span>
         </p>
@@ -276,7 +276,6 @@ function estrellas(puntuacion) {
 
 <style scoped>
 .perfil {
-  background-color: var(--color-bg);
   font-family: var(--font-base);
   color: var(--color-text);
   padding: var(--gap-lg) 60px 60px;
@@ -300,13 +299,9 @@ function estrellas(puntuacion) {
 
 .perfil__info {
   flex: 2;
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
-  border-top: 4px solid var(--color-border);
+  /* El cristal, la sombra y la entrada vienen de la clase global tarjeta-cristal */
   padding: 28px;
-  box-shadow: var(--shadow-card);
   overflow: hidden;
-  animation: entra-sube 0.5s var(--ease-out) backwards;
 
   & h2 {
     margin-top: 24px;
@@ -317,11 +312,11 @@ function estrellas(puntuacion) {
 
 /* La línea de arriba indica la disponibilidad: verde si está disponible, roja si no */
 .perfil__info--disponible {
-  border-top-color: var(--color-secondary);
+  --borde-tarjeta: var(--color-secondary);
 }
 
 .perfil__info--ocupado {
-  border-top-color: var(--color-error);
+  --borde-tarjeta: var(--color-error);
 }
 
 /* Franja de color con la foto y el nombre, hasta los bordes de la tarjeta */
@@ -451,14 +446,9 @@ function estrellas(puntuacion) {
   flex: 1;
   position: sticky;
   top: 20px;
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
-  border-top: 4px solid var(--color-accent);
+  --borde-tarjeta: var(--color-accent);
   padding: 28px;
-  box-shadow: var(--shadow-card);
   height: fit-content;
-  /* La barra lateral entra un poco después que la información */
-  animation: entra-sube 0.5s var(--ease-out) 120ms backwards;
 }
 
 /* Etiqueta verde bien visible bajo el precio, para que se vea a primera vista */
