@@ -524,6 +524,15 @@ const avisoDireccion = computed(
   max-height: 85vh;
   overflow-y: auto;
   box-shadow: var(--shadow-card);
+  border-top: 4px solid var(--color-accent);
+  animation: ventana-entra 0.25s var(--ease-out) backwards;
+}
+
+@keyframes ventana-entra {
+  from {
+    opacity: 0;
+    translate: 0 16px;
+  }
 }
 
 /* Títulos pequeños que separan los bloques de la ventana de detalles */
@@ -563,16 +572,47 @@ const avisoDireccion = computed(
   }
 }
 
+/* La X de arriba: un círculo suave que se llena de coral al pasar el ratón y gira un poco */
 .solicitudes__cerrar {
-  background: none;
-  border: none;
-  font-size: 1.2rem;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--color-accent);
+  background-color: var(--color-accent-bg);
+  font-size: 1rem;
+  line-height: 1;
   cursor: pointer;
-  color: var(--color-text-muted);
+  color: var(--color-accent-dark);
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
 }
 
+.solicitudes__cerrar:hover {
+  background-color: var(--color-accent);
+  color: var(--color-white);
+  transform: rotate(90deg);
+}
+
+/* El botón Cerrar de abajo: borde coral que se rellena al pasar el ratón */
 .solicitudes__cerrar-btn {
   width: 100%;
+  margin-top: 20px;
+  padding: 12px;
+  background-color: var(--color-white);
+  border: 2px solid var(--color-accent);
+  color: var(--color-accent-dark);
+  font-weight: bold;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.solicitudes__cerrar-btn:hover:not(:disabled) {
+  background-color: var(--color-accent);
+  color: var(--color-white);
 }
 
 /* Enlace al mapa: una pastilla verde que se llena al pasar el ratón */
