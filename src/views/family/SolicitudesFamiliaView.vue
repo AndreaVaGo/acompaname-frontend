@@ -6,6 +6,7 @@ import PagoRepository from "@/repositories/PagoRepository";
 import MensajeRepository from "@/repositories/MensajeRepository";
 import ValoracionRepository from "@/repositories/ValoracionRepository";
 import { mensajeDeError } from "@/utils/mensajeDeError";
+import { moverFoco } from "@/utils/focoTarjeta";
 
 const solicitudRepository = new SolicitudRepository();
 const pagoRepository = new PagoRepository();
@@ -63,7 +64,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="solicitudes">
+  <div class="solicitudes pantalla">
     <header class="solicitudes__header">
       <h1>Mis solicitudes</h1>
       <p>Solicitudes que has enviado a las personas cuidadoras.</p>
@@ -75,8 +76,10 @@ onMounted(async () => {
 
     <div v-else class="solicitudes__grid">
       <SolicitudCard
-        v-for="solicitud in solicitudes"
+        v-for="(solicitud, indice) in solicitudes"
         :key="solicitud.id"
+        :style="{ '--i': Math.min(indice, 8) }"
+        @mousemove="moverFoco"
         :solicitud="solicitud"
         :nombreMostrado="solicitud.cuidadorNombre"
         :mostrarAcciones="false"
@@ -91,7 +94,6 @@ onMounted(async () => {
 <style scoped>
 .solicitudes {
   min-height: 100vh;
-  background-color: var(--color-bg);
   font-family: var(--font-base);
   color: var(--color-text);
   padding: var(--gap-lg) 60px;
