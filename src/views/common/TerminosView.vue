@@ -7,7 +7,8 @@ const emailContacto = EMAIL_CONTACTO;
 </script>
 
 <template>
-  <div class="legal">
+  <div class="pantalla">
+    <div class="legal tarjeta-cristal">
     <h1>Términos y condiciones de uso</h1>
     <p class="legal__fecha">Última actualización: noviembre de 2026</p>
 
@@ -112,19 +113,19 @@ const emailContacto = EMAIL_CONTACTO;
         <RouterLink to="/aviso-legal">aviso legal</RouterLink>.
       </p>
     </section>
+    </div>
   </div>
 </template>
 
 <style scoped>
+/* El cristal, la sombra y la entrada vienen de la clase global tarjeta-cristal */
 .legal {
-  background-color: var(--color-white);
+  --borde-tarjeta: var(--color-accent);
   font-family: var(--font-base);
   color: var(--color-text);
   max-width: 800px;
   margin: var(--gap-lg) auto;
   padding: 32px;
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
   line-height: 1.6;
 
   & h1 {
@@ -135,11 +136,22 @@ const emailContacto = EMAIL_CONTACTO;
     margin-top: 24px;
     margin-bottom: 8px;
     font-size: 1.1rem;
+    color: var(--color-accent-dark);
   }
 
   & a {
     color: var(--color-accent-dark);
   }
+}
+
+/* Es un texto largo para leer: la tarjeta no se levanta ni brilla al pasar el ratón */
+.legal:hover {
+  transform: none;
+  box-shadow: var(--shadow-card);
+}
+
+.legal::after {
+  display: none;
 }
 
 .legal__fecha {
