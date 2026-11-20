@@ -18,22 +18,22 @@ describe("formularios · diseño", () => {
 });
 
 describe("SolicitudCard · diseño", () => {
-  test("la tarjeta aparece con opacidad y no con transform", () => {
-    const keyframes = tarjeta.slice(tarjeta.indexOf("@keyframes solicitud-entra"));
-
-    expect(tarjeta).toContain("animation: solicitud-entra");
-    expect(keyframes.slice(0, 80)).toContain("opacity: 0");
-    expect(keyframes.slice(0, 80)).not.toContain("transform");
+  test("la entrada, la elevación al pasar el ratón y reducir movimiento vienen de la clase global", () => {
+    // La animación, la sombra y el reducir movimiento están en base.css (probados en pantallaCristal.spec.js)
+    expect(tarjeta).toContain('class="solicitudes__card tarjeta-cristal"');
+    expect(base).toContain("animation: tarjeta-entra");
+    expect(base).toContain("box-shadow: var(--shadow-card-hover)");
   });
 
-  test("al pasar el ratón sube y gana sombra", () => {
-    expect(tarjeta).toContain("box-shadow: var(--shadow-card-hover)");
+  test("la tarjeta no usa cosas que romperían la ventana de detalles de dentro", () => {
+    expect(tarjeta).toContain("backdrop-filter: none");
+    expect(tarjeta).toContain("overflow: visible");
   });
 
-  test("con reducir movimiento se apaga la animación", () => {
-    const bloque = tarjeta.slice(tarjeta.indexOf("@media (prefers-reduced-motion: reduce)"));
+  test("con la ventana abierta la tarjeta no se mueve", () => {
+    const bloque = tarjeta.slice(tarjeta.indexOf(".solicitudes__card.solicitudes__card--abierta"));
 
-    expect(bloque).toContain("animation: none");
+    expect(bloque.slice(0, 250)).toContain("transform: none");
   });
 });
 
