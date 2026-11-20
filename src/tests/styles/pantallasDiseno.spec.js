@@ -32,6 +32,26 @@ describe("pantallas · diseño", () => {
     expect(bloque).not.toContain("isolation");
   });
 
+  test("las tarjetas tienen un velo de color propio que se define con --tinte-tarjeta", () => {
+    expect(base).toContain("var(--tinte-tarjeta, transparent)");
+  });
+
+  test("cada estado de solicitud e historial tiene su velo de color y su icono", () => {
+    const solicitud = readFileSync("src/components/SolicitudCard.vue", "utf-8");
+
+    expect(solicitud.match(/--tinte-tarjeta:/g).length).toBe(4);
+    expect(solicitud).toContain('content: "⏳ "');
+    expect(solicitud).toContain('content: "✔ "');
+    expect(historial.match(/--tinte-tarjeta:/g).length).toBe(2);
+    expect(historial).toContain('content: "🎉 "');
+  });
+
+  test("Mi perfil tiene avatar con degradado y botón de cerrar sesión con color", () => {
+    expect(miPerfil).toContain("@keyframes avatar-entra");
+    expect(miPerfil).toContain("linear-gradient(135deg, var(--color-accent)");
+    expect(miPerfil).toContain(".mi-perfil__acciones .btn--secondary:hover");
+  });
+
   test("el historial usa el fondo y las tarjetas de cristal globales", () => {
     expect(historial).toContain('class="historial pantalla"');
     expect(historial).toContain('class="historial__card tarjeta-cristal"');
