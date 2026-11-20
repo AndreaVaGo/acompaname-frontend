@@ -83,3 +83,26 @@ describe("NavBar · diseño", () => {
     expect(bloque).toContain(".navbar__logo:hover .navbar__logo-icon");
   });
 });
+
+describe("NavBar · el nombre de la marca", () => {
+  test("el nombre va en la fuente de los títulos y con un tamaño que se ve", () => {
+    const bloque = archivo.slice(archivo.indexOf(".navbar__logo {"), archivo.indexOf(".navbar__logo-icon {"));
+
+    expect(bloque).toContain("font-family: var(--font-display)");
+    expect(bloque).toContain("font-size: 1.6rem");
+  });
+
+  test("el círculo y el corazón crecen con el nombre", () => {
+    const bloque = archivo.slice(archivo.indexOf(".navbar__logo-icon {"), archivo.indexOf(".navbar__logo-icon {") + 200);
+
+    expect(bloque).toContain("width: 46px");
+    expect(archivo).toContain(".navbar__logo-icon svg");
+  });
+
+  test("en el móvil el nombre es un poco más pequeño", () => {
+    const movil = archivo.slice(archivo.indexOf("@media (max-width: 768px)"));
+
+    expect(movil.slice(0, 80)).toContain(".navbar__logo");
+    expect(movil).toContain("font-size: 1.4rem");
+  });
+});
