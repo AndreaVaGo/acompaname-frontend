@@ -8,7 +8,7 @@ import fotoManos from "@/assets/hero-manos.jpg";
 </script>
 
 <template>
-  <div class="pantalla-foto">
+  <div class="pantalla-foto pantalla">
     <aside class="pantalla-foto__panel" aria-hidden="true" data-testid="panel-foto">
       <div class="pantalla-foto__marco">
         <img
@@ -44,7 +44,6 @@ import fotoManos from "@/assets/hero-manos.jpg";
   .pantalla-foto {
     display: grid;
     grid-template-columns: minmax(320px, 5fr) 7fr;
-    background-color: var(--color-bg);
   }
 
   .pantalla-foto__panel {
