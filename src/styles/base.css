@@ -150,9 +150,11 @@ h3 {
 
 /* Pantalla con el mismo fondo que la portada y que Buscar: manchas de color coral y verde
    que se desplazan muy despacio. Se pone la clase "pantalla" en el contenedor principal de la vista.
-   El fondo va fijo detrás de todo y no se puede pinchar (pointer-events: none) */
+   El fondo va fijo detrás de todo y no se puede pinchar (pointer-events: none).
+   No se usa "isolation" a propósito: así las ventanas emergentes (z-index alto) siguen
+   tapando también la barra de arriba. Por eso la vista no debe poner fondo propio en su contenedor */
 .pantalla {
-  isolation: isolate;
+  position: relative;
 }
 
 .pantalla::before {
