@@ -479,7 +479,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="calendario">
+  <div class="calendario pantalla">
     <div class="calendario__wrapper">
       <h1>Mi calendario</h1>
       <p class="calendario__subtitle">
@@ -488,7 +488,7 @@ onMounted(() => {
         que coincidan.
       </p>
 
-      <div class="calendario__box">
+      <div class="calendario__box tarjeta-cristal">
         <CalendarioMensual
           :marcas="marcas"
           :seleccionado="diaSeleccionado"
@@ -496,7 +496,7 @@ onMounted(() => {
         />
       </div>
 
-      <section class="calendario__detalle" aria-live="polite">
+      <section class="calendario__detalle tarjeta-cristal" aria-live="polite">
         <header class="calendario__cabecera-dia">
           <button
             type="button"
@@ -579,7 +579,7 @@ onMounted(() => {
         </button>
       </section>
 
-      <div class="calendario__box calendario__box--formulario">
+      <div class="calendario__box calendario__box--formulario tarjeta-cristal">
         <form class="formulario calendario__form" @submit.prevent="guardarBloque">
           <h2 class="titulo-seccion" data-icono="📅">Añadir un rato ocupado</h2>
 
@@ -665,7 +665,7 @@ onMounted(() => {
         </form>
       </div>
 
-      <div class="calendario__box calendario__box--formulario">
+      <div class="calendario__box calendario__box--formulario tarjeta-cristal">
         <section class="formulario calendario__importar">
           <h2 class="titulo-seccion" data-icono="📥">Importar desde otro calendario</h2>
           <p class="calendario__ayuda">
@@ -699,7 +699,6 @@ onMounted(() => {
 <style scoped>
 .calendario {
   min-height: 100vh;
-  background-color: var(--color-bg);
   font-family: var(--font-base);
   color: var(--color-text);
   display: flex;
@@ -723,16 +722,24 @@ onMounted(() => {
   margin: 0 0 24px;
 }
 
+/* El cristal, la sombra y la entrada vienen de la clase global tarjeta-cristal */
 .calendario__box {
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
-  border-top: 4px solid var(--color-accent);
-  box-shadow: var(--shadow-card);
-  overflow: hidden;
+  --borde-tarjeta: var(--color-accent);
+  padding: 0;
 }
 
 .calendario__box--formulario {
   margin-top: 32px;
+}
+
+/* Las tarjetas con formulario no se levantan al pasar el ratón: se está escribiendo dentro */
+.calendario__box--formulario:hover {
+  transform: none;
+  box-shadow: var(--shadow-card);
+}
+
+.calendario__box--formulario::after {
+  display: none;
 }
 
 /* Etiquetas, campos y títulos de sección vienen de base.css (clases "formulario" y "titulo-seccion") */
@@ -878,10 +885,8 @@ onMounted(() => {
 .calendario__detalle {
   margin-top: 20px;
   padding: 20px 24px 24px;
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
-  border-top: 4px solid var(--color-accent);
-  box-shadow: var(--shadow-card);
+  --borde-tarjeta: var(--color-secondary);
+  --tinte-tarjeta: color-mix(in srgb, var(--color-secondary) 14%, transparent);
 }
 
 .calendario__cabecera-dia {
@@ -1015,16 +1020,29 @@ onMounted(() => {
   padding: 14px 18px;
 }
 
-/* Los servicios aceptados y los ratos ocupados llevan la misma franja; los distingue su etiqueta */
+/* Los servicios aceptados van en verde y los ratos ocupados en azul, para distinguirlos de un vistazo */
 .calendario__servicio {
   display: flex;
   flex-direction: column;
   gap: 2px;
   background-color: var(--color-white);
   border-radius: var(--radius-card);
-  border-left: 4px solid var(--color-info);
+  border-left: 4px solid var(--color-secondary);
   box-shadow: var(--shadow-card);
   padding: 14px 18px;
+}
+
+.calendario__servicio .calendario__tipo {
+  background-color: var(--color-secondary-bg);
+  color: var(--color-secondary);
+}
+
+.calendario__servicio .calendario__tipo::before {
+  content: "✔ ";
+}
+
+.calendario__bloque .calendario__tipo::before {
+  content: "⏸ ";
 }
 
 /* Etiqueta que dice qué es cada tarjeta: servicio aceptado o rato ocupado */
