@@ -101,7 +101,7 @@ async function handleSubmit() {
           Solo necesitamos cuatro datos para empezar.
         </p>
 
-        <div class="register__box">
+        <div class="register__box tarjeta-cristal">
           <div class="register__cabecera">
             <span class="register__icono">🌱</span>
             <span class="register__aviso"> Crea tu cuenta en un minuto. </span>
@@ -245,7 +245,6 @@ async function handleSubmit() {
 
 <style scoped>
 .register {
-  background-color: var(--color-bg);
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -270,12 +269,20 @@ async function handleSubmit() {
   margin: 0 0 24px;
 }
 
+/* El cristal, la sombra y la entrada vienen de la clase global tarjeta-cristal */
 .register__box {
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
-  border-top: 4px solid var(--color-accent);
+  --borde-tarjeta: var(--color-accent);
+  padding: 0;
+}
+
+/* Dentro hay un formulario: la tarjeta no se levanta ni brilla al pasar el ratón */
+.register__box:hover {
+  transform: none;
   box-shadow: var(--shadow-card);
-  overflow: hidden;
+}
+
+.register__box::after {
+  display: none;
 }
 
 /* Franja de color con un icono y un aviso corto */
@@ -284,7 +291,10 @@ async function handleSubmit() {
   align-items: center;
   gap: 16px;
   padding: 24px 32px;
-  background-color: var(--color-accent-bg);
+  background:
+    radial-gradient(circle at 10% 20%, rgba(242, 137, 107, 0.35), transparent 60%),
+    radial-gradient(circle at 90% 80%, rgba(46, 125, 91, 0.25), transparent 60%),
+    var(--color-accent-bg);
 }
 
 .register__icono {
