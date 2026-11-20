@@ -148,6 +148,102 @@ h3 {
   }
 }
 
+/* Pantalla con el mismo fondo que la portada y que Buscar: manchas de color coral y verde
+   que se desplazan muy despacio. Se pone la clase "pantalla" en el contenedor principal de la vista.
+   El fondo va fijo detrás de todo y no se puede pinchar (pointer-events: none) */
+.pantalla {
+  isolation: isolate;
+}
+
+.pantalla::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(242, 137, 107, 0.28), transparent 45%),
+    radial-gradient(circle at 88% 62%, rgba(46, 125, 91, 0.24), transparent 50%);
+  background-size: 130% 130%;
+  animation: pantalla-degradado 20s ease-in-out infinite alternate;
+}
+
+@keyframes pantalla-degradado {
+  from {
+    background-position: 0% 0%;
+  }
+  to {
+    background-position: 100% 100%;
+  }
+}
+
+/* Tarjeta de cristal, la misma de Buscar: casi blanca pero deja pasar un poco del fondo.
+   - La línea de arriba toma su color de la variable --borde-tarjeta (gris si no se define)
+   - Entra con un pequeño retraso según la variable --i (0, 1, 2...): se pone con :style en cada tarjeta
+   - Al pasar el ratón se eleva y deja un resplandor verde que sigue al puntero
+     (las variables --x e --y las guarda moverFoco, de utils/focoTarjeta.js, con @mousemove) */
+.tarjeta-cristal {
+  position: relative;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: var(--radius-card);
+  border: 1px solid transparent;
+  border-top: 4px solid var(--borde-tarjeta, var(--color-border));
+  padding: 22px;
+  box-shadow: var(--shadow-card);
+  animation: tarjeta-entra 0.5s var(--ease-out) backwards;
+  animation-delay: calc(var(--i, 0) * 60ms);
+  transition:
+    transform var(--dur-med) var(--ease-out),
+    box-shadow var(--dur-med) var(--ease-out);
+}
+
+@keyframes tarjeta-entra {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+.tarjeta-cristal::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    240px circle at var(--x, 50%) var(--y, 50%),
+    rgba(46, 125, 91, 0.12),
+    transparent 70%
+  );
+  transition: opacity var(--dur-med) var(--ease-out);
+}
+
+/* Solo en pantallas con ratón */
+@media (hover: hover) {
+  .tarjeta-cristal:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  .tarjeta-cristal:hover::after {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pantalla::before,
+  .tarjeta-cristal {
+    animation: none;
+    transition: none;
+  }
+
+  .tarjeta-cristal:hover {
+    transform: none;
+  }
+}
+
 /* Quien tiene activado "reducir movimiento" no ve ninguna animación ni transición */
 @media (prefers-reduced-motion: reduce) {
   *,
