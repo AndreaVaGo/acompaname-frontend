@@ -106,7 +106,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="chat">
+  <div class="chat pantalla">
     <RouterLink :to="volverA" class="chat__volver">← Volver a mis solicitudes</RouterLink>
 
     <header class="chat__header">
@@ -118,7 +118,7 @@ onBeforeUnmount(() => {
 
     <p v-if="cargando" class="chat__cargando">Cargando mensajes…</p>
 
-    <div v-else class="chat__caja">
+    <div v-else class="chat__caja tarjeta-cristal">
       <ul ref="lista" class="chat__mensajes" aria-live="polite" aria-label="Mensajes">
         <li v-if="mensajes.length === 0" class="chat__vacio">
           Todavía no hay mensajes. ¡Escribe el primero!
@@ -206,13 +206,22 @@ onBeforeUnmount(() => {
   color: var(--color-text-muted);
 }
 
+/* El cristal y la sombra vienen de la clase global tarjeta-cristal. En un chat la caja no debe
+   moverse ni brillar al pasar el ratón, porque se está escribiendo dentro */
 .chat__caja {
   display: flex;
   flex-direction: column;
-  background-color: rgba(255, 255, 255, 0.85);
-  border-radius: var(--radius-card);
+  padding: 0;
+  --borde-tarjeta: var(--color-secondary);
+}
+
+.chat__caja:hover {
+  transform: none;
   box-shadow: var(--shadow-card);
-  overflow: hidden;
+}
+
+.chat__caja::after {
+  display: none;
 }
 
 .chat__mensajes {
@@ -247,9 +256,10 @@ onBeforeUnmount(() => {
 
 .chat__mensaje--mio {
   align-self: flex-end;
-  background-color: var(--color-accent-bg);
+  background: linear-gradient(135deg, var(--color-accent-bg), rgba(242, 137, 107, 0.28));
   border-color: var(--color-accent);
   border-radius: 16px 16px 4px 16px;
+  box-shadow: 0 2px 6px rgba(242, 137, 107, 0.2);
 }
 
 .chat__autor {
