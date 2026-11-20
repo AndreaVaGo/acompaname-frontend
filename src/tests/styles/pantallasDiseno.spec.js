@@ -12,9 +12,24 @@ describe("pantallas · diseño", () => {
     expect(base).toContain("@keyframes entra-sube");
   });
 
-  test("los perfiles usan la entrada global", () => {
-    expect(miPerfil).toContain("animation: entra-sube");
-    expect(perfilCuidador.match(/animation: entra-sube/g).length).toBe(2);
+  test("los perfiles usan el fondo y las tarjetas de cristal globales", () => {
+    expect(miPerfil).toContain('class="mi-perfil pantalla"');
+    expect(miPerfil).toContain('class="mi-perfil__box tarjeta-cristal"');
+    expect(perfilCuidador).toContain('class="perfil pantalla"');
+    expect(perfilCuidador).toContain('class="perfil__info tarjeta-cristal"');
+    expect(perfilCuidador).toContain('class="perfil__sidebar tarjeta-cristal"');
+    expect(perfilCuidador).not.toContain("animation: entra-sube");
+  });
+
+  test("la disponibilidad se marca con el color del borde de la tarjeta", () => {
+    expect(perfilCuidador).toContain("--borde-tarjeta: var(--color-secondary)");
+    expect(perfilCuidador).toContain("--borde-tarjeta: var(--color-error)");
+  });
+
+  test("el fondo de pantalla no aísla las ventanas emergentes de la barra de arriba", () => {
+    const bloque = base.slice(base.indexOf(".pantalla {"), base.indexOf(".pantalla::before"));
+
+    expect(bloque).not.toContain("isolation");
   });
 
   test("el historial usa el fondo y las tarjetas de cristal globales", () => {
