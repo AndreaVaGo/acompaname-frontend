@@ -135,7 +135,6 @@ const avisoDireccion = computed(
         <div class="solicitudes__modal-top" v-if="mostrarAcciones">
           <div>
             <h3>{{ nombreMostrado }}</h3>
-            <p class="solicitudes__paciente">{{ nombresDePersonas(solicitud) }}</p>
           </div>
           <button
             class="solicitudes__cerrar"
