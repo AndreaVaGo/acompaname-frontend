@@ -349,20 +349,31 @@ const avisoDireccion = computed(
 }
 
 /* El color de la línea de arriba cambia según el estado de la solicitud */
+/* Además de la línea de arriba, cada estado tiene su velo de color, para distinguirlas de un vistazo */
 .solicitudes__card--pendiente {
   --borde-tarjeta: var(--color-accent);
+  --tinte-tarjeta: color-mix(in srgb, var(--color-accent) 18%, transparent);
 }
 
 .solicitudes__card--aceptada {
   --borde-tarjeta: var(--color-secondary);
+  --tinte-tarjeta: color-mix(in srgb, var(--color-secondary) 18%, transparent);
 }
 
 .solicitudes__card--completada {
   --borde-tarjeta: var(--color-info);
+  --tinte-tarjeta: color-mix(in srgb, var(--color-info) 16%, transparent);
 }
 
 .solicitudes__card--rechazada {
   --borde-tarjeta: var(--color-border);
+  --tinte-tarjeta: color-mix(in srgb, var(--color-text-muted) 12%, transparent);
+}
+
+/* Las rechazadas se ven apagadas: ya no hay nada que hacer con ellas */
+.solicitudes__card--rechazada .solicitudes__card-top h3,
+.solicitudes__card--rechazada .solicitudes__paciente {
+  color: var(--color-text-muted);
 }
 
 /* Una tarjeta con "transform" hace que la ventana de dentro (position: fixed) se coloque
@@ -389,11 +400,13 @@ const avisoDireccion = computed(
   }
 }
 
+/* La etiqueta de estado lleva un icono (puesto con CSS, así el texto sigue siendo solo el estado) */
 .solicitudes__estado {
-  padding: 4px 12px;
+  padding: 5px 14px;
   border-radius: var(--radius-pill);
   font-size: 0.8rem;
   font-weight: bold;
+  border: 1px solid currentColor;
 }
 
 .solicitudes__estado--pendiente {
@@ -401,9 +414,17 @@ const avisoDireccion = computed(
   color: var(--color-accent-dark);
 }
 
+.solicitudes__estado--pendiente::before {
+  content: "⏳ ";
+}
+
 .solicitudes__estado--aceptada {
   background-color: var(--color-secondary-bg);
   color: var(--color-secondary);
+}
+
+.solicitudes__estado--aceptada::before {
+  content: "✔ ";
 }
 
 .solicitudes__estado--completada {
@@ -411,9 +432,17 @@ const avisoDireccion = computed(
   color: var(--color-info);
 }
 
+.solicitudes__estado--completada::before {
+  content: "🎉 ";
+}
+
 .solicitudes__estado--rechazada {
   background-color: var(--color-neutral-bg);
   color: var(--color-text-muted);
+}
+
+.solicitudes__estado--rechazada::before {
+  content: "✕ ";
 }
 
 .solicitudes__paciente {
