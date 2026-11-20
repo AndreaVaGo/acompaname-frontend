@@ -262,9 +262,11 @@ async function cargarServicios() {
 // Cuándo es el servicio: un solo día ("10-09-2026 · 09:00 - 12:00") o varios días ("10-09-2026 · 22:00 → 12-09-2026 · 08:00")
 function cuandoEs(servicio) {
   if (servicio.fechaFin && servicio.fechaFin !== servicio.fechaCuidado) {
+    // Un salto de línea entre el inicio y el fin (se ve gracias a white-space: pre-line)
     return (
+      "Desde " +
       formatearMomento(servicio.fechaCuidado, servicio.horaInicio) +
-      " → " +
+      "\nhasta " +
       formatearMomento(servicio.fechaFin, servicio.horaFin)
     );
   }
@@ -1067,8 +1069,10 @@ onMounted(() => {
   gap: 2px;
 }
 
+/* pre-line hace que el salto de línea entre el inicio y el fin de un servicio de varios días se vea */
 .calendario__bloque-fecha {
   font-weight: bold;
+  white-space: pre-line;
 }
 
 .calendario__bloque-motivo {
