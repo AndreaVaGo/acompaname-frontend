@@ -308,7 +308,7 @@ async function eliminarValoracion(id) {
 </script>
 
 <template>
-  <div class="admin">
+  <div class="admin pantalla">
     <header>
       <h1>Panel de administración</h1>
       <p class="admin__subtitulo">Resumen de la actividad de Acompáñame.</p>
