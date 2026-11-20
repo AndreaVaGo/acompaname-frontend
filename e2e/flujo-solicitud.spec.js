@@ -94,7 +94,8 @@ test("la familia solicita, el cuidador acepta y completa, y la familia paga", as
   await expect(page.getByText("Pendiente de pagar")).toBeVisible();
   await expect(page.getByRole("heading", { name: nombreCuidador })).toBeVisible();
   await page.getByRole("link", { name: "Pagar" }).click();
-  await expect(page.getByText("Importe: 18")).toBeVisible();
+  // 3 horas (de 09:00 a 12:00) a 18 € la hora
+  await expect(page.getByText("Importe: 54")).toBeVisible();
   await page.fill("#numero", "4242424242424242");
   await page.fill("#nombre", "Ana Flujo");
   await page.fill("#caducidad", "12/30");
