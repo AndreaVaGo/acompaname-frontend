@@ -143,7 +143,7 @@ async function guardar() {
 </script>
 
 <template>
-  <div class="editar">
+  <div class="editar pantalla">
     <div class="editar__wrapper">
       <h1>Mi perfil profesional</h1>
       <p class="editar__subtitle">
@@ -152,7 +152,7 @@ async function guardar() {
 
       <p v-if="guardado" class="editar__ok">Perfil guardado correctamente.</p>
 
-      <div class="editar__box">
+      <div class="editar__box tarjeta-cristal">
         <p v-if="cargando" class="editar__cargando">Cargando tu perfil...</p>
 
         <form v-if="perfil" class="editar__form" @submit.prevent="guardar">
@@ -399,7 +399,6 @@ async function guardar() {
 <style scoped>
 .editar {
   min-height: 100vh;
-  background-color: var(--color-bg);
   font-family: var(--font-base);
   color: var(--color-text);
   display: flex;
@@ -423,12 +422,20 @@ async function guardar() {
   margin: 0 0 24px;
 }
 
+/* El cristal, la sombra y la entrada vienen de la clase global tarjeta-cristal */
 .editar__box {
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
-  border-top: 4px solid var(--color-accent);
+  --borde-tarjeta: var(--color-accent);
+  padding: 0;
+}
+
+/* Dentro hay un formulario: la tarjeta no se levanta ni brilla al pasar el ratón */
+.editar__box:hover {
+  transform: none;
   box-shadow: var(--shadow-card);
-  overflow: hidden;
+}
+
+.editar__box::after {
+  display: none;
 }
 
 .editar__cargando {
