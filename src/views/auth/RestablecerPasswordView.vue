@@ -56,14 +56,14 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <div class="restablecer">
+  <div class="restablecer pantalla">
     <div class="restablecer__wrapper">
       <h1>Elige una contraseña nueva</h1>
       <p class="restablecer__subtitle">
         Es el último paso para volver a entrar.
       </p>
 
-      <div class="restablecer__box">
+      <div class="restablecer__box tarjeta-cristal">
         <div class="restablecer__cabecera">
           <span class="restablecer__icono">🔒</span>
           <span class="restablecer__aviso">
@@ -134,7 +134,6 @@ async function handleSubmit() {
 
 <style scoped>
 .restablecer {
-  background-color: var(--color-bg);
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -159,12 +158,20 @@ async function handleSubmit() {
   margin: 0 0 24px;
 }
 
+/* El cristal, la sombra y la entrada vienen de la clase global tarjeta-cristal */
 .restablecer__box {
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
-  border-top: 4px solid var(--color-accent);
+  --borde-tarjeta: var(--color-accent);
+  padding: 0;
+}
+
+/* Dentro hay un formulario: la tarjeta no se levanta ni brilla al pasar el ratón */
+.restablecer__box:hover {
+  transform: none;
   box-shadow: var(--shadow-card);
-  overflow: hidden;
+}
+
+.restablecer__box::after {
+  display: none;
 }
 
 .restablecer__cabecera {
@@ -172,7 +179,10 @@ async function handleSubmit() {
   align-items: center;
   gap: 16px;
   padding: 24px 32px;
-  background-color: var(--color-accent-bg);
+  background:
+    radial-gradient(circle at 10% 20%, rgba(242, 137, 107, 0.35), transparent 60%),
+    radial-gradient(circle at 90% 80%, rgba(46, 125, 91, 0.25), transparent 60%),
+    var(--color-accent-bg);
 }
 
 .restablecer__icono {
