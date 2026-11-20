@@ -28,12 +28,12 @@ const valoracion = computed(() => {
 
 <template>
   <section class="admin-tarjetas">
-    <div class="admin-tarjetas__tarjeta admin-tarjetas__tarjeta--verde">
+    <div class="admin-tarjetas__tarjeta tarjeta-cristal admin-tarjetas__tarjeta--verde">
       <div class="admin-tarjetas__nombre">Familias</div>
       <div class="admin-tarjetas__numero">{{ estadisticas.totalFamilias }}</div>
     </div>
 
-    <div class="admin-tarjetas__tarjeta admin-tarjetas__tarjeta--coral">
+    <div class="admin-tarjetas__tarjeta tarjeta-cristal admin-tarjetas__tarjeta--coral">
       <div class="admin-tarjetas__nombre">Personas cuidadoras</div>
       <div class="admin-tarjetas__numero">{{ estadisticas.totalCuidadores }}</div>
       <div class="admin-tarjetas__detalle">
@@ -41,19 +41,19 @@ const valoracion = computed(() => {
       </div>
     </div>
 
-    <div class="admin-tarjetas__tarjeta admin-tarjetas__tarjeta--azul">
+    <div class="admin-tarjetas__tarjeta tarjeta-cristal admin-tarjetas__tarjeta--azul">
       <div class="admin-tarjetas__nombre">Solicitudes</div>
       <div class="admin-tarjetas__numero">{{ totalSolicitudes }}</div>
     </div>
 
-    <div class="admin-tarjetas__tarjeta admin-tarjetas__tarjeta--verde">
+    <div class="admin-tarjetas__tarjeta tarjeta-cristal admin-tarjetas__tarjeta--verde">
       <div class="admin-tarjetas__nombre">Ingresos cobrados</div>
       <div class="admin-tarjetas__numero">
         {{ formatearEuros(estadisticas.ingresosCobrados) }}
       </div>
     </div>
 
-    <div class="admin-tarjetas__tarjeta admin-tarjetas__tarjeta--coral">
+    <div class="admin-tarjetas__tarjeta tarjeta-cristal admin-tarjetas__tarjeta--coral">
       <div class="admin-tarjetas__nombre">Valoración media</div>
       <div class="admin-tarjetas__numero">
         {{ valoracion }}
@@ -74,19 +74,20 @@ const valoracion = computed(() => {
 
 .admin-tarjetas__tarjeta {
   flex: 1 1 200px;
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
-  border-left: 6px solid var(--color-secondary);
+  /* El cristal, la sombra y la entrada vienen de la clase global tarjeta-cristal */
+  --borde-tarjeta: var(--color-secondary);
+  --tinte-tarjeta: color-mix(in srgb, var(--color-secondary) 14%, transparent);
   padding: 20px 22px;
-  box-shadow: var(--shadow-card);
 }
 
 .admin-tarjetas__tarjeta--coral {
-  border-left-color: var(--color-accent);
+  --borde-tarjeta: var(--color-accent);
+  --tinte-tarjeta: color-mix(in srgb, var(--color-accent) 16%, transparent);
 }
 
 .admin-tarjetas__tarjeta--azul {
-  border-left-color: var(--color-info);
+  --borde-tarjeta: var(--color-info);
+  --tinte-tarjeta: color-mix(in srgb, var(--color-info) 14%, transparent);
 }
 
 .admin-tarjetas__nombre {
