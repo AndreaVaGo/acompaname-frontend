@@ -221,10 +221,13 @@ function descripcionDe(celda) {
   margin-bottom: 12px;
 }
 
+/* El mes va en coral y con la primera letra en mayúscula */
 .calendario-mensual__titulo {
   margin: 0;
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   text-align: center;
+  color: var(--color-accent-dark);
+  text-transform: capitalize;
 }
 
 .calendario-mensual__flecha {
@@ -237,10 +240,16 @@ function descripcionDe(celda) {
   font-size: 1.5rem;
   line-height: 1;
   cursor: pointer;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
 }
 
 .calendario-mensual__flecha:hover {
-  background-color: var(--color-accent-bg);
+  background-color: var(--color-accent);
+  color: var(--color-white);
+  transform: scale(1.1);
 }
 
 .calendario-mensual__semana,
@@ -273,6 +282,18 @@ function descripcionDe(celda) {
   font-family: inherit;
   font-size: 0.95rem;
   cursor: pointer;
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+
+/* Al pasar el ratón el día se levanta un poco */
+@media (hover: hover) {
+  .calendario-mensual__dia:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card);
+  }
 }
 
 /* Día libre: verde suave de la paleta */
@@ -325,13 +346,26 @@ function descripcionDe(celda) {
   color: var(--color-text-muted);
 }
 
+/* Hoy: el número va en un círculo coral */
 .calendario-mensual__dia--hoy {
   border-color: var(--color-accent);
   font-weight: bold;
 }
 
+.calendario-mensual__dia--hoy .calendario-mensual__numero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background-color: var(--color-accent);
+  color: var(--color-white);
+}
+
 /* El día abierto lleva un aro grueso, así no pierde el color que tenga */
-.calendario-mensual__dia--seleccionado {
+.calendario-mensual__dia--seleccionado,
+.calendario-mensual__dia--seleccionado:hover {
   box-shadow: 0 0 0 3px var(--color-accent);
   font-weight: bold;
 }
@@ -414,7 +448,8 @@ function descripcionDe(celda) {
 }
 
 .calendario-mensual__hoy:hover {
-  background-color: var(--color-accent-bg);
+  background-color: var(--color-accent);
+  color: var(--color-white);
 }
 
 @media (max-width: 768px) {
