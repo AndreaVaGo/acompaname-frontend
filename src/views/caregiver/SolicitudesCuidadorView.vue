@@ -4,6 +4,7 @@ import SolicitudCard from "../../components/SolicitudCard.vue";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
 import MensajeRepository from "@/repositories/MensajeRepository";
 import { mensajeDeError } from "@/utils/mensajeDeError";
+import { moverFoco } from "@/utils/focoTarjeta";
 
 const solicitudRepository = new SolicitudRepository();
 const mensajeRepository = new MensajeRepository();
@@ -73,7 +74,7 @@ async function completar(id) {
 </script>
 
 <template>
-  <div class="solicitudes">
+  <div class="solicitudes pantalla">
     <header class="solicitudes__header">
       <h1>Solicitudes recibidas</h1>
       <p>Solicitudes que las familias te han enviado.</p>
@@ -83,8 +84,10 @@ async function completar(id) {
 
     <div class="solicitudes__grid">
       <SolicitudCard
-        v-for="solicitud in solicitudes"
+        v-for="(solicitud, indice) in solicitudes"
         :key="solicitud.id"
+        :style="{ '--i': Math.min(indice, 8) }"
+        @mousemove="moverFoco"
         :solicitud="solicitud"
         :nombreMostrado="solicitud.familiaNombre"
         :mostrarAcciones="true"
@@ -99,7 +102,6 @@ async function completar(id) {
 <style scoped>
 .solicitudes {
   min-height: 100vh;
-  background-color: var(--color-bg);
   font-family: var(--font-base);
   color: var(--color-text);
   padding: var(--gap-lg) 60px;
