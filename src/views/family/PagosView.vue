@@ -8,6 +8,7 @@ import { formatearFecha } from "@/utils/formatearFecha";
 import { nombreTipo } from "@/utils/nombreTipo";
 import { textoDesglose } from "@/utils/desglosePago";
 import { mensajeDeError } from "@/utils/mensajeDeError";
+import { moverFoco } from "@/utils/focoTarjeta";
 
 const pagoRepository = new PagoRepository();
 const pagos = ref([]);
@@ -71,7 +72,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="pagos">
+  <div class="pagos pantalla">
     <header class="pagos__header">
       <h1>Mis pagos</h1>
       <p>Todos tus pagos en un solo sitio.</p>
@@ -82,7 +83,7 @@ onMounted(async () => {
     <p v-if="cargando" class="pagos__cargando">Cargando pagos…</p>
 
     <template v-else-if="!error">
-      <div v-if="pagos.length === 0" class="pagos__vacio">
+      <div v-if="pagos.length === 0" class="pagos__vacio tarjeta-cristal">
         <span class="pagos__vacio-icono" aria-hidden="true">🧾</span>
         <p>Todavía no tienes pagos.</p>
         <p>
@@ -96,14 +97,17 @@ onMounted(async () => {
 
       <template v-else>
         <div class="pagos__totales">
-          <div class="pagos__total pagos__total--pendiente">
+          <div class="pagos__total pagos__total--pendiente tarjeta-cristal">
             <span class="pagos__total-nombre">Pendiente de pagar</span>
             <strong class="pagos__total-importe">{{
               formatearEuros(totalPendiente)
             }}</strong>
             <span class="pagos__total-texto">{{ textoPendientes }}</span>
           </div>
-          <div class="pagos__total pagos__total--pagado">
+          <div
+            class="pagos__total pagos__total--pagado tarjeta-cristal"
+            :style="{ '--i': 1 }"
+          >
             <span class="pagos__total-nombre">Total pagado</span>
             <strong class="pagos__total-importe">{{
               formatearEuros(totalPagado)
@@ -114,10 +118,12 @@ onMounted(async () => {
 
         <ul class="pagos__lista">
           <li
-            v-for="pago in pagosOrdenados"
+            v-for="(pago, indice) in pagosOrdenados"
             :key="pago.id"
-            class="pagos__tarjeta"
+            class="pagos__tarjeta tarjeta-cristal"
             :class="'pagos__tarjeta--' + pago.estado.toLowerCase()"
+            :style="{ '--i': Math.min(indice + 2, 8) }"
+            @mousemove="moverFoco"
           >
             <span class="pagos__avatar" aria-hidden="true">{{
               iconoDe(pago)
@@ -164,7 +170,6 @@ onMounted(async () => {
 <style scoped>
 .pagos {
   min-height: 100vh;
-  background-color: var(--color-bg);
   font-family: var(--font-base);
   color: var(--color-text);
   padding: var(--gap-lg) 60px;
@@ -204,10 +209,8 @@ onMounted(async () => {
   margin-bottom: 8px;
 }
 
+/* El aspecto de cristal viene de la clase global "tarjeta-cristal" (base.css) */
 .pagos__vacio {
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
   padding: 32px;
   text-align: center;
 
@@ -233,20 +236,18 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
   padding: 24px 28px;
 }
 
-/* El pendiente es lo importante: fondo de acento y número grande */
+/* El pendiente es lo importante: fondo de acento (algo transparente, como el cristal) y número grande */
 .pagos__total--pendiente {
-  background-color: var(--color-accent-bg);
-  border: 2px solid var(--color-accent);
+  --borde-tarjeta: var(--color-accent);
+  background-color: rgba(251, 224, 214, 0.85);
 }
 
 .pagos__total--pagado {
-  background-color: var(--color-secondary-bg);
-  border: 2px solid transparent;
+  --borde-tarjeta: var(--color-secondary);
+  background-color: rgba(214, 240, 224, 0.85);
 }
 
 .pagos__total-nombre {
@@ -283,26 +284,17 @@ onMounted(async () => {
   align-items: center;
   flex-wrap: wrap;
   gap: 16px;
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
-  border: 2px solid transparent;
-  box-shadow: var(--shadow-card);
   padding: 18px 24px;
-  transition:
-    transform var(--dur-med) var(--ease-out),
-    box-shadow var(--dur-med) var(--ease-out);
 }
 
-/* Al pasar el ratón la tarjeta sube un poco */
-.pagos__tarjeta:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-card-hover);
-}
-
-/* Los pendientes se distinguen de un vistazo: borde de acento y fondo suave */
+/* Los pendientes se distinguen de un vistazo: línea de acento y fondo suave */
 .pagos__tarjeta--pendiente {
-  border-color: var(--color-accent);
-  background-color: var(--color-accent-bg);
+  --borde-tarjeta: var(--color-accent);
+  background-color: rgba(251, 224, 214, 0.85);
+}
+
+.pagos__tarjeta--completado {
+  --borde-tarjeta: var(--color-secondary);
 }
 
 .pagos__tarjeta--cancelado {
@@ -396,16 +388,6 @@ onMounted(async () => {
 .pagos__estado--cancelado {
   background-color: var(--color-neutral-bg);
   color: var(--color-text-muted);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .pagos__tarjeta {
-    transition: none;
-  }
-
-  .pagos__tarjeta:hover {
-    transform: none;
-  }
 }
 
 @media (max-width: 768px) {
