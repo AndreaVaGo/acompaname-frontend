@@ -37,14 +37,14 @@ async function enviarSugerencia() {
 </script>
 
 <template>
-  <div class="sugerencia">
+  <div class="sugerencia pantalla">
     <div class="sugerencia__wrapper">
       <h1>Enviar una sugerencia</h1>
       <p class="sugerencia__subtitle">
         Cuéntanos qué cambiarías o qué te gustaría encontrar en Acompáñame.
       </p>
 
-      <div class="sugerencia__box">
+      <div class="sugerencia__box tarjeta-cristal">
         <div class="sugerencia__cabecera">
           <span class="sugerencia__icono">💡</span>
           <span class="sugerencia__aviso">
@@ -82,7 +82,6 @@ async function enviarSugerencia() {
 <style scoped>
 .sugerencia {
   min-height: 100vh;
-  background-color: var(--color-bg);
   font-family: var(--font-base);
   color: var(--color-text);
   display: flex;
@@ -106,12 +105,20 @@ async function enviarSugerencia() {
   margin: 0 0 24px;
 }
 
+/* El cristal, la sombra y la entrada vienen de la clase global tarjeta-cristal */
 .sugerencia__box {
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
-  border-top: 4px solid var(--color-accent);
+  --borde-tarjeta: var(--color-accent);
+  padding: 0;
+}
+
+/* Dentro hay un formulario: la tarjeta no se levanta ni brilla al pasar el ratón */
+.sugerencia__box:hover {
+  transform: none;
   box-shadow: var(--shadow-card);
-  overflow: hidden;
+}
+
+.sugerencia__box::after {
+  display: none;
 }
 
 /* Franja de color con un icono y un aviso corto */
@@ -120,7 +127,10 @@ async function enviarSugerencia() {
   align-items: center;
   gap: 16px;
   padding: 24px 32px;
-  background-color: var(--color-accent-bg);
+  background:
+    radial-gradient(circle at 10% 20%, rgba(242, 137, 107, 0.35), transparent 60%),
+    radial-gradient(circle at 90% 80%, rgba(46, 125, 91, 0.25), transparent 60%),
+    var(--color-accent-bg);
 }
 
 .sugerencia__icono {
