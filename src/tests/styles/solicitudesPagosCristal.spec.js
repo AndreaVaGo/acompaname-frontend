@@ -64,3 +64,26 @@ describe("pagos · diseño de cristal", () => {
     expect(pagos).toContain("--borde-tarjeta: var(--color-accent)");
   });
 });
+
+describe("ventana de detalles de la solicitud · botones de cerrar", () => {
+  test("la X de arriba es un círculo coral que gira al pasar el ratón", () => {
+    const bloque = tarjeta.slice(tarjeta.indexOf(".solicitudes__cerrar:hover"));
+
+    expect(tarjeta).toContain("border-radius: 50%");
+    expect(bloque.slice(0, 150)).toContain("background-color: var(--color-accent)");
+    expect(bloque.slice(0, 150)).toContain("rotate(90deg)");
+  });
+
+  test("el botón Cerrar de abajo tiene borde coral y se rellena al pasar el ratón", () => {
+    const base = tarjeta.slice(tarjeta.indexOf(".solicitudes__cerrar-btn {"));
+    const hover = tarjeta.slice(tarjeta.indexOf(".solicitudes__cerrar-btn:hover"));
+
+    expect(base.slice(0, 300)).toContain("border: 2px solid var(--color-accent)");
+    expect(hover.slice(0, 150)).toContain("background-color: var(--color-accent)");
+  });
+
+  test("la ventana lleva una línea coral arriba y entra suavemente", () => {
+    expect(tarjeta).toContain("@keyframes ventana-entra");
+    expect(tarjeta).toContain("animation: ventana-entra");
+  });
+});
