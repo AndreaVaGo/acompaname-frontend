@@ -38,11 +38,11 @@ function cerrarSesion() {
 </script>
 
 <template>
-  <div class="mi-perfil" v-if="usuario">
+  <div class="mi-perfil pantalla" v-if="usuario">
     <h1>Mi perfil</h1>
     <p class="mi-perfil__subtitle">Tus datos de contacto.</p>
 
-    <div class="mi-perfil__box">
+    <div class="mi-perfil__box tarjeta-cristal">
       <div class="mi-perfil__cabecera">
         <span class="mi-perfil__avatar">{{ inicial }}</span>
         <h2>{{ usuario.nombre }}</h2>
@@ -74,7 +74,6 @@ function cerrarSesion() {
 <style scoped>
 .mi-perfil {
   min-height: 100vh;
-  background-color: var(--color-bg);
   font-family: var(--font-base);
   color: var(--color-text);
   padding: var(--gap-lg) 20px;
@@ -94,13 +93,10 @@ function cerrarSesion() {
   margin-bottom: 24px;
 }
 
+/* El cristal, la sombra y la entrada vienen de la clase global tarjeta-cristal */
 .mi-perfil__box {
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
-  border-top: 4px solid var(--color-accent);
-  box-shadow: var(--shadow-card);
+  --borde-tarjeta: var(--color-accent);
   overflow: hidden;
-  animation: entra-sube 0.5s var(--ease-out) backwards;
 }
 
 /* Franja de color con la inicial, el nombre y el tipo de cuenta */
