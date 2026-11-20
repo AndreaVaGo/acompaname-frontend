@@ -32,14 +32,14 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <div class="olvide">
+  <div class="olvide pantalla">
     <div class="olvide__wrapper">
       <h1>¿Has olvidado tu contraseña?</h1>
       <p class="olvide__subtitle">
         No pasa nada. Te mandamos un enlace para elegir una nueva.
       </p>
 
-      <div class="olvide__box">
+      <div class="olvide__box tarjeta-cristal">
         <div class="olvide__cabecera">
           <span class="olvide__icono">✉️</span>
           <span class="olvide__aviso">
@@ -90,7 +90,6 @@ async function handleSubmit() {
 
 <style scoped>
 .olvide {
-  background-color: var(--color-bg);
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -115,12 +114,20 @@ async function handleSubmit() {
   margin: 0 0 24px;
 }
 
+/* El cristal, la sombra y la entrada vienen de la clase global tarjeta-cristal */
 .olvide__box {
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
-  border-top: 4px solid var(--color-accent);
+  --borde-tarjeta: var(--color-accent);
+  padding: 0;
+}
+
+/* Dentro hay un formulario: la tarjeta no se levanta ni brilla al pasar el ratón */
+.olvide__box:hover {
+  transform: none;
   box-shadow: var(--shadow-card);
-  overflow: hidden;
+}
+
+.olvide__box::after {
+  display: none;
 }
 
 .olvide__cabecera {
@@ -128,7 +135,10 @@ async function handleSubmit() {
   align-items: center;
   gap: 16px;
   padding: 24px 32px;
-  background-color: var(--color-accent-bg);
+  background:
+    radial-gradient(circle at 10% 20%, rgba(242, 137, 107, 0.35), transparent 60%),
+    radial-gradient(circle at 90% 80%, rgba(46, 125, 91, 0.25), transparent 60%),
+    var(--color-accent-bg);
 }
 
 .olvide__icono {
