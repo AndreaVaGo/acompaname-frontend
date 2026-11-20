@@ -79,16 +79,22 @@ test.describe("Registro y login", () => {
     await expect(page).toHaveURL("/registro");
   });
 
-  test("cerrar sesión lleva al login", async ({ page }) => {
+  test("cerrar sesión lleva a la portada y quita el menú de la cuenta", async ({ page }) => {
     const familia = datosUsuario("Sara E2E", "familia");
     await registrar(page, familia);
     await iniciarSesion(page, familia.email, familia.password);
+    // Se espera a llegar a la portada antes de cerrar sesión: si no, el login
+    // todavía está redirigiendo y esa redirección pisa la del cierre de sesión
+    await expect(page).toHaveURL("/");
     await expect(page.getByRole("link", { name: "Buscar" })).toBeVisible();
 
     await page.getByRole("button", { name: "Abrir menú de mi cuenta" }).click();
     await page.getByRole("button", { name: "Cerrar sesión" }).click();
 
-    await expect(page).toHaveURL("/login");
+    // Al cerrar la sesión se vuelve a la portada, con los enlaces de visitante
+    await expect(page).toHaveURL("/");
+    await expect(page.getByRole("link", { name: "Iniciar sesión" }).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: "Buscar" })).toHaveCount(0);
   });
 
   test("el ojo enseña y oculta la contraseña en el login y en el registro", async ({
