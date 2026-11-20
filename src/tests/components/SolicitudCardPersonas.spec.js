@@ -178,3 +178,19 @@ describe('SolicitudCard: varias personas', () => {
     expect(wrapper.find('.solicitudes__grupo-persona').exists()).toBe(false)
   })
 })
+
+describe('SolicitudCard: ventana de detalles', () => {
+  test('el nombre de la persona a cuidar sale solo en su recuadro, no debajo de la cabecera', async () => {
+    const wrapper = montarTarjeta(
+      crearSolicitud({ personas: [{ nombre: 'Antonio', edad: 85 }] }),
+      true,
+    )
+
+    await wrapper.find('.solicitudes__ver').trigger('click')
+
+    const modal = wrapper.find('.solicitudes__modal')
+    expect(modal.find('.solicitudes__modal-top h3').text()).toBe('Familia Serrano')
+    expect(modal.find('.solicitudes__modal-top .solicitudes__paciente').exists()).toBe(false)
+    expect(modal.find('.solicitudes__lista-personas').text()).toContain('Antonio')
+  })
+})
