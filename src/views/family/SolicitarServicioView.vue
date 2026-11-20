@@ -225,7 +225,7 @@ async function enviarSolicitud() {
 </script>
 
 <template>
-  <div class="solicitar">
+  <div class="solicitar pantalla">
     <RouterLink :to="`/cuidador/${route.params.id}`" class="solicitar__back"
       >← Volver al perfil</RouterLink
     >
@@ -235,7 +235,7 @@ async function enviarSolicitud() {
       Cinco datos y listo. Puedes cambiarlos después hablando con la persona cuidadora.
     </p>
 
-    <div class="solicitar__box">
+    <div class="solicitar__box tarjeta-cristal">
       <div class="solicitar__cabecera">
         <span class="solicitar__icono">📝</span>
         <span class="solicitar__aviso">
@@ -503,7 +503,6 @@ async function enviarSolicitud() {
 <style scoped>
 .solicitar {
   min-height: 100vh;
-  background-color: var(--color-bg);
   font-family: var(--font-base);
   color: var(--color-text);
   padding: var(--gap-lg) 20px;
@@ -531,12 +530,20 @@ async function enviarSolicitud() {
   margin: 0 0 24px;
 }
 
+/* El cristal, la sombra y la entrada vienen de la clase global tarjeta-cristal */
 .solicitar__box {
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
-  border-top: 4px solid var(--color-accent);
+  --borde-tarjeta: var(--color-accent);
+  padding: 0;
+}
+
+/* Dentro hay un formulario: la tarjeta no se levanta ni brilla al pasar el ratón */
+.solicitar__box:hover {
+  transform: none;
   box-shadow: var(--shadow-card);
-  overflow: hidden;
+}
+
+.solicitar__box::after {
+  display: none;
 }
 
 /* Franja de color con un icono y un aviso corto */
@@ -545,7 +552,10 @@ async function enviarSolicitud() {
   align-items: center;
   gap: 16px;
   padding: 24px 32px;
-  background-color: var(--color-accent-bg);
+  background:
+    radial-gradient(circle at 10% 20%, rgba(242, 137, 107, 0.35), transparent 60%),
+    radial-gradient(circle at 90% 80%, rgba(46, 125, 91, 0.25), transparent 60%),
+    var(--color-accent-bg);
 }
 
 .solicitar__icono {
