@@ -48,14 +48,14 @@ async function enviarValoracion() {
 </script>
 
 <template>
-  <div class="valorar">
+  <div class="valorar pantalla">
     <div class="valorar__wrapper">
       <h1>Valorar a {{ cuidadorNombre }}</h1>
       <p class="valorar__subtitle">
         Tu opinión ayuda a otras familias a decidir.
       </p>
 
-      <div class="valorar__box">
+      <div class="valorar__box tarjeta-cristal">
         <div class="valorar__cabecera">
           <span class="valorar__icono">💬</span>
           <span class="valorar__aviso">
@@ -112,7 +112,6 @@ async function enviarValoracion() {
 <style scoped>
 .valorar {
   min-height: 100vh;
-  background-color: var(--color-bg);
   font-family: var(--font-base);
   color: var(--color-text);
   display: flex;
@@ -137,12 +136,10 @@ async function enviarValoracion() {
   margin: 0 0 24px;
 }
 
+/* El cristal, la sombra y la entrada vienen de la clase global tarjeta-cristal */
 .valorar__box {
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
-  border-top: 4px solid var(--color-accent);
-  box-shadow: var(--shadow-card);
-  overflow: hidden;
+  --borde-tarjeta: var(--color-accent);
+  padding: 0;
 }
 
 /* Franja de color con un icono y un aviso corto */
@@ -151,7 +148,10 @@ async function enviarValoracion() {
   align-items: center;
   gap: 16px;
   padding: 24px 32px;
-  background-color: var(--color-accent-bg);
+  background:
+    radial-gradient(circle at 10% 20%, rgba(242, 137, 107, 0.35), transparent 60%),
+    radial-gradient(circle at 90% 80%, rgba(46, 125, 91, 0.25), transparent 60%),
+    var(--color-accent-bg);
 }
 
 .valorar__icono {
@@ -198,6 +198,10 @@ async function enviarValoracion() {
   cursor: pointer;
   filter: grayscale(100%);
   opacity: 0.4;
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    opacity var(--dur-fast) var(--ease-out),
+    filter var(--dur-fast) var(--ease-out);
 }
 
 .valorar__estrella--active {
@@ -224,6 +228,7 @@ async function enviarValoracion() {
 @media (hover: hover) {
   .valorar__estrella:hover {
     opacity: 1;
+    transform: scale(1.25) rotate(-8deg);
   }
 }
 
