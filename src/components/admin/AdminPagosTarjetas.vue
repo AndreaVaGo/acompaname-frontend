@@ -30,31 +30,31 @@ const facturados = computed(() => {
 
 <template>
   <section class="admin-pagos-tarjetas">
-    <div class="admin-pagos-tarjetas__tarjeta admin-pagos-tarjetas__tarjeta--verde">
+    <div class="admin-pagos-tarjetas__tarjeta tarjeta-cristal admin-pagos-tarjetas__tarjeta--verde">
       <div class="admin-pagos-tarjetas__nombre">Total cobrado</div>
       <div class="admin-pagos-tarjetas__numero">{{ formatearEuros(resumen.totalCobrado) }}</div>
       <div class="admin-pagos-tarjetas__detalle">{{ textoPagos(resumen.numeroCobrados) }}</div>
     </div>
 
-    <div class="admin-pagos-tarjetas__tarjeta admin-pagos-tarjetas__tarjeta--coral">
+    <div class="admin-pagos-tarjetas__tarjeta tarjeta-cristal admin-pagos-tarjetas__tarjeta--coral">
       <div class="admin-pagos-tarjetas__nombre">Pendiente de cobro</div>
       <div class="admin-pagos-tarjetas__numero">{{ formatearEuros(resumen.totalPendiente) }}</div>
       <div class="admin-pagos-tarjetas__detalle">{{ textoPagos(resumen.numeroPendientes) }}</div>
     </div>
 
-    <div class="admin-pagos-tarjetas__tarjeta admin-pagos-tarjetas__tarjeta--azul">
+    <div class="admin-pagos-tarjetas__tarjeta tarjeta-cristal admin-pagos-tarjetas__tarjeta--azul">
       <div class="admin-pagos-tarjetas__nombre">Porcentaje cobrado</div>
       <div class="admin-pagos-tarjetas__numero">{{ porcentaje }}</div>
       <div class="admin-pagos-tarjetas__detalle">de {{ textoPagos(facturados) }} facturados</div>
     </div>
 
-    <div class="admin-pagos-tarjetas__tarjeta admin-pagos-tarjetas__tarjeta--azul">
+    <div class="admin-pagos-tarjetas__tarjeta tarjeta-cristal admin-pagos-tarjetas__tarjeta--azul">
       <div class="admin-pagos-tarjetas__nombre">Importe medio</div>
       <div class="admin-pagos-tarjetas__numero">{{ formatearEuros(resumen.importeMedio) }}</div>
       <div class="admin-pagos-tarjetas__detalle">por pago facturado</div>
     </div>
 
-    <div class="admin-pagos-tarjetas__tarjeta admin-pagos-tarjetas__tarjeta--coral">
+    <div class="admin-pagos-tarjetas__tarjeta tarjeta-cristal admin-pagos-tarjetas__tarjeta--coral">
       <div class="admin-pagos-tarjetas__nombre">Sin cobrar más de 7 días</div>
       <div class="admin-pagos-tarjetas__numero">{{ resumen.pendientesMasDeSieteDias }}</div>
       <div class="admin-pagos-tarjetas__detalle">
@@ -74,19 +74,20 @@ const facturados = computed(() => {
 }
 
 .admin-pagos-tarjetas__tarjeta {
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
-  border-left: 6px solid var(--color-secondary);
+  /* El cristal, la sombra y la entrada vienen de la clase global tarjeta-cristal */
+  --borde-tarjeta: var(--color-secondary);
+  --tinte-tarjeta: color-mix(in srgb, var(--color-secondary) 14%, transparent);
   padding: 18px 18px;
-  box-shadow: var(--shadow-card);
 }
 
 .admin-pagos-tarjetas__tarjeta--coral {
-  border-left-color: var(--color-accent);
+  --borde-tarjeta: var(--color-accent);
+  --tinte-tarjeta: color-mix(in srgb, var(--color-accent) 16%, transparent);
 }
 
 .admin-pagos-tarjetas__tarjeta--azul {
-  border-left-color: var(--color-info);
+  --borde-tarjeta: var(--color-info);
+  --tinte-tarjeta: color-mix(in srgb, var(--color-info) 14%, transparent);
 }
 
 .admin-pagos-tarjetas__nombre {
