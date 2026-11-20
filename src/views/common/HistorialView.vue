@@ -13,6 +13,7 @@ import {
 } from "@/utils/personasSolicitud";
 import { formatearMomento } from "@/utils/formatearHora";
 import { mensajeDeError } from "@/utils/mensajeDeError";
+import { moverFoco } from "@/utils/focoTarjeta";
 
 const solicitudRepository = new SolicitudRepository();
 const valoracionRepository = new ValoracionRepository();
@@ -61,7 +62,7 @@ function textoEstado(estado) {
 </script>
 
 <template>
-  <div class="historial">
+  <div class="historial pantalla">
     <header class="historial__header">
       <h1>Historial de solicitudes</h1>
       <p>El estado final de cada acompañamiento que has gestionado.</p>
@@ -71,10 +72,12 @@ function textoEstado(estado) {
 
     <div class="historial__grid" v-if="historial.length">
       <div
-        class="historial__card"
+        class="historial__card tarjeta-cristal"
         :class="'historial__card--' + item.estado"
-        v-for="item in historial"
+        v-for="(item, indice) in historial"
         :key="item.id"
+        :style="{ '--i': Math.min(indice, 8) }"
+        @mousemove="moverFoco"
       >
         <div class="historial__card-top">
           <h3>{{ item.nombre }}</h3>
@@ -148,9 +151,9 @@ function textoEstado(estado) {
 </template>
 
 <style scoped>
+/* El fondo con degradado lo pone la clase global "pantalla" y las tarjetas de cristal, "tarjeta-cristal" (base.css) */
 .historial {
   min-height: 100vh;
-  background-color: var(--color-bg);
   font-family: var(--font-base);
   color: var(--color-text);
   padding: var(--gap-lg) 60px;
@@ -179,44 +182,15 @@ function textoEstado(estado) {
 .historial__card {
   display: flex;
   flex-direction: column;
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
-  border-left: 6px solid var(--color-border);
-  padding: 24px 24px 24px 22px;
-  box-shadow: var(--shadow-card);
-  animation: historial-entra var(--dur-med) var(--ease-out) backwards;
-  transition:
-    transform var(--dur-med) var(--ease-out),
-    box-shadow var(--dur-med) var(--ease-out);
 }
 
-@keyframes historial-entra {
-  from {
-    opacity: 0;
-  }
-}
-
-/* El color del borde lateral cambia según el estado de la solicitud */
+/* El color de la línea de arriba cambia según el estado de la solicitud */
 .historial__card--completada {
-  border-left-color: var(--color-info);
+  --borde-tarjeta: var(--color-info);
 }
 
 .historial__card--rechazada {
-  border-left-color: var(--color-border);
-}
-
-@media (hover: hover) {
-  .historial__card:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-card-hover);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .historial__card {
-    animation: none;
-    transition: none;
-  }
+  --borde-tarjeta: var(--color-border);
 }
 
 .historial__card-top {

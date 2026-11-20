@@ -17,14 +17,17 @@ describe("pantallas · diseño", () => {
     expect(perfilCuidador.match(/animation: entra-sube/g).length).toBe(2);
   });
 
-  test("las tarjetas del historial aparecen con fundido y ganan sombra al pasar el ratón", () => {
-    expect(historial).toContain("animation: historial-entra");
-    expect(historial).toContain("box-shadow: var(--shadow-card-hover)");
+  test("el historial usa el fondo y las tarjetas de cristal globales", () => {
+    expect(historial).toContain('class="historial pantalla"');
+    expect(historial).toContain('class="historial__card tarjeta-cristal"');
   });
 
-  test("con reducir movimiento el historial no se anima", () => {
-    const bloque = historial.slice(historial.indexOf("@media (prefers-reduced-motion: reduce)"));
+  test("las tarjetas del historial entran una tras otra y siguen al ratón", () => {
+    expect(historial).toContain(":style=\"{ '--i': Math.min(indice, 8) }\"");
+    expect(historial).toContain('@mousemove="moverFoco"');
+  });
 
-    expect(bloque).toContain("animation: none");
+  test("el color de la línea de arriba de cada tarjeta depende del estado", () => {
+    expect(historial).toContain("--borde-tarjeta: var(--color-info)");
   });
 });
