@@ -34,18 +34,12 @@ describe("Panel de administración · diseño de cristal", () => {
     expect(vista).not.toMatch(/grid-template-columns: 1fr;/);
   });
 
-  test("el menú de pestañas del móvil se puede encoger y hace scroll por dentro", () => {
+  test("las pestañas del móvil pasan a otra línea y no necesitan deslizarse", () => {
     const movil = menu.slice(menu.indexOf("@media (max-width: 768px)"));
 
-    expect(movil).toContain("overflow-x: auto");
-    expect(movil).toContain("min-width: 0");
-  });
-
-  test("la barra de desplazamiento de las pestañas es fina y del color del panel", () => {
-    const movil = menu.slice(menu.indexOf("@media (max-width: 768px)"));
-
-    expect(movil).toContain("scrollbar-width: thin");
-    expect(movil).toContain("scrollbar-color: var(--color-secondary) transparent");
+    expect(movil).toContain("flex-wrap: wrap");
+    expect(movil).not.toContain("overflow-x");
+    expect(movil).not.toContain("scrollbar");
   });
 });
 
