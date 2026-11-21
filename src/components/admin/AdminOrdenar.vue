@@ -1,26 +1,30 @@
 <script setup>
-// Desplegable "Ordenar por" para el móvil, donde las tablas no tienen cabecera que pulsar.
+// Desplegable "Ordenar por" para el móvil, donde las tablas no tienen cabecera con flechas.
 // - columnas: lista de { clave, nombre } por las que se puede ordenar
 // - orden: { clave, direccion } con el orden actual
-// Avisa con "ordenar" y la clave: al elegir una columna, o al pulsar el botón de sentido
-// (que repite la clave actual y por eso da la vuelta al orden).
+// Avisa con "ordenar" y el nuevo orden { clave, direccion }: al elegir una columna
+// (mantiene el sentido actual) o al pulsar uno de los dos botones de sentido.
 const props = defineProps({
   columnas: { type: Array, required: true },
   orden: { type: Object, required: true },
 });
 
 const emit = defineEmits(["ordenar"]);
+
+function elegirColumna(evento) {
+  emit("ordenar", { clave: evento.target.value, direccion: props.orden.direccion });
+}
+
+function elegirSentido(direccion) {
+  emit("ordenar", { clave: props.orden.clave, direccion: direccion });
+}
 </script>
 
 <template>
   <div class="admin-ordenar">
     <label class="admin-ordenar__etiqueta">
       Ordenar por
-      <select
-        class="admin-ordenar__select"
-        :value="orden.clave"
-        @change="emit('ordenar', $event.target.value)"
-      >
+      <select class="admin-ordenar__select" :value="orden.clave" @change="elegirColumna">
         <option value="">Sin ordenar</option>
         <option v-for="columna in props.columnas" :key="columna.clave" :value="columna.clave">
           {{ columna.nombre }}
@@ -28,19 +32,33 @@ const emit = defineEmits(["ordenar"]);
       </select>
     </label>
 
-    <button
-      v-if="orden.clave !== ''"
-      type="button"
-      class="admin-ordenar__sentido"
-      @click="emit('ordenar', orden.clave)"
-    >
-      {{ orden.direccion === "asc" ? "▲ De menor a mayor" : "▼ De mayor a menor" }}
-    </button>
+    <div v-if="orden.clave !== ''" class="admin-ordenar__sentidos">
+      <button
+        type="button"
+        class="admin-ordenar__sentido"
+        :class="{ 'admin-ordenar__sentido--activo': orden.direccion === 'asc' }"
+        data-direccion="asc"
+        :aria-pressed="orden.direccion === 'asc'"
+        @click="elegirSentido('asc')"
+      >
+        ▲ De menor a mayor
+      </button>
+      <button
+        type="button"
+        class="admin-ordenar__sentido"
+        :class="{ 'admin-ordenar__sentido--activo': orden.direccion === 'desc' }"
+        data-direccion="desc"
+        :aria-pressed="orden.direccion === 'desc'"
+        @click="elegirSentido('desc')"
+      >
+        ▼ De mayor a menor
+      </button>
+    </div>
   </div>
 </template>
 
 <style scoped>
-/* Solo se ve en el móvil: en pantallas grandes se ordena pulsando las cabeceras */
+/* Solo se ve en el móvil: en pantallas grandes se ordena con las flechas de las cabeceras */
 .admin-ordenar {
   display: none;
   flex-wrap: wrap;
@@ -63,6 +81,12 @@ const emit = defineEmits(["ordenar"]);
   font-weight: bold;
 }
 
+.admin-ordenar__sentidos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .admin-ordenar__select,
 .admin-ordenar__sentido {
   padding: 8px 12px;
@@ -77,5 +101,12 @@ const emit = defineEmits(["ordenar"]);
 .admin-ordenar__sentido {
   cursor: pointer;
   font-weight: bold;
+}
+
+/* El sentido elegido se ve relleno con el color de la sección */
+.admin-ordenar__sentido--activo {
+  background-color: var(--admin-color, var(--color-accent));
+  border-color: var(--admin-color, var(--color-accent));
+  color: var(--color-white);
 }
 </style>
