@@ -26,6 +26,27 @@ describe("Panel de administración · diseño de cristal", () => {
     expect(menu).toContain("backdrop-filter: blur(10px)");
     expect(menu).toContain("rgba(255, 255, 255, 0.8)");
   });
+
+  // Si la columna fuera 1fr, las pestañas del móvil estirarían la página y se cortaría por la derecha
+  test("la columna del contenido no crece más que la pantalla (minmax(0, 1fr))", () => {
+    expect(vista).toContain("grid-template-columns: 200px minmax(0, 1fr)");
+    expect(vista).toContain("grid-template-columns: minmax(0, 1fr)");
+    expect(vista).not.toMatch(/grid-template-columns: 1fr;/);
+  });
+
+  test("el menú de pestañas del móvil se puede encoger y hace scroll por dentro", () => {
+    const movil = menu.slice(menu.indexOf("@media (max-width: 768px)"));
+
+    expect(movil).toContain("overflow-x: auto");
+    expect(movil).toContain("min-width: 0");
+  });
+
+  test("la barra de desplazamiento de las pestañas es fina y del color del panel", () => {
+    const movil = menu.slice(menu.indexOf("@media (max-width: 768px)"));
+
+    expect(movil).toContain("scrollbar-width: thin");
+    expect(movil).toContain("scrollbar-color: var(--color-secondary) transparent");
+  });
 });
 
 // Las secciones con tabla, listas y gráficas ya no son cajas blancas lisas
