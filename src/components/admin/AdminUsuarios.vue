@@ -4,7 +4,7 @@ import AdminFiltros from "@/components/admin/AdminFiltros.vue";
 import AdminPildora from "@/components/admin/AdminPildora.vue";
 import AdminCabeceraOrden from "@/components/admin/AdminCabeceraOrden.vue";
 import AdminOrdenar from "@/components/admin/AdminOrdenar.vue";
-import { ordenarFilas, siguienteOrden } from "@/utils/ordenarTabla";
+import { ordenarFilas } from "@/utils/ordenarTabla";
 
 // Tabla de usuarios con botones por rol (Todos, Familias, Cuidadores y Administradores, cada uno
 // con su contador y con el mismo color que su píldora de rol) y buscador por nombre o email.
@@ -89,8 +89,9 @@ const VALORES = {
 // Primero se filtra y se busca, y lo que queda se ordena
 const usuariosOrdenados = computed(() => ordenarFilas(usuariosMostrados.value, VALORES, orden.value));
 
-function cambiarOrden(clave) {
-  orden.value = siguienteOrden(orden.value, clave);
+// Las flechas de la cabecera y el desplegable del móvil mandan el orden ya decidido
+function cambiarOrden(nuevoOrden) {
+  orden.value = nuevoOrden;
 }
 
 // «1 usuario» o «3 usuarios»
