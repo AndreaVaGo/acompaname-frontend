@@ -127,23 +127,55 @@
   border-top-right-radius: var(--radius-input);
 }
 
-/* Las filas se iluminan al pasar el ratón */
+/* Cada fila es una tarjeta suelta: hay un hueco entre ellas, cada una tiene su fondo,
+   su sombra y una barra de color a la izquierda, así se lee una línea sin mezclarla con la de al lado */
+.admin-panel .admin-tabla table {
+  border-collapse: separate;
+  border-spacing: 0 10px;
+}
+
 .admin-panel .admin-tabla td {
-  border-bottom-color: rgba(0, 0, 0, 0.06);
-  transition: background-color var(--dur-med) var(--ease-out);
+  background-color: rgba(255, 255, 255, 0.82);
+  border-top: 1px solid rgba(255, 255, 255, 0.9);
+  border-bottom: 1px solid color-mix(in srgb, var(--admin-color, var(--color-accent)) 25%, transparent);
+  transition:
+    background-color var(--dur-med) var(--ease-out),
+    box-shadow var(--dur-med) var(--ease-out);
+}
+
+.admin-panel .admin-tabla td:first-child {
+  border-left: 5px solid var(--admin-color, var(--color-accent));
+  border-radius: var(--radius-input) 0 0 var(--radius-input);
+}
+
+.admin-panel .admin-tabla td:last-child {
+  border-radius: 0 var(--radius-input) var(--radius-input) 0;
 }
 
 @media (hover: hover) {
   .admin-panel .admin-tabla tbody tr:hover td {
-    background-color: color-mix(in srgb, var(--admin-color, var(--color-accent)) 9%, transparent);
+    background-color: color-mix(in srgb, var(--admin-color, var(--color-accent)) 14%, white);
   }
 }
 
 /* En el móvil cada fila es una tarjeta de cristal */
 @media (max-width: 640px) {
+  .admin-panel .admin-tabla table {
+    border-spacing: 0;
+  }
+
+  .admin-panel .admin-tabla td,
+  .admin-panel .admin-tabla td:first-child,
+  .admin-panel .admin-tabla td:last-child {
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+  }
+
   .admin-panel .admin-tabla tr {
-    background-color: rgba(255, 255, 255, 0.65);
-    border-color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-left: 5px solid var(--admin-color, var(--color-accent));
     box-shadow: var(--shadow-card);
   }
 }
