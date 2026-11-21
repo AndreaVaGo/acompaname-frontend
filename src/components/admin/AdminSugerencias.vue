@@ -219,7 +219,8 @@ function colorRol(rol) {
 }
 
 .admin-sugerencias__buscador {
-  min-width: 240px;
+  /* Lo bastante ancho para que se lea entero lo que pone dentro */
+  min-width: 320px;
   padding: 10px 14px;
   border-radius: var(--radius-input);
   border: 1px solid var(--color-border);

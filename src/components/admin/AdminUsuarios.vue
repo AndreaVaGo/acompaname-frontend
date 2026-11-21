@@ -239,7 +239,8 @@ function esMiCuenta(usuario, idPropio) {
 }
 
 .admin-usuarios__buscador {
-  min-width: 240px;
+  /* Lo bastante ancho para que se lea entero lo que pone dentro */
+  min-width: 300px;
   padding: 10px 14px;
   border-radius: var(--radius-input);
   border: 1px solid var(--color-border);

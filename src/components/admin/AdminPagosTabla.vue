@@ -246,7 +246,8 @@ function textoPagos(cantidad) {
 }
 
 .admin-pagos-tabla__buscador {
-  min-width: 240px;
+  /* Lo bastante ancho para que se lea entero lo que pone dentro */
+  min-width: 360px;
   padding: 10px 14px;
   border-radius: var(--radius-input);
   border: 1px solid var(--color-border);
