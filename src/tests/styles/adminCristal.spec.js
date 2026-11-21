@@ -27,3 +27,60 @@ describe("Panel de administración · diseño de cristal", () => {
     expect(menu).toContain("rgba(255, 255, 255, 0.8)");
   });
 });
+
+// Las secciones con tabla, listas y gráficas ya no son cajas blancas lisas
+const SECCIONES = [
+  "AdminSolicitudes",
+  "AdminUsuarios",
+  "AdminSugerencias",
+  "AdminPagosTabla",
+  "AdminPagos",
+  "AdminPagosMeses",
+  "AdminPagosBarras",
+  "AdminCuidadores",
+  "AdminValoraciones",
+  "AdminBarras",
+];
+const estilosTabla = readFileSync("src/styles/adminTabla.css", "utf-8");
+
+describe("Panel de administración · secciones de cristal", () => {
+  test.each(SECCIONES)("%s lleva la clase admin-panel y su color de sección", (nombre) => {
+    const codigo = readFileSync(`src/components/admin/${nombre}.vue`, "utf-8");
+    const plantilla = codigo.slice(codigo.indexOf("<template>"), codigo.indexOf("</template>"));
+
+    expect(plantilla).toContain("admin-panel");
+    expect(codigo).toContain("--admin-color:");
+  });
+
+  test.each(SECCIONES)("%s ya no pinta la caja de blanco liso", (nombre) => {
+    const codigo = readFileSync(`src/components/admin/${nombre}.vue`, "utf-8");
+    const estilo = codigo.slice(codigo.indexOf("<style"));
+    const primeraRegla = estilo.slice(estilo.indexOf("{"), estilo.indexOf("}"));
+
+    expect(primeraRegla).not.toContain("--color-white");
+    expect(primeraRegla).not.toContain("box-shadow");
+  });
+
+  test("admin-panel es de cristal: transparencia, desenfoque y borde de color", () => {
+    const bloque = estilosTabla.slice(estilosTabla.indexOf(".admin-panel {"));
+
+    expect(bloque).toContain("backdrop-filter: blur(10px)");
+    expect(bloque).toContain("rgba(255, 255, 255, 0.78)");
+    expect(bloque).toContain("border-top: 4px solid var(--admin-color");
+  });
+
+  test("las tablas del panel tienen cabecera con color y filas que se iluminan", () => {
+    expect(estilosTabla).toContain(".admin-panel .admin-tabla th {");
+    expect(estilosTabla).toContain(".admin-panel .admin-tabla tbody tr:hover td");
+  });
+
+  test("las tarjetas de sugerencias son de cristal claro", () => {
+    const codigo = readFileSync("src/components/admin/AdminSugerencias.vue", "utf-8");
+
+    expect(codigo).toContain("background-color: rgba(255, 255, 255, 0.7)");
+  });
+
+  test("si el usuario reduce el movimiento, el panel no se anima", () => {
+    expect(estilosTabla).toMatch(/prefers-reduced-motion: reduce\) \{\s+\.admin-panel \{\s+animation: none/);
+  });
+});
