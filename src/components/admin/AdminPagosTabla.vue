@@ -7,7 +7,7 @@ import AdminFiltros from "@/components/admin/AdminFiltros.vue";
 import AdminPildora from "@/components/admin/AdminPildora.vue";
 import AdminCabeceraOrden from "@/components/admin/AdminCabeceraOrden.vue";
 import AdminOrdenar from "@/components/admin/AdminOrdenar.vue";
-import { ordenarFilas, siguienteOrden } from "@/utils/ordenarTabla";
+import { ordenarFilas } from "@/utils/ordenarTabla";
 
 // Tabla de pagos con botones de estado (el filtro lo hace el servidor, cada botón lleva el color
 // de su píldora) y buscador por familia o cuidador (lo hace el propio componente).
@@ -70,8 +70,9 @@ const VALORES = {
 
 const pagosOrdenados = computed(() => ordenarFilas(pagosMostrados.value, VALORES, orden.value));
 
-function cambiarOrden(clave) {
-  orden.value = siguienteOrden(orden.value, clave);
+// Las flechas de la cabecera y el desplegable del móvil mandan el orden ya decidido
+function cambiarOrden(nuevoOrden) {
+  orden.value = nuevoOrden;
 }
 
 const totalMostrado = computed(() => {
