@@ -40,7 +40,7 @@ function colorDe(fila) {
 </script>
 
 <template>
-  <div class="admin-pagos-barras">
+  <div class="admin-pagos-barras admin-panel">
     <h2 class="titulo-seccion">{{ titulo }}</h2>
 
     <p v-if="filas.length === 0" class="admin-pagos-barras__vacio">{{ vacio }}</p>
@@ -72,10 +72,9 @@ function colorDe(fila) {
 <style scoped>
 .admin-pagos-barras {
   flex: 1 1 320px;
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
   padding: 24px;
-  box-shadow: var(--shadow-card);
+  /* El cristal viene de la clase global admin-panel; aquí solo el color de la sección */
+  --admin-color: var(--color-accent);
 }
 
 .admin-pagos-barras .titulo-seccion {

@@ -20,7 +20,7 @@ const porcentajeCobrado = computed(() => {
 </script>
 
 <template>
-  <div class="admin-pagos">
+  <div class="admin-pagos admin-panel">
     <h2 class="titulo-seccion">Pagos</h2>
 
     <div class="admin-pagos__lista">
@@ -49,10 +49,9 @@ const porcentajeCobrado = computed(() => {
 <style scoped>
 .admin-pagos {
   flex: 1 1 280px;
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
   padding: 24px;
-  box-shadow: var(--shadow-card);
+  /* El cristal viene de la clase global admin-panel; aquí solo el color de la sección */
+  --admin-color: var(--color-secondary);
 }
 
 .admin-pagos .titulo-seccion {

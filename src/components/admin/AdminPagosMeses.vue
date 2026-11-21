@@ -46,7 +46,7 @@ function descripcion(mes) {
 </script>
 
 <template>
-  <div class="admin-pagos-meses">
+  <div class="admin-pagos-meses admin-panel">
     <h2 class="titulo-seccion">Pagos por mes</h2>
 
     <p v-if="maximo === 0" class="admin-pagos-meses__vacio">
@@ -89,10 +89,9 @@ function descripcion(mes) {
 <style scoped>
 .admin-pagos-meses {
   flex: 2 1 420px;
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
   padding: 24px;
-  box-shadow: var(--shadow-card);
+  /* El cristal viene de la clase global admin-panel; aquí solo el color de la sección */
+  --admin-color: var(--color-info);
 }
 
 .admin-pagos-meses .titulo-seccion {

@@ -103,7 +103,7 @@ function textoPagos(cantidad) {
 </script>
 
 <template>
-  <section class="admin-pagos-tabla">
+  <section class="admin-pagos-tabla admin-panel">
     <div class="admin-pagos-tabla__cabecera">
       <h2 class="admin-pagos-tabla__titulo">Detalle de pagos</h2>
 
@@ -186,10 +186,9 @@ function textoPagos(cantidad) {
 
 <style scoped>
 .admin-pagos-tabla {
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
   padding: 24px;
-  box-shadow: var(--shadow-card);
+  /* El cristal viene de la clase global admin-panel; aquí solo el color de la sección */
+  --admin-color: var(--color-secondary);
 }
 
 .admin-pagos-tabla__cabecera {
@@ -243,7 +242,7 @@ function textoPagos(cantidad) {
   display: inline-block;
   padding: 4px 10px;
   border-radius: var(--radius-input);
-  background-color: var(--color-neutral-bg);
+  background-color: color-mix(in srgb, var(--admin-color) 12%, white);
   font-weight: bold;
 }
 
