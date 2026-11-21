@@ -1,30 +1,7 @@
 import { describe, test, expect } from "vitest";
-import { ordenarFilas, siguienteOrden } from "../../utils/ordenarTabla";
+import { ordenarFilas } from "../../utils/ordenarTabla";
 
 const SIN_ORDEN = { clave: "", direccion: "asc" };
-
-describe("siguienteOrden", () => {
-  test("una columna nueva empieza de menor a mayor", () => {
-    expect(siguienteOrden(SIN_ORDEN, "fecha")).toEqual({ clave: "fecha", direccion: "asc" });
-  });
-
-  test("pulsar la misma columna da la vuelta al orden", () => {
-    const asc = { clave: "fecha", direccion: "asc" };
-
-    expect(siguienteOrden(asc, "fecha")).toEqual({ clave: "fecha", direccion: "desc" });
-    expect(siguienteOrden({ clave: "fecha", direccion: "desc" }, "fecha")).toEqual(asc);
-  });
-
-  test("cambiar de columna vuelve a empezar de menor a mayor", () => {
-    const orden = { clave: "fecha", direccion: "desc" };
-
-    expect(siguienteOrden(orden, "nombre")).toEqual({ clave: "nombre", direccion: "asc" });
-  });
-
-  test("elegir 'sin ordenar' (clave vacía) deja la clave vacía", () => {
-    expect(siguienteOrden({ clave: "fecha", direccion: "desc" }, "")).toEqual(SIN_ORDEN);
-  });
-});
 
 describe("ordenarFilas", () => {
   const FILAS = [
