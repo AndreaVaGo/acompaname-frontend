@@ -5,6 +5,9 @@ import { formatearFecha } from "@/utils/formatearFecha";
 import { nombreTipo, colorTipo } from "@/utils/nombreTipo";
 import AdminFiltros from "@/components/admin/AdminFiltros.vue";
 import AdminPildora from "@/components/admin/AdminPildora.vue";
+import AdminCabeceraOrden from "@/components/admin/AdminCabeceraOrden.vue";
+import AdminOrdenar from "@/components/admin/AdminOrdenar.vue";
+import { ordenarFilas, siguienteOrden } from "@/utils/ordenarTabla";
 
 // Tabla de pagos con botones de estado (el filtro lo hace el servidor, cada botón lleva el color
 // de su píldora) y buscador por familia o cuidador (lo hace el propio componente).
@@ -39,6 +42,37 @@ const pagosMostrados = computed(() => {
     );
   });
 });
+
+// Orden de la tabla: por qué columna y en qué sentido ("" = como llegan del servidor)
+const orden = ref({ clave: "", direccion: "asc" });
+
+const COLUMNAS = [
+  { clave: "familia", nombre: "Familia" },
+  { clave: "cuidador", nombre: "Persona cuidadora" },
+  { clave: "tipo", nombre: "Tipo" },
+  { clave: "importe", nombre: "Importe" },
+  { clave: "fecha", nombre: "Fecha" },
+  { clave: "sinCobrar", nombre: "Sin cobrar" },
+  { clave: "estado", nombre: "Estado" },
+];
+
+// Cómo sacar de un pago el valor de cada columna.
+// Los días sin cobrar solo existen en los pendientes: el resto quedan siempre al final.
+const VALORES = {
+  familia: (pago) => pago.nombreFamilia,
+  cuidador: (pago) => pago.nombreCuidador,
+  tipo: (pago) => nombreTipo(pago.tipoCuidado),
+  importe: (pago) => pago.importe,
+  fecha: (pago) => pago.fecha,
+  sinCobrar: (pago) => (pago.estado === "PENDIENTE" ? pago.diasDesdeCreacion : null),
+  estado: (pago) => ESTADOS.findIndex((opcion) => opcion.valor === pago.estado),
+};
+
+const pagosOrdenados = computed(() => ordenarFilas(pagosMostrados.value, VALORES, orden.value));
+
+function cambiarOrden(clave) {
+  orden.value = siguienteOrden(orden.value, clave);
+}
 
 const totalMostrado = computed(() => {
   let suma = 0;
@@ -131,21 +165,24 @@ function textoPagos(cantidad) {
     </p>
 
     <template v-else>
+      <AdminOrdenar :columnas="COLUMNAS" :orden="orden" @ordenar="cambiarOrden" />
+
       <div class="admin-tabla">
         <table>
           <thead>
             <tr>
-              <th>Familia</th>
-              <th>Persona cuidadora</th>
-              <th>Tipo</th>
-              <th>Importe</th>
-              <th>Fecha</th>
-              <th>Sin cobrar</th>
-              <th>Estado</th>
+              <AdminCabeceraOrden
+                v-for="columna in COLUMNAS"
+                :key="columna.clave"
+                :etiqueta="columna.nombre"
+                :clave="columna.clave"
+                :orden="orden"
+                @ordenar="cambiarOrden"
+              />
             </tr>
           </thead>
           <tbody>
-            <tr v-for="pago in pagosMostrados" :key="pago.id">
+            <tr v-for="pago in pagosOrdenados" :key="pago.id">
               <td data-label="Familia">{{ pago.nombreFamilia }}</td>
               <td data-label="Persona cuidadora">{{ pago.nombreCuidador }}</td>
               <td data-label="Tipo">

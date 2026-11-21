@@ -199,3 +199,54 @@ describe('AdminPagosTabla', () => {
     expect(wrapper.find('.admin-tabla table').exists()).toBe(true)
   })
 })
+
+function pulsarCabecera(wrapper, nombre) {
+  return wrapper
+    .findAll('th button')
+    .find((boton) => boton.text() === nombre)
+    .trigger('click')
+}
+
+function importes(wrapper) {
+  return wrapper.findAll('tbody tr').map((fila) => fila.find('td[data-label="Familia"]').text())
+}
+
+describe('AdminPagosTabla · ordenar', () => {
+  test('al ordenar por Importe va de menor a mayor como número (10, 18, 20, 36)', async () => {
+    const wrapper = montar(PAGOS, '')
+
+    await pulsarCabecera(wrapper, 'Importe')
+
+    // 10 es Ana (id 4), 18 Luis, 20 Carmen y 36 Ana (id 1)
+    expect(importes(wrapper)).toEqual(['Ana', 'Luis', 'Carmen', 'Ana'])
+    expect(wrapper.findAll('tbody tr')[0].text()).toContain('10')
+  })
+
+  test('al ordenar por Familia sale Ana, Ana, Carmen, Luis', async () => {
+    const wrapper = montar(PAGOS, '')
+
+    await pulsarCabecera(wrapper, 'Familia')
+
+    expect(importes(wrapper)).toEqual(['Ana', 'Ana', 'Carmen', 'Luis'])
+  })
+
+  test('al ordenar por Sin cobrar los que no tienen días quedan siempre al final', async () => {
+    const wrapper = montar(PAGOS, '')
+
+    await pulsarCabecera(wrapper, 'Sin cobrar')
+    expect(importes(wrapper).slice(0, 2)).toEqual(['Luis', 'Ana'])
+
+    await pulsarCabecera(wrapper, 'Sin cobrar')
+    expect(importes(wrapper).slice(0, 2)).toEqual(['Ana', 'Luis'])
+    expect(wrapper.findAll('tbody tr')[3].text()).toContain('—')
+  })
+
+  test('el total no cambia al ordenar', async () => {
+    const wrapper = montar(PAGOS, '')
+    const antes = wrapper.find('.admin-pagos-tabla__pie').text()
+
+    await pulsarCabecera(wrapper, 'Importe')
+
+    expect(wrapper.find('.admin-pagos-tabla__pie').text()).toBe(antes)
+  })
+})
