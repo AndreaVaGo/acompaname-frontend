@@ -66,19 +66,18 @@ defineEmits(["cambiar"]);
   color: var(--color-secondary);
 }
 
-/* En móvil el menú pasa a ser una fila de pestañas con scroll horizontal */
+/* En móvil el menú son pestañas que pasan a la línea de abajo si no caben,
+   así se ven todas a la vez y no hace falta deslizar */
 @media (max-width: 768px) {
   .admin-menu {
     flex-direction: row;
-    overflow-x: auto;
-    min-width: 0;
+    flex-wrap: wrap;
     padding: 8px;
-    /* Barra de desplazamiento fina y del color del panel, en vez de la gris gruesa del navegador */
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-secondary) transparent;
   }
 
   .admin-menu__boton {
+    flex: 1 1 auto;
+    text-align: center;
     white-space: nowrap;
   }
 }
