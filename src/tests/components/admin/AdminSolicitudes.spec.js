@@ -136,11 +136,12 @@ describe('AdminSolicitudes', () => {
   })
 })
 
-function pulsarCabecera(wrapper, nombre) {
-  return wrapper
-    .findAll('th button')
-    .find((boton) => boton.text() === nombre)
-    .trigger('click')
+// Pulsa una flecha de la cabecera de una columna: direccion es 'asc' (▲) o 'desc' (▼)
+function pulsarFlecha(wrapper, nombre, direccion) {
+  const cabecera = wrapper
+    .findAll('th')
+    .find((th) => th.find('.admin-cabecera-orden__texto').text() === nombre)
+  return cabecera.find(`button[data-direccion="${direccion}"]`).trigger('click')
 }
 
 function familias(wrapper) {
@@ -152,20 +153,20 @@ describe('AdminSolicitudes · ordenar', () => {
     expect(familias(montar(SOLICITUDES, ''))).toEqual(['Ana', 'Luis'])
   })
 
-  test('al pulsar Fecha salen primero las más antiguas y al pulsar otra vez las más nuevas', async () => {
+  test('con ▲ en Fecha salen primero las más antiguas y con ▼ las más nuevas', async () => {
     const wrapper = montar(SOLICITUDES, '')
 
-    await pulsarCabecera(wrapper, 'Fecha')
+    await pulsarFlecha(wrapper, 'Fecha', 'asc')
     expect(familias(wrapper)).toEqual(['Luis', 'Ana'])
 
-    await pulsarCabecera(wrapper, 'Fecha')
+    await pulsarFlecha(wrapper, 'Fecha', 'desc')
     expect(familias(wrapper)).toEqual(['Ana', 'Luis'])
   })
 
   test('al ordenar por Estado sigue el flujo: pendiente antes que completada', async () => {
     const wrapper = montar([SOLICITUDES[1], SOLICITUDES[0]], '')
 
-    await pulsarCabecera(wrapper, 'Estado')
+    await pulsarFlecha(wrapper, 'Estado', 'asc')
 
     expect(familias(wrapper)).toEqual(['Ana', 'Luis'])
   })
@@ -173,7 +174,7 @@ describe('AdminSolicitudes · ordenar', () => {
   test('al ordenar por Persona cuidadora usa el nombre de la persona cuidadora', async () => {
     const wrapper = montar(SOLICITUDES, '')
 
-    await pulsarCabecera(wrapper, 'Persona cuidadora')
+    await pulsarFlecha(wrapper, 'Persona cuidadora', 'asc')
 
     expect(familias(wrapper)).toEqual(['Luis', 'Ana'])
   })
@@ -182,7 +183,7 @@ describe('AdminSolicitudes · ordenar', () => {
     const lista = [...SOLICITUDES]
     const wrapper = montar(lista, '')
 
-    await pulsarCabecera(wrapper, 'Fecha')
+    await pulsarFlecha(wrapper, 'Fecha', 'asc')
 
     expect(lista.map((s) => s.id)).toEqual([1, 2])
   })
