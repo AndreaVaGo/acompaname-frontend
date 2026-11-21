@@ -2,6 +2,9 @@
 import { ref, computed } from "vue";
 import AdminFiltros from "@/components/admin/AdminFiltros.vue";
 import AdminPildora from "@/components/admin/AdminPildora.vue";
+import AdminCabeceraOrden from "@/components/admin/AdminCabeceraOrden.vue";
+import AdminOrdenar from "@/components/admin/AdminOrdenar.vue";
+import { ordenarFilas, siguienteOrden } from "@/utils/ordenarTabla";
 
 // Tabla de usuarios con botones por rol (Todos, Familias, Cuidadores y Administradores, cada uno
 // con su contador y con el mismo color que su píldora de rol) y buscador por nombre o email.
@@ -63,6 +66,32 @@ const usuariosMostrados = computed(() => {
   }
   return resultado;
 });
+
+// Orden de la tabla: por qué columna y en qué sentido ("" = como llegan del servidor)
+const orden = ref({ clave: "", direccion: "asc" });
+
+// Las columnas por las que se puede ordenar (la de Acción no tiene nada que ordenar)
+const COLUMNAS = [
+  { clave: "nombre", nombre: "Nombre" },
+  { clave: "email", nombre: "Email" },
+  { clave: "rol", nombre: "Rol" },
+  { clave: "estado", nombre: "Estado" },
+];
+
+// Cómo sacar de un usuario el valor de cada columna (los activos van antes que los bloqueados)
+const VALORES = {
+  nombre: (usuario) => usuario.nombre,
+  email: (usuario) => usuario.email,
+  rol: (usuario) => nombreRol(usuario.rol),
+  estado: (usuario) => (usuario.activo ? 0 : 1),
+};
+
+// Primero se filtra y se busca, y lo que queda se ordena
+const usuariosOrdenados = computed(() => ordenarFilas(usuariosMostrados.value, VALORES, orden.value));
+
+function cambiarOrden(clave) {
+  orden.value = siguienteOrden(orden.value, clave);
+}
 
 // «1 usuario» o «3 usuarios»
 function textoUsuarios(cantidad) {
@@ -129,19 +158,25 @@ function esMiCuenta(usuario, idPropio) {
     </p>
 
     <template v-else>
+      <AdminOrdenar :columnas="COLUMNAS" :orden="orden" @ordenar="cambiarOrden" />
+
       <div class="admin-tabla">
         <table>
           <thead>
             <tr>
-              <th>Nombre</th>
-              <th>Email</th>
-              <th>Rol</th>
-              <th>Estado</th>
+              <AdminCabeceraOrden
+                v-for="columna in COLUMNAS"
+                :key="columna.clave"
+                :etiqueta="columna.nombre"
+                :clave="columna.clave"
+                :orden="orden"
+                @ordenar="cambiarOrden"
+              />
               <th>Acción</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="usuario in usuariosMostrados" :key="usuario.id">
+            <tr v-for="usuario in usuariosOrdenados" :key="usuario.id">
               <td data-label="Nombre">{{ usuario.nombre }}</td>
               <td data-label="Email" class="admin-usuarios__celda-email">{{ usuario.email }}</td>
               <td data-label="Rol">

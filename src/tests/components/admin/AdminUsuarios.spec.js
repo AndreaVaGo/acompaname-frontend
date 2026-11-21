@@ -233,3 +233,71 @@ describe('AdminUsuarios', () => {
     expect(celda.text()).toBe('ana@test.com')
   })
 })
+
+// Pulsa la cabecera de una columna (Nombre, Email, Rol, Estado)
+function pulsarCabecera(wrapper, nombre) {
+  return wrapper
+    .findAll('th button')
+    .find((boton) => boton.text() === nombre)
+    .trigger('click')
+}
+
+function nombres(wrapper) {
+  return wrapper.findAll('tbody tr').map((fila) => fila.find('td[data-label="Nombre"]').text())
+}
+
+describe('AdminUsuarios · ordenar', () => {
+  test('al principio salen en el orden en que llegan', () => {
+    expect(nombres(montar(9))).toEqual(['Ana', 'Pepe', 'Luis', 'Admin'])
+  })
+
+  test('al pulsar Nombre se ordena de la A a la Z y al pulsar otra vez al revés', async () => {
+    const wrapper = montar(9)
+
+    await pulsarCabecera(wrapper, 'Nombre')
+    expect(nombres(wrapper)).toEqual(['Admin', 'Ana', 'Luis', 'Pepe'])
+
+    await pulsarCabecera(wrapper, 'Nombre')
+    expect(nombres(wrapper)).toEqual(['Pepe', 'Luis', 'Ana', 'Admin'])
+  })
+
+  test('al ordenar por Estado salen primero los activos', async () => {
+    const wrapper = montar(9)
+
+    await pulsarCabecera(wrapper, 'Estado')
+
+    expect(nombres(wrapper)[3]).toBe('Luis')
+  })
+
+  test('el orden se mantiene al filtrar por rol', async () => {
+    const wrapper = montar(9)
+
+    await pulsarCabecera(wrapper, 'Nombre')
+    await botonGrupo(wrapper, 'Familias').trigger('click')
+
+    expect(nombres(wrapper)).toEqual(['Ana', 'Luis'])
+  })
+
+  test('la cabecera ordenada avisa con aria-sort', async () => {
+    const wrapper = montar(9)
+
+    await pulsarCabecera(wrapper, 'Email')
+
+    expect(wrapper.find('th[aria-sort="ascending"]').text()).toBe('Email')
+  })
+
+  test('la columna Acción no se puede ordenar', () => {
+    const wrapper = montar(9)
+    const textos = wrapper.findAll('th button').map((boton) => boton.text())
+
+    expect(textos).not.toContain('Acción')
+  })
+
+  test('el desplegable del móvil también ordena', async () => {
+    const wrapper = montar(9)
+
+    await wrapper.find('.admin-ordenar__select').setValue('nombre')
+
+    expect(nombres(wrapper)).toEqual(['Admin', 'Ana', 'Luis', 'Pepe'])
+  })
+})
