@@ -200,11 +200,12 @@ describe('AdminPagosTabla', () => {
   })
 })
 
-function pulsarCabecera(wrapper, nombre) {
-  return wrapper
-    .findAll('th button')
-    .find((boton) => boton.text() === nombre)
-    .trigger('click')
+// Pulsa una flecha de la cabecera de una columna: direccion es 'asc' (▲) o 'desc' (▼)
+function pulsarFlecha(wrapper, nombre, direccion) {
+  const cabecera = wrapper
+    .findAll('th')
+    .find((th) => th.find('.admin-cabecera-orden__texto').text() === nombre)
+  return cabecera.find(`button[data-direccion="${direccion}"]`).trigger('click')
 }
 
 function importes(wrapper) {
@@ -215,7 +216,7 @@ describe('AdminPagosTabla · ordenar', () => {
   test('al ordenar por Importe va de menor a mayor como número (10, 18, 20, 36)', async () => {
     const wrapper = montar(PAGOS, '')
 
-    await pulsarCabecera(wrapper, 'Importe')
+    await pulsarFlecha(wrapper, 'Importe', 'asc')
 
     // 10 es Ana (id 4), 18 Luis, 20 Carmen y 36 Ana (id 1)
     expect(importes(wrapper)).toEqual(['Ana', 'Luis', 'Carmen', 'Ana'])
@@ -225,7 +226,7 @@ describe('AdminPagosTabla · ordenar', () => {
   test('al ordenar por Familia sale Ana, Ana, Carmen, Luis', async () => {
     const wrapper = montar(PAGOS, '')
 
-    await pulsarCabecera(wrapper, 'Familia')
+    await pulsarFlecha(wrapper, 'Familia', 'asc')
 
     expect(importes(wrapper)).toEqual(['Ana', 'Ana', 'Carmen', 'Luis'])
   })
@@ -233,10 +234,10 @@ describe('AdminPagosTabla · ordenar', () => {
   test('al ordenar por Sin cobrar los que no tienen días quedan siempre al final', async () => {
     const wrapper = montar(PAGOS, '')
 
-    await pulsarCabecera(wrapper, 'Sin cobrar')
+    await pulsarFlecha(wrapper, 'Sin cobrar', 'asc')
     expect(importes(wrapper).slice(0, 2)).toEqual(['Luis', 'Ana'])
 
-    await pulsarCabecera(wrapper, 'Sin cobrar')
+    await pulsarFlecha(wrapper, 'Sin cobrar', 'desc')
     expect(importes(wrapper).slice(0, 2)).toEqual(['Ana', 'Luis'])
     expect(wrapper.findAll('tbody tr')[3].text()).toContain('—')
   })
@@ -245,7 +246,7 @@ describe('AdminPagosTabla · ordenar', () => {
     const wrapper = montar(PAGOS, '')
     const antes = wrapper.find('.admin-pagos-tabla__pie').text()
 
-    await pulsarCabecera(wrapper, 'Importe')
+    await pulsarFlecha(wrapper, 'Importe', 'asc')
 
     expect(wrapper.find('.admin-pagos-tabla__pie').text()).toBe(antes)
   })
