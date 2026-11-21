@@ -234,12 +234,12 @@ describe('AdminUsuarios', () => {
   })
 })
 
-// Pulsa la cabecera de una columna (Nombre, Email, Rol, Estado)
-function pulsarCabecera(wrapper, nombre) {
-  return wrapper
-    .findAll('th button')
-    .find((boton) => boton.text() === nombre)
-    .trigger('click')
+// Pulsa una flecha de la cabecera de una columna: direccion es 'asc' (▲) o 'desc' (▼)
+function pulsarFlecha(wrapper, nombre, direccion) {
+  const cabecera = wrapper
+    .findAll('th')
+    .find((th) => th.find('.admin-cabecera-orden__texto').text() === nombre)
+  return cabecera.find(`button[data-direccion="${direccion}"]`).trigger('click')
 }
 
 function nombres(wrapper) {
@@ -251,20 +251,20 @@ describe('AdminUsuarios · ordenar', () => {
     expect(nombres(montar(9))).toEqual(['Ana', 'Pepe', 'Luis', 'Admin'])
   })
 
-  test('al pulsar Nombre se ordena de la A a la Z y al pulsar otra vez al revés', async () => {
+  test('con ▲ en Nombre va de la A a la Z y con ▼ al revés', async () => {
     const wrapper = montar(9)
 
-    await pulsarCabecera(wrapper, 'Nombre')
+    await pulsarFlecha(wrapper, 'Nombre', 'asc')
     expect(nombres(wrapper)).toEqual(['Admin', 'Ana', 'Luis', 'Pepe'])
 
-    await pulsarCabecera(wrapper, 'Nombre')
+    await pulsarFlecha(wrapper, 'Nombre', 'desc')
     expect(nombres(wrapper)).toEqual(['Pepe', 'Luis', 'Ana', 'Admin'])
   })
 
   test('al ordenar por Estado salen primero los activos', async () => {
     const wrapper = montar(9)
 
-    await pulsarCabecera(wrapper, 'Estado')
+    await pulsarFlecha(wrapper, 'Estado', 'asc')
 
     expect(nombres(wrapper)[3]).toBe('Luis')
   })
@@ -272,7 +272,7 @@ describe('AdminUsuarios · ordenar', () => {
   test('el orden se mantiene al filtrar por rol', async () => {
     const wrapper = montar(9)
 
-    await pulsarCabecera(wrapper, 'Nombre')
+    await pulsarFlecha(wrapper, 'Nombre', 'asc')
     await botonGrupo(wrapper, 'Familias').trigger('click')
 
     expect(nombres(wrapper)).toEqual(['Ana', 'Luis'])
@@ -281,14 +281,14 @@ describe('AdminUsuarios · ordenar', () => {
   test('la cabecera ordenada avisa con aria-sort', async () => {
     const wrapper = montar(9)
 
-    await pulsarCabecera(wrapper, 'Email')
+    await pulsarFlecha(wrapper, 'Email', 'asc')
 
-    expect(wrapper.find('th[aria-sort="ascending"]').text()).toBe('Email')
+    expect(wrapper.find('th[aria-sort="ascending"] .admin-cabecera-orden__texto').text()).toBe('Email')
   })
 
   test('la columna Acción no se puede ordenar', () => {
     const wrapper = montar(9)
-    const textos = wrapper.findAll('th button').map((boton) => boton.text())
+    const textos = wrapper.findAll('.admin-cabecera-orden__texto').map((texto) => texto.text())
 
     expect(textos).not.toContain('Acción')
   })
