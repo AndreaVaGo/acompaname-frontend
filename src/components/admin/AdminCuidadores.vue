@@ -23,7 +23,7 @@ function textoServicios(cantidad) {
 </script>
 
 <template>
-  <div class="admin-cuidadores">
+  <div class="admin-cuidadores admin-panel">
     <h2 class="titulo-seccion">Personas cuidadoras mejor valoradas</h2>
 
     <p v-if="cuidadores.length === 0" class="admin-cuidadores__vacio">
@@ -52,10 +52,9 @@ function textoServicios(cantidad) {
 <style scoped>
 .admin-cuidadores {
   flex: 1 1 420px;
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
   padding: 24px;
-  box-shadow: var(--shadow-card);
+  /* El cristal viene de la clase global admin-panel; aquí solo el color de la sección */
+  --admin-color: var(--color-secondary);
 }
 
 .admin-cuidadores .titulo-seccion {

@@ -27,7 +27,7 @@ function confirmar(id) {
 </script>
 
 <template>
-  <div class="admin-valoraciones">
+  <div class="admin-valoraciones admin-panel">
     <h2 class="titulo-seccion">Últimas valoraciones</h2>
 
     <p v-if="valoraciones.length === 0" class="admin-valoraciones__vacio">
@@ -83,10 +83,9 @@ function confirmar(id) {
 <style scoped>
 .admin-valoraciones {
   flex: 1 1 420px;
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
   padding: 24px;
-  box-shadow: var(--shadow-card);
+  /* El cristal viene de la clase global admin-panel; aquí solo el color de la sección */
+  --admin-color: var(--color-accent);
 }
 
 .admin-valoraciones .titulo-seccion {
