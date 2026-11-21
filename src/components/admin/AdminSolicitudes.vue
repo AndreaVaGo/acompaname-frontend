@@ -1,12 +1,16 @@
 <script setup>
+import { ref, computed } from "vue";
 import { formatearFecha } from "@/utils/formatearFecha";
 import { nombreTipo, colorTipo } from "@/utils/nombreTipo";
 import AdminFiltros from "@/components/admin/AdminFiltros.vue";
 import AdminPildora from "@/components/admin/AdminPildora.vue";
+import AdminCabeceraOrden from "@/components/admin/AdminCabeceraOrden.vue";
+import AdminOrdenar from "@/components/admin/AdminOrdenar.vue";
+import { ordenarFilas, siguienteOrden } from "@/utils/ordenarTabla";
 
 // Tabla de solicitudes con botones de estado (cada uno con el mismo color que su píldora).
 // estado es lo que está elegido en el filtro ("" = todas).
-defineProps({
+const props = defineProps({
   solicitudes: { type: Array, required: true },
   estado: { type: String, default: "" },
 });
@@ -40,6 +44,34 @@ function nombreEstado(estado) {
   }
   return estado;
 }
+
+// Orden de la tabla: por qué columna y en qué sentido ("" = como llegan del servidor)
+const orden = ref({ clave: "", direccion: "asc" });
+
+// Las columnas por las que se puede ordenar (también las usa el desplegable del móvil)
+const COLUMNAS = [
+  { clave: "tipo", nombre: "Tipo" },
+  { clave: "familia", nombre: "Familia" },
+  { clave: "cuidador", nombre: "Persona cuidadora" },
+  { clave: "fecha", nombre: "Fecha" },
+  { clave: "estado", nombre: "Estado" },
+];
+
+// Cómo sacar de una solicitud el valor de cada columna
+// (el estado se ordena como el flujo: pendiente, aceptada, completada, rechazada)
+const VALORES = {
+  tipo: (solicitud) => nombreTipo(solicitud.tipoCuidado),
+  familia: (solicitud) => solicitud.nombreFamilia,
+  cuidador: (solicitud) => solicitud.nombreCuidador,
+  fecha: (solicitud) => solicitud.fechaCuidado,
+  estado: (solicitud) => ESTADOS.findIndex((opcion) => opcion.valor === solicitud.estado),
+};
+
+const solicitudesOrdenadas = computed(() => ordenarFilas(props.solicitudes, VALORES, orden.value));
+
+function cambiarOrden(clave) {
+  orden.value = siguienteOrden(orden.value, clave);
+}
 </script>
 
 <template>
@@ -59,19 +91,25 @@ function nombreEstado(estado) {
       No hay solicitudes con este estado.
     </p>
 
-    <div v-else class="admin-tabla">
+    <template v-else>
+    <AdminOrdenar :columnas="COLUMNAS" :orden="orden" @ordenar="cambiarOrden" />
+
+    <div class="admin-tabla">
       <table>
         <thead>
           <tr>
-            <th>Tipo</th>
-            <th>Familia</th>
-            <th>Persona cuidadora</th>
-            <th>Fecha</th>
-            <th>Estado</th>
+            <AdminCabeceraOrden
+              v-for="columna in COLUMNAS"
+              :key="columna.clave"
+              :etiqueta="columna.nombre"
+              :clave="columna.clave"
+              :orden="orden"
+              @ordenar="cambiarOrden"
+            />
           </tr>
         </thead>
         <tbody>
-          <tr v-for="solicitud in solicitudes" :key="solicitud.id">
+          <tr v-for="solicitud in solicitudesOrdenadas" :key="solicitud.id">
             <td data-label="Tipo">
               <AdminPildora :color="colorTipo(solicitud.tipoCuidado)">
                 {{ nombreTipo(solicitud.tipoCuidado) }}
@@ -93,6 +131,7 @@ function nombreEstado(estado) {
         </tbody>
       </table>
     </div>
+    </template>
   </section>
 </template>
 

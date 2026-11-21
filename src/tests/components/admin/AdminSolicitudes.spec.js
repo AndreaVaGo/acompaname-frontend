@@ -135,3 +135,55 @@ describe('AdminSolicitudes', () => {
     expect(wrapper.find('.admin-tabla table').exists()).toBe(true)
   })
 })
+
+function pulsarCabecera(wrapper, nombre) {
+  return wrapper
+    .findAll('th button')
+    .find((boton) => boton.text() === nombre)
+    .trigger('click')
+}
+
+function familias(wrapper) {
+  return wrapper.findAll('tbody tr').map((fila) => fila.find('td[data-label="Familia"]').text())
+}
+
+describe('AdminSolicitudes · ordenar', () => {
+  test('al principio salen en el orden en que llegan', () => {
+    expect(familias(montar(SOLICITUDES, ''))).toEqual(['Ana', 'Luis'])
+  })
+
+  test('al pulsar Fecha salen primero las más antiguas y al pulsar otra vez las más nuevas', async () => {
+    const wrapper = montar(SOLICITUDES, '')
+
+    await pulsarCabecera(wrapper, 'Fecha')
+    expect(familias(wrapper)).toEqual(['Luis', 'Ana'])
+
+    await pulsarCabecera(wrapper, 'Fecha')
+    expect(familias(wrapper)).toEqual(['Ana', 'Luis'])
+  })
+
+  test('al ordenar por Estado sigue el flujo: pendiente antes que completada', async () => {
+    const wrapper = montar([SOLICITUDES[1], SOLICITUDES[0]], '')
+
+    await pulsarCabecera(wrapper, 'Estado')
+
+    expect(familias(wrapper)).toEqual(['Ana', 'Luis'])
+  })
+
+  test('al ordenar por Persona cuidadora usa el nombre de la persona cuidadora', async () => {
+    const wrapper = montar(SOLICITUDES, '')
+
+    await pulsarCabecera(wrapper, 'Persona cuidadora')
+
+    expect(familias(wrapper)).toEqual(['Luis', 'Ana'])
+  })
+
+  test('no cambia la lista original que recibe', async () => {
+    const lista = [...SOLICITUDES]
+    const wrapper = montar(lista, '')
+
+    await pulsarCabecera(wrapper, 'Fecha')
+
+    expect(lista.map((s) => s.id)).toEqual([1, 2])
+  })
+})
