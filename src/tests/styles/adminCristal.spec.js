@@ -74,6 +74,12 @@ describe("Panel de administración · secciones de cristal", () => {
     expect(estilosTabla).toContain(".admin-panel .admin-tabla tbody tr:hover td");
   });
 
+  test("cada fila de las tablas es una tarjeta suelta con hueco entre ellas", () => {
+    expect(estilosTabla).toContain("border-spacing: 0 10px");
+    expect(estilosTabla).toContain(".admin-panel .admin-tabla td:first-child {");
+    expect(estilosTabla).toContain("border-left: 5px solid var(--admin-color");
+  });
+
   test("las tarjetas de sugerencias son de cristal claro", () => {
     const codigo = readFileSync("src/components/admin/AdminSugerencias.vue", "utf-8");
 
