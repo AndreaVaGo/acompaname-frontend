@@ -71,7 +71,11 @@ defineEmits(["cambiar"]);
   .admin-menu {
     flex-direction: row;
     overflow-x: auto;
+    min-width: 0;
     padding: 8px;
+    /* Barra de desplazamiento fina y del color del panel, en vez de la gris gruesa del navegador */
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-secondary) transparent;
   }
 
   .admin-menu__boton {
