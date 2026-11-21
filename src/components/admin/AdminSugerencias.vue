@@ -107,7 +107,7 @@ function colorRol(rol) {
 </script>
 
 <template>
-  <section class="admin-sugerencias">
+  <section class="admin-sugerencias admin-panel">
     <div class="admin-sugerencias__cabecera">
       <div>
         <h2 class="admin-sugerencias__titulo">
@@ -176,10 +176,9 @@ function colorRol(rol) {
 
 <style scoped>
 .admin-sugerencias {
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
   padding: 24px;
-  box-shadow: var(--shadow-card);
+  /* El cristal viene de la clase global admin-panel; aquí solo el color de la sección */
+  --admin-color: var(--color-accent);
 }
 
 .admin-sugerencias__cabecera {
@@ -252,9 +251,10 @@ function colorRol(rol) {
   gap: 14px;
   padding: 18px;
   border-radius: var(--radius-card);
-  border: 1px solid var(--color-border);
+  border: 1px solid rgba(255, 255, 255, 0.8);
   border-top: 5px solid var(--acento);
-  background-color: var(--color-white);
+  /* Cristal claro: deja ver el fondo animado de detrás */
+  background-color: rgba(255, 255, 255, 0.7);
   box-shadow: var(--shadow-card);
   transition: box-shadow 0.2s, transform 0.2s;
 }

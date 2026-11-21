@@ -43,7 +43,7 @@ function nombreEstado(estado) {
 </script>
 
 <template>
-  <section class="admin-solicitudes" id="solicitudes">
+  <section class="admin-solicitudes admin-panel" id="solicitudes">
     <div class="admin-solicitudes__cabecera">
       <h2 class="admin-solicitudes__titulo">Solicitudes</h2>
     </div>
@@ -98,10 +98,9 @@ function nombreEstado(estado) {
 
 <style scoped>
 .admin-solicitudes {
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
   padding: 24px;
-  box-shadow: var(--shadow-card);
+  /* El cristal viene de la clase global admin-panel; aquí solo el color de la sección */
+  --admin-color: var(--color-accent);
 }
 
 .admin-solicitudes__cabecera {
@@ -127,7 +126,7 @@ function nombreEstado(estado) {
   display: inline-block;
   padding: 4px 10px;
   border-radius: var(--radius-input);
-  background-color: var(--color-neutral-bg);
+  background-color: color-mix(in srgb, var(--admin-color) 12%, white);
   font-weight: bold;
 }
 </style>

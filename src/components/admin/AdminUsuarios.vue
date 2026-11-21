@@ -103,7 +103,7 @@ function esMiCuenta(usuario, idPropio) {
 </script>
 
 <template>
-  <section class="admin-usuarios" id="usuarios">
+  <section class="admin-usuarios admin-panel" id="usuarios">
     <div class="admin-usuarios__cabecera">
       <h2 class="admin-usuarios__titulo">Usuarios</h2>
 
@@ -181,10 +181,9 @@ function esMiCuenta(usuario, idPropio) {
 
 <style scoped>
 .admin-usuarios {
-  background-color: var(--color-white);
-  border-radius: var(--radius-card);
   padding: 24px;
-  box-shadow: var(--shadow-card);
+  /* El cristal viene de la clase global admin-panel; aquí solo el color de la sección */
+  --admin-color: var(--color-info);
 }
 
 .admin-usuarios__cabecera {
