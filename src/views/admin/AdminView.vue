@@ -463,7 +463,7 @@ async function eliminarValoracion(id) {
 /* Menú a la izquierda y la sección elegida a la derecha */
 .admin__cuerpo {
   display: grid;
-  grid-template-columns: 200px 1fr;
+  grid-template-columns: 200px minmax(0, 1fr);
   gap: 24px;
   align-items: start;
 }
@@ -489,7 +489,7 @@ async function eliminarValoracion(id) {
 
   /* En móvil el menú queda arriba como una fila de pestañas */
   .admin__cuerpo {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 16px;
   }
 }
