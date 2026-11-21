@@ -53,25 +53,43 @@ const ariaSort = computed(() => {
   cursor: pointer;
 }
 
-/* La flecha se dibuja con CSS: ↕ si no está ordenada, ▲ de menor a mayor y ▼ al revés */
+/* La flecha se dibuja con CSS: ⇅ si no está ordenada, ▲ de menor a mayor y ▼ al revés.
+   Va en una cajita redonda del color de la sección para que se vea bien */
 .admin-cabecera-orden__boton::after {
-  content: "↕";
-  font-size: 0.8rem;
-  opacity: 0.4;
+  content: "⇅";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background-color: color-mix(in srgb, var(--admin-color, var(--color-accent)) 18%, white);
+  color: var(--admin-color, var(--color-accent));
+  font-size: 0.95rem;
+  font-weight: bold;
+  line-height: 1;
 }
 
 .admin-cabecera-orden__boton[data-direccion="asc"]::after {
   content: "▲";
-  opacity: 1;
+  background-color: var(--admin-color, var(--color-accent));
+  color: var(--color-white);
+  font-size: 0.7rem;
 }
 
 .admin-cabecera-orden__boton[data-direccion="desc"]::after {
   content: "▼";
-  opacity: 1;
+  background-color: var(--admin-color, var(--color-accent));
+  color: var(--color-white);
+  font-size: 0.7rem;
 }
 
 .admin-cabecera-orden__boton:hover::after {
-  opacity: 1;
+  background-color: color-mix(in srgb, var(--admin-color, var(--color-accent)) 35%, white);
+}
+
+.admin-cabecera-orden__boton[data-direccion]:not([data-direccion=""]):hover::after {
+  background-color: var(--admin-color, var(--color-accent));
 }
 
 .admin-cabecera-orden__boton--activo {
