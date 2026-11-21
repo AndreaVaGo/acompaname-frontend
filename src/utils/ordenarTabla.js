@@ -2,19 +2,6 @@
 // orden es un objeto { clave, direccion }: clave dice por qué columna se ordena ("" = sin ordenar)
 // y direccion es "asc" (de menor a mayor, de la A a la Z) o "desc" (al revés).
 
-// Qué orden toca al pulsar una columna:
-// - si ya estaba ordenada por ella, se da la vuelta (asc pasa a desc y desc a asc)
-// - si es otra columna, se empieza por asc
-export function siguienteOrden(actual, clave) {
-  if (clave !== "" && actual.clave === clave) {
-    if (actual.direccion === "asc") {
-      return { clave: clave, direccion: "desc" };
-    }
-    return { clave: clave, direccion: "asc" };
-  }
-  return { clave: clave, direccion: "asc" };
-}
-
 // Compara dos valores: los números como números y lo demás como texto en español
 // (sin mirar mayúsculas ni tildes, y con "pepe 2" antes que "pepe 10")
 function comparar(a, b) {
