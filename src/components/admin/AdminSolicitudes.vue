@@ -6,7 +6,7 @@ import AdminFiltros from "@/components/admin/AdminFiltros.vue";
 import AdminPildora from "@/components/admin/AdminPildora.vue";
 import AdminCabeceraOrden from "@/components/admin/AdminCabeceraOrden.vue";
 import AdminOrdenar from "@/components/admin/AdminOrdenar.vue";
-import { ordenarFilas, siguienteOrden } from "@/utils/ordenarTabla";
+import { ordenarFilas } from "@/utils/ordenarTabla";
 
 // Tabla de solicitudes con botones de estado (cada uno con el mismo color que su píldora).
 // estado es lo que está elegido en el filtro ("" = todas).
@@ -69,8 +69,9 @@ const VALORES = {
 
 const solicitudesOrdenadas = computed(() => ordenarFilas(props.solicitudes, VALORES, orden.value));
 
-function cambiarOrden(clave) {
-  orden.value = siguienteOrden(orden.value, clave);
+// Las flechas de la cabecera y el desplegable del móvil mandan el orden ya decidido
+function cambiarOrden(nuevoOrden) {
+  orden.value = nuevoOrden;
 }
 </script>
 
