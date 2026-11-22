@@ -3,6 +3,8 @@ import { ref, computed, onMounted, watch } from "vue";
 import { RouterLink } from "vue-router";
 import CuidadorRepository from "@/repositories/CuidadorRepository";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
+import VerificacionRepository from "@/repositories/VerificacionRepository";
+import InsigniaVerificado from "@/components/InsigniaVerificado.vue";
 import FotoCuidador from "@/components/FotoCuidador.vue";
 import SelectorGrupos from "@/components/SelectorGrupos.vue";
 import { CUIDADOS, nombreCuidado } from "@/utils/catalogoCuidados";
@@ -14,7 +16,10 @@ import { textoDistancia } from "@/utils/textoDistancia";
 
 const cuidadorRepository = new CuidadorRepository();
 const solicitudRepository = new SolicitudRepository();
+const verificacionRepository = new VerificacionRepository();
 const cuidadores = ref([]);
+// Qué tiene verificado cada persona cuidadora, según su id: { 3: { titulacionVerificada, ... } }
+const verificados = ref({});
 const busqueda = ref("");
 const ciudadBuscada = ref("");
 const tipoBuscado = ref("todos");
@@ -52,7 +57,26 @@ onMounted(async () => {
   } finally {
     cargando.value = false;
   }
+  cargarVerificados();
 });
+
+// Las insignias son un extra: si no se pueden pedir, la búsqueda sigue funcionando sin ellas
+async function cargarVerificados() {
+  try {
+    const lista = await verificacionRepository.getPublicas();
+    const porId = {};
+    for (const fila of lista) {
+      porId[fila.cuidadorId] = fila;
+    }
+    verificados.value = porId;
+  } catch {
+    verificados.value = {};
+  }
+}
+
+function verificadoDe(cuidador) {
+  return verificados.value[cuidador.id] || {};
+}
 
 // Pide al servidor las distancias. Solo se hace al pulsar el botón (no al escribir),
 // para no preguntar por cada letra
@@ -640,6 +664,16 @@ const cuidadoresMostrados = computed(() => {
             :key="codigo"
             >{{ nombreCuidado(codigo) }}</span
           >
+        </div>
+
+        <div
+          class="buscar__tags"
+          v-if="verificadoDe(cuidador).titulacionVerificada || verificadoDe(cuidador).antecedentesVerificados"
+        >
+          <InsigniaVerificado
+            :titulacion="!!verificadoDe(cuidador).titulacionVerificada"
+            :antecedentes="!!verificadoDe(cuidador).antecedentesVerificados"
+          />
         </div>
 
         <div class="buscar__tags" v-if="titulacionesDe(cuidador).length > 0">

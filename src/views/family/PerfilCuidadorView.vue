@@ -5,6 +5,8 @@ import { useAuthStore } from "../../stores/auth";
 import { RouterLink } from "vue-router";
 import CuidadorRepository from "@/repositories/CuidadorRepository";
 import ValoracionRepository from "@/repositories/ValoracionRepository";
+import VerificacionRepository from "@/repositories/VerificacionRepository";
+import InsigniaVerificado from "@/components/InsigniaVerificado.vue";
 import FotoCuidador from "@/components/FotoCuidador.vue";
 import { nombreCuidado } from "@/utils/catalogoCuidados";
 import { nombreTitulacion } from "@/utils/catalogoTitulaciones";
@@ -39,6 +41,10 @@ function formacionDe(persona) {
   return nombres;
 }
 
+const verificacionRepository = new VerificacionRepository();
+// Qué tiene verificado esta persona (null mientras no se sabe o si no tiene nada)
+const verificado = ref(null);
+
 const valoraciones = ref([]);
 const mostrarValoraciones = ref(false);
 const cargandoValoraciones = ref(false);
@@ -56,7 +62,21 @@ onMounted(async () => {
   } finally {
     cargando.value = false;
   }
+  cargarVerificado();
 });
+
+// La insignia es un extra: si no se puede pedir, el perfil se ve igual sin ella
+async function cargarVerificado() {
+  if (!cuidador.value) {
+    return;
+  }
+  try {
+    const lista = await verificacionRepository.getPublicas();
+    verificado.value = lista.find((fila) => fila.cuidadorId === cuidador.value.id) || null;
+  } catch {
+    verificado.value = null;
+  }
+}
 
 async function abrirValoraciones() {
   mostrarValoraciones.value = true;
@@ -105,6 +125,11 @@ function estrellas(puntuacion) {
             <p v-if="cuidador.ciudad" class="perfil__ciudad">
               📍 {{ cuidador.ciudad }}
             </p>
+            <InsigniaVerificado
+              v-if="verificado"
+              :titulacion="verificado.titulacionVerificada"
+              :antecedentes="verificado.antecedentesVerificados"
+            />
           </div>
         </div>
 
