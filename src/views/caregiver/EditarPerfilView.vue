@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue";
 import CuidadorRepository from "@/repositories/CuidadorRepository";
 import FotoCuidador from "@/components/FotoCuidador.vue";
+import VerificacionPerfil from "@/components/VerificacionPerfil.vue";
 import SelectorGrupos from "@/components/SelectorGrupos.vue";
 import { reducirImagen } from "@/utils/reducirImagen";
 import { CUIDADOS } from "@/utils/catalogoCuidados";
@@ -273,8 +274,8 @@ async function guardar() {
 
             <h2 class="editar__seccion">Formación y titulaciones</h2>
             <p class="editar__ayuda">
-              Marca la formación que tienes. Es solo una declaración tuya: la
-              web no comprueba los títulos.
+              Marca la formación que tienes. Lo que marques aquí es una
+              declaración tuya; abajo puedes pedir que se verifique.
             </p>
             <div class="editar__servicios">
               <label
@@ -306,6 +307,8 @@ async function guardar() {
               maxlength="200"
               placeholder="Por ejemplo: curso de movilización de pacientes"
             />
+
+            <VerificacionPerfil />
 
             <h2 class="editar__seccion">Experiencia y tarifa</h2>
             <div class="editar__row">
