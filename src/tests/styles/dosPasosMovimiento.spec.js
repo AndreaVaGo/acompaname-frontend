@@ -42,4 +42,20 @@ describe("Animaciones del inicio de sesión en dos pasos", () => {
     expect(base).toContain("@media (prefers-reduced-motion: reduce)");
     expect(base).toContain("animation-duration: 0.01ms !important");
   });
+
+  test("los botones del bloque de dos pasos tienen borde de color y se rellenan al pasar el ratón", () => {
+    expect(perfil).toMatch(/\.dos-pasos__boton,\s*\.dos-pasos__botones \.btn--secondary\s*\{[^}]*border: 2px solid var\(--color-secondary\)/);
+    expect(perfil).toContain(".dos-pasos__boton--desactivar");
+  });
+
+  test("la tarjeta de Mi perfil se divide en bloques con título y Cerrar sesión va separado por una línea", () => {
+    const miPerfil = readFileSync("src/views/common/MiPerfilView.vue", "utf-8");
+    expect(miPerfil).toContain('<h3 class="mi-perfil__seccion">Tus datos</h3>');
+    expect(perfil).toContain('<h3 class="dos-pasos__seccion">Seguridad</h3>');
+    expect(miPerfil).toMatch(/\.mi-perfil__acciones\s*\{[^}]*border-top: 1px solid/);
+  });
+
+  test("el bloque de dos pasos es una tarjeta blanca con sombra, distinta de las filas grises", () => {
+    expect(perfil).toMatch(/\.dos-pasos__cabecera\s*\{[^}]*background-color: var\(--color-white\)[^}]*box-shadow: var\(--shadow-card\)/);
+  });
 });

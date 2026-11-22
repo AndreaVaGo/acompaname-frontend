@@ -68,6 +68,7 @@ async function confirmar() {
 
 <template>
   <section class="dos-pasos" v-if="activo !== null">
+    <h3 class="dos-pasos__seccion">Seguridad</h3>
     <div class="dos-pasos__cabecera">
       <span class="dos-pasos__escudo" :class="{ 'dos-pasos__escudo--activo': activo }" aria-hidden="true">
         {{ activo ? "🛡️" : "🔓" }}
@@ -94,6 +95,7 @@ async function confirmar() {
       v-if="!abierto"
       type="button"
       class="btn btn--secondary dos-pasos__boton"
+      :class="{ 'dos-pasos__boton--desactivar': activo }"
       @click="abrir"
     >
       {{ activo ? "Desactivar" : "Activar" }}
@@ -127,7 +129,18 @@ async function confirmar() {
 
 <style scoped>
 .dos-pasos {
-  padding: 8px 28px 8px;
+  padding: 18px 28px 8px;
+}
+
+/* Mismo título pequeño que "Tus datos" en Mi perfil */
+.dos-pasos__seccion {
+  margin: 0 0 10px;
+  font-family: var(--font-base);
+  font-size: 0.78rem;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
 }
 
 .dos-pasos__cabecera {
@@ -135,9 +148,12 @@ async function confirmar() {
   align-items: center;
   gap: 14px;
   padding: 16px 18px;
-  background-color: var(--color-neutral-bg);
+  /* Blanca y con sombra: se distingue de las filas grises de datos, es una tarjeta propia */
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
   border-left: 4px solid var(--color-secondary);
   border-radius: var(--radius-input);
+  box-shadow: var(--shadow-card);
 }
 
 .dos-pasos__escudo {
@@ -148,7 +164,7 @@ async function confirmar() {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background-color: var(--color-white);
+  background-color: var(--color-neutral-bg);
   font-size: 1.5rem;
 }
 
@@ -187,7 +203,7 @@ async function confirmar() {
   flex-shrink: 0;
   padding: 4px 12px;
   border-radius: var(--radius-pill);
-  background-color: var(--color-white);
+  background-color: var(--color-neutral-bg);
   border: 1px solid var(--color-border);
   font-size: 0.78rem;
   font-weight: bold;
@@ -214,6 +230,38 @@ async function confirmar() {
 .dos-pasos__boton {
   width: 100%;
   margin-top: 12px;
+}
+
+/* Botones secundarios del bloque: borde verde que se rellena al pasar el ratón,
+   igual que "Cerrar sesión" pero en el color de este bloque */
+.dos-pasos__boton,
+.dos-pasos__botones .btn--secondary {
+  background-color: var(--color-white);
+  border: 2px solid var(--color-secondary);
+  color: var(--color-secondary);
+  font-weight: bold;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+/* Desactivar va en coral, porque quita protección */
+.dos-pasos__boton--desactivar {
+  border-color: var(--color-accent);
+  color: var(--color-accent-dark);
+}
+
+@media (hover: hover) {
+  .dos-pasos__boton:hover,
+  .dos-pasos__botones .btn--secondary:hover {
+    background-color: var(--color-secondary);
+    color: var(--color-white);
+  }
+
+  .dos-pasos__boton--desactivar:hover {
+    background-color: var(--color-accent);
+    color: var(--color-white);
+  }
 }
 
 .dos-pasos__form {
@@ -255,7 +303,7 @@ async function confirmar() {
 
 @media (max-width: 768px) {
   .dos-pasos {
-    padding: 8px 20px;
+    padding: 16px 20px 8px;
   }
 
   .dos-pasos__cabecera {

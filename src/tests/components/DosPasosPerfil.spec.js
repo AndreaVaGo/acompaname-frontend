@@ -25,6 +25,7 @@ describe("DosPasosPerfil", () => {
 
     expect(wrapper.find("[data-testid='estado-dos-pasos']").text()).toBe("Desactivado");
     expect(wrapper.find(".dos-pasos__boton").text()).toBe("Activar");
+    expect(wrapper.find(".dos-pasos__boton").classes()).not.toContain("dos-pasos__boton--desactivar");
     expect(wrapper.find(".dos-pasos__escudo--activo").exists()).toBe(false);
   });
 
@@ -33,6 +34,7 @@ describe("DosPasosPerfil", () => {
 
     expect(wrapper.find("[data-testid='estado-dos-pasos']").text()).toBe("Activado");
     expect(wrapper.find(".dos-pasos__boton").text()).toBe("Desactivar");
+    expect(wrapper.find(".dos-pasos__boton").classes()).toContain("dos-pasos__boton--desactivar");
     expect(wrapper.find(".dos-pasos__escudo--activo").exists()).toBe(true);
   });
 
