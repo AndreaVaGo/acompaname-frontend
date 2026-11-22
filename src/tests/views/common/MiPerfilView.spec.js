@@ -4,6 +4,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import { createPinia } from "pinia";
 import MiPerfilView from "../../../views/common/MiPerfilView.vue";
 import UsuarioRepository from "../../../repositories/UsuarioRepository";
+import DosPasosRepository from "../../../repositories/DosPasosRepository";
 import { useAuthStore } from "../../../stores/auth";
 
 const getByIdFalso = vi
@@ -15,6 +16,11 @@ const getByIdFalso = vi
     telefono: "600111222",
     roles: ["FAMILIA"],
   });
+
+// El bloque de dos pasos pide su estado al servidor: aquí se simula
+vi.spyOn(DosPasosRepository.prototype, "getEstado").mockResolvedValue({
+  activo: false,
+});
 
 const router = createRouter({
   history: createWebHistory(),
@@ -48,6 +54,12 @@ describe("MiPerfilView", () => {
 
     expect(wrapper.find("#mi-perfil-editar-datos").exists()).toBe(false);
     expect(wrapper.find("#mi-perfil-cambiar-password").exists()).toBe(false);
+  });
+
+  test("muestra el bloque para activar el inicio de sesión en dos pasos", async () => {
+    const wrapper = await montarVista();
+
+    expect(wrapper.text()).toContain("Inicio de sesión en dos pasos");
   });
 
   test("muestra un error si no se pueden cargar los datos", async () => {

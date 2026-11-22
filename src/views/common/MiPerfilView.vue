@@ -4,6 +4,7 @@ import { useRouter } from "vue-router";
 import { useAuthStore } from "../../stores/auth";
 import UsuarioRepository from "@/repositories/UsuarioRepository";
 import { mensajeDeError } from "@/utils/mensajeDeError";
+import DosPasosPerfil from "@/components/DosPasosPerfil.vue";
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -59,6 +60,8 @@ function cerrarSesion() {
           <strong>{{ usuario.telefono }}</strong>
         </div>
       </div>
+
+      <DosPasosPerfil />
 
       <div class="mi-perfil__acciones">
         <button class="btn btn--secondary" @click="cerrarSesion">
