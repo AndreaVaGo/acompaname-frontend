@@ -329,7 +329,7 @@ Frontend architecture, navigation flow, use cases, sequence diagrams (sign up an
 
 ## ✅ Tests
 
-- **Unit tests** (Vitest + Vue Test Utils): **1,617 tests in 150 files** covering components, views, router, store, repositories and utils. They mock the repository, so they do not need the backend. Coverage: **98.16 %** of statements, **96.9 %** of branches, **97.25 %** of functions and **98.22 %** of lines.
+- **Unit tests** (Vitest + Vue Test Utils): **1,619 tests in 150 files** covering components, views, router, store, repositories and utils. They mock the repository, so they do not need the backend. Coverage: **98.09 %** of statements, **96.81 %** of branches, **97.26 %** of functions and **98.16 %** of lines.
 - **End-to-end tests** (Playwright): **31 tests** that open a real browser and go through the main flows (sign up and login, search and request, admin panel, visitor and the photo panel on the auth screens). They **need the backend running**, run one after another because they share the database, and start the frontend by themselves if it is not already running.
 
 ```bash
