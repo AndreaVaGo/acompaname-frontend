@@ -232,35 +232,35 @@ async function confirmar() {
   margin-top: 12px;
 }
 
-/* Botones secundarios del bloque: borde verde que se rellena al pasar el ratón,
-   igual que "Cerrar sesión" pero en el color de este bloque */
-.dos-pasos__boton,
-.dos-pasos__botones .btn--secondary {
-  background-color: var(--color-white);
+/* Botones del bloque: ya vienen con su color de relleno (no solo al pasar el ratón).
+   Activar en verde y Desactivar en coral oscuro, porque quita protección */
+.dos-pasos__boton {
+  background-color: var(--color-secondary);
   border: 2px solid var(--color-secondary);
-  color: var(--color-secondary);
+  color: var(--color-white);
   font-weight: bold;
-  transition:
-    background-color var(--dur-fast) var(--ease-out),
-    color var(--dur-fast) var(--ease-out);
+  transition: filter var(--dur-fast) var(--ease-out);
 }
 
-/* Desactivar va en coral, porque quita protección */
 .dos-pasos__boton--desactivar {
-  border-color: var(--color-accent);
-  color: var(--color-accent-dark);
+  background-color: var(--color-accent-dark);
+  border-color: var(--color-accent-dark);
 }
 
+/* Cancelar: gris suave, para que Confirmar destaque */
+.dos-pasos__botones .btn--secondary {
+  background-color: var(--color-neutral-bg);
+  border: 2px solid var(--color-border);
+  color: var(--color-text);
+  font-weight: bold;
+  transition: filter var(--dur-fast) var(--ease-out);
+}
+
+/* Al pasar el ratón se oscurecen un poco */
 @media (hover: hover) {
   .dos-pasos__boton:hover,
   .dos-pasos__botones .btn--secondary:hover {
-    background-color: var(--color-secondary);
-    color: var(--color-white);
-  }
-
-  .dos-pasos__boton--desactivar:hover {
-    background-color: var(--color-accent);
-    color: var(--color-white);
+    filter: brightness(0.92);
   }
 }
 

@@ -43,9 +43,9 @@ describe("Animaciones del inicio de sesión en dos pasos", () => {
     expect(base).toContain("animation-duration: 0.01ms !important");
   });
 
-  test("los botones del bloque de dos pasos tienen borde de color y se rellenan al pasar el ratón", () => {
-    expect(perfil).toMatch(/\.dos-pasos__boton,\s*\.dos-pasos__botones \.btn--secondary\s*\{[^}]*border: 2px solid var\(--color-secondary\)/);
-    expect(perfil).toContain(".dos-pasos__boton--desactivar");
+  test("los botones del bloque de dos pasos ya tienen su color de relleno sin pasar el ratón", () => {
+    expect(perfil).toMatch(/\.dos-pasos__boton\s*\{[^}]*background-color: var\(--color-secondary\)[^}]*color: var\(--color-white\)/);
+    expect(perfil).toMatch(/\.dos-pasos__boton--desactivar\s*\{[^}]*background-color: var\(--color-accent-dark\)/);
   });
 
   test("la tarjeta de Mi perfil se divide en bloques con título y Cerrar sesión va separado por una línea", () => {
