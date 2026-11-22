@@ -61,6 +61,20 @@ const SOLICITUDES = [
   },
 ]
 
+const VERIFICACIONES = [
+  {
+    id: 1,
+    cuidadorId: 3,
+    cuidadorNombre: 'Pepe',
+    tipo: 'TITULACION',
+    estado: 'PENDIENTE',
+    referencia: 'COL-12345',
+    solicitadaEn: '2026-11-22T10:05:00',
+    revisadaEn: null,
+    motivoRechazo: null,
+  },
+]
+
 const SUGERENCIAS = [
   {
     id: 1,
@@ -141,6 +155,8 @@ function prepararRepositorio(cambios) {
   vi.spyOn(AdminRepository.prototype, 'getPagosResumen').mockResolvedValue(datos.pagosResumen)
   vi.spyOn(AdminRepository.prototype, 'getPagos').mockResolvedValue(datos.pagos)
   vi.spyOn(AdminRepository.prototype, 'getSugerencias').mockResolvedValue(datos.sugerencias)
+  vi.spyOn(AdminRepository.prototype, 'getVerificaciones').mockResolvedValue(VERIFICACIONES)
+  vi.spyOn(AdminRepository.prototype, 'resolverVerificacion').mockResolvedValue({})
   vi.spyOn(AdminRepository.prototype, 'cambiarActivo').mockResolvedValue({})
   vi.spyOn(AdminRepository.prototype, 'borrarValoracion').mockResolvedValue()
 }
@@ -151,7 +167,7 @@ async function montarVista() {
   return wrapper
 }
 
-// Pulsa un botón del menú lateral por su texto (Resumen, Solicitudes, Pagos, Usuarios, Sugerencias)
+// Pulsa un botón del menú lateral por su texto (Resumen, Solicitudes, Pagos, Usuarios, Sugerencias, Verificaciones)
 async function irASeccion(wrapper, texto) {
   const boton = wrapper.findAll('.admin-menu__boton').find((b) => b.text() === texto)
   await boton.trigger('click')
@@ -194,7 +210,14 @@ describe('AdminView', () => {
     expect(wrapper.text()).not.toContain('Cargando el panel...')
     expect(wrapper.text()).toContain('Panel de administración')
     const textosMenu = wrapper.findAll('.admin-menu__boton').map((b) => b.text())
-    expect(textosMenu).toEqual(['Resumen', 'Solicitudes', 'Pagos', 'Usuarios', 'Sugerencias'])
+    expect(textosMenu).toEqual([
+      'Resumen',
+      'Solicitudes',
+      'Pagos',
+      'Usuarios',
+      'Sugerencias',
+      'Verificaciones',
+    ])
     expect(wrapper.find('.admin-menu__boton--activo').text()).toBe('Resumen')
     expect(wrapper.text()).toContain('Requieren atención')
     expect(wrapper.text()).toContain('Ingresos cobrados')
@@ -563,5 +586,72 @@ describe('AdminView', () => {
       'No se pudo eliminar la valoración. No se ha encontrado lo que buscas.'
     )
     expect(wrapper.text()).not.toContain('Valoración eliminada.')
+  })
+
+  test('las verificaciones no se piden al abrir el panel, solo al entrar en su pestaña', async () => {
+    prepararRepositorio()
+
+    const wrapper = await montarVista()
+    expect(AdminRepository.prototype.getVerificaciones).not.toHaveBeenCalled()
+
+    await irASeccion(wrapper, 'Verificaciones')
+
+    expect(AdminRepository.prototype.getVerificaciones).toHaveBeenCalledTimes(1)
+    expect(wrapper.find('.admin-menu__boton--activo').text()).toBe('Verificaciones')
+    expect(wrapper.findAll('[data-testid="verificacion"]')).toHaveLength(1)
+    expect(wrapper.text()).toContain('COL-12345')
+  })
+
+  test('si falla al cargar las verificaciones muestra el motivo', async () => {
+    prepararRepositorio()
+    AdminRepository.prototype.getVerificaciones.mockRejectedValue(errorDelServidor(500))
+    const wrapper = await montarVista()
+
+    await irASeccion(wrapper, 'Verificaciones')
+
+    expect(wrapper.text()).toContain(
+      'No se pudieron cargar las verificaciones. Ha ocurrido un error en el servidor. Inténtalo más tarde.'
+    )
+  })
+
+  test('aprobar una verificación la envía y vuelve a pedir la lista', async () => {
+    prepararRepositorio()
+    const wrapper = await montarVista()
+    await irASeccion(wrapper, 'Verificaciones')
+
+    await wrapper.find('[data-testid="aprobar"]').trigger('click')
+    await flushPromises()
+
+    expect(AdminRepository.prototype.resolverVerificacion).toHaveBeenCalledWith(1, true, '')
+    expect(AdminRepository.prototype.getVerificaciones).toHaveBeenCalledTimes(2)
+    expect(wrapper.text()).toContain('Verificación aprobada.')
+  })
+
+  test('rechazar una verificación envía el motivo y lo avisa', async () => {
+    prepararRepositorio()
+    const wrapper = await montarVista()
+    await irASeccion(wrapper, 'Verificaciones')
+
+    await wrapper.find('.admin-verif__acciones input').setValue('No existe')
+    await wrapper.find('[data-testid="rechazar"]').trigger('click')
+    await flushPromises()
+
+    expect(AdminRepository.prototype.resolverVerificacion).toHaveBeenCalledWith(1, false, 'No existe')
+    expect(wrapper.text()).toContain('Verificación rechazada.')
+  })
+
+  test('si no se puede resolver una verificación muestra el motivo', async () => {
+    prepararRepositorio()
+    AdminRepository.prototype.resolverVerificacion.mockRejectedValue(errorDelServidor(500))
+    const wrapper = await montarVista()
+    await irASeccion(wrapper, 'Verificaciones')
+
+    await wrapper.find('[data-testid="aprobar"]').trigger('click')
+    await flushPromises()
+
+    expect(wrapper.text()).toContain(
+      'No se pudo resolver la verificación. Ha ocurrido un error en el servidor. Inténtalo más tarde.'
+    )
+    expect(wrapper.text()).not.toContain('Verificación aprobada.')
   })
 })

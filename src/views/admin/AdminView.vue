@@ -17,6 +17,7 @@ import AdminPagosMeses from "@/components/admin/AdminPagosMeses.vue";
 import AdminPagosBarras from "@/components/admin/AdminPagosBarras.vue";
 import AdminPagosTabla from "@/components/admin/AdminPagosTabla.vue";
 import AdminSugerencias from "@/components/admin/AdminSugerencias.vue";
+import AdminVerificaciones from "@/components/admin/AdminVerificaciones.vue";
 
 const adminRepository = new AdminRepository();
 const authStore = useAuthStore();
@@ -28,6 +29,7 @@ const secciones = [
   { id: "pagos", texto: "Pagos" },
   { id: "usuarios", texto: "Usuarios" },
   { id: "sugerencias", texto: "Sugerencias" },
+  { id: "verificaciones", texto: "Verificaciones" },
 ];
 // Sección que se está viendo: solo se muestra una a la vez
 const seccion = ref("resumen");
@@ -48,6 +50,8 @@ const pagosResumen = ref(null);
 const pagos = ref([]);
 // Las sugerencias no se piden al abrir el panel, sino al entrar en su pestaña
 const sugerencias = ref([]);
+// Las verificaciones tampoco: se piden al entrar en su pestaña
+const verificaciones = ref([]);
 // Estado elegido en el filtro de solicitudes ("" = todas)
 const estadoFiltro = ref("");
 // Estado elegido en el filtro de pagos ("" = todos)
@@ -223,6 +227,16 @@ function limpiarMensajes() {
 async function cambiarSeccion(id) {
   limpiarMensajes();
   seccion.value = id;
+  if (id === "verificaciones") {
+    try {
+      verificaciones.value = await adminRepository.getVerificaciones();
+    } catch (err) {
+      mensajeError.value = mensajeDeError(
+        err,
+        "No se pudieron cargar las verificaciones.",
+      );
+    }
+  }
   if (id === "sugerencias") {
     try {
       sugerencias.value = await adminRepository.getSugerencias();
@@ -267,6 +281,21 @@ async function cambiarEstadoPagos(estado) {
 async function verPendientes() {
   seccion.value = "solicitudes";
   await cambiarEstado("PENDIENTE");
+}
+
+// Aprueba o rechaza una verificación y vuelve a pedir la lista para ver su nuevo estado
+async function resolverVerificacion({ id, aprobar, motivo }) {
+  limpiarMensajes();
+  try {
+    await adminRepository.resolverVerificacion(id, aprobar, motivo);
+    verificaciones.value = await adminRepository.getVerificaciones();
+    mensajeOk.value = aprobar ? "Verificación aprobada." : "Verificación rechazada.";
+  } catch (err) {
+    mensajeError.value = mensajeDeError(
+      err,
+      "No se pudo resolver la verificación.",
+    );
+  }
 }
 
 // Bloquea al usuario si estaba activo y lo desbloquea si estaba bloqueado
@@ -405,6 +434,12 @@ async function eliminarValoracion(id) {
         <AdminSugerencias
           v-else-if="seccion === 'sugerencias'"
           :sugerencias="sugerencias"
+        />
+
+        <AdminVerificaciones
+          v-else-if="seccion === 'verificaciones'"
+          :verificaciones="verificaciones"
+          @resolver="resolverVerificacion"
         />
       </div>
     </div>
