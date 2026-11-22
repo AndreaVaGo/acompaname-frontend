@@ -60,4 +60,17 @@ export default class AdminRepository extends Repository {
   async getSugerencias() {
     return this.get("/admin/sugerencias");
   }
+
+  // Verificaciones de titulación y antecedentes. Si no se indica estado, salen todas
+  async getVerificaciones(estado) {
+    if (estado) {
+      return this.get(`/admin/verificaciones?estado=${estado}`);
+    }
+    return this.get("/admin/verificaciones");
+  }
+
+  // Aprueba (aprobar = true) o rechaza una verificación pendiente. El motivo es opcional
+  async resolverVerificacion(id, aprobar, motivo) {
+    return this.put(`/admin/verificaciones/${id}`, { aprobar, motivo });
+  }
 }
