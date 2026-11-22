@@ -20,6 +20,21 @@ export default class AuthRepository extends Repository {
     return await response.json();
   }
 
+  // Segundo paso del login: envía el desafío que dio el login y el código que llegó por correo.
+  // Si valen, devuelve lo mismo que un login normal (datos de la persona y token)
+  async verificarCodigo(desafio, codigo) {
+    const response = await fetch(`${this.uri}/login/verificar`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ desafio, codigo }),
+    });
+    // true: es una ruta pública, un 401 aquí nunca es una sesión caducada
+    if (!response.ok) {
+      await lanzarError(response, "Código incorrecto", true);
+    }
+    return await response.json();
+  }
+
   async register(usuarioData) {
     return this.post("/usuarios", usuarioData);
   }
