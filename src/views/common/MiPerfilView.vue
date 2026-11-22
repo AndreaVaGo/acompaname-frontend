@@ -51,6 +51,7 @@ function cerrarSesion() {
       </div>
 
       <div class="mi-perfil__datos">
+        <h3 class="mi-perfil__seccion">Tus datos</h3>
         <div class="mi-perfil__fila">
           <span>✉️ Email</span>
           <strong>{{ usuario.email }}</strong>
@@ -162,7 +163,18 @@ function cerrarSesion() {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 20px 28px 8px;
+  padding: 22px 28px 8px;
+}
+
+/* Título pequeño de cada bloque (Tus datos, Seguridad) para que se distingan las partes de la tarjeta */
+.mi-perfil__seccion {
+  margin: 0 0 2px;
+  font-family: var(--font-base);
+  font-size: 0.78rem;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
 }
 
 /* Cada dato va en su propia pastilla, que se resalta al pasar el ratón */
@@ -200,23 +212,27 @@ function cerrarSesion() {
   }
 }
 
+/* Cerrar sesión va aparte, separado del resto por una línea */
 .mi-perfil__acciones {
-  padding: 16px 28px 28px;
+  margin: 20px 28px 0;
+  padding: 20px 0 28px;
+  border-top: 1px solid var(--color-border);
 
   & .btn {
     width: 100%;
   }
 }
 
-/* Cerrar sesión: borde coral que se rellena al pasar el ratón (el icono va puesto con CSS) */
+/* Cerrar sesión: botón relleno de coral oscuro, que se oscurece un poco al pasar el ratón
+   (el icono va puesto con CSS) */
 .mi-perfil__acciones .btn--secondary {
-  background-color: var(--color-white);
-  border: 2px solid var(--color-accent);
-  color: var(--color-accent-dark);
+  background-color: var(--color-accent-dark);
+  border: 2px solid var(--color-accent-dark);
+  color: var(--color-white);
   font-weight: bold;
   transition:
     background-color var(--dur-fast) var(--ease-out),
-    color var(--dur-fast) var(--ease-out);
+    border-color var(--dur-fast) var(--ease-out);
 }
 
 .mi-perfil__acciones .btn--secondary::before {
@@ -224,8 +240,8 @@ function cerrarSesion() {
 }
 
 .mi-perfil__acciones .btn--secondary:hover {
-  background-color: var(--color-accent);
-  color: var(--color-white);
+  background-color: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
 }
 
 @media (max-width: 768px) {
@@ -238,7 +254,8 @@ function cerrarSesion() {
   }
 
   .mi-perfil__acciones {
-    padding: 8px 20px 24px;
+    margin: 16px 20px 0;
+    padding: 16px 0 24px;
   }
 
   .mi-perfil__fila {
