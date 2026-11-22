@@ -7,6 +7,7 @@ import { mensajeDeError } from "@/utils/mensajeDeError";
 import CampoPassword from "@/components/CampoPassword.vue";
 import PantallaConFoto from "@/components/PantallaConFoto.vue";
 import CaptchaTurnstile from "@/components/CaptchaTurnstile.vue";
+import CodigoDosPasos from "@/components/CodigoDosPasos.vue";
 import { captchaActivo } from "@/utils/captcha";
 
 const email = ref("");
@@ -16,10 +17,49 @@ const error = ref("");
 const conCaptcha = captchaActivo();
 const captchaToken = ref("");
 const captchaRef = ref(null);
+// Si la cuenta tiene el segundo paso activado, aquí se guarda el desafío que da el servidor
+// y se enseña la pantalla del código en vez del formulario
+const desafio = ref("");
 
 const authRepository = new AuthRepository();
 const authStore = useAuthStore();
 const router = useRouter();
+
+// Guarda la sesión y lleva a la persona a su pantalla
+function terminarLogin(data) {
+  authStore.login(data.id, data.username, data.token, data.roles);
+  // El administrador entra directamente en su panel
+  if (data.roles === "ADMIN") {
+    router.push("/admin");
+  } else {
+    router.push("/");
+  }
+}
+
+// Segundo paso: se comprueba el código que llegó por correo
+async function verificarCodigo(codigo) {
+  error.value = "";
+  try {
+    const data = await authRepository.verificarCodigo(desafio.value, codigo);
+    terminarLogin(data);
+  } catch (err) {
+    // 400: el código es incorrecto, ha caducado o se han gastado los intentos
+    if (err.status === 400) {
+      error.value =
+        "El código no es correcto o ha caducado. Si has fallado varias veces, vuelve atrás e inicia sesión otra vez.";
+    } else {
+      error.value = mensajeDeError(err, "No se pudo comprobar el código.");
+    }
+  }
+}
+
+// Vuelve al formulario. El CAPTCHA ya se gastó, así que hay que resolverlo otra vez
+function volverAlLogin() {
+  desafio.value = "";
+  error.value = "";
+  password.value = "";
+  captchaToken.value = "";
+}
 
 async function handleSubmit() {
   if (!email.value || !password.value) {
@@ -36,13 +76,12 @@ async function handleSubmit() {
     const data = conCaptcha
       ? await authRepository.login(email.value, password.value, captchaToken.value)
       : await authRepository.login(email.value, password.value);
-    authStore.login(data.id, data.username, data.token, data.roles);
-    // El administrador entra directamente en su panel
-    if (data.roles === "ADMIN") {
-      router.push("/admin");
-    } else {
-      router.push("/");
+    // Con el segundo paso activado todavía no hay token: falta escribir el código del correo
+    if (data.requiereCodigo) {
+      desafio.value = data.desafio;
+      return;
     }
+    terminarLogin(data);
   } catch (err) {
     // El token del CAPTCHA ya se ha usado: se pide uno nuevo
     captchaRef.value?.reiniciar();
@@ -67,13 +106,33 @@ async function handleSubmit() {
 
         <div class="login__box tarjeta-cristal">
           <div class="login__cabecera">
-            <span class="login__icono">👋</span>
+            <span class="login__icono">{{ desafio ? "📬" : "👋" }}</span>
             <span class="login__aviso">
-              Entra con tu email y tu contraseña.
+              {{
+                desafio
+                  ? "Un paso más: escribe el código que te hemos mandado."
+                  : "Entra con tu email y tu contraseña."
+              }}
             </span>
           </div>
 
-          <form class="formulario login__form" @submit.prevent="handleSubmit">
+          <!-- El formulario y la pantalla del código se cambian con un deslizamiento -->
+          <Transition name="paso" mode="out-in">
+          <CodigoDosPasos
+            v-if="desafio"
+            key="codigo"
+            class="login__form"
+            :correo="email"
+            :error="error"
+            @verificar="verificarCodigo"
+            @volver="volverAlLogin"
+          />
+          <form
+            v-else
+            key="datos"
+            class="formulario login__form"
+            @submit.prevent="handleSubmit"
+          >
             <h2 class="titulo-seccion" data-icono="🔑">Tus datos de acceso</h2>
 
             <label for="email">Email</label>
@@ -105,6 +164,7 @@ async function handleSubmit() {
 
             <button type="submit" class="btn btn--primary">Entrar</button>
           </form>
+          </Transition>
         </div>
 
         <p class="login__switch">
@@ -207,6 +267,24 @@ async function handleSubmit() {
   padding: 10px 14px;
   border-radius: var(--radius-input);
   margin: -4px 0 16px;
+}
+
+/* Cambio entre el formulario y la pantalla del código: sale hacia un lado y entra desde el otro */
+.paso-enter-active,
+.paso-leave-active {
+  transition:
+    opacity var(--dur-med) var(--ease-out),
+    translate var(--dur-med) var(--ease-out);
+}
+
+.paso-enter-from {
+  opacity: 0;
+  translate: 24px 0;
+}
+
+.paso-leave-to {
+  opacity: 0;
+  translate: -24px 0;
 }
 
 /* Enlace pequeño bajo la contraseña */
