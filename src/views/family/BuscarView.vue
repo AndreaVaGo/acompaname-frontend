@@ -8,7 +8,11 @@ import InsigniaVerificado from "@/components/InsigniaVerificado.vue";
 import FotoCuidador from "@/components/FotoCuidador.vue";
 import SelectorGrupos from "@/components/SelectorGrupos.vue";
 import { CUIDADOS } from "@/utils/catalogoCuidados";
-import { codigoModalidad } from "@/utils/catalogoModalidades";
+import {
+  codigoModalidad,
+  buscarModalidad,
+  buscarExtra,
+} from "@/utils/catalogoModalidades";
 import EtiquetaCuidado from "@/components/EtiquetaCuidado.vue";
 import { mensajeDeError } from "@/utils/mensajeDeError";
 import { moverFoco } from "@/utils/focoTarjeta";
@@ -401,6 +405,7 @@ const cuidadoresMostrados = computed(() => {
           </button>
           <button
             id="filtro-tipo-hospitalario"
+            :data-icono="buscarModalidad('hospitalario').icono"
             class="buscar__filter-btn"
             :class="{
               'buscar__filter-btn--active': tipoBuscado === 'hospitalario',
@@ -411,6 +416,7 @@ const cuidadoresMostrados = computed(() => {
           </button>
           <button
             id="filtro-tipo-domicilio"
+            :data-icono="buscarModalidad('domicilio').icono"
             class="buscar__filter-btn"
             :class="{
               'buscar__filter-btn--active': tipoBuscado === 'domicilio',
@@ -465,6 +471,7 @@ const cuidadoresMostrados = computed(() => {
           </button>
           <button
             id="filtro-disponible"
+            :data-icono="buscarExtra('disponible').icono"
             class="buscar__filter-btn"
             :class="{ 'buscar__filter-btn--active': soloDisponibles }"
             @click="soloDisponibles = true"
@@ -487,6 +494,7 @@ const cuidadoresMostrados = computed(() => {
           </button>
           <button
             id="filtro-vehiculo"
+            :data-icono="buscarExtra('vehiculo').icono"
             class="buscar__filter-btn"
             :class="{ 'buscar__filter-btn--active': soloVehiculo }"
             @click="soloVehiculo = true"
@@ -978,6 +986,13 @@ const cuidadoresMostrados = computed(() => {
   cursor: pointer;
   font-size: 0.9rem;
   font-family: inherit;
+}
+
+/* El icono va delante del nombre; el texto del botón sigue siendo solo el nombre */
+.buscar__filter-btn[data-icono]::before {
+  content: attr(data-icono);
+  content: attr(data-icono) / "";
+  margin-right: 6px;
 }
 
 /* Solo en pantallas con ratón: el botón se tiñe un poco al pasar por encima */
