@@ -8,8 +8,7 @@ import ValoracionRepository from "@/repositories/ValoracionRepository";
 import VerificacionRepository from "@/repositories/VerificacionRepository";
 import InsigniaVerificado from "@/components/InsigniaVerificado.vue";
 import FotoCuidador from "@/components/FotoCuidador.vue";
-import { nombreCuidado } from "@/utils/catalogoCuidados";
-import { nombreTitulacion } from "@/utils/catalogoTitulaciones";
+import EtiquetaCuidado from "@/components/EtiquetaCuidado.vue";
 import { formatearFecha } from "@/utils/formatearFecha";
 import { mensajeDeError } from "@/utils/mensajeDeError";
 import { recargoAplicable } from "@/utils/estimacionImporte";
@@ -31,15 +30,6 @@ const recargoMostrado = computed(() => {
 });
 const cargando = ref(true);
 const error = ref("");
-
-// Nombres de las titulaciones marcadas y, al final, las otras que escribió a mano
-function formacionDe(persona) {
-  const nombres = (persona.titulaciones || []).map(nombreTitulacion);
-  if (persona.otrasTitulaciones) {
-    nombres.push(persona.otrasTitulaciones);
-  }
-  return nombres;
-}
 
 const verificacionRepository = new VerificacionRepository();
 // Qué tiene verificado esta persona (null mientras no se sabe o si no tiene nada)
@@ -171,34 +161,39 @@ function estrellas(puntuacion) {
         </ul>
 
         <div
-          class="perfil__servicios"
-          v-if="cuidador.servicios && cuidador.servicios.length > 0"
+          class="perfil__formacion"
+          v-if="
+            (cuidador.titulaciones && cuidador.titulaciones.length > 0) ||
+            cuidador.otrasTitulaciones
+          "
         >
-          <h2>Servicios</h2>
+          <h2>Formación</h2>
           <div class="perfil__servicios-lista">
-            <span
+            <EtiquetaCuidado
               class="perfil__servicio"
-              v-for="codigo in cuidador.servicios"
+              v-for="codigo in cuidador.titulaciones || []"
               :key="codigo"
-            >
-              {{ nombreCuidado(codigo) }}
+              :codigo="codigo"
+              tipo="titulacion"
+            />
+            <span class="perfil__servicio" v-if="cuidador.otrasTitulaciones">
+              {{ cuidador.otrasTitulaciones }}
             </span>
           </div>
         </div>
 
         <div
-          class="perfil__formacion"
-          v-if="formacionDe(cuidador).length > 0"
+          class="perfil__servicios"
+          v-if="cuidador.servicios && cuidador.servicios.length > 0"
         >
-          <h2>Formación</h2>
+          <h2>Servicios</h2>
           <div class="perfil__servicios-lista">
-            <span
+            <EtiquetaCuidado
               class="perfil__servicio"
-              v-for="nombre in formacionDe(cuidador)"
-              :key="nombre"
-            >
-              {{ nombre }}
-            </span>
+              v-for="codigo in cuidador.servicios"
+              :key="codigo"
+              :codigo="codigo"
+            />
           </div>
         </div>
 
