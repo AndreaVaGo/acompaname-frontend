@@ -3,6 +3,7 @@ import { computed, ref } from "vue";
 import { RouterLink } from "vue-router";
 import EtiquetaCuidado from "@/components/EtiquetaCuidado.vue";
 import { nombreGrupo } from "@/utils/catalogoGrupos";
+import { iconoTipo } from "@/utils/nombreTipo";
 import {
   listaDePersonas,
   nombresDePersonas,
@@ -90,7 +91,9 @@ const avisoDireccion = computed(
     </p>
 
     <ul class="solicitudes__detalles">
-      <li class="solicitudes__tipo">🏠 {{ solicitud.tipoCuidado }}</li>
+      <li class="solicitudes__tipo">
+        {{ iconoTipo(solicitud.tipoCuidado) }} {{ solicitud.tipoCuidado }}
+      </li>
       <li v-if="textoGrupos(solicitud)" class="solicitudes__grupo">
         👥
         <strong>{{
@@ -170,7 +173,9 @@ const avisoDireccion = computed(
 
           <p class="solicitudes__bloque-titulo">📅 Cuándo y qué tipo</p>
           <ul class="solicitudes__detalles solicitudes__detalles--modal">
-            <li>🏠 {{ solicitud.tipoCuidado }}</li>
+            <li>
+              {{ iconoTipo(solicitud.tipoCuidado) }} {{ solicitud.tipoCuidado }}
+            </li>
             <li v-if="textoGrupos(solicitud)">
               👥
               <strong>{{
