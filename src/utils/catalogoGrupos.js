@@ -3,11 +3,14 @@
 // así que está escrito UNA sola vez aquí.
 // "codigo" es lo que viaja al back (tiene que coincidir con el enum GrupoEdad),
 // "nombre" es lo que se ve en pantalla y "edades" explica el rango.
+// "icono" y "color" son fijos (ver paletaEtiquetas.js): se ven igual en todas las pantallas.
 // "edadMin" y "edadMax" son los límites que acepta el formulario de solicitud, y los
 // "ejemplo..." son los textos de ayuda que se ven en cada campo según el grupo elegido.
 export const GRUPOS = [
   {
     codigo: "BEBES",
+    icono: "👶",
+    color: "rosa",
     nombre: "Bebés",
     edades: "De 0 a 3 años",
     edadMin: 0,
@@ -19,6 +22,8 @@ export const GRUPOS = [
   },
   {
     codigo: "NINOS",
+    icono: "🧒",
+    color: "naranja",
     nombre: "Niñas y niños",
     edades: "De 4 a 12 años",
     edadMin: 4,
@@ -30,6 +35,8 @@ export const GRUPOS = [
   },
   {
     codigo: "ADOLESCENTES",
+    icono: "🎒",
+    color: "indigo",
     nombre: "Adolescentes",
     edades: "De 13 a 17 años",
     edadMin: 13,
@@ -41,6 +48,8 @@ export const GRUPOS = [
   },
   {
     codigo: "ADULTOS",
+    icono: "🧑",
+    color: "azul",
     nombre: "Personas adultas",
     edades: "De 18 a 64 años",
     edadMin: 18,
@@ -52,6 +61,8 @@ export const GRUPOS = [
   },
   {
     codigo: "MAYORES",
+    icono: "🧓",
+    color: "marron",
     nombre: "Personas mayores",
     edades: "65 años o más",
     edadMin: 65,
@@ -63,6 +74,8 @@ export const GRUPOS = [
   },
   {
     codigo: "DISCAPACIDAD_DEPENDENCIA",
+    icono: "🦽",
+    color: "turquesa",
     nombre: "Discapacidad o dependencia",
     edades: "A cualquier edad",
     edadMin: 0,
