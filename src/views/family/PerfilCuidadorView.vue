@@ -9,6 +9,7 @@ import VerificacionRepository from "@/repositories/VerificacionRepository";
 import InsigniaVerificado from "@/components/InsigniaVerificado.vue";
 import FotoCuidador from "@/components/FotoCuidador.vue";
 import EtiquetaCuidado from "@/components/EtiquetaCuidado.vue";
+import { codigoModalidad } from "@/utils/catalogoModalidades";
 import { formatearFecha } from "@/utils/formatearFecha";
 import { mensajeDeError } from "@/utils/mensajeDeError";
 import { recargoAplicable } from "@/utils/estimacionImporte";
@@ -159,6 +160,33 @@ function estrellas(puntuacion) {
             }}
           </li>
         </ul>
+
+        <div class="perfil__etiquetas" data-testid="perfil-etiquetas">
+          <EtiquetaCuidado
+            tipo="modalidad"
+            :codigo="codigoModalidad(cuidador.tipoCuidado)"
+          />
+          <EtiquetaCuidado
+            v-if="cuidador.tieneVehiculo"
+            tipo="extra"
+            codigo="vehiculo"
+          />
+        </div>
+
+        <div
+          class="perfil__atiende"
+          v-if="cuidador.gruposEdad && cuidador.gruposEdad.length > 0"
+        >
+          <h2>Atiende a</h2>
+          <div class="perfil__etiquetas">
+            <EtiquetaCuidado
+              v-for="codigo in cuidador.gruposEdad"
+              :key="codigo"
+              tipo="grupo"
+              :codigo="codigo"
+            />
+          </div>
+        </div>
 
         <div
           class="perfil__formacion"
@@ -427,7 +455,8 @@ function estrellas(puntuacion) {
   background-color: var(--color-secondary);
 }
 
-.perfil__servicios-lista {
+.perfil__servicios-lista,
+.perfil__etiquetas {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
