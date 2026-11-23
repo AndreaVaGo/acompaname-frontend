@@ -8,7 +8,7 @@ import InsigniaVerificado from "@/components/InsigniaVerificado.vue";
 import FotoCuidador from "@/components/FotoCuidador.vue";
 import SelectorGrupos from "@/components/SelectorGrupos.vue";
 import { CUIDADOS } from "@/utils/catalogoCuidados";
-import { nombreGrupo } from "@/utils/catalogoGrupos";
+import { codigoModalidad } from "@/utils/catalogoModalidades";
 import EtiquetaCuidado from "@/components/EtiquetaCuidado.vue";
 import { mensajeDeError } from "@/utils/mensajeDeError";
 import { moverFoco } from "@/utils/focoTarjeta";
@@ -161,13 +161,6 @@ watch([fechaDesde, fechaHasta, horaDesde, horaHasta], comprobarFechas);
 // Un cuidador sin tipo de cuidado se trata como "ambos"
 function tipoDe(cuidador) {
   return cuidador.tipoCuidado || "ambos";
-}
-
-function textoTipo(cuidador) {
-  const tipo = tipoDe(cuidador);
-  if (tipo === "hospitalario") return "Hospitalario";
-  if (tipo === "domicilio") return "A domicilio";
-  return "Hospital y domicilio";
 }
 
 // Un cuidador sin servicios se trata como una lista vacía
@@ -633,28 +626,33 @@ const cuidadoresMostrados = computed(() => {
         </p>
 
         <div class="buscar__tags">
-          <span class="buscar__tag buscar__tag--tipo">{{
-            textoTipo(cuidador)
-          }}</span>
-          <span
+          <EtiquetaCuidado
+            class="buscar__tag buscar__tag--tipo"
+            tipo="modalidad"
+            :codigo="codigoModalidad(tipoDe(cuidador))"
+          />
+          <EtiquetaCuidado
             class="buscar__tag buscar__tag--disponible"
             v-if="cuidador.disponibleAhora"
-            >Disponible ahora</span
-          >
-          <span
+            tipo="extra"
+            codigo="disponible"
+          />
+          <EtiquetaCuidado
             class="buscar__tag buscar__tag--vehiculo"
             v-if="cuidador.tieneVehiculo"
-            >Vehículo propio</span
-          >
+            tipo="extra"
+            codigo="vehiculo"
+          />
         </div>
 
         <div class="buscar__tags" v-if="gruposDe(cuidador).length > 0">
-          <span
+          <EtiquetaCuidado
             class="buscar__tag buscar__tag--grupo"
             v-for="codigo in gruposDe(cuidador)"
             :key="codigo"
-            >{{ nombreGrupo(codigo) }}</span
-          >
+            tipo="grupo"
+            :codigo="codigo"
+          />
         </div>
 
         <div
@@ -1169,17 +1167,6 @@ const cuidadoresMostrados = computed(() => {
   background-color: var(--color-secondary-bg);
   color: var(--color-secondary);
   font-weight: bold;
-
-  /* Círculo verde delante, igual que en el perfil del cuidador */
-  &::before {
-    content: "";
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    margin-right: 6px;
-    border-radius: 50%;
-    background-color: var(--color-secondary);
-  }
 }
 
 .buscar__tag--vehiculo {
