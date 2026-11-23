@@ -244,7 +244,8 @@ async function enviarSolicitud() {
       </div>
 
       <form class="formulario solicitar__form" @submit.prevent="enviarSolicitud">
-        <h2 class="titulo-seccion" data-icono="👥">¿Quién necesita cuidados?</h2>
+          <p class="formulario__nota">Los campos marcados con <span aria-hidden="true">*</span> son obligatorios.</p>
+        <h2 class="titulo-seccion obligatorio" data-icono="👥">¿Quién necesita cuidados?</h2>
         <div class="solicitar__grupos">
           <SelectorGrupos
             v-model="grupoEdad"
@@ -254,7 +255,7 @@ async function enviarSolicitud() {
           />
         </div>
 
-        <h2 class="titulo-seccion" data-icono="🩺">Tipo de cuidado</h2>
+        <h2 class="titulo-seccion obligatorio" data-icono="🩺">Tipo de cuidado</h2>
         <div class="solicitar__opciones">
           <button
             type="button"
@@ -281,19 +282,21 @@ async function enviarSolicitud() {
         <h2 class="titulo-seccion" data-icono="📍">¿Dónde y cuándo?</h2>
 
         <template v-if="tipoCuidado === 'hospitalario'">
-          <label for="hospital">Hospital</label>
+          <label class="obligatorio" for="hospital">Hospital</label>
           <input
             type="text"
             id="hospital"
+              aria-required="true"
             v-model="hospital"
             maxlength="100"
             placeholder="Hospital de Cabueñes"
           />
 
-          <label for="ubicacion">Planta, área y habitación</label>
+          <label class="obligatorio" for="ubicacion">Planta, área y habitación</label>
           <input
             type="text"
             id="ubicacion"
+              aria-required="true"
             v-model="ubicacionHospital"
             maxlength="90"
             placeholder="Planta 2, Medicina Interna, habitación 214"
@@ -301,10 +304,11 @@ async function enviarSolicitud() {
         </template>
 
         <template v-if="tipoCuidado === 'domicilio'">
-          <label for="direccion">Dirección del domicilio</label>
+          <label class="obligatorio" for="direccion">Dirección del domicilio</label>
           <input
             type="text"
             id="direccion"
+              aria-required="true"
             v-model="direccion"
             maxlength="200"
             placeholder="Calle Uría 10, 3º B, Oviedo"
@@ -313,8 +317,9 @@ async function enviarSolicitud() {
 
         <div class="solicitar__row">
           <div>
-            <label for="fecha">Fecha de inicio</label>
-            <input type="date" id="fecha" v-model="fechaInicio" />
+            <label class="obligatorio" for="fecha">Fecha de inicio</label>
+            <input type="date" id="fecha"
+              aria-required="true" v-model="fechaInicio" />
           </div>
           <div>
             <label for="fecha-fin">Fecha de fin (opcional)</label>
@@ -329,12 +334,14 @@ async function enviarSolicitud() {
 
         <div class="solicitar__row">
           <div>
-            <label for="hora-inicio">Hora de inicio</label>
-            <input type="time" id="hora-inicio" v-model="horaInicio" />
+            <label class="obligatorio" for="hora-inicio">Hora de inicio</label>
+            <input type="time" id="hora-inicio"
+              aria-required="true" v-model="horaInicio" />
           </div>
           <div>
-            <label for="hora-fin">Hora de fin</label>
-            <input type="time" id="hora-fin" v-model="horaFin" />
+            <label class="obligatorio" for="hora-fin">Hora de fin</label>
+            <input type="time" id="hora-fin"
+              aria-required="true" v-model="horaFin" />
           </div>
         </div>
         <p class="solicitar__ayuda">
@@ -362,7 +369,7 @@ async function enviarSolicitud() {
             </p>
             <div class="solicitar__row">
               <div>
-                <label :for="indice === 0 ? 'paciente' : 'paciente-' + (indice + 1)"
+                <label class="obligatorio" :for="indice === 0 ? 'paciente' : 'paciente-' + (indice + 1)"
                   >Nombre de la persona cuidada</label
                 >
                 <input
@@ -374,7 +381,7 @@ async function enviarSolicitud() {
                 />
               </div>
               <div>
-                <label :for="indice === 0 ? 'edad' : 'edad-' + (indice + 1)"
+                <label class="obligatorio" :for="indice === 0 ? 'edad' : 'edad-' + (indice + 1)"
                   >Edad de la persona cuidada</label
                 >
                 <input
@@ -391,7 +398,7 @@ async function enviarSolicitud() {
 
             <!-- Con varias personas, cada una enseña su grupo (el de la primera es el de arriba) -->
             <div v-if="personas.length > 1" class="solicitar__grupo-persona">
-              <label :for="'grupo-' + (indice + 1)">Grupo de edad</label>
+              <label class="obligatorio" :for="'grupo-' + (indice + 1)">Grupo de edad</label>
               <select
                 :id="'grupo-' + (indice + 1)"
                 :value="codigoDeGrupo(indice)"
