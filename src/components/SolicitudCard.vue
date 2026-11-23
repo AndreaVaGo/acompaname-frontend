@@ -1,7 +1,7 @@
 <script setup>
 import { computed, ref } from "vue";
 import { RouterLink } from "vue-router";
-import { nombreCuidado } from "@/utils/catalogoCuidados";
+import EtiquetaCuidado from "@/components/EtiquetaCuidado.vue";
 import { nombreGrupo } from "@/utils/catalogoGrupos";
 import {
   listaDePersonas,
@@ -208,13 +208,12 @@ const avisoDireccion = computed(
           class="solicitudes__necesidades"
           v-if="solicitud.necesidades && solicitud.necesidades.length > 0"
         >
-          <span
+          <EtiquetaCuidado
             class="solicitudes__necesidad"
             v-for="codigo in solicitud.necesidades"
             :key="codigo"
-          >
-            {{ nombreCuidado(codigo) }}
-          </span>
+            :codigo="codigo"
+          />
         </div>
 
         <p
