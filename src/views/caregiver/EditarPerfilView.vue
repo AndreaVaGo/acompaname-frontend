@@ -157,6 +157,7 @@ async function guardar() {
         <p v-if="cargando" class="editar__cargando">Cargando tu perfil...</p>
 
         <form v-if="perfil" class="editar__form" @submit.prevent="guardar">
+          <p class="formulario__nota">Los campos marcados con <span aria-hidden="true">*</span> son obligatorios.</p>
           <!-- Franja de color con la foto y los botones para cambiarla -->
           <div class="editar__foto">
             <FotoCuidador
@@ -193,10 +194,11 @@ async function guardar() {
 
             <div class="editar__row">
               <div>
-                <label for="especialidad">Especialidad</label>
+                <label class="obligatorio" for="especialidad">Especialidad</label>
                 <input
                   type="text"
                   id="especialidad"
+              aria-required="true"
                   v-model="especialidad"
                   maxlength="100"
                   placeholder="Geriatría, acompañamiento hospitalario..."
@@ -322,10 +324,11 @@ async function guardar() {
                 />
               </div>
               <div>
-                <label for="tarifa">Tarifa por hora (€)</label>
+                <label class="obligatorio" for="tarifa">Tarifa por hora (€)</label>
                 <input
                   type="number"
                   id="tarifa"
+              aria-required="true"
                   v-model="tarifaHora"
                   min="0"
                   step="0.5"
@@ -352,9 +355,10 @@ async function guardar() {
               tarifa. Déjalo vacío para usar el 25 % por defecto.
             </p>
 
-            <label for="bio">Sobre ti</label>
+            <label class="obligatorio" for="bio">Sobre ti</label>
             <textarea
               id="bio"
+              aria-required="true"
               v-model="bio"
               maxlength="1000"
               placeholder="Cuéntales tu experiencia y cómo trabajas..."
