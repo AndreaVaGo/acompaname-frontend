@@ -13,6 +13,7 @@ import {
 } from "@/utils/personasSolicitud";
 import { formatearMomento } from "@/utils/formatearHora";
 import { mensajeDeError } from "@/utils/mensajeDeError";
+import { iconoTipo } from "@/utils/nombreTipo";
 import { moverFoco } from "@/utils/focoTarjeta";
 
 const solicitudRepository = new SolicitudRepository();
@@ -106,7 +107,9 @@ function textoEstado(estado) {
         </div>
 
         <ul class="historial__detalles">
-          <li class="historial__tipo">🏠 {{ item.tipoCuidado }}</li>
+          <li class="historial__tipo">
+            {{ iconoTipo(item.tipoCuidado) }} {{ item.tipoCuidado }}
+          </li>
           <li v-if="item.gruposTexto" class="historial__grupo">
             👥
             <strong>{{
