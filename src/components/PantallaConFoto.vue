@@ -1,26 +1,17 @@
 <script setup>
-// Pantalla con panel de foto (login y registro). En escritorio la foto va a un lado y el contenido
-// (la tarjeta del formulario) al otro; en el móvil no se enseña la foto para no estorbar al formulario.
-// La foto es decorativa: no lleva texto alternativo y se esconde a los lectores de pantalla.
-// OJO ACOM-189: falta confirmar la fuente y la licencia de esta foto. Si no se encuentra, hay que
-// cambiar el archivo por uno de un banco libre (Unsplash, Pexels) y anotar el enlace en el README.
-import fotoManos from "@/assets/hero-manos.jpg";
+// Pantalla con panel de ilustración (login y registro). En escritorio el panel va a un lado y el contenido
+// (la tarjeta del formulario) al otro; en el móvil no se enseña el panel para no estorbar al formulario.
+// ACOM-242: el panel enseña dos manos que se dan la mano (ilustración propia y animada), en lugar de la foto
+// de antes, de la que no se pudo confirmar la licencia (ACOM-189). Es decorativo: se esconde a los lectores de pantalla.
+import ManosQueSeEncuentran from "@/components/animation/ManosQueSeEncuentran.vue";
 </script>
 
 <template>
   <div class="pantalla-foto pantalla">
     <aside class="pantalla-foto__panel" aria-hidden="true" data-testid="panel-foto">
       <div class="pantalla-foto__marco">
-        <img
-          class="pantalla-foto__imagen"
-          :src="fotoManos"
-          alt=""
-          width="1000"
-          height="667"
-          loading="lazy"
-          decoding="async"
-        />
         <div class="pantalla-foto__velo"></div>
+        <ManosQueSeEncuentran class="pantalla-foto__manos" />
         <p class="pantalla-foto__lema">Cuidar también es acompañar</p>
       </div>
     </aside>
@@ -50,7 +41,7 @@ import fotoManos from "@/assets/hero-manos.jpg";
     display: block;
   }
 
-  /* La foto se queda a la vista aunque el formulario sea largo y haya que bajar */
+  /* El panel se queda a la vista aunque el formulario sea largo y haya que bajar */
   .pantalla-foto__marco {
     position: sticky;
     top: 0;
@@ -60,30 +51,33 @@ import fotoManos from "@/assets/hero-manos.jpg";
     overflow: hidden;
   }
 
-  .pantalla-foto__imagen {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  /* Velo de color encima de la foto para que el texto blanco se lea bien */
+  /* Fondo de color del panel: terracota arriba (donde va el lema, para que el texto blanco se lea bien) y verde abajo */
   .pantalla-foto__velo {
     position: absolute;
     inset: 0;
     background: linear-gradient(
-      160deg,
-      color-mix(in srgb, var(--color-accent-dark) 78%, transparent),
-      color-mix(in srgb, var(--color-secondary) 62%, transparent)
+      170deg,
+      var(--color-accent-dark) 0%,
+      var(--color-accent-dark) 42%,
+      var(--color-secondary) 78%
     );
+  }
+
+  /* Las manos, centradas en el panel */
+  .pantalla-foto__manos {
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    top: 50%;
+    width: 84%;
+    transform: translateY(-40%);
   }
 
   .pantalla-foto__lema {
     position: absolute;
     left: 32px;
     right: 32px;
-    /* Arriba, para que se vea siempre aunque el formulario sea largo y la foto llegue más abajo de la pantalla */
+    /* Arriba, para que se vea siempre aunque el formulario sea largo y el panel llegue más abajo de la pantalla */
     top: 40px;
     margin: 0;
     color: var(--color-white);
