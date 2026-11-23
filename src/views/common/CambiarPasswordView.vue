@@ -78,16 +78,17 @@ async function handleSubmit() {
           class="formulario cambiar-password__form"
           @submit.prevent="handleSubmit"
         >
+          <p class="formulario__nota">Los campos marcados con <span aria-hidden="true">*</span> son obligatorios.</p>
           <h2 class="titulo-seccion" data-icono="🔑">Tu contraseña</h2>
 
-          <label for="password-actual">Contraseña actual</label>
+          <label class="obligatorio" for="password-actual">Contraseña actual</label>
           <CampoPassword
             id="password-actual"
             placeholder="••••••"
             v-model="passwordActual"
           />
 
-          <label for="password-nueva">Contraseña nueva</label>
+          <label class="obligatorio" for="password-nueva">Contraseña nueva</label>
           <CampoPassword
             id="password-nueva"
             placeholder="Mínimo 8 caracteres"
@@ -97,7 +98,7 @@ async function handleSubmit() {
             Con mayúscula, minúscula, número y un carácter especial.
           </p>
 
-          <label for="password-repetida">Repite la contraseña nueva</label>
+          <label class="obligatorio" for="password-repetida">Repite la contraseña nueva</label>
           <CampoPassword
             id="password-repetida"
             placeholder="••••••"
