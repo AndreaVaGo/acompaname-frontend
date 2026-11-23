@@ -360,7 +360,12 @@ async function eliminarValoracion(id) {
         </p>
 
         <template v-if="seccion === 'resumen'">
-          <AdminAvisos :avisos="avisos" @ver-pendientes="verPendientes" />
+          <AdminAvisos
+            :avisos="avisos"
+            @ver-pendientes="verPendientes"
+            @ver-verificaciones="cambiarSeccion('verificaciones')"
+            @ver-sugerencias="cambiarSeccion('sugerencias')"
+          />
 
           <AdminTarjetas :estadisticas="estadisticas" />
 
