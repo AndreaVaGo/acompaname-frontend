@@ -226,9 +226,9 @@ async function guardar() {
               <div>
                 <label for="tipo-cuidado">Tipo de cuidado</label>
                 <select id="tipo-cuidado" v-model="tipoCuidado">
-                  <option value="hospitalario">Hospitalario</option>
-                  <option value="domicilio">A domicilio</option>
-                  <option value="ambos">Ambos (hospital y domicilio)</option>
+                  <option value="hospitalario">🏥 Hospitalario</option>
+                  <option value="domicilio">🏠 A domicilio</option>
+                  <option value="ambos">🏥🏠 Ambos (hospital y domicilio)</option>
                 </select>
               </div>
             </div>
