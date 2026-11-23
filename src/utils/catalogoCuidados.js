@@ -13,7 +13,7 @@ export const CUIDADOS = [
   { codigo: "paliativos", nombre: "Cuidados paliativos", icono: "🕊️", color: "rosa" },
   { codigo: "domicilio", nombre: "Ayuda a domicilio", icono: "🏠", color: "marron" },
   { codigo: "acompanamiento", nombre: "Acompañamiento general", icono: "🤝", color: "coral" },
-  { codigo: "traslados", nombre: "Traslados y citas médicas", icono: "🚗", color: "oliva" },
+  { codigo: "traslados", nombre: "Traslados y citas médicas", icono: "🚑", color: "oliva" },
 ];
 
 // Devuelve el cuidado completo (con su icono y su color) a partir del código, o undefined si no existe
