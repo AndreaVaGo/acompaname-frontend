@@ -6,7 +6,7 @@ const props = defineProps({
   avisos: { type: Object, required: true },
 });
 
-const emit = defineEmits(["verPendientes"]);
+const emit = defineEmits(["verPendientes", "verVerificaciones", "verSugerencias"]);
 
 function textoProximas(cantidad) {
   if (cantidad === 1) {
@@ -29,6 +29,20 @@ function textoPagos(cantidad) {
   return `${cantidad} pagos sin cobrar desde hace más de una semana.`;
 }
 
+function textoVerificaciones(cantidad) {
+  if (cantidad === 1) {
+    return "1 verificación pendiente de revisar (titulación o antecedentes).";
+  }
+  return `${cantidad} verificaciones pendientes de revisar (titulación o antecedentes).`;
+}
+
+function textoSugerencias(cantidad) {
+  if (cantidad === 1) {
+    return "1 sugerencia nueva en la última semana.";
+  }
+  return `${cantidad} sugerencias nuevas en la última semana.`;
+}
+
 // Lista de frases, una por cada aviso que tenga alguna cantidad
 const frases = computed(() => {
   const lista = [];
@@ -41,6 +55,12 @@ const frases = computed(() => {
   if (props.avisos.pagosSinCobrarMasDeUnaSemana > 0) {
     lista.push(textoPagos(props.avisos.pagosSinCobrarMasDeUnaSemana));
   }
+  if (props.avisos.verificacionesPendientes > 0) {
+    lista.push(textoVerificaciones(props.avisos.verificacionesPendientes));
+  }
+  if (props.avisos.sugerenciasUltimaSemana > 0) {
+    lista.push(textoSugerencias(props.avisos.sugerenciasUltimaSemana));
+  }
   return lista;
 });
 
@@ -51,6 +71,9 @@ const hayPendientes = computed(() => {
     props.avisos.pendientesVencidas > 0
   );
 });
+
+const hayVerificaciones = computed(() => props.avisos.verificacionesPendientes > 0);
+const haySugerencias = computed(() => props.avisos.sugerenciasUltimaSemana > 0);
 </script>
 
 <template>
@@ -61,14 +84,32 @@ const hayPendientes = computed(() => {
         <li v-for="frase in frases" :key="frase">{{ frase }}</li>
       </ul>
     </div>
-    <button
-      v-if="hayPendientes"
-      type="button"
-      class="btn admin-avisos__boton"
-      @click="emit('verPendientes')"
-    >
-      Ver solicitudes pendientes
-    </button>
+    <div class="admin-avisos__botones">
+      <button
+        v-if="hayPendientes"
+        type="button"
+        class="btn admin-avisos__boton"
+        @click="emit('verPendientes')"
+      >
+        Ver solicitudes pendientes
+      </button>
+      <button
+        v-if="hayVerificaciones"
+        type="button"
+        class="btn admin-avisos__boton"
+        @click="emit('verVerificaciones')"
+      >
+        Revisar verificaciones
+      </button>
+      <button
+        v-if="haySugerencias"
+        type="button"
+        class="btn admin-avisos__boton"
+        @click="emit('verSugerencias')"
+      >
+        Ver sugerencias
+      </button>
+    </div>
   </section>
 
   <section v-else class="admin-avisos admin-avisos--vacio">
@@ -111,6 +152,12 @@ const hayPendientes = computed(() => {
   margin: 0;
   font-weight: bold;
   color: var(--color-secondary);
+}
+
+.admin-avisos__botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .admin-avisos__boton {
