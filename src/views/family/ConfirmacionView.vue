@@ -4,6 +4,7 @@ import { useRoute, RouterLink } from "vue-router";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
 import { formatearMomento } from "@/utils/formatearHora";
 import { mensajeDeError } from "@/utils/mensajeDeError";
+import { iconoTipo } from "@/utils/nombreTipo";
 import {
   detalleDePersonas,
   hayVariasPersonas,
@@ -53,7 +54,10 @@ onMounted(async () => {
       <div v-if="solicitud" class="confirmacion__resumen">
         <div class="confirmacion__fila">
           <span>Tipo de cuidado</span>
-          <strong>{{ tipos[solicitud.tipoCuidado] || solicitud.tipoCuidado }}</strong>
+          <strong
+            >{{ iconoTipo(solicitud.tipoCuidado) }}
+            {{ tipos[solicitud.tipoCuidado] || solicitud.tipoCuidado }}</strong
+          >
         </div>
         <div class="confirmacion__fila">
           <span>Fecha de inicio</span>
