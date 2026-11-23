@@ -64,7 +64,8 @@ async function enviarValoracion() {
         </div>
 
         <form class="formulario valorar__form" @submit.prevent="enviarValoracion">
-          <h2 class="titulo-seccion" data-icono="⭐">Tu puntuación</h2>
+          <p class="formulario__nota">Los campos marcados con <span aria-hidden="true">*</span> son obligatorios.</p>
+          <h2 class="titulo-seccion obligatorio" data-icono="⭐">Tu puntuación</h2>
 
           <div class="valorar__estrellas">
             <span
