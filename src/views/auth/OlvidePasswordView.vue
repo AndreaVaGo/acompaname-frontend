@@ -64,12 +64,14 @@ async function handleSubmit() {
           class="formulario olvide__form"
           @submit.prevent="handleSubmit"
         >
+          <p class="formulario__nota">Los campos marcados con <span aria-hidden="true">*</span> son obligatorios.</p>
           <h2 class="titulo-seccion" data-icono="📧">Tu correo</h2>
 
-          <label for="email">Email</label>
+          <label class="obligatorio" for="email">Email</label>
           <input
             type="email"
             id="email"
+              aria-required="true"
             placeholder="tu@correo.com"
             v-model="email"
           />
