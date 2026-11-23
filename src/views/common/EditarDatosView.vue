@@ -88,16 +88,20 @@ async function handleSubmit() {
             class="formulario editar-datos__form"
             @submit.prevent="handleSubmit"
           >
+          <p class="formulario__nota">Los campos marcados con <span aria-hidden="true">*</span> son obligatorios.</p>
             <h2 class="titulo-seccion" data-icono="📇">Datos de contacto</h2>
 
-            <label for="nombre">Nombre</label>
-            <input type="text" id="nombre" v-model="nombre" />
+            <label class="obligatorio" for="nombre">Nombre</label>
+            <input type="text" id="nombre"
+              aria-required="true" v-model="nombre" />
 
-            <label for="email">Email</label>
-            <input type="email" id="email" v-model="email" />
+            <label class="obligatorio" for="email">Email</label>
+            <input type="email" id="email"
+              aria-required="true" v-model="email" />
 
-            <label for="telefono">Teléfono</label>
-            <input type="tel" id="telefono" v-model="telefono" />
+            <label class="obligatorio" for="telefono">Teléfono</label>
+            <input type="tel" id="telefono"
+              aria-required="true" v-model="telefono" />
 
             <p role="alert" v-if="error" class="editar-datos__error">{{ error }}</p>
             <p v-if="exito" class="editar-datos__exito">{{ exito }}</p>
