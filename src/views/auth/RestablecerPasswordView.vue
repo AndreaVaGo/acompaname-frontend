@@ -97,9 +97,10 @@ async function handleSubmit() {
           class="formulario restablecer__form"
           @submit.prevent="handleSubmit"
         >
+          <p class="formulario__nota">Los campos marcados con <span aria-hidden="true">*</span> son obligatorios.</p>
           <h2 class="titulo-seccion" data-icono="🔑">Tu contraseña nueva</h2>
 
-          <label for="password-nueva">Contraseña nueva</label>
+          <label class="obligatorio" for="password-nueva">Contraseña nueva</label>
           <CampoPassword
             id="password-nueva"
             placeholder="Mínimo 8 caracteres"
@@ -109,7 +110,7 @@ async function handleSubmit() {
             Con mayúscula, minúscula, número y un carácter especial.
           </p>
 
-          <label for="password-repetida">Repite la contraseña</label>
+          <label class="obligatorio" for="password-repetida">Repite la contraseña</label>
           <CampoPassword
             id="password-repetida"
             placeholder="••••••"
