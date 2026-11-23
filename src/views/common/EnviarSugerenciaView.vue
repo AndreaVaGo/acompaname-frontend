@@ -53,11 +53,13 @@ async function enviarSugerencia() {
         </div>
 
         <form class="formulario sugerencia__form" @submit.prevent="enviarSugerencia">
+          <p class="formulario__nota">Los campos marcados con <span aria-hidden="true">*</span> son obligatorios.</p>
           <h2 class="titulo-seccion" data-icono="📝">Tu sugerencia</h2>
 
-          <label for="sugerencia">Sugerencia</label>
+          <label class="obligatorio" for="sugerencia">Sugerencia</label>
           <textarea
             id="sugerencia"
+              aria-required="true"
             v-model="texto"
             :maxlength="MAXIMO"
             placeholder="Escribe aquí tu idea o el cambio que propones..."
