@@ -108,25 +108,28 @@ async function handleSubmit() {
           </div>
 
           <form class="formulario register__form" @submit.prevent="handleSubmit">
+          <p class="formulario__nota">Los campos marcados con <span aria-hidden="true">*</span> son obligatorios.</p>
             <h2 class="titulo-seccion" data-icono="👤">Tus datos</h2>
 
-            <label for="nombre">Nombre completo</label>
+            <label class="obligatorio" for="nombre">Nombre completo</label>
             <input
               type="text"
               id="nombre"
+              aria-required="true"
               placeholder="María López"
               v-model="nombre"
             />
 
-            <label for="email">Email</label>
+            <label class="obligatorio" for="email">Email</label>
             <input
               type="email"
               id="email"
+              aria-required="true"
               placeholder="nombre@correo.com"
               v-model="email"
             />
 
-            <label for="password">Contraseña</label>
+            <label class="obligatorio" for="password">Contraseña</label>
             <CampoPassword
               id="password"
               placeholder="Mínimo 8 caracteres"
@@ -136,17 +139,18 @@ async function handleSubmit() {
               Con mayúscula, minúscula, número y un carácter especial.
             </p>
 
-            <label for="password-repetida">Repite la contraseña</label>
+            <label class="obligatorio" for="password-repetida">Repite la contraseña</label>
             <CampoPassword
               id="password-repetida"
               placeholder="••••••••"
               v-model="passwordRepetida"
             />
 
-            <label for="telefono">Teléfono</label>
+            <label class="obligatorio" for="telefono">Teléfono</label>
             <input
               type="tel"
               id="telefono"
+              aria-required="true"
               placeholder="600 123 456"
               v-model="telefono"
             />
