@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed } from "vue";
 import { formatearFecha } from "@/utils/formatearFecha";
-import { nombreTipo, colorTipo } from "@/utils/nombreTipo";
+import { nombreTipo, colorTipo, iconoTipo } from "@/utils/nombreTipo";
 import AdminFiltros from "@/components/admin/AdminFiltros.vue";
 import AdminPildora from "@/components/admin/AdminPildora.vue";
 import AdminCabeceraOrden from "@/components/admin/AdminCabeceraOrden.vue";
@@ -112,7 +112,10 @@ function cambiarOrden(nuevoOrden) {
         <tbody>
           <tr v-for="solicitud in solicitudesOrdenadas" :key="solicitud.id">
             <td data-label="Tipo">
-              <AdminPildora :color="colorTipo(solicitud.tipoCuidado)">
+              <AdminPildora
+                :color="colorTipo(solicitud.tipoCuidado)"
+                :data-icono="iconoTipo(solicitud.tipoCuidado)"
+              >
                 {{ nombreTipo(solicitud.tipoCuidado) }}
               </AdminPildora>
             </td>
