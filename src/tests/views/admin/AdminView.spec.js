@@ -25,6 +25,8 @@ const AVISOS = {
   pendientesProximas48Horas: 3,
   pendientesVencidas: 1,
   pagosSinCobrarMasDeUnaSemana: 2,
+  verificacionesPendientes: 4,
+  sugerenciasUltimaSemana: 5,
 }
 
 const CUIDADORES = [
@@ -431,6 +433,32 @@ describe('AdminView', () => {
     expect(AdminRepository.prototype.getSolicitudes).toHaveBeenLastCalledWith('PENDIENTE')
     expect(wrapper.find('.admin-menu__boton--activo').text()).toBe('Solicitudes')
     expect(wrapper.find('.admin-filtros__boton--activo').text()).toBe('Pendiente')
+  })
+
+  test('el aviso de verificaciones abre la sección Verificaciones', async () => {
+    prepararRepositorio()
+    const wrapper = await montarVista()
+
+    const boton = wrapper
+      .findAll('button')
+      .find((b) => b.text() === 'Revisar verificaciones')
+    await boton.trigger('click')
+    await flushPromises()
+
+    expect(wrapper.find('.admin-menu__boton--activo').text()).toBe('Verificaciones')
+    expect(AdminRepository.prototype.getVerificaciones).toHaveBeenCalled()
+  })
+
+  test('el aviso de sugerencias abre la sección Sugerencias', async () => {
+    prepararRepositorio()
+    const wrapper = await montarVista()
+
+    const boton = wrapper.findAll('button').find((b) => b.text() === 'Ver sugerencias')
+    await boton.trigger('click')
+    await flushPromises()
+
+    expect(wrapper.find('.admin-menu__boton--activo').text()).toBe('Sugerencias')
+    expect(AdminRepository.prototype.getSugerencias).toHaveBeenCalled()
   })
 
   test('si falla al filtrar muestra el motivo y mantiene la tabla', async () => {
