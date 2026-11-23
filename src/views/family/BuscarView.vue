@@ -7,9 +7,9 @@ import VerificacionRepository from "@/repositories/VerificacionRepository";
 import InsigniaVerificado from "@/components/InsigniaVerificado.vue";
 import FotoCuidador from "@/components/FotoCuidador.vue";
 import SelectorGrupos from "@/components/SelectorGrupos.vue";
-import { CUIDADOS, nombreCuidado } from "@/utils/catalogoCuidados";
+import { CUIDADOS } from "@/utils/catalogoCuidados";
 import { nombreGrupo } from "@/utils/catalogoGrupos";
-import { nombreCortoTitulacion } from "@/utils/catalogoTitulaciones";
+import EtiquetaCuidado from "@/components/EtiquetaCuidado.vue";
 import { mensajeDeError } from "@/utils/mensajeDeError";
 import { moverFoco } from "@/utils/focoTarjeta";
 import { textoDistancia } from "@/utils/textoDistancia";
@@ -657,32 +657,35 @@ const cuidadoresMostrados = computed(() => {
           >
         </div>
 
-        <div class="buscar__tags" v-if="serviciosDe(cuidador).length > 0">
-          <span
-            class="buscar__tag buscar__tag--servicio"
-            v-for="codigo in serviciosDe(cuidador)"
-            :key="codigo"
-            >{{ nombreCuidado(codigo) }}</span
-          >
-        </div>
-
         <div
           class="buscar__tags"
-          v-if="verificadoDe(cuidador).titulacionVerificada || verificadoDe(cuidador).antecedentesVerificados"
+          v-if="
+            titulacionesDe(cuidador).length > 0 ||
+            verificadoDe(cuidador).titulacionVerificada ||
+            verificadoDe(cuidador).antecedentesVerificados
+          "
         >
+          <EtiquetaCuidado
+            class="buscar__tag buscar__tag--titulacion"
+            v-for="codigo in titulacionesDe(cuidador)"
+            :key="codigo"
+            :codigo="codigo"
+            tipo="titulacion"
+            corto
+          />
           <InsigniaVerificado
             :titulacion="!!verificadoDe(cuidador).titulacionVerificada"
             :antecedentes="!!verificadoDe(cuidador).antecedentesVerificados"
           />
         </div>
 
-        <div class="buscar__tags" v-if="titulacionesDe(cuidador).length > 0">
-          <span
-            class="buscar__tag buscar__tag--titulacion"
-            v-for="codigo in titulacionesDe(cuidador)"
+        <div class="buscar__tags" v-if="serviciosDe(cuidador).length > 0">
+          <EtiquetaCuidado
+            class="buscar__tag buscar__tag--servicio"
+            v-for="codigo in serviciosDe(cuidador)"
             :key="codigo"
-            >{{ nombreCortoTitulacion(codigo) }}</span
-          >
+            :codigo="codigo"
+          />
         </div>
 
         </div>
