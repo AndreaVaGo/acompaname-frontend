@@ -133,17 +133,19 @@ async function handleSubmit() {
             class="formulario login__form"
             @submit.prevent="handleSubmit"
           >
+          <p class="formulario__nota">Los campos marcados con <span aria-hidden="true">*</span> son obligatorios.</p>
             <h2 class="titulo-seccion" data-icono="🔑">Tus datos de acceso</h2>
 
-            <label for="email">Email</label>
+            <label class="obligatorio" for="email">Email</label>
             <input
               type="email"
               id="email"
+              aria-required="true"
               placeholder="tu@correo.com"
               v-model="email"
             />
 
-            <label for="password">Contraseña</label>
+            <label class="obligatorio" for="password">Contraseña</label>
             <CampoPassword
               id="password"
               placeholder="••••••"
