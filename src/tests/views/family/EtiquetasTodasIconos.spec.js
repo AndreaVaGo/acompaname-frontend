@@ -112,3 +112,24 @@ describe("Todas las etiquetas con icono", () => {
     expect(wrapper.find(".perfil__atiende").exists()).toBe(false);
   });
 });
+
+describe("Filtros de la búsqueda con icono", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  test("los botones de tipo, disponibilidad y vehículo llevan su icono delante", async () => {
+    const wrapper = await montarBuscar();
+
+    expect(wrapper.find("#filtro-tipo-hospitalario").attributes("data-icono")).toBe("🏥");
+    expect(wrapper.find("#filtro-tipo-domicilio").attributes("data-icono")).toBe("🏠");
+    expect(wrapper.find("#filtro-disponible").attributes("data-icono")).toBe("🟢");
+    expect(wrapper.find("#filtro-vehiculo").attributes("data-icono")).toBe("🚗");
+  });
+
+  test("el texto de los botones sigue siendo solo el nombre", async () => {
+    const wrapper = await montarBuscar();
+
+    expect(wrapper.find("#filtro-tipo-domicilio").text()).toBe("A domicilio");
+  });
+});
