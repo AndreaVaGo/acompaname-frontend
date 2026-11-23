@@ -46,6 +46,13 @@ defineProps({
   background-color: currentColor;
 }
 
+/* Icono opcional delante (data-icono); el texto de la píldora sigue siendo solo el nombre */
+.admin-pildora[data-icono]:not([data-icono=""])::before {
+  content: attr(data-icono);
+  content: attr(data-icono) / "";
+  margin-right: 5px;
+}
+
 /* El gris es el color por defecto */
 .admin-pildora--naranja {
   --fondo: var(--color-accent-bg);
