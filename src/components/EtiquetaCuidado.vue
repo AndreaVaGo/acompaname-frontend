@@ -2,25 +2,39 @@
 import { computed } from "vue";
 import { buscarCuidado } from "@/utils/catalogoCuidados";
 import { buscarTitulacion } from "@/utils/catalogoTitulaciones";
+import { buscarGrupo } from "@/utils/catalogoGrupos";
+import { buscarModalidad, buscarExtra } from "@/utils/catalogoModalidades";
 import { coloresDe } from "@/utils/paletaEtiquetas";
 
-// Etiqueta de un servicio (medicación, higiene...) o de una titulación (enfermería, TCAE...).
-// Cada una lleva siempre el mismo icono y el mismo color, en todas las pantallas.
-// Las titulaciones se destacan: fondo lleno de color y letra blanca.
+// Etiqueta con icono y color fijos: la misma en todas las pantallas y en todos los perfiles.
+// Según "tipo" busca el código en un catálogo u otro:
+//  - "cuidado": servicio o necesidad (medicación, higiene...)
+//  - "titulacion": enfermería, TCAE... (se destaca: fondo lleno y letra blanca)
+//  - "grupo": a quién cuida (bebés, personas mayores...)
+//  - "modalidad": dónde cuida (hospital, domicilio)
+//  - "extra": disponible ahora, vehículo propio
 // El icono se pinta con CSS (data-icono), así que el texto de la etiqueta es solo el nombre.
 const props = defineProps({
   codigo: { type: String, required: true },
-  // "cuidado" (servicio o necesidad) o "titulacion"
   tipo: { type: String, default: "cuidado" },
   // Solo para titulaciones: el nombre corto (el de las tarjetas) en vez del completo
   corto: { type: Boolean, default: false },
 });
 
+const BUSCADORES = {
+  cuidado: buscarCuidado,
+  titulacion: buscarTitulacion,
+  grupo: buscarGrupo,
+  modalidad: buscarModalidad,
+  extra: buscarExtra,
+};
+
 const esTitulacion = computed(() => props.tipo === "titulacion");
 
 // Los datos del catálogo (o undefined si el código no existe)
 const datos = computed(() => {
-  return esTitulacion.value ? buscarTitulacion(props.codigo) : buscarCuidado(props.codigo);
+  const buscar = BUSCADORES[props.tipo] || buscarCuidado;
+  return buscar(props.codigo);
 });
 
 const nombre = computed(() => {
