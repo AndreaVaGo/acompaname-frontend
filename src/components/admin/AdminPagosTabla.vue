@@ -2,7 +2,7 @@
 import { ref, computed } from "vue";
 import { formatearEuros } from "@/utils/formatearEuros";
 import { formatearFecha } from "@/utils/formatearFecha";
-import { nombreTipo, colorTipo } from "@/utils/nombreTipo";
+import { nombreTipo, colorTipo, iconoTipo } from "@/utils/nombreTipo";
 import AdminFiltros from "@/components/admin/AdminFiltros.vue";
 import AdminPildora from "@/components/admin/AdminPildora.vue";
 import AdminCabeceraOrden from "@/components/admin/AdminCabeceraOrden.vue";
@@ -187,7 +187,10 @@ function textoPagos(cantidad) {
               <td data-label="Familia">{{ pago.nombreFamilia }}</td>
               <td data-label="Persona cuidadora">{{ pago.nombreCuidador }}</td>
               <td data-label="Tipo">
-                <AdminPildora :color="colorTipo(pago.tipoCuidado)">
+                <AdminPildora
+                  :color="colorTipo(pago.tipoCuidado)"
+                  :data-icono="iconoTipo(pago.tipoCuidado)"
+                >
                   {{ nombreTipo(pago.tipoCuidado) }}
                 </AdminPildora>
               </td>
