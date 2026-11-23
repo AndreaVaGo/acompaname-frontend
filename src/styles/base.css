@@ -290,3 +290,20 @@ summary:focus-visible,
 .saltar-contenido:focus {
   top: 12px;
 }
+
+/* Campo obligatorio: asterisco rojo detrás del nombre. Se pone la clase "obligatorio" en la etiqueta
+   (o en el título de la sección) y el asterisco lo pinta el CSS, así el texto de la etiqueta no cambia.
+   La segunda línea de content lo marca como decoración para los lectores de pantalla (el campo lleva aria-required). */
+.obligatorio::after {
+  content: " *";
+  content: " *" / "";
+  color: var(--color-error);
+  font-weight: bold;
+}
+
+/* Nota "los campos con * son obligatorios" al principio de cada formulario */
+.formulario__nota {
+  margin: 0 0 12px;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
