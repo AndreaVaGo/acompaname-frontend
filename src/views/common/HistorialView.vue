@@ -3,7 +3,7 @@ import { ref, onMounted } from "vue";
 import { RouterLink } from "vue-router";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
 import ValoracionRepository from "@/repositories/ValoracionRepository";
-import { nombreCuidado } from "@/utils/catalogoCuidados";
+import EtiquetaCuidado from "@/components/EtiquetaCuidado.vue";
 import {
   nombresDePersonas,
   detalleDePersonas,
@@ -97,13 +97,12 @@ function textoEstado(estado) {
         </p>
 
         <div class="historial__necesidades" v-if="item.necesidades.length > 0">
-          <span
+          <EtiquetaCuidado
             class="historial__necesidad"
             v-for="codigo in item.necesidades"
             :key="codigo"
-          >
-            {{ nombreCuidado(codigo) }}
-          </span>
+            :codigo="codigo"
+          />
         </div>
 
         <ul class="historial__detalles">
