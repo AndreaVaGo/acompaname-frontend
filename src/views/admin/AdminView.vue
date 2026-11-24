@@ -365,6 +365,7 @@ async function eliminarValoracion(id) {
             @ver-pendientes="verPendientes"
             @ver-verificaciones="cambiarSeccion('verificaciones')"
             @ver-sugerencias="cambiarSeccion('sugerencias')"
+            @ver-usuarios="cambiarSeccion('usuarios')"
           />
 
           <AdminTarjetas :estadisticas="estadisticas" />
