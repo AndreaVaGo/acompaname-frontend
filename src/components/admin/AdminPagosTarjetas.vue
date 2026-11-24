@@ -78,6 +78,29 @@ const facturados = computed(() => {
   --borde-tarjeta: var(--color-secondary);
   --tinte-tarjeta: color-mix(in srgb, var(--color-secondary) 14%, transparent);
   padding: 18px 18px;
+  /* Si no hay subgrid, el nombre ocupa el hueco y el número y el detalle quedan abajo */
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-pagos-tarjetas__nombre {
+  flex: 1;
+}
+
+/* Cada tarjeta ocupa tres filas de la rejilla (nombre, número y detalle) y las comparte con las demás:
+   así los números quedan a la misma altura aunque un título ocupe una, dos o tres líneas */
+@supports (grid-template-rows: subgrid) {
+  .admin-pagos-tarjetas__tarjeta {
+    display: grid;
+    grid-row: span 3;
+    grid-template-rows: subgrid;
+    row-gap: 0;
+    align-content: start;
+  }
+
+  .admin-pagos-tarjetas__nombre {
+    flex: none;
+  }
 }
 
 .admin-pagos-tarjetas__tarjeta--coral {
