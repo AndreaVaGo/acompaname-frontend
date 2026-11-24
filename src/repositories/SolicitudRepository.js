@@ -48,4 +48,10 @@ export default class SolicitudRepository extends Repository {
   async getMisSolicitudes() {
     return this.get("/solicitudes/mis-solicitudes");
   }
+
+  // Las solicitudes del usuario por páginas (pagina empieza en 0), las más recientes primero.
+  // Devuelve { contenido, pagina, tamano, totalElementos, totalPaginas }
+  async getMisSolicitudesPaginadas(pagina = 0, tamano = 20) {
+    return this.get(`/solicitudes/mis-solicitudes/pagina?page=${pagina}&size=${tamano}`);
+  }
 }
