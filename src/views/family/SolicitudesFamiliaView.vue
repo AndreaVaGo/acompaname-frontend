@@ -5,20 +5,23 @@ import SolicitudRepository from "@/repositories/SolicitudRepository";
 import PagoRepository from "@/repositories/PagoRepository";
 import MensajeRepository from "@/repositories/MensajeRepository";
 import ValoracionRepository from "@/repositories/ValoracionRepository";
-import { mensajeDeError } from "@/utils/mensajeDeError";
+import { usarSolicitudesPaginadas } from "@/utils/solicitudesPaginadas";
 import { moverFoco } from "@/utils/focoTarjeta";
 
 const solicitudRepository = new SolicitudRepository();
 const pagoRepository = new PagoRepository();
 const valoracionRepository = new ValoracionRepository();
 const mensajeRepository = new MensajeRepository();
-const solicitudes = ref([]);
 const idsPagados = ref([]);
 const idsValoradas = ref([]);
 // Mensajes sin leer por solicitud: { idSolicitud: cantidad }
 const sinLeerPorSolicitud = ref({});
 const cargando = ref(true);
 const error = ref("");
+const { solicitudes, totalElementos, hayMas, cargandoMas, cargarSiguiente } =
+  usarSolicitudesPaginadas(solicitudRepository, (mensaje) => {
+    error.value = mensaje;
+  });
 
 // Se pide aparte y sin esperar: si falla o tarda, la lista se ve igual y solo no sale el contador
 async function cargarMensajesSinLeer() {
@@ -33,11 +36,7 @@ async function cargarMensajesSinLeer() {
 onMounted(async () => {
   cargarMensajesSinLeer();
 
-  try {
-    solicitudes.value = await solicitudRepository.getMisSolicitudes();
-  } catch (err) {
-    error.value = mensajeDeError(err, "No se pudieron cargar tus solicitudes.");
-  }
+  await cargarSiguiente();
 
   // Si falla la carga de pagos, la lista se ve igual y solo no marca ninguno como pagado
   try {
@@ -88,6 +87,20 @@ onMounted(async () => {
         :mensajesSinLeer="sinLeerPorSolicitud[solicitud.id]"
       />
     </div>
+
+    <div v-if="!cargando && hayMas" class="solicitudes__mas">
+      <p class="solicitudes__contador">
+        Mostrando {{ solicitudes.length }} de {{ totalElementos }}
+      </p>
+      <button
+        class="btn btn--secondary"
+        data-testid="cargar-mas"
+        :disabled="cargandoMas"
+        @click="cargarSiguiente"
+      >
+        {{ cargandoMas ? "Cargando…" : "Cargar más" }}
+      </button>
+    </div>
   </div>
 </template>
 
@@ -124,6 +137,20 @@ onMounted(async () => {
 
 .solicitudes__cargando {
   color: var(--color-text-muted);
+}
+
+.solicitudes__mas {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.solicitudes__contador {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
 }
 
 .solicitudes__grid {
