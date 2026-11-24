@@ -16,3 +16,11 @@ export function formatearMomento(fecha, hora) {
   }
   return formatearFecha(fecha) + " · " + formatearHora(hora);
 }
+
+// Saca la hora de un momento del back (2026-11-24T09:05:12.123456) para enseñarla: 09:05.
+export function horaDeMomento(momento) {
+  if (!momento || momento.length < 16) {
+    return "";
+  }
+  return momento.slice(11, 16);
+}
