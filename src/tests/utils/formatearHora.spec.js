@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { formatearHora, formatearMomento } from "../../utils/formatearHora";
+import { formatearHora, formatearMomento, horaDeMomento } from "../../utils/formatearHora";
 
 describe("formatearHora", () => {
   test("quita los segundos de la hora que manda el back", () => {
@@ -25,5 +25,18 @@ describe("formatearMomento", () => {
 
   test("sin hora enseña solo la fecha", () => {
     expect(formatearMomento("2026-10-21", null)).toBe("21-10-2026");
+  });
+});
+
+describe("horaDeMomento", () => {
+  test("saca la hora de un momento con fecha", () => {
+    expect(horaDeMomento("2026-11-24T09:05:12.123456")).toBe("09:05");
+    expect(horaDeMomento("2026-11-24T18:30:00")).toBe("18:30");
+  });
+
+  test("sin momento devuelve un texto vacío", () => {
+    expect(horaDeMomento(null)).toBe("");
+    expect(horaDeMomento(undefined)).toBe("");
+    expect(horaDeMomento("")).toBe("");
   });
 });
