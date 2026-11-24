@@ -6,7 +6,7 @@ const props = defineProps({
   avisos: { type: Object, required: true },
 });
 
-const emit = defineEmits(["verPendientes", "verVerificaciones", "verSugerencias"]);
+const emit = defineEmits(["verPendientes", "verVerificaciones", "verSugerencias", "verUsuarios"]);
 
 function textoProximas(cantidad) {
   if (cantidad === 1) {
@@ -43,6 +43,13 @@ function textoSugerencias(cantidad) {
   return `${cantidad} sugerencias nuevas en la última semana.`;
 }
 
+function textoUsuarios(cantidad) {
+  if (cantidad === 1) {
+    return "1 usuario nuevo en la última semana.";
+  }
+  return `${cantidad} usuarios nuevos en la última semana.`;
+}
+
 // Lista de frases, una por cada aviso que tenga alguna cantidad
 const frases = computed(() => {
   const lista = [];
@@ -61,6 +68,9 @@ const frases = computed(() => {
   if (props.avisos.sugerenciasUltimaSemana > 0) {
     lista.push(textoSugerencias(props.avisos.sugerenciasUltimaSemana));
   }
+  if (props.avisos.usuariosNuevosUltimaSemana > 0) {
+    lista.push(textoUsuarios(props.avisos.usuariosNuevosUltimaSemana));
+  }
   return lista;
 });
 
@@ -74,6 +84,7 @@ const hayPendientes = computed(() => {
 
 const hayVerificaciones = computed(() => props.avisos.verificacionesPendientes > 0);
 const haySugerencias = computed(() => props.avisos.sugerenciasUltimaSemana > 0);
+const hayUsuariosNuevos = computed(() => props.avisos.usuariosNuevosUltimaSemana > 0);
 </script>
 
 <template>
@@ -108,6 +119,14 @@ const haySugerencias = computed(() => props.avisos.sugerenciasUltimaSemana > 0);
         @click="emit('verSugerencias')"
       >
         Ver sugerencias
+      </button>
+      <button
+        v-if="hayUsuariosNuevos"
+        type="button"
+        class="btn admin-avisos__boton"
+        @click="emit('verUsuarios')"
+      >
+        Ver usuarios
       </button>
     </div>
   </section>
