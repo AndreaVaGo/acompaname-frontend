@@ -3,12 +3,13 @@ import { mount } from "@vue/test-utils";
 import { createRouter, createWebHistory } from "vue-router";
 import SolicitudesCuidadorView from "../../../views/caregiver/SolicitudesCuidadorView.vue";
 import SolicitudRepository from "../../../repositories/SolicitudRepository";
+import { pagina } from "../../ayudas/paginaFalsa";
 
 // Cada test recibe una solicitud nueva, porque la vista cambia su estado
 const espiaMisSolicitudes = vi
-  .spyOn(SolicitudRepository.prototype, "getMisSolicitudes")
+  .spyOn(SolicitudRepository.prototype, "getMisSolicitudesPaginadas")
   .mockImplementation(() =>
-    Promise.resolve([
+    Promise.resolve(pagina([
       {
         id: 1,
         familiaNombre: "Ana",
@@ -19,7 +20,7 @@ const espiaMisSolicitudes = vi
         notas: "test",
         estado: "PENDIENTE",
       },
-    ]),
+    ])),
   );
 
 // Solicitud que ya está aceptada, para probar el botón de completar
@@ -170,7 +171,7 @@ describe("SolicitudesCuidadorView", () => {
   });
 
   test("al marcar una solicitud aceptada como completada pasa a estar completada", async () => {
-    espiaMisSolicitudes.mockResolvedValueOnce(solicitudAceptada());
+    espiaMisSolicitudes.mockResolvedValueOnce(pagina(solicitudAceptada()));
     const cambiarEstado = vi
       .spyOn(SolicitudRepository.prototype, "cambiarEstado")
       .mockResolvedValue({ estado: "COMPLETADA" });
@@ -188,7 +189,7 @@ describe("SolicitudesCuidadorView", () => {
   });
 
   test("muestra un error si no se puede marcar la solicitud como completada", async () => {
-    espiaMisSolicitudes.mockResolvedValueOnce(solicitudAceptada());
+    espiaMisSolicitudes.mockResolvedValueOnce(pagina(solicitudAceptada()));
     vi.spyOn(SolicitudRepository.prototype, "cambiarEstado").mockRejectedValue(
       new Error("fallo"),
     );
@@ -208,7 +209,7 @@ describe("SolicitudesCuidadorView", () => {
   test("muestra el motivo si el servidor responde con un error al completar", async () => {
     const errorNoEncontrado = new Error("fallo");
     errorNoEncontrado.status = 404;
-    espiaMisSolicitudes.mockResolvedValueOnce(solicitudAceptada());
+    espiaMisSolicitudes.mockResolvedValueOnce(pagina(solicitudAceptada()));
     vi.spyOn(SolicitudRepository.prototype, "cambiarEstado").mockRejectedValue(
       errorNoEncontrado,
     );

@@ -4,6 +4,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import SolicitudesCuidadorView from "../../../views/caregiver/SolicitudesCuidadorView.vue";
 import SolicitudRepository from "../../../repositories/SolicitudRepository";
 import MensajeRepository from "../../../repositories/MensajeRepository";
+import { pagina } from "../../ayudas/paginaFalsa";
 
 const router = createRouter({ history: createWebHistory(), routes: [] });
 
@@ -21,10 +22,10 @@ function crearSolicitud(id) {
 }
 
 async function montarVista() {
-  vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
+  vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudesPaginadas").mockResolvedValue(pagina([
     crearSolicitud(1),
     crearSolicitud(2),
-  ]);
+  ]));
   const wrapper = mount(SolicitudesCuidadorView, { global: { plugins: [router] } });
   await new Promise((resolve) => setTimeout(resolve, 0));
   await new Promise((resolve) => setTimeout(resolve, 0));
