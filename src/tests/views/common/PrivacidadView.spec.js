@@ -70,4 +70,19 @@ describe("PrivacidadView", () => {
       "mailto:" + EMAIL_CONTACTO,
     );
   });
+
+  test("explica los fichajes y que no se guardan coordenadas", () => {
+    const wrapper = montarVista();
+
+    expect(wrapper.text()).toContain("Fichajes del servicio");
+    expect(wrapper.text()).toContain("No guardamos coordenadas ni recorridos");
+  });
+
+  test("explica el uso puntual de la ubicación y el servicio de mapas", () => {
+    const wrapper = montarVista();
+
+    expect(wrapper.text()).toContain("solo en el momento de fichar");
+    expect(wrapper.text()).toContain("Nominatim");
+    expect(wrapper.text()).toContain("no se almacena");
+  });
 });
