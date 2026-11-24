@@ -6,6 +6,7 @@ import SolicitudRepository from "../../../repositories/SolicitudRepository";
 import PagoRepository from "../../../repositories/PagoRepository";
 import ValoracionRepository from "../../../repositories/ValoracionRepository";
 import MensajeRepository from "../../../repositories/MensajeRepository";
+import { pagina } from "../../ayudas/paginaFalsa";
 
 const router = createRouter({ history: createWebHistory(), routes: [] });
 
@@ -22,10 +23,10 @@ function crearSolicitud(id) {
 }
 
 async function montarVista() {
-  vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
+  vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudesPaginadas").mockResolvedValue(pagina([
     crearSolicitud(1),
     crearSolicitud(2),
-  ]);
+  ]));
   vi.spyOn(PagoRepository.prototype, "getMisPagos").mockResolvedValue([]);
   vi.spyOn(ValoracionRepository.prototype, "getAll").mockResolvedValue([]);
 

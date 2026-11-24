@@ -5,6 +5,7 @@ import SolicitudesFamiliaView from "../../../views/family/SolicitudesFamiliaView
 import SolicitudRepository from "../../../repositories/SolicitudRepository";
 import PagoRepository from "../../../repositories/PagoRepository";
 import ValoracionRepository from "../../../repositories/ValoracionRepository";
+import { pagina } from "../../ayudas/paginaFalsa";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -39,9 +40,9 @@ describe("SolicitudesFamiliaView", () => {
   });
 
   test("muestra las solicitudes cargadas", async () => {
-    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
+    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudesPaginadas").mockResolvedValue(pagina([
       crearSolicitud(1, "PENDIENTE"),
-    ]);
+    ]));
     vi.spyOn(PagoRepository.prototype, "getMisPagos").mockResolvedValue([]);
     vi.spyOn(ValoracionRepository.prototype, "getAll").mockResolvedValue([]);
 
@@ -51,9 +52,9 @@ describe("SolicitudesFamiliaView", () => {
   });
 
   test("mientras carga muestra Cargando solicitudes y no las tarjetas", async () => {
-    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
+    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudesPaginadas").mockResolvedValue(pagina([
       crearSolicitud(1, "COMPLETADA"),
-    ]);
+    ]));
     vi.spyOn(PagoRepository.prototype, "getMisPagos").mockResolvedValue([]);
     vi.spyOn(ValoracionRepository.prototype, "getAll").mockResolvedValue([]);
 
@@ -71,9 +72,9 @@ describe("SolicitudesFamiliaView", () => {
   });
 
   test("al terminar de cargar quita el mensaje de carga y muestra las tarjetas", async () => {
-    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
+    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudesPaginadas").mockResolvedValue(pagina([
       crearSolicitud(1, "COMPLETADA"),
-    ]);
+    ]));
     vi.spyOn(PagoRepository.prototype, "getMisPagos").mockResolvedValue([]);
     vi.spyOn(ValoracionRepository.prototype, "getAll").mockResolvedValue([]);
 
@@ -85,9 +86,9 @@ describe("SolicitudesFamiliaView", () => {
   });
 
   test("una solicitud solo aceptada no se puede pagar todavía", async () => {
-    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
+    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudesPaginadas").mockResolvedValue(pagina([
       crearSolicitud(1, "ACEPTADA"),
-    ]);
+    ]));
     vi.spyOn(PagoRepository.prototype, "getMisPagos").mockResolvedValue([]);
     vi.spyOn(ValoracionRepository.prototype, "getAll").mockResolvedValue([]);
 
@@ -99,10 +100,10 @@ describe("SolicitudesFamiliaView", () => {
   });
 
   test("marca como pagada solo la solicitud con el pago completado", async () => {
-    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
+    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudesPaginadas").mockResolvedValue(pagina([
       crearSolicitud(1, "COMPLETADA"),
       crearSolicitud(2, "COMPLETADA"),
-    ]);
+    ]));
     vi.spyOn(PagoRepository.prototype, "getMisPagos").mockResolvedValue([
       { id: 10, solicitudId: 1, estado: "COMPLETADO" },
       { id: 11, solicitudId: 2, estado: "PENDIENTE" },
@@ -116,9 +117,9 @@ describe("SolicitudesFamiliaView", () => {
   });
 
   test("si falla la carga de pagos, muestra las solicitudes sin marcar ninguna como pagada", async () => {
-    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
+    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudesPaginadas").mockResolvedValue(pagina([
       crearSolicitud(1, "COMPLETADA"),
-    ]);
+    ]));
     vi.spyOn(PagoRepository.prototype, "getMisPagos").mockRejectedValue(
       new Error("fallo")
     );
@@ -131,7 +132,7 @@ describe("SolicitudesFamiliaView", () => {
   });
 
   test("muestra un error si falla la carga de solicitudes", async () => {
-    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockRejectedValue(
+    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudesPaginadas").mockRejectedValue(
       new Error("fallo")
     );
     vi.spyOn(PagoRepository.prototype, "getMisPagos").mockResolvedValue([]);
@@ -145,7 +146,7 @@ describe("SolicitudesFamiliaView", () => {
   test("muestra el motivo si el servidor responde con un error al cargar las solicitudes", async () => {
     const errorNoEncontrado = new Error("fallo");
     errorNoEncontrado.status = 404;
-    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockRejectedValue(
+    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudesPaginadas").mockRejectedValue(
       errorNoEncontrado
     );
     vi.spyOn(PagoRepository.prototype, "getMisPagos").mockResolvedValue([]);
@@ -159,9 +160,9 @@ describe("SolicitudesFamiliaView", () => {
   });
 
   test("muestra Dejar valoración en una solicitud completada sin valorar", async () => {
-    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
+    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudesPaginadas").mockResolvedValue(pagina([
       crearSolicitud(1, "COMPLETADA"),
-    ]);
+    ]));
     vi.spyOn(PagoRepository.prototype, "getMisPagos").mockResolvedValue([]);
     vi.spyOn(ValoracionRepository.prototype, "getAll").mockResolvedValue([]);
 
@@ -172,9 +173,9 @@ describe("SolicitudesFamiliaView", () => {
   });
 
   test("muestra Valoración enviada y no el botón si la solicitud ya está valorada", async () => {
-    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
+    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudesPaginadas").mockResolvedValue(pagina([
       crearSolicitud(1, "COMPLETADA"),
-    ]);
+    ]));
     vi.spyOn(PagoRepository.prototype, "getMisPagos").mockResolvedValue([]);
     vi.spyOn(ValoracionRepository.prototype, "getAll").mockResolvedValue([
       { id: 5, solicitudId: 1, puntuacion: 4 },
@@ -187,9 +188,9 @@ describe("SolicitudesFamiliaView", () => {
   });
 
   test("si falla la carga de valoraciones, muestra las solicitudes y el botón de valorar", async () => {
-    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([
+    vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudesPaginadas").mockResolvedValue(pagina([
       crearSolicitud(1, "COMPLETADA"),
-    ]);
+    ]));
     vi.spyOn(PagoRepository.prototype, "getMisPagos").mockResolvedValue([]);
     vi.spyOn(ValoracionRepository.prototype, "getAll").mockRejectedValue(
       new Error("fallo")
