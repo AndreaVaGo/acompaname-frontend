@@ -2,6 +2,7 @@
 import { computed, ref } from "vue";
 import { RouterLink } from "vue-router";
 import EtiquetaCuidado from "@/components/EtiquetaCuidado.vue";
+import FichajeServicio from "@/components/FichajeServicio.vue";
 import { nombreGrupo } from "@/utils/catalogoGrupos";
 import { iconoTipo } from "@/utils/nombreTipo";
 import {
@@ -317,6 +318,13 @@ const avisoDireccion = computed(
         Dejar valoración
       </RouterLink>
     </div>
+
+    <!-- Inicio y fin del servicio: la persona cuidadora ficha y la familia lo ve -->
+    <FichajeServicio
+      v-if="solicitud.estado === 'ACEPTADA' || solicitud.estado === 'COMPLETADA'"
+      :solicitud="solicitud"
+      :esCuidador="!!mostrarAcciones"
+    />
 
     <!-- El chat está para la familia y para la persona cuidadora, salvo en las solicitudes rechazadas -->
     <div class="solicitudes__chat-fila" v-if="solicitud.estado !== 'RECHAZADA'">
