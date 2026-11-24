@@ -2,7 +2,7 @@ import { describe, test, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import AdminAvisos from '../../../components/admin/AdminAvisos.vue'
 
-function montar(proximas, vencidas, pagos, verificaciones = 0, sugerencias = 0) {
+function montar(proximas, vencidas, pagos, verificaciones = 0, sugerencias = 0, usuarios = 0) {
   return mount(AdminAvisos, {
     props: {
       avisos: {
@@ -11,6 +11,7 @@ function montar(proximas, vencidas, pagos, verificaciones = 0, sugerencias = 0) 
         pagosSinCobrarMasDeUnaSemana: pagos,
         verificacionesPendientes: verificaciones,
         sugerenciasUltimaSemana: sugerencias,
+        usuariosNuevosUltimaSemana: usuarios,
       },
     },
   })
@@ -122,5 +123,39 @@ describe('AdminAvisos', () => {
     const wrapper = montar(0, 0, 0, 2, 0)
 
     expect(wrapper.findAll('button').map((b) => b.text())).toEqual(['Revisar verificaciones'])
+  })
+
+  test('avisa de los usuarios nuevos y el botón lleva a verlos', async () => {
+    const wrapper = montar(0, 0, 0, 0, 0, 4)
+
+    expect(wrapper.text()).toContain('4 usuarios nuevos en la última semana.')
+    expect(wrapper.text()).not.toContain('Todo en orden')
+    await wrapper.find('button').trigger('click')
+
+    expect(wrapper.emitted('verUsuarios').length).toBe(1)
+  })
+
+  test('con un usuario nuevo usa el singular', () => {
+    const wrapper = montar(0, 0, 0, 0, 0, 1)
+
+    expect(wrapper.text()).toContain('1 usuario nuevo en la última semana.')
+  })
+
+  test('sin usuarios nuevos no sale el aviso ni el botón', () => {
+    const wrapper = montar(1, 0, 0, 0, 0, 0)
+
+    expect(wrapper.text()).not.toContain('usuarios nuevos')
+    expect(wrapper.findAll('button').map((b) => b.text())).toEqual(['Ver solicitudes pendientes'])
+  })
+
+  test('con todos los avisos salen los cuatro botones, cada uno en su sitio', () => {
+    const wrapper = montar(1, 0, 0, 2, 3, 4)
+
+    expect(wrapper.findAll('button').map((b) => b.text())).toEqual([
+      'Ver solicitudes pendientes',
+      'Revisar verificaciones',
+      'Ver sugerencias',
+      'Ver usuarios',
+    ])
   })
 })
