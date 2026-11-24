@@ -9,7 +9,7 @@ const emailContacto = EMAIL_CONTACTO;
   <div class="pantalla">
     <div class="legal tarjeta-cristal">
     <h1>Política de privacidad</h1>
-    <p class="legal__fecha">Última actualización: octubre de 2026</p>
+    <p class="legal__fecha">Última actualización: noviembre de 2026</p>
 
     <p class="legal__aviso">
       Acompáñame es un proyecto formativo y de demostración. Este texto es una
@@ -46,6 +46,13 @@ const emailContacto = EMAIL_CONTACTO;
         <li>
           <strong>Valoraciones:</strong> puntuación, comentario y fecha.
         </li>
+        <li>
+          <strong>Fichajes del servicio:</strong> la hora a la que la persona
+          cuidadora indica que empieza y que termina el servicio y, solo si está
+          activada la comprobación del lugar, si en ese momento estaba cerca de
+          la dirección del servicio. <strong>No guardamos coordenadas ni
+          recorridos.</strong>
+        </li>
       </ul>
       <p>
         Las necesidades de cuidado y las notas pueden revelar información sobre
@@ -61,8 +68,8 @@ const emailContacto = EMAIL_CONTACTO;
       <p>
         Para gestionar tu cuenta, permitir que las familias encuentren
         personas cuidadoras y soliciten servicios, que las personas cuidadoras
-        gestionen esas solicitudes, simular el pago y publicar las valoraciones de los
-        servicios.
+        gestionen esas solicitudes, simular el pago, publicar las valoraciones de los
+        servicios y dejar constancia de la hora de inicio y de fin de cada servicio.
       </p>
     </section>
 
@@ -80,8 +87,20 @@ const emailContacto = EMAIL_CONTACTO;
           datos de la familia.
         </li>
         <li>
-          No cedemos datos a terceros ni los usamos para publicidad, salvo
-          obligación legal.
+          Los <strong>fichajes</strong> de una solicitud (las horas y, si procede,
+          si la persona cuidadora estaba en el lugar) los ven la familia y la
+          persona cuidadora de esa solicitud, y nadie más.
+        </li>
+        <li>
+          Si se activa la <strong>comprobación del lugar</strong>, el navegador
+          te pide tu ubicación solo en el momento de fichar (puedes decir que no
+          y se guarda solo la hora). Para calcular la distancia, la dirección del
+          servicio se envía al servicio de mapas Nominatim (OpenStreetMap). La
+          ubicación se compara con esa dirección y se descarta: no se almacena.
+        </li>
+        <li>
+          Fuera de eso, no cedemos datos a terceros ni los usamos para
+          publicidad, salvo obligación legal.
         </li>
       </ul>
     </section>
