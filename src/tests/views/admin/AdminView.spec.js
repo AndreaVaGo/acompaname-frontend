@@ -27,6 +27,7 @@ const AVISOS = {
   pagosSinCobrarMasDeUnaSemana: 2,
   verificacionesPendientes: 4,
   sugerenciasUltimaSemana: 5,
+  usuariosNuevosUltimaSemana: 6,
 }
 
 const CUIDADORES = [
@@ -459,6 +460,18 @@ describe('AdminView', () => {
 
     expect(wrapper.find('.admin-menu__boton--activo').text()).toBe('Sugerencias')
     expect(AdminRepository.prototype.getSugerencias).toHaveBeenCalled()
+  })
+
+  test('el aviso de usuarios nuevos abre la sección Usuarios', async () => {
+    prepararRepositorio()
+    const wrapper = await montarVista()
+
+    const boton = wrapper.findAll('button').find((b) => b.text() === 'Ver usuarios')
+    await boton.trigger('click')
+    await flushPromises()
+
+    expect(wrapper.find('.admin-menu__boton--activo').text()).toBe('Usuarios')
+    expect(AdminRepository.prototype.getUsuarios).toHaveBeenCalled()
   })
 
   test('si falla al filtrar muestra el motivo y mantiene la tabla', async () => {
