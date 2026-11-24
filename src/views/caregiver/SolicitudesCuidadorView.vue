@@ -4,15 +4,19 @@ import SolicitudCard from "../../components/SolicitudCard.vue";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
 import MensajeRepository from "@/repositories/MensajeRepository";
 import { mensajeDeError } from "@/utils/mensajeDeError";
+import { usarSolicitudesPaginadas } from "@/utils/solicitudesPaginadas";
 import { moverFoco } from "@/utils/focoTarjeta";
 
 const solicitudRepository = new SolicitudRepository();
 const mensajeRepository = new MensajeRepository();
-const solicitudes = ref([]);
 const cargando = ref(true);
 // Mensajes sin leer por solicitud: { idSolicitud: cantidad }
 const sinLeerPorSolicitud = ref({});
 const error = ref("");
+const { solicitudes, totalElementos, hayMas, cargandoMas, cargarSiguiente } =
+  usarSolicitudesPaginadas(solicitudRepository, (mensaje) => {
+    error.value = mensaje;
+  });
 
 // Se pide aparte y sin esperar: si falla o tarda, la lista se ve igual y solo no sale el contador
 async function cargarMensajesSinLeer() {
@@ -27,13 +31,8 @@ async function cargarMensajesSinLeer() {
 onMounted(async () => {
   cargarMensajesSinLeer();
 
-  try {
-    solicitudes.value = await solicitudRepository.getMisSolicitudes();
-  } catch (err) {
-    error.value = mensajeDeError(err, "No se pudieron cargar tus solicitudes.");
-  } finally {
-    cargando.value = false;
-  }
+  await cargarSiguiente();
+  cargando.value = false;
 });
 
 async function aceptar(id) {
@@ -97,6 +96,20 @@ async function completar(id) {
         :mensajesSinLeer="sinLeerPorSolicitud[solicitud.id]"
       />
     </div>
+
+    <div v-if="!cargando && hayMas" class="solicitudes__mas">
+      <p class="solicitudes__contador">
+        Mostrando {{ solicitudes.length }} de {{ totalElementos }}
+      </p>
+      <button
+        class="btn btn--secondary"
+        data-testid="cargar-mas"
+        :disabled="cargandoMas"
+        @click="cargarSiguiente"
+      >
+        {{ cargandoMas ? "Cargando…" : "Cargar más" }}
+      </button>
+    </div>
   </div>
 </template>
 <style scoped>
@@ -129,6 +142,20 @@ async function completar(id) {
   padding: 10px 14px;
   border-radius: var(--radius-input);
   margin-bottom: 16px;
+}
+
+.solicitudes__mas {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.solicitudes__contador {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
 }
 
 .solicitudes__grid {
