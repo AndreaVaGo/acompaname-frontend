@@ -1,6 +1,7 @@
 import { describe, test, expect } from "vitest";
 import { mount } from "@vue/test-utils";
 import FotoCuidador from "../../components/FotoCuidador.vue";
+import { API_URL } from "../../repositories/Repository";
 
 describe("FotoCuidador", () => {
   test("muestra la foto si hay enlace", () => {
@@ -11,6 +12,21 @@ describe("FotoCuidador", () => {
     const imagen = wrapper.find("img");
     expect(imagen.exists()).toBe(true);
     expect(imagen.attributes("src")).toBe("https://ejemplo.com/foto.jpg");
+  });
+
+  test("una foto que es una dirección de la API se completa con la dirección del servidor", () => {
+    const wrapper = mount(FotoCuidador, {
+      props: { foto: "/cuidadores/5/foto?v=1a2b", nombre: "Ana" },
+    });
+
+    expect(wrapper.find("img").attributes("src")).toBe(`${API_URL}/cuidadores/5/foto?v=1a2b`);
+  });
+
+  test("una foto en Base64 se deja tal cual", () => {
+    const base64 = "data:image/png;base64,AAAA";
+    const wrapper = mount(FotoCuidador, { props: { foto: base64, nombre: "Ana" } });
+
+    expect(wrapper.find("img").attributes("src")).toBe(base64);
   });
 
   test("sin foto muestra la inicial del nombre en mayúscula", () => {
