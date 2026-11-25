@@ -50,6 +50,12 @@ describe("PrivacidadView", () => {
     expect(wrapper.text()).toContain("no utiliza cookies");
   });
 
+  test("aclara que las cookies que no usa son las propias", () => {
+    const wrapper = montarVista();
+
+    expect(wrapper.text()).toContain("no utiliza cookies propias");
+  });
+
   test("informa de los derechos y de la AEPD", () => {
     const wrapper = montarVista();
 
@@ -84,5 +90,35 @@ describe("PrivacidadView", () => {
     expect(wrapper.text()).toContain("solo en el momento de fichar");
     expect(wrapper.text()).toContain("Nominatim");
     expect(wrapper.text()).toContain("no se almacena");
+  });
+
+  test("informa del uso de Cloudflare Turnstile en el registro y el inicio de sesión", () => {
+    const wrapper = montarVista();
+
+    expect(wrapper.text()).toContain("Cloudflare Turnstile");
+    expect(wrapper.text()).toContain("En el registro y en el inicio de sesión");
+    expect(wrapper.text()).toContain("recibe datos técnicos de tu navegador");
+  });
+
+  test("informa de la dirección IP de los intentos fallidos y de su plazo de 30 días", () => {
+    const wrapper = montarVista();
+
+    expect(wrapper.text()).toContain("Datos técnicos de seguridad");
+    expect(wrapper.text()).toContain("intentos fallidos de inicio de sesión");
+    expect(wrapper.text()).toContain("durante 30 días");
+  });
+
+  test("explica qué pasa con los datos al eliminar la cuenta", () => {
+    const wrapper = montarVista();
+
+    expect(wrapper.text()).toContain("Si eliminas tu cuenta, se borran tus datos personales");
+    expect(wrapper.text()).toContain("asociados a una cuenta anónima");
+  });
+
+  test("informa de que el lugar de la búsqueda se envía a Nominatim desde el servidor", () => {
+    const wrapper = montarVista();
+
+    expect(wrapper.text()).toContain("cerca de un lugar");
+    expect(wrapper.text()).toContain("Nominatim no recibe los datos de tu cuenta");
   });
 });
