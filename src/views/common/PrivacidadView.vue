@@ -53,6 +53,10 @@ const emailContacto = EMAIL_CONTACTO;
           la dirección del servicio. <strong>No guardamos coordenadas ni
           recorridos.</strong>
         </li>
+        <li>
+          <strong>Datos técnicos de seguridad:</strong> la dirección IP desde la
+          que se intenta iniciar sesión sin éxito, para detectar abusos.
+        </li>
       </ul>
       <p>
         Las necesidades de cuidado y las notas pueden revelar información sobre
@@ -99,6 +103,19 @@ const emailContacto = EMAIL_CONTACTO;
           ubicación se compara con esa dirección y se descarta: no se almacena.
         </li>
         <li>
+          En el registro y en el inicio de sesión usamos
+          <strong>Cloudflare Turnstile</strong> para comprobar que eres una
+          persona y no un programa automático. Para ello tu navegador carga un
+          script de Cloudflare, que recibe datos técnicos de tu navegador, como
+          tu dirección IP.
+        </li>
+        <li>
+          Cuando buscas personas cuidadoras cerca de un lugar (una ciudad o un
+          código postal), ese lugar se envía a Nominatim (OpenStreetMap) para
+          convertirlo en una ubicación. La petición la hace nuestro servidor, así
+          que Nominatim no recibe los datos de tu cuenta.
+        </li>
+        <li>
           Fuera de eso, no cedemos datos a terceros ni los usamos para
           publicidad, salvo obligación legal.
         </li>
@@ -108,10 +125,15 @@ const emailContacto = EMAIL_CONTACTO;
     <section>
       <h2>5. Cookies y almacenamiento</h2>
       <p>
-        Esta aplicación <strong>no utiliza cookies</strong> ni herramientas de
-        analítica o seguimiento. Solo guarda los datos de la sesión en el
-        almacenamiento de sesión de tu navegador (<code>sessionStorage</code>),
-        que se borra al cerrar la pestaña o al cerrar sesión.
+        Esta aplicación <strong>no utiliza cookies propias</strong> ni
+        herramientas de analítica o seguimiento. Solo guarda los datos de la
+        sesión en el almacenamiento de sesión de tu navegador
+        (<code>sessionStorage</code>), que se borra al cerrar la pestaña o al
+        cerrar sesión.
+      </p>
+      <p>
+        La comprobación de Cloudflare Turnstile del registro y del inicio de
+        sesión es de un tercero y se rige por su propia política de privacidad.
       </p>
     </section>
 
@@ -129,6 +151,17 @@ const emailContacto = EMAIL_CONTACTO;
         Mientras la cuenta exista y, al ser un proyecto de demostración, hasta
         que se eliminen los datos de prueba. Puedes pedir su supresión en
         cualquier momento.
+      </p>
+      <p>
+        Si eliminas tu cuenta, se borran tus datos personales: nombre, correo,
+        teléfono y, si eres persona cuidadora, tu foto y tu descripción. Las
+        solicitudes, los pagos y los mensajes de los servicios en los que
+        participaste se conservan asociados a una cuenta anónima, porque la otra
+        persona los necesita para su historial.
+      </p>
+      <p>
+        Los registros técnicos con la dirección IP de los intentos fallidos de
+        inicio de sesión se conservan durante 30 días.
       </p>
     </section>
 
