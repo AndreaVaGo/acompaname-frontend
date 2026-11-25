@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, watch } from "vue";
+import { API_URL } from "@/repositories/Repository";
 
 const props = defineProps({
   foto: { type: String, default: "" },
@@ -18,6 +19,15 @@ watch(
 );
 
 const mostrarFoto = computed(() => props.foto && !falloAlCargar.value);
+
+// En las listas y los perfiles públicos la foto llega como una dirección de la API (/cuidadores/5/foto?v=...),
+// que hay que completar con la dirección del servidor. Una foto en Base64 o con su enlace completo se deja igual
+const direccionDeLaFoto = computed(() => {
+  if (props.foto && props.foto.startsWith("/")) {
+    return API_URL + props.foto;
+  }
+  return props.foto;
+});
 
 // Sin foto se enseña la inicial del nombre en mayúscula (Ana -> A).
 // Si no hay nombre, se queda el monigote de siempre
@@ -38,7 +48,7 @@ const medidas = computed(() => ({
   <img
     v-if="mostrarFoto"
     class="foto-cuidador"
-    :src="foto"
+    :src="direccionDeLaFoto"
     :alt="'Foto de ' + nombre"
     :style="medidas"
     @error="falloAlCargar = true"
