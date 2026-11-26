@@ -19,7 +19,7 @@ describe("MiCalendarioView · diseño", () => {
   test("el calendario, el día abierto y los formularios son tarjetas de cristal", () => {
     expect(calendario).toContain('class="calendario__box tarjeta-cristal"');
     expect(calendario).toContain('class="calendario__detalle tarjeta-cristal"');
-    expect(calendario.match(/calendario__box calendario__box--formulario tarjeta-cristal/g).length).toBe(2);
+    expect(calendario.match(/calendario__box calendario__box--formulario tarjeta-cristal/g).length).toBe(3);
   });
 
   test("las tarjetas con formulario no se levantan al pasar el ratón", () => {
