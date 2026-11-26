@@ -1,15 +1,25 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, nextTick } from "vue";
 import { RouterLink } from "vue-router";
 import UsuarioRepository from "@/repositories/UsuarioRepository";
 import { useAuthStore } from "@/stores/auth";
 import { mensajeDeError } from "@/utils/mensajeDeError";
+import { validarContacto } from "@/utils/validarRegistro";
+import {
+  erroresDelServidor,
+  primerCampoConError,
+  hayErrores,
+} from "@/utils/erroresDeCampos";
 
 const nombre = ref("");
 const email = ref("");
 const telefono = ref("");
 const cargando = ref(true);
+// Aviso general y errores de cada campo: { campo: "mensaje" }
 const error = ref("");
+const errores = ref({});
+const MENSAJE_REVISAR = "Revisa los campos marcados en rojo.";
+const ORDEN_CAMPOS = ["nombre", "email", "telefono"];
 const exito = ref("");
 
 const usuarioRepository = new UsuarioRepository();
@@ -36,15 +46,35 @@ onMounted(async () => {
   }
 });
 
+// Atributos de accesibilidad de un campo con error: lo marca como inválido y lo une a su mensaje
+function ariaInvalido(campo) {
+  return errores.value[campo] ? "true" : undefined;
+}
+
+function ariaDescrito(campo) {
+  return errores.value[campo] ? "error-" + campo : undefined;
+}
+
+// Los ids de los campos coinciden con su nombre
+async function llevarElCursorAlPrimerError() {
+  const campo = primerCampoConError(errores.value, ORDEN_CAMPOS);
+  await nextTick();
+  if (campo) {
+    document.getElementById(campo)?.focus();
+  }
+}
+
 async function handleSubmit() {
   exito.value = "";
 
-  if (!nombre.value.trim() || !email.value.trim() || !telefono.value.trim()) {
-    error.value = "Por favor, rellena todos los campos.";
-    return;
-  }
-  if (!email.value.includes("@")) {
-    error.value = "El email no tiene un formato válido.";
+  errores.value = validarContacto({
+    nombre: nombre.value,
+    email: email.value,
+    telefono: telefono.value,
+  });
+  if (hayErrores(errores.value)) {
+    error.value = MENSAJE_REVISAR;
+    await llevarElCursorAlPrimerError();
     return;
   }
   error.value = "";
@@ -62,6 +92,20 @@ async function handleSubmit() {
     }
     exito.value = "Datos actualizados correctamente.";
   } catch (err) {
+    // Si el back dice qué campos fallan, se marcan; si no, un aviso general según el código HTTP
+    const delServidor = erroresDelServidor(err);
+    const visibles = {};
+    for (const campo of ORDEN_CAMPOS) {
+      if (delServidor[campo]) {
+        visibles[campo] = delServidor[campo];
+      }
+    }
+    errores.value = visibles;
+    if (hayErrores(visibles)) {
+      error.value = MENSAJE_REVISAR;
+      await llevarElCursorAlPrimerError();
+      return;
+    }
     error.value = mensajeDeError(err, "No se pudieron guardar los datos.");
   }
 }
@@ -92,16 +136,37 @@ async function handleSubmit() {
             <h2 class="titulo-seccion" data-icono="📇">Datos de contacto</h2>
 
             <label class="obligatorio" for="nombre">Nombre</label>
-            <input type="text" id="nombre"
-              aria-required="true" v-model="nombre" />
+            <input
+              type="text"
+              id="nombre"
+              aria-required="true"
+              :aria-invalid="ariaInvalido('nombre')"
+              :aria-describedby="ariaDescrito('nombre')"
+              v-model="nombre"
+            />
+            <p v-if="errores.nombre" id="error-nombre" class="campo-error">{{ errores.nombre }}</p>
 
             <label class="obligatorio" for="email">Email</label>
-            <input type="email" id="email"
-              aria-required="true" v-model="email" />
+            <input
+              type="email"
+              id="email"
+              aria-required="true"
+              :aria-invalid="ariaInvalido('email')"
+              :aria-describedby="ariaDescrito('email')"
+              v-model="email"
+            />
+            <p v-if="errores.email" id="error-email" class="campo-error">{{ errores.email }}</p>
 
             <label class="obligatorio" for="telefono">Teléfono</label>
-            <input type="tel" id="telefono"
-              aria-required="true" v-model="telefono" />
+            <input
+              type="tel"
+              id="telefono"
+              aria-required="true"
+              :aria-invalid="ariaInvalido('telefono')"
+              :aria-describedby="ariaDescrito('telefono')"
+              v-model="telefono"
+            />
+            <p v-if="errores.telefono" id="error-telefono" class="campo-error">{{ errores.telefono }}</p>
 
             <p role="alert" v-if="error" class="editar-datos__error">{{ error }}</p>
             <p v-if="exito" class="editar-datos__exito">{{ exito }}</p>
