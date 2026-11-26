@@ -17,6 +17,7 @@ afterEach(() => {
 
 async function montarVista() {
   vi.spyOn(BloqueOcupadoRepository.prototype, "getMios").mockResolvedValue([]);
+  vi.spyOn(BloqueOcupadoRepository.prototype, "getSuscripcion").mockResolvedValue({ vinculado: false });
   vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([]);
   const wrapper = mount(MiCalendarioView);
   await flushPromises();
@@ -212,5 +213,32 @@ describe("MiCalendarioView · importar calendario", () => {
 
     expect(wrapper.find('.calendario__importar [role="status"]').exists()).toBe(false);
     expect(wrapper.find('.calendario__importar [role="alert"]').exists()).toBe(true);
+  });
+});
+
+// ACOM-236: la sección de sincronizar con un calendario externo está en Mi calendario
+describe("MiCalendarioView · sincronizar calendario", () => {
+  test("enseña la sección para vincular un calendario", async () => {
+    const wrapper = await montarVista();
+
+    expect(wrapper.text()).toContain("Sincronizar con otro calendario");
+    expect(wrapper.find("#calendario-url").exists()).toBe(true);
+  });
+
+  test("al vincular, vuelve a cargar los ratos ocupados", async () => {
+    const wrapper = await montarVista();
+    vi.spyOn(BloqueOcupadoRepository.prototype, "vincularCalendario").mockResolvedValue({
+      vinculado: true,
+      ultimaSincronizacion: null,
+      ultimoError: null,
+    });
+    const getMios = BloqueOcupadoRepository.prototype.getMios;
+    getMios.mockClear();
+
+    await wrapper.find("#calendario-url").setValue("https://calendar.google.com/x.ics");
+    await wrapper.find("#vincular").trigger("click");
+    await flushPromises();
+
+    expect(getMios).toHaveBeenCalledTimes(1);
   });
 });
