@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, afterEach } from "vitest";
+import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createRouter, createWebHistory } from "vue-router";
 import { createPinia } from "pinia";
@@ -43,7 +43,14 @@ async function rellenarFechasYHoras(wrapper, inicio = "10:00", fin = "14:00") {
 }
 
 describe("SolicitarServicioView · precio estimado", () => {
+  // Fecha fija: la vista no deja elegir fechas pasadas, así que los tests no pueden depender del día real
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date(2026, 0, 1, 10, 0));
+  });
+
   afterEach(() => {
+    vi.useRealTimers();
     vi.restoreAllMocks();
   });
 
