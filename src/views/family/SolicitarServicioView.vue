@@ -830,8 +830,9 @@ async function enviarSolicitud() {
 }
 
 .campo-error {
-  margin: 0.25rem 0 0;
-  font-size: 0.875rem;
+  margin: 0.375rem 0 0;
+  font-size: 1.0625rem;
+  font-weight: 700;
   color: var(--color-error);
 }
 
