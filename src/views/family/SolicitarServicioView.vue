@@ -1,12 +1,23 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, nextTick } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { RouterLink } from "vue-router";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
 import CuidadorRepository from "@/repositories/CuidadorRepository";
 import SelectorGrupos from "@/components/SelectorGrupos.vue";
 import { CUIDADOS } from "@/utils/catalogoCuidados";
-import { GRUPOS, buscarGrupo, edadValidaParaGrupo } from "@/utils/catalogoGrupos";
+import { GRUPOS, buscarGrupo } from "@/utils/catalogoGrupos";
+import {
+  validarSolicitud,
+  ordenDeCampos,
+  campoDeSolicitud,
+  fechaDeHoy,
+} from "@/utils/validarSolicitud";
+import {
+  erroresDelServidor,
+  primerCampoConError,
+  hayErrores,
+} from "@/utils/erroresDeCampos";
 import { useAuthStore } from "@/stores/auth";
 import { mensajeDeError } from "@/utils/mensajeDeError";
 import { formatearEuros } from "@/utils/formatearEuros";
@@ -41,7 +52,12 @@ const MAX_PERSONAS = 5;
 const personas = ref([{ nombre: "", edad: "" }]);
 const necesidades = ref([]);
 const notas = ref("");
+// Aviso general (arriba del botón) y errores de cada campo: { campo: "mensaje" }
 const error = ref("");
+const errores = ref({});
+// Fecha de hoy, para que no se pueda elegir una fecha pasada
+const hoy = fechaDeHoy();
+const MENSAJE_REVISAR = "Revisa los campos marcados en rojo.";
 
 // Precio estimado: horas x tarifa, con recargo por cada persona extra.
 // Es null mientras falten datos (fechas, horas o tarifa)
@@ -82,13 +98,6 @@ function direccionCompleta() {
   return direccion.value.trim();
 }
 
-function faltaDireccion() {
-  if (tipoCuidado.value === "hospitalario") {
-    return !hospital.value.trim() || !ubicacionHospital.value.trim();
-  }
-  return !direccion.value.trim();
-}
-
 // Código del grupo de edad de una persona. La primera usa el que se elige arriba;
 // las demás tienen el suyo, así se puede pedir "tres niños y un abuelo" en la misma solicitud
 function codigoDeGrupo(indice) {
@@ -127,34 +136,107 @@ function quitarPersona(indice) {
   }
 }
 
-// La edad 0 es válida (un bebé), así que no se puede comprobar con "!edad"
-function faltaEdad(persona) {
-  return persona.edad === "" || persona.edad === null;
+// Clave del error de un campo de una persona, por ejemplo "personas.0.nombre"
+function clave(indice, campo) {
+  return `personas.${indice}.${campo}`;
 }
 
-// Alguna persona sin nombre, sin edad o sin grupo de edad
-function faltanDatosDePersonas() {
-  for (let i = 0; i < personas.value.length; i++) {
-    const persona = personas.value[i];
-    if (!persona.nombre.trim() || faltaEdad(persona) || !codigoDeGrupo(i)) {
-      return true;
-    }
-  }
-  return false;
+// Atributos de accesibilidad de un campo con error: lo marca como inválido y lo une a su mensaje
+function ariaInvalido(campo) {
+  return errores.value[campo] ? "true" : undefined;
 }
 
-// Devuelve el texto de error de la primera persona cuya edad no encaja con SU grupo,
-// o un texto vacío si todas encajan
-function errorDeEdadPorGrupo() {
+function ariaDescrito(campo) {
+  return errores.value[campo] ? "error-" + campo : undefined;
+}
+
+// Los datos del formulario tal como los pide validarSolicitud
+function datosDelFormulario() {
+  const lista = [];
   for (let i = 0; i < personas.value.length; i++) {
-    const persona = personas.value[i];
-    if (!edadValidaParaGrupo(codigoDeGrupo(i), Number(persona.edad))) {
-      const datos = buscarGrupo(codigoDeGrupo(i));
-      const quien = personas.value.length > 1 ? `Persona ${i + 1}: para` : "Para";
-      return `${quien} "${datos.nombre}" la edad tiene que estar entre ${datos.edadMin} y ${datos.edadMax} años.`;
+    lista.push({
+      nombre: personas.value[i].nombre,
+      edad: personas.value[i].edad,
+      grupoEdad: codigoDeGrupo(i),
+    });
+  }
+  return {
+    grupoEdad: grupoEdad.value,
+    tipoCuidado: tipoCuidado.value,
+    hospital: hospital.value,
+    ubicacionHospital: ubicacionHospital.value,
+    direccion: direccion.value,
+    fechaInicio: fechaInicio.value,
+    fechaFin: fechaFin.value,
+    horaInicio: horaInicio.value,
+    horaFin: horaFin.value,
+    personas: lista,
+    notas: notas.value,
+  };
+}
+
+// Id del elemento de cada campo, para llevar el cursor al primero con error
+function idDelCampo(campo) {
+  const fijos = {
+    hospital: "hospital",
+    ubicacionHospital: "ubicacion",
+    direccion: "direccion",
+    fechaInicio: "fecha",
+    fechaFin: "fecha-fin",
+    horaInicio: "hora-inicio",
+    horaFin: "hora-fin",
+    notas: "notas",
+  };
+  if (fijos[campo]) {
+    return fijos[campo];
+  }
+  // Campos de una persona: "personas.1.edad" -> "edad-2" (la primera no lleva número)
+  const partes = campo.split(".");
+  if (partes[0] !== "personas") {
+    return "";
+  }
+  const numero = Number(partes[1]) + 1;
+  const sufijo = numero === 1 ? "" : "-" + numero;
+  if (partes[2] === "nombre") {
+    return "paciente" + sufijo;
+  }
+  if (partes[2] === "edad") {
+    return "edad" + sufijo;
+  }
+  return "grupo-" + numero;
+}
+
+async function llevarElCursorAlPrimerError() {
+  const campo = primerCampoConError(errores.value, ordenDeCampos(personas.value.length));
+  await nextTick();
+  let elemento = null;
+  if (campo === "grupoEdad") {
+    elemento = document.querySelector('input[name="grupo-solicitud"]');
+  } else if (campo === "tipoCuidado") {
+    elemento = document.querySelector(".solicitar__opcion");
+  } else if (campo) {
+    elemento = document.getElementById(idDelCampo(campo));
+  }
+  if (elemento) {
+    elemento.focus();
+  }
+}
+
+// Los errores del servidor se muestran bajo los campos que existen en pantalla.
+// El back habla de "direccion" aunque un hospital se escriba en dos campos
+function erroresDelServidorParaLaPantalla(err) {
+  const delServidor = erroresDelServidor(err, campoDeSolicitud);
+  if (delServidor.direccion && tipoCuidado.value === "hospitalario") {
+    delServidor.hospital = delServidor.direccion;
+    delete delServidor.direccion;
+  }
+  const visibles = {};
+  for (const campo of ordenDeCampos(personas.value.length)) {
+    if (delServidor[campo]) {
+      visibles[campo] = delServidor[campo];
     }
   }
-  return "";
+  return visibles;
 }
 
 // Lista que se envía al back, con la edad como número
@@ -171,33 +253,10 @@ function personasParaEnviar() {
 }
 
 async function enviarSolicitud() {
-  if (
-    !grupoEdad.value ||
-    !tipoCuidado.value ||
-    faltaDireccion() ||
-    !fechaInicio.value ||
-    !horaInicio.value ||
-    !horaFin.value ||
-    faltanDatosDePersonas()
-  ) {
-    error.value = "Por favor, rellena todos los campos obligatorios.";
-    return;
-  }
-  const errorEdad = errorDeEdadPorGrupo();
-  if (errorEdad) {
-    error.value = errorEdad;
-    return;
-  }
-  // Las fechas tienen formato AAAA-MM-DD, así que se pueden comparar como texto
-  if (fechaFin.value && fechaFin.value < fechaInicio.value) {
-    error.value = "La fecha de fin no puede ser anterior a la de inicio.";
-    return;
-  }
-  // Si el cuidado dura un solo día, la hora de fin tiene que ser posterior a la de inicio
-  // (las horas tienen formato HH:mm, así que también se pueden comparar como texto)
-  const variosDias = fechaFin.value && fechaFin.value > fechaInicio.value;
-  if (!variosDias && horaFin.value <= horaInicio.value) {
-    error.value = "La hora de fin tiene que ser posterior a la de inicio.";
+  errores.value = validarSolicitud(datosDelFormulario());
+  if (hayErrores(errores.value)) {
+    error.value = MENSAJE_REVISAR;
+    await llevarElCursorAlPrimerError();
     return;
   }
   error.value = "";
@@ -219,6 +278,13 @@ async function enviarSolicitud() {
     });
     router.push({ name: "confirmacion", query: { id: solicitudCreada.id } });
   } catch (err) {
+    // Si el back dice qué campos fallan, se marcan; si no, un aviso general según el código HTTP
+    errores.value = erroresDelServidorParaLaPantalla(err);
+    if (hayErrores(errores.value)) {
+      error.value = MENSAJE_REVISAR;
+      await llevarElCursorAlPrimerError();
+      return;
+    }
     error.value = mensajeDeError(err, "No se pudo enviar la solicitud.");
   }
 }
@@ -254,6 +320,7 @@ async function enviarSolicitud() {
             name="grupo-solicitud"
           />
         </div>
+        <p v-if="errores.grupoEdad" id="error-grupoEdad" class="campo-error">{{ errores.grupoEdad }}</p>
 
         <h2 class="titulo-seccion obligatorio" data-icono="🩺">Tipo de cuidado</h2>
         <div class="solicitar__opciones">
@@ -278,6 +345,7 @@ async function enviarSolicitud() {
             🏠 A domicilio
           </button>
         </div>
+        <p v-if="errores.tipoCuidado" id="error-tipoCuidado" class="campo-error">{{ errores.tipoCuidado }}</p>
 
         <h2 class="titulo-seccion" data-icono="📍">¿Dónde y cuándo?</h2>
 
@@ -287,20 +355,24 @@ async function enviarSolicitud() {
             type="text"
             id="hospital"
               aria-required="true"
+            :aria-invalid="ariaInvalido('hospital')" :aria-describedby="ariaDescrito('hospital')"
             v-model="hospital"
             maxlength="100"
             placeholder="Hospital de Cabueñes"
           />
+          <p v-if="errores.hospital" id="error-hospital" class="campo-error">{{ errores.hospital }}</p>
 
           <label class="obligatorio" for="ubicacion">Planta, área y habitación</label>
           <input
             type="text"
             id="ubicacion"
               aria-required="true"
+            :aria-invalid="ariaInvalido('ubicacionHospital')" :aria-describedby="ariaDescrito('ubicacionHospital')"
             v-model="ubicacionHospital"
             maxlength="90"
             placeholder="Planta 2, Medicina Interna, habitación 214"
           />
+          <p v-if="errores.ubicacionHospital" id="error-ubicacionHospital" class="campo-error">{{ errores.ubicacionHospital }}</p>
         </template>
 
         <template v-if="tipoCuidado === 'domicilio'">
@@ -309,17 +381,26 @@ async function enviarSolicitud() {
             type="text"
             id="direccion"
               aria-required="true"
+            :aria-invalid="ariaInvalido('direccion')" :aria-describedby="ariaDescrito('direccion')"
             v-model="direccion"
             maxlength="200"
             placeholder="Calle Uría 10, 3º B, Oviedo"
           />
+          <p v-if="errores.direccion" id="error-direccion" class="campo-error">{{ errores.direccion }}</p>
         </template>
 
         <div class="solicitar__row">
           <div>
             <label class="obligatorio" for="fecha">Fecha de inicio</label>
-            <input type="date" id="fecha"
-              aria-required="true" v-model="fechaInicio" />
+            <input
+              type="date"
+              id="fecha"
+              aria-required="true"
+              :min="hoy"
+              :aria-invalid="ariaInvalido('fechaInicio')" :aria-describedby="ariaDescrito('fechaInicio')"
+              v-model="fechaInicio"
+            />
+            <p v-if="errores.fechaInicio" id="error-fechaInicio" class="campo-error">{{ errores.fechaInicio }}</p>
           </div>
           <div>
             <label for="fecha-fin">Fecha de fin (opcional)</label>
@@ -327,21 +408,35 @@ async function enviarSolicitud() {
               type="date"
               id="fecha-fin"
               v-model="fechaFin"
-              :min="fechaInicio"
+              :min="fechaInicio || hoy"
+              :aria-invalid="ariaInvalido('fechaFin')" :aria-describedby="ariaDescrito('fechaFin')"
             />
+            <p v-if="errores.fechaFin" id="error-fechaFin" class="campo-error">{{ errores.fechaFin }}</p>
           </div>
         </div>
 
         <div class="solicitar__row">
           <div>
             <label class="obligatorio" for="hora-inicio">Hora de inicio</label>
-            <input type="time" id="hora-inicio"
-              aria-required="true" v-model="horaInicio" />
+            <input
+              type="time"
+              id="hora-inicio"
+              aria-required="true"
+              :aria-invalid="ariaInvalido('horaInicio')" :aria-describedby="ariaDescrito('horaInicio')"
+              v-model="horaInicio"
+            />
+            <p v-if="errores.horaInicio" id="error-horaInicio" class="campo-error">{{ errores.horaInicio }}</p>
           </div>
           <div>
             <label class="obligatorio" for="hora-fin">Hora de fin</label>
-            <input type="time" id="hora-fin"
-              aria-required="true" v-model="horaFin" />
+            <input
+              type="time"
+              id="hora-fin"
+              aria-required="true"
+              :aria-invalid="ariaInvalido('horaFin')" :aria-describedby="ariaDescrito('horaFin')"
+              v-model="horaFin"
+            />
+            <p v-if="errores.horaFin" id="error-horaFin" class="campo-error">{{ errores.horaFin }}</p>
           </div>
         </div>
         <p class="solicitar__ayuda">
@@ -375,10 +470,19 @@ async function enviarSolicitud() {
                 <input
                   type="text"
                   :id="indice === 0 ? 'paciente' : 'paciente-' + (indice + 1)"
+                  :aria-invalid="ariaInvalido(clave(indice, 'nombre'))"
+                  :aria-describedby="ariaDescrito(clave(indice, 'nombre'))"
                   v-model="persona.nombre"
                   maxlength="100"
                   :placeholder="grupoDePersona(indice).ejemploNombre"
                 />
+                <p
+                  v-if="errores[clave(indice, 'nombre')]"
+                  :id="'error-' + clave(indice, 'nombre')"
+                  class="campo-error"
+                >
+                  {{ errores[clave(indice, 'nombre')] }}
+                </p>
               </div>
               <div>
                 <label class="obligatorio" :for="indice === 0 ? 'edad' : 'edad-' + (indice + 1)"
@@ -391,8 +495,17 @@ async function enviarSolicitud() {
                   :min="grupoDePersona(indice).edadMin"
                   :max="grupoDePersona(indice).edadMax"
                   step="1"
+                  :aria-invalid="ariaInvalido(clave(indice, 'edad'))"
+                  :aria-describedby="ariaDescrito(clave(indice, 'edad'))"
                   :placeholder="grupoDePersona(indice).ejemploEdad"
                 />
+                <p
+                  v-if="errores[clave(indice, 'edad')]"
+                  :id="'error-' + clave(indice, 'edad')"
+                  class="campo-error"
+                >
+                  {{ errores[clave(indice, 'edad')] }}
+                </p>
               </div>
             </div>
 
@@ -402,6 +515,8 @@ async function enviarSolicitud() {
               <select
                 :id="'grupo-' + (indice + 1)"
                 :value="codigoDeGrupo(indice)"
+                :aria-invalid="ariaInvalido(clave(indice, 'grupoEdad'))"
+                :aria-describedby="ariaDescrito(clave(indice, 'grupoEdad'))"
                 @change="cambiarGrupo(indice, $event.target.value)"
               >
                 <option value="">Elige un grupo</option>
@@ -413,6 +528,13 @@ async function enviarSolicitud() {
                   {{ opcion.nombre }} ({{ opcion.edades }})
                 </option>
               </select>
+              <p
+                v-if="errores[clave(indice, 'grupoEdad')]"
+                :id="'error-' + clave(indice, 'grupoEdad')"
+                class="campo-error"
+              >
+                {{ errores[clave(indice, 'grupoEdad')] }}
+              </p>
             </div>
 
             <button
@@ -470,8 +592,11 @@ async function enviarSolicitud() {
           <textarea
             id="notas"
             v-model="notas"
+            :aria-invalid="ariaInvalido('notas')"
+            :aria-describedby="ariaDescrito('notas')"
             :placeholder="grupo.ejemploNotas"
           ></textarea>
+          <p v-if="errores.notas" id="error-notas" class="campo-error">{{ errores.notas }}</p>
         </template>
 
         <div v-if="estimacion" class="solicitar__precio" data-testid="precio-estimado">
@@ -702,6 +827,17 @@ async function enviarSolicitud() {
   grid-template-columns: repeat(2, 1fr);
   gap: 8px;
   margin-bottom: var(--gap-md);
+}
+
+.campo-error {
+  margin: 0.25rem 0 0;
+  font-size: 0.875rem;
+  color: var(--color-error);
+}
+
+[aria-invalid="true"] {
+  border-color: var(--color-error);
+  outline-color: var(--color-error);
 }
 
 .solicitar__error {
