@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, afterEach } from "vitest";
+import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createRouter, createWebHistory } from "vue-router";
 import { createPinia } from "pinia";
@@ -67,7 +67,14 @@ async function enviar(wrapper) {
 }
 
 describe("SolicitarServicioView · varias personas", () => {
+  // Fecha fija: la vista no deja elegir fechas pasadas, así que los tests no pueden depender del día real
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date(2026, 0, 1, 10, 0));
+  });
+
   afterEach(() => {
+    vi.useRealTimers();
     vi.restoreAllMocks();
   });
 
@@ -160,8 +167,9 @@ describe("SolicitarServicioView · varias personas", () => {
 
     expect(createSpy).not.toHaveBeenCalled();
     expect(wrapper.find(".solicitar__error").text()).toContain(
-      "rellena todos los campos obligatorios",
+      "Revisa los campos marcados en rojo.",
     );
+    expect(wrapper.find('[id="error-personas.1.nombre"]').exists()).toBe(true);
   });
 
   test("si falta la edad de una persona no envía y avisa", async () => {
@@ -198,7 +206,7 @@ describe("SolicitarServicioView · varias personas", () => {
     await enviar(wrapper);
 
     expect(createSpy).not.toHaveBeenCalled();
-    expect(wrapper.find(".solicitar__error").text()).toContain("65");
+    expect(wrapper.find('[id="error-personas.1.edad"]').text()).toContain("65");
   });
 
   test("las personas añadidas heredan los límites de edad del grupo", async () => {
