@@ -1,10 +1,15 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, nextTick } from "vue";
 import { RouterLink, useRouter, useRoute } from "vue-router";
 import AuthRepository from "@/repositories/AuthRepository";
 import RoleRepository from "../../repositories/RoleRepository";
 import { mensajeDeError } from "@/utils/mensajeDeError";
-import { mensajePassword } from "@/utils/validarPassword";
+import { validarRegistro, ORDEN_REGISTRO } from "@/utils/validarRegistro";
+import {
+  erroresDelServidor,
+  primerCampoConError,
+  hayErrores,
+} from "@/utils/erroresDeCampos";
 import CampoPassword from "@/components/CampoPassword.vue";
 import PantallaConFoto from "@/components/PantallaConFoto.vue";
 import CaptchaTurnstile from "@/components/CaptchaTurnstile.vue";
@@ -21,7 +26,18 @@ const password = ref("");
 // Segunda vez que se escribe la contraseña, para evitar errores al teclearla
 const passwordRepetida = ref("");
 const telefono = ref("");
+// Aviso general (CAPTCHA, errores del servidor sin campo) y errores de cada campo
 const error = ref("");
+const errores = ref({});
+const MENSAJE_REVISAR = "Revisa los campos marcados en rojo.";
+// Id del elemento de cada campo, para llevar el cursor al primero con error
+const ID_DE_CAMPO = {
+  nombre: "nombre",
+  email: "email",
+  password: "password",
+  passwordRepetida: "password-repetida",
+  telefono: "telefono",
+};
 // CAPTCHA: solo se muestra y se exige si hay clave de Turnstile configurada
 const conCaptcha = captchaActivo();
 const captchaToken = ref("");
@@ -36,27 +52,36 @@ onMounted(async () => {
   rolesDisponibles.value = await roleRepository.getAll();
 });
 
-async function handleSubmit() {
-  if (
-    !nombre.value ||
-    !email.value ||
-    !password.value ||
-    !passwordRepetida.value ||
-    !telefono.value
-  ) {
-    error.value = "Por favor, rellena todos los campos.";
-    return;
-  }
+// Atributos de accesibilidad de un campo con error: lo marca como inválido y lo une a su mensaje
+function ariaInvalido(campo) {
+  return errores.value[campo] ? "true" : undefined;
+}
 
-  // Se comprueban las reglas de la contraseña antes de llamar al back
-  // (el back las vuelve a comprobar: esta comprobación solo ahorra una petición)
-  const mensaje = mensajePassword(password.value);
-  if (mensaje) {
-    error.value = mensaje;
-    return;
+function ariaDescrito(campo) {
+  return errores.value[campo] ? "error-" + campo : undefined;
+}
+
+async function llevarElCursorAlPrimerError() {
+  const campo = primerCampoConError(errores.value, ORDEN_REGISTRO);
+  await nextTick();
+  if (campo) {
+    document.getElementById(ID_DE_CAMPO[campo])?.focus();
   }
-  if (password.value !== passwordRepetida.value) {
-    error.value = "Las contraseñas no coinciden.";
+}
+
+async function handleSubmit() {
+  // Se comprueban los campos antes de llamar al back
+  // (el back las vuelve a comprobar: esta comprobación solo ahorra una petición)
+  errores.value = validarRegistro({
+    nombre: nombre.value,
+    email: email.value,
+    password: password.value,
+    passwordRepetida: passwordRepetida.value,
+    telefono: telefono.value,
+  });
+  if (hayErrores(errores.value)) {
+    error.value = MENSAJE_REVISAR;
+    await llevarElCursorAlPrimerError();
     return;
   }
   if (conCaptcha && !captchaToken.value) {
@@ -87,6 +112,20 @@ async function handleSubmit() {
   } catch (err) {
     // El token del CAPTCHA ya se ha usado: se pide uno nuevo
     captchaRef.value?.reiniciar();
+    // Si el back dice qué campos fallan, se marcan; si no, un aviso general según el código HTTP
+    const delServidor = erroresDelServidor(err);
+    const visibles = {};
+    for (const campo of ORDEN_REGISTRO) {
+      if (delServidor[campo]) {
+        visibles[campo] = delServidor[campo];
+      }
+    }
+    errores.value = visibles;
+    if (hayErrores(visibles)) {
+      error.value = MENSAJE_REVISAR;
+      await llevarElCursorAlPrimerError();
+      return;
+    }
     error.value = mensajeDeError(err, "No se pudo completar el registro.");
   }
 }
@@ -117,8 +156,11 @@ async function handleSubmit() {
               id="nombre"
               aria-required="true"
               placeholder="María López"
+              :aria-invalid="ariaInvalido('nombre')"
+              :aria-describedby="ariaDescrito('nombre')"
               v-model="nombre"
             />
+            <p v-if="errores.nombre" id="error-nombre" class="campo-error">{{ errores.nombre }}</p>
 
             <label class="obligatorio" for="email">Email</label>
             <input
@@ -126,15 +168,21 @@ async function handleSubmit() {
               id="email"
               aria-required="true"
               placeholder="nombre@correo.com"
+              :aria-invalid="ariaInvalido('email')"
+              :aria-describedby="ariaDescrito('email')"
               v-model="email"
             />
+            <p v-if="errores.email" id="error-email" class="campo-error">{{ errores.email }}</p>
 
             <label class="obligatorio" for="password">Contraseña</label>
             <CampoPassword
               id="password"
               placeholder="Mínimo 8 caracteres"
+              :invalido="!!errores.password"
+              descrito-por="error-password"
               v-model="password"
             />
+            <p v-if="errores.password" id="error-password" class="campo-error">{{ errores.password }}</p>
             <p class="register__ayuda">
               Con mayúscula, minúscula, número y un carácter especial.
             </p>
@@ -143,8 +191,11 @@ async function handleSubmit() {
             <CampoPassword
               id="password-repetida"
               placeholder="••••••••"
+              :invalido="!!errores.passwordRepetida"
+              descrito-por="error-passwordRepetida"
               v-model="passwordRepetida"
             />
+            <p v-if="errores.passwordRepetida" id="error-passwordRepetida" class="campo-error">{{ errores.passwordRepetida }}</p>
 
             <label class="obligatorio" for="telefono">Teléfono</label>
             <input
@@ -152,8 +203,11 @@ async function handleSubmit() {
               id="telefono"
               aria-required="true"
               placeholder="600 123 456"
+              :aria-invalid="ariaInvalido('telefono')"
+              :aria-describedby="ariaDescrito('telefono')"
               v-model="telefono"
             />
+            <p v-if="errores.telefono" id="error-telefono" class="campo-error">{{ errores.telefono }}</p>
 
             <h2 class="titulo-seccion" data-icono="🧭">
               ¿Cómo vas a usar Acompáñame?
