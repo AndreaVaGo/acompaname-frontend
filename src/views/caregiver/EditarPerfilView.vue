@@ -4,6 +4,7 @@ import CuidadorRepository from "@/repositories/CuidadorRepository";
 import FotoCuidador from "@/components/FotoCuidador.vue";
 import VerificacionPerfil from "@/components/VerificacionPerfil.vue";
 import SelectorGrupos from "@/components/SelectorGrupos.vue";
+import SugerenciasMunicipios from "@/components/SugerenciasMunicipios.vue";
 import { reducirImagen } from "@/utils/reducirImagen";
 import { CUIDADOS } from "@/utils/catalogoCuidados";
 import { TITULACIONES } from "@/utils/catalogoTitulaciones";
@@ -255,10 +256,13 @@ async function guardar() {
                 <input
                   type="text"
                   id="ciudad"
+                  list="lista-municipios"
+                  autocomplete="off"
                   v-model="ciudad"
                   maxlength="100"
                   placeholder="Oviedo, Gijón, Madrid..."
                 />
+                <SugerenciasMunicipios />
               </div>
             </div>
 
