@@ -11,3 +11,10 @@ import router from "./router";
 import pinia from "./pinia/pinia";
 
 createApp(App).use(router).use(pinia).mount("#app");
+
+// Service worker para poder instalar la web como app (solo en la web publicada, no al programar)
+if ("serviceWorker" in navigator && import.meta.env.PROD) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js");
+  });
+}
