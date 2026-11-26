@@ -107,8 +107,12 @@ describe("EditarPerfilView", () => {
     await wrapper.find("#especialidad").setValue("   ");
     await enviar(wrapper);
 
-    expect(wrapper.text()).toContain(
-      "Rellena la especialidad y la descripción."
+    expect(wrapper.find("#error-especialidad").text()).toBe(
+      "Escribe tu especialidad."
+    );
+    expect(wrapper.find("#especialidad").attributes("aria-invalid")).toBe("true");
+    expect(wrapper.find(".editar__error").text()).toBe(
+      "Revisa los campos marcados en rojo."
     );
     expect(updateSpy).not.toHaveBeenCalled();
   });
