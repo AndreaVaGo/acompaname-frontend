@@ -307,3 +307,16 @@ summary:focus-visible,
   font-size: 0.85rem;
   color: var(--color-text-muted);
 }
+
+/* Errores por campo (todos los formularios): mensaje rojo bajo el campo y borde rojo */
+.campo-error {
+  margin: 0.375rem 0 0;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--color-error);
+}
+
+[aria-invalid="true"] {
+  border-color: var(--color-error);
+  outline-color: var(--color-error);
+}
