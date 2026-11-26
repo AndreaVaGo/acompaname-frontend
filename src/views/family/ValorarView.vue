@@ -1,9 +1,10 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, nextTick } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
 import ValoracionRepository from "@/repositories/ValoracionRepository";
 import { mensajeDeError } from "@/utils/mensajeDeError";
+import { erroresDelServidor, hayErrores } from "@/utils/erroresDeCampos";
 
 const route = useRoute();
 const router = useRouter();
@@ -14,7 +15,11 @@ const solicitudId = route.params.id;
 const cuidadorNombre = ref("");
 const puntuacion = ref(0);
 const comentario = ref("");
+// Aviso general y errores de cada campo: { campo: "mensaje" }
 const error = ref("");
+const errores = ref({});
+const MENSAJE_REVISAR = "Revisa los campos marcados en rojo.";
+const MAXIMO_COMENTARIO = 500;
 
 // Texto que se muestra debajo de las estrellas según la puntuación elegida
 const textosPuntuacion = ["Muy mala", "Mala", "Normal", "Buena", "Excelente"];
@@ -30,10 +35,40 @@ onMounted(async () => {
 
 function seleccionarEstrella(valor) {
   puntuacion.value = valor;
+  // Ya se ha elegido: el aviso de las estrellas deja de tener sentido
+  delete errores.value.puntuacion;
+}
+
+// Los campos que se pueden marcar: el id del elemento al que va el cursor
+const ID_DE_CAMPO = { puntuacion: "estrellas", comentario: "comentario" };
+
+function validarValoracion() {
+  const resultado = {};
+  if (puntuacion.value === 0) {
+    resultado.puntuacion = "Elige de 1 a 5 estrellas.";
+  }
+  if (comentario.value.length > MAXIMO_COMENTARIO) {
+    resultado.comentario = `El comentario no puede superar ${MAXIMO_COMENTARIO} caracteres.`;
+  }
+  return resultado;
+}
+
+async function llevarElCursorAlPrimerError() {
+  const campo = ["puntuacion", "comentario"].find((c) => errores.value[c]);
+  await nextTick();
+  if (campo) {
+    document.getElementById(ID_DE_CAMPO[campo])?.focus();
+  }
 }
 
 async function enviarValoracion() {
-  if (puntuacion.value === 0) return;
+  errores.value = validarValoracion();
+  if (hayErrores(errores.value)) {
+    error.value = MENSAJE_REVISAR;
+    await llevarElCursorAlPrimerError();
+    return;
+  }
+  error.value = "";
   try {
     await valoracionRepository.create({
       comentario: comentario.value,
@@ -42,6 +77,20 @@ async function enviarValoracion() {
     });
     router.push({ name: "historial" });
   } catch (err) {
+    // Si el back dice qué campos fallan, se marcan; si no, un aviso general según el código HTTP
+    const delServidor = erroresDelServidor(err);
+    const visibles = {};
+    for (const campo of ["puntuacion", "comentario"]) {
+      if (delServidor[campo]) {
+        visibles[campo] = delServidor[campo];
+      }
+    }
+    errores.value = visibles;
+    if (hayErrores(visibles)) {
+      error.value = MENSAJE_REVISAR;
+      await llevarElCursorAlPrimerError();
+      return;
+    }
     error.value = mensajeDeError(err, "No se pudo enviar la valoración.");
   }
 }
@@ -67,7 +116,13 @@ async function enviarValoracion() {
           <p class="formulario__nota">Los campos marcados con <span aria-hidden="true">*</span> son obligatorios.</p>
           <h2 class="titulo-seccion obligatorio" data-icono="⭐">Tu puntuación</h2>
 
-          <div class="valorar__estrellas">
+          <div
+            id="estrellas"
+            class="valorar__estrellas"
+            role="group"
+            tabindex="-1"
+            :aria-describedby="errores.puntuacion ? 'error-puntuacion' : undefined"
+          >
             <span
               v-for="n in 5"
               :key="n"
@@ -85,6 +140,9 @@ async function enviarValoracion() {
                 : textosPuntuacion[puntuacion - 1]
             }}
           </p>
+          <p v-if="errores.puntuacion" id="error-puntuacion" class="campo-error">
+            {{ errores.puntuacion }}
+          </p>
 
           <h2 class="titulo-seccion" data-icono="📝">Tu comentario</h2>
 
@@ -92,15 +150,19 @@ async function enviarValoracion() {
           <textarea
             id="comentario"
             v-model="comentario"
+            :aria-invalid="errores.comentario ? 'true' : undefined"
+            :aria-describedby="errores.comentario ? 'error-comentario' : undefined"
             placeholder="Cuéntanos cómo fue tu experiencia..."
           ></textarea>
+          <p v-if="errores.comentario" id="error-comentario" class="campo-error">
+            {{ errores.comentario }}
+          </p>
 
           <p role="alert" v-if="error" class="valorar__error">{{ error }}</p>
 
           <button
             type="submit"
             class="btn btn--primary"
-            :disabled="puntuacion === 0"
           >
             Enviar valoración
           </button>
