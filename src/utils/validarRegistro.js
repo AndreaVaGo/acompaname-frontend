@@ -15,7 +15,8 @@ export const ORDEN_REGISTRO = [
 // Algo, una @, algo, un punto y algo; sin espacios. El back hace la comprobación definitiva
 const FORMATO_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export function validarRegistro(datos) {
+// Los tres datos de contacto, que también se editan en "Editar mis datos"
+export function validarContacto(datos) {
   const errores = {};
 
   if (!datos.nombre.trim()) {
@@ -28,6 +29,16 @@ export function validarRegistro(datos) {
   } else if (!FORMATO_EMAIL.test(email)) {
     errores.email = "El email no tiene un formato válido.";
   }
+
+  if (!datos.telefono.trim()) {
+    errores.telefono = "Escribe tu teléfono.";
+  }
+
+  return errores;
+}
+
+export function validarRegistro(datos) {
+  const errores = validarContacto(datos);
 
   if (!datos.password) {
     errores.password = "Escribe una contraseña.";
@@ -44,9 +55,12 @@ export function validarRegistro(datos) {
     errores.passwordRepetida = "Las contraseñas no coinciden.";
   }
 
-  if (!datos.telefono.trim()) {
-    errores.telefono = "Escribe tu teléfono.";
+  // Mismo orden que en pantalla: nombre, email, contraseñas y teléfono
+  const ordenados = {};
+  for (const campo of ORDEN_REGISTRO) {
+    if (errores[campo]) {
+      ordenados[campo] = errores[campo];
+    }
   }
-
-  return errores;
+  return ordenados;
 }
