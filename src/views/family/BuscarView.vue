@@ -7,6 +7,7 @@ import VerificacionRepository from "@/repositories/VerificacionRepository";
 import InsigniaVerificado from "@/components/InsigniaVerificado.vue";
 import FotoCuidador from "@/components/FotoCuidador.vue";
 import SelectorGrupos from "@/components/SelectorGrupos.vue";
+import SugerenciasMunicipios from "@/components/SugerenciasMunicipios.vue";
 import { CUIDADOS } from "@/utils/catalogoCuidados";
 import {
   codigoModalidad,
@@ -314,10 +315,13 @@ const cuidadoresMostrados = computed(() => {
         <input
           type="text"
           id="filtro-ciudad"
+          list="lista-municipios"
+          autocomplete="off"
           v-model="ciudadBuscada"
           placeholder="Oviedo, Gijón, Madrid..."
           class="buscar__input buscar__input--ciudad"
         />
+        <SugerenciasMunicipios />
       </div>
 
       <div class="buscar__filter-group">
