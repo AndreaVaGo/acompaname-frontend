@@ -1,5 +1,9 @@
 import { describe, test, expect } from "vitest";
-import { validarRegistro, ORDEN_REGISTRO } from "@/utils/validarRegistro";
+import {
+  validarRegistro,
+  validarContacto,
+  ORDEN_REGISTRO,
+} from "@/utils/validarRegistro";
 
 const VALIDOS = {
   nombre: "Ana López",
@@ -12,6 +16,22 @@ const VALIDOS = {
 function con(cambios) {
   return validarRegistro({ ...VALIDOS, ...cambios });
 }
+
+describe("validarContacto", () => {
+  test("solo comprueba nombre, email y teléfono", () => {
+    expect(
+      validarContacto({ nombre: "", email: "ana", telefono: " " }),
+    ).toEqual({
+      nombre: "Escribe tu nombre completo.",
+      email: "El email no tiene un formato válido.",
+      telefono: "Escribe tu teléfono.",
+    });
+  });
+
+  test("con datos correctos no hay errores", () => {
+    expect(validarContacto(VALIDOS)).toEqual({});
+  });
+});
 
 describe("validarRegistro", () => {
   test("con datos correctos no hay errores", () => {
