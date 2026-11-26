@@ -4,6 +4,7 @@ import BloqueOcupadoRepository from "@/repositories/BloqueOcupadoRepository";
 import SolicitudRepository from "@/repositories/SolicitudRepository";
 import CalendarioMensual from "@/components/CalendarioMensual.vue";
 import LineaDelDia from "@/components/LineaDelDia.vue";
+import SincronizarCalendario from "@/components/SincronizarCalendario.vue";
 import { mensajeDeError } from "@/utils/mensajeDeError";
 import { formatearFecha } from "@/utils/formatearFecha";
 import { nombresDePersonas } from "@/utils/personasSolicitud";
@@ -665,6 +666,10 @@ onMounted(() => {
             Añadir a mi calendario
           </button>
         </form>
+      </div>
+
+      <div class="calendario__box calendario__box--formulario tarjeta-cristal">
+        <SincronizarCalendario @cambio="cargarBloques" />
       </div>
 
       <div class="calendario__box calendario__box--formulario tarjeta-cristal">
