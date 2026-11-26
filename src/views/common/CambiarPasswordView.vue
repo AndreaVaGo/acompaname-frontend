@@ -1,37 +1,54 @@
 <script setup>
-import { ref } from "vue";
+import { ref, nextTick } from "vue";
 import UsuarioRepository from "@/repositories/UsuarioRepository";
 import { useAuthStore } from "@/stores/auth";
 import { mensajeDeError } from "@/utils/mensajeDeError";
-import { mensajePassword } from "@/utils/validarPassword";
+import {
+  validarCambioPassword,
+  ORDEN_CAMBIO_PASSWORD,
+} from "@/utils/validarCambioPassword";
+import { primerCampoConError, hayErrores } from "@/utils/erroresDeCampos";
 import CampoPassword from "@/components/CampoPassword.vue";
 
 const passwordActual = ref("");
 const passwordNueva = ref("");
 const passwordRepetida = ref("");
+// Aviso general y errores de cada campo: { campo: "mensaje" }
 const error = ref("");
+const errores = ref({});
+const MENSAJE_REVISAR = "Revisa los campos marcados en rojo.";
+// Id del elemento de cada campo, para llevar el cursor al primero con error
+const ID_DE_CAMPO = {
+  passwordActual: "password-actual",
+  passwordNueva: "password-nueva",
+  passwordRepetida: "password-repetida",
+};
 const exito = ref("");
 
 const usuarioRepository = new UsuarioRepository();
 const authStore = useAuthStore();
 
+async function llevarElCursorAlPrimerError() {
+  const campo = primerCampoConError(errores.value, ORDEN_CAMBIO_PASSWORD);
+  await nextTick();
+  if (campo) {
+    document.getElementById(ID_DE_CAMPO[campo])?.focus();
+  }
+}
+
 async function handleSubmit() {
   exito.value = "";
 
-  if (!passwordActual.value || !passwordNueva.value || !passwordRepetida.value) {
-    error.value = "Por favor, rellena todos los campos.";
-    return;
-  }
-
   // La contraseña nueva debe cumplir las mismas reglas que en el registro.
   // La actual NO se comprueba: puede ser una contraseña antigua y débil.
-  const mensaje = mensajePassword(passwordNueva.value);
-  if (mensaje) {
-    error.value = mensaje;
-    return;
-  }
-  if (passwordNueva.value !== passwordRepetida.value) {
-    error.value = "Las contraseñas nuevas no coinciden.";
+  errores.value = validarCambioPassword({
+    passwordActual: passwordActual.value,
+    passwordNueva: passwordNueva.value,
+    passwordRepetida: passwordRepetida.value,
+  });
+  if (hayErrores(errores.value)) {
+    error.value = MENSAJE_REVISAR;
+    await llevarElCursorAlPrimerError();
     return;
   }
   error.value = "";
@@ -85,15 +102,21 @@ async function handleSubmit() {
           <CampoPassword
             id="password-actual"
             placeholder="••••••"
+            :invalido="!!errores.passwordActual"
+            descrito-por="error-passwordActual"
             v-model="passwordActual"
           />
+          <p v-if="errores.passwordActual" id="error-passwordActual" class="campo-error">{{ errores.passwordActual }}</p>
 
           <label class="obligatorio" for="password-nueva">Contraseña nueva</label>
           <CampoPassword
             id="password-nueva"
             placeholder="Mínimo 8 caracteres"
+            :invalido="!!errores.passwordNueva"
+            descrito-por="error-passwordNueva"
             v-model="passwordNueva"
           />
+          <p v-if="errores.passwordNueva" id="error-passwordNueva" class="campo-error">{{ errores.passwordNueva }}</p>
           <p class="cambiar-password__ayuda">
             Con mayúscula, minúscula, número y un carácter especial.
           </p>
@@ -102,8 +125,11 @@ async function handleSubmit() {
           <CampoPassword
             id="password-repetida"
             placeholder="••••••"
+            :invalido="!!errores.passwordRepetida"
+            descrito-por="error-passwordRepetida"
             v-model="passwordRepetida"
           />
+          <p v-if="errores.passwordRepetida" id="error-passwordRepetida" class="campo-error">{{ errores.passwordRepetida }}</p>
 
           <p role="alert" v-if="error" class="cambiar-password__error">{{ error }}</p>
           <p v-if="exito" class="cambiar-password__exito">{{ exito }}</p>
