@@ -32,4 +32,25 @@ export default class BloqueOcupadoRepository extends Repository {
   async remove(id) {
     return this.delete(`/bloques-ocupados/${id}`);
   }
+
+  // Cómo está la vinculación con un calendario externo: { vinculado, ultimaSincronizacion, ultimoError }
+  // (la dirección secreta nunca vuelve del servidor)
+  async getSuscripcion() {
+    return this.get("/bloques-ocupados/suscripcion");
+  }
+
+  // Vincula (o cambia) el calendario externo con su dirección .ics. El servidor lo lee al momento
+  async vincularCalendario(url) {
+    return this.put("/bloques-ocupados/suscripcion", { url: url });
+  }
+
+  // Vuelve a leer el calendario externo ahora mismo
+  async sincronizarCalendario() {
+    return this.post("/bloques-ocupados/suscripcion/sincronizar", {});
+  }
+
+  // Quita la vinculación y los ratos que vinieron de ella
+  async desvincularCalendario() {
+    return this.delete("/bloques-ocupados/suscripcion");
+  }
 }
