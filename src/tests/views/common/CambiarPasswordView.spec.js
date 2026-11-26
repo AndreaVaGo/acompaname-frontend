@@ -40,7 +40,17 @@ describe("CambiarPasswordView", () => {
 
     await wrapper.find("form").trigger("submit");
 
-    expect(wrapper.text()).toContain("Por favor, rellena todos los campos.");
+    expect(wrapper.find(".cambiar-password__error").text()).toBe(
+      "Revisa los campos marcados en rojo.",
+    );
+    expect(wrapper.find("#error-passwordActual").text()).toBe(
+      "Escribe tu contraseña actual.",
+    );
+    expect(wrapper.find("#error-passwordNueva").exists()).toBe(true);
+    expect(wrapper.find("#error-passwordRepetida").exists()).toBe(true);
+    expect(wrapper.find("#password-actual").attributes("aria-invalid")).toBe(
+      "true",
+    );
     expect(espia).not.toHaveBeenCalled();
   });
 
@@ -60,7 +70,7 @@ describe("CambiarPasswordView", () => {
 
     await rellenarFormulario(wrapper, "actual1234", "nueva12345", "nueva12345");
 
-    const error = wrapper.find(".cambiar-password__error").text();
+    const error = wrapper.find("#error-passwordNueva").text();
     expect(error).toContain("una letra mayúscula");
     expect(error).toContain("un carácter especial");
     expect(espia).not.toHaveBeenCalled();
