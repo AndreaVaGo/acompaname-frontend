@@ -7,6 +7,9 @@ defineProps({
   modelValue: { type: String, default: "" },
   id: { type: String, required: true },
   placeholder: { type: String, default: "" },
+  // Si hay un error en el campo: se marca como inválido y se une a su mensaje (por su id)
+  invalido: { type: Boolean, default: false },
+  descritoPor: { type: String, default: "" },
 });
 
 const emit = defineEmits(["update:modelValue"]);
@@ -26,6 +29,8 @@ function alternar() {
       :id="id"
       :type="visible ? 'text' : 'password'"
       :placeholder="placeholder"
+      :aria-invalid="invalido ? 'true' : undefined"
+      :aria-describedby="invalido && descritoPor ? descritoPor : undefined"
       :value="modelValue"
       @input="emit('update:modelValue', $event.target.value)"
     />
