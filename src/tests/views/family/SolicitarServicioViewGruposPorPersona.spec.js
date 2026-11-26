@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, afterEach } from "vitest";
+import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createRouter, createWebHistory } from "vue-router";
 import { createPinia } from "pinia";
@@ -53,7 +53,14 @@ async function enviar(wrapper) {
 }
 
 describe("SolicitarServicioView · grupo de edad por persona", () => {
+  // Fecha fija: la vista no deja elegir fechas pasadas, así que los tests no pueden depender del día real
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date(2026, 0, 1, 10, 0));
+  });
+
   afterEach(() => {
+    vi.useRealTimers();
     vi.restoreAllMocks();
   });
 
@@ -163,8 +170,7 @@ describe("SolicitarServicioView · grupo de edad por persona", () => {
     await enviar(wrapper);
 
     expect(createSpy).not.toHaveBeenCalled();
-    const texto = wrapper.find(".solicitar__error").text();
-    expect(texto).toContain("Persona 2");
+    const texto = wrapper.find('[id="error-personas.1.edad"]').text();
     expect(texto).toContain("Personas mayores");
     expect(texto).toContain("65");
   });
@@ -186,7 +192,9 @@ describe("SolicitarServicioView · grupo de edad por persona", () => {
     await enviar(wrapper);
 
     expect(createSpy).not.toHaveBeenCalled();
-    expect(wrapper.find(".solicitar__error").text()).toContain("Niñas y niños");
+    expect(wrapper.find('[id="error-personas.1.edad"]').text()).toContain(
+      "Niñas y niños",
+    );
   });
 
   test("si una persona añadida se queda sin grupo no se envía", async () => {
@@ -206,8 +214,8 @@ describe("SolicitarServicioView · grupo de edad por persona", () => {
     await enviar(wrapper);
 
     expect(createSpy).not.toHaveBeenCalled();
-    expect(wrapper.find(".solicitar__error").text()).toContain(
-      "rellena todos los campos obligatorios",
+    expect(wrapper.find('[id="error-personas.1.grupoEdad"]').exists()).toBe(
+      true,
     );
   });
 
