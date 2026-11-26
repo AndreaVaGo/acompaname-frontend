@@ -66,14 +66,50 @@ describe("ValorarView", () => {
     );
   });
 
-  test("el botón de enviar está deshabilitado si no se ha elegido puntuación", async () => {
+  test("sin puntuación no se envía y se explica bajo las estrellas", async () => {
     vi.spyOn(SolicitudRepository.prototype, "getById").mockResolvedValue({
       cuidadorNombre: "Pepe",
     });
+    const crear = vi
+      .spyOn(ValoracionRepository.prototype, "create")
+      .mockResolvedValue({});
+    crear.mockClear();
 
     const { wrapper } = await montarVista();
 
-    expect(wrapper.find("button[type='submit']").attributes("disabled")).toBeDefined();
+    expect(wrapper.find("button[type='submit']").attributes("disabled")).toBeUndefined();
+    await wrapper.find("form").trigger("submit");
+
+    expect(wrapper.find("#error-puntuacion").text()).toBe(
+      "Elige de 1 a 5 estrellas.",
+    );
+    expect(wrapper.find(".valorar__error").text()).toBe(
+      "Revisa los campos marcados en rojo.",
+    );
+    expect(crear).not.toHaveBeenCalled();
+
+    // Al elegir una estrella, el aviso desaparece
+    await wrapper.findAll(".valorar__estrella")[3].trigger("click");
+    expect(wrapper.find("#error-puntuacion").exists()).toBe(false);
+  });
+
+  test("un comentario de más de 500 caracteres se marca en su campo", async () => {
+    vi.spyOn(SolicitudRepository.prototype, "getById").mockResolvedValue({
+      cuidadorNombre: "Pepe",
+    });
+    const crear = vi
+      .spyOn(ValoracionRepository.prototype, "create")
+      .mockResolvedValue({});
+    crear.mockClear();
+
+    const { wrapper } = await montarVista();
+    await wrapper.findAll(".valorar__estrella")[3].trigger("click");
+    await wrapper.find("#comentario").setValue("a".repeat(501));
+    await wrapper.find("form").trigger("submit");
+
+    expect(wrapper.find("#error-comentario").text()).toContain("500");
+    expect(wrapper.find("#comentario").attributes("aria-invalid")).toBe("true");
+    expect(crear).not.toHaveBeenCalled();
   });
 
   test("al hacer click en una estrella se habilita el botón de enviar", async () => {
