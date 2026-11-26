@@ -52,6 +52,41 @@ describe('RegisterView', () => {
     await wrapper.find('form').trigger('submit')
 
     expect(wrapper.find('.register__error').exists()).toBe(true)
+    expect(wrapper.findAll('.campo-error')).toHaveLength(5)
+  })
+
+  test('un email sin formato válido se marca en su campo y no registra', async () => {
+    const registrar = vi
+      .spyOn(AuthRepository.prototype, 'register')
+      .mockResolvedValue({})
+    const wrapper = await montarVista()
+
+    await rellenarFormulario(wrapper)
+    await wrapper.find('#email').setValue('ana')
+    await wrapper.find('form').trigger('submit')
+    await esperar()
+
+    expect(wrapper.find('#error-email').text()).toBe(
+      'El email no tiene un formato válido.'
+    )
+    expect(wrapper.find('#email').attributes('aria-invalid')).toBe('true')
+    expect(registrar).not.toHaveBeenCalled()
+  })
+
+  test('los errores por campo que manda el servidor se marcan en pantalla', async () => {
+    const error = new Error('Error en la petición POST')
+    error.status = 400
+    error.detalle = JSON.stringify({ telefono: 'El telefono no puede estar vacío' })
+    vi.spyOn(AuthRepository.prototype, 'register').mockRejectedValue(error)
+    const wrapper = await montarVista()
+
+    await rellenarFormulario(wrapper)
+    await wrapper.find('form').trigger('submit')
+    await esperar()
+
+    expect(wrapper.find('#error-telefono').text()).toBe(
+      'El telefono no puede estar vacío'
+    )
   })
 
   test('registra a una familia con el id de su rol y va al login', async () => {
@@ -189,7 +224,7 @@ describe('RegisterView', () => {
     await wrapper.find('form').trigger('submit')
     await esperar()
 
-    const error = wrapper.find('.register__error').text()
+    const error = wrapper.find('#error-password').text()
     expect(error).toContain('una letra mayúscula')
     expect(error).toContain('un número')
     expect(error).toContain('un carácter especial')
@@ -207,13 +242,16 @@ describe('RegisterView', () => {
     await wrapper.find('form').trigger('submit')
     await esperar()
 
-    expect(wrapper.find('.register__error').text()).toBe(
+    expect(wrapper.find('#error-passwordRepetida').text()).toBe(
       'Las contraseñas no coinciden.'
+    )
+    expect(wrapper.find('#password-repetida').attributes('aria-invalid')).toBe(
+      'true'
     )
     expect(registrar).not.toHaveBeenCalled()
   })
 
-  test('si falta repetir la contraseña, pide rellenar todos los campos', async () => {
+  test('si falta repetir la contraseña, lo marca en ese campo', async () => {
     const registrar = vi
       .spyOn(AuthRepository.prototype, 'register')
       .mockResolvedValue({})
@@ -224,8 +262,11 @@ describe('RegisterView', () => {
     await wrapper.find('form').trigger('submit')
     await esperar()
 
+    expect(wrapper.find('#error-passwordRepetida').text()).toBe(
+      'Repite la contraseña.'
+    )
     expect(wrapper.find('.register__error').text()).toBe(
-      'Por favor, rellena todos los campos.'
+      'Revisa los campos marcados en rojo.'
     )
     expect(registrar).not.toHaveBeenCalled()
   })
