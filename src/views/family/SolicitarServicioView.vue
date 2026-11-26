@@ -829,18 +829,6 @@ async function enviarSolicitud() {
   margin-bottom: var(--gap-md);
 }
 
-.campo-error {
-  margin: 0.375rem 0 0;
-  font-size: 1.0625rem;
-  font-weight: 700;
-  color: var(--color-error);
-}
-
-[aria-invalid="true"] {
-  border-color: var(--color-error);
-  outline-color: var(--color-error);
-}
-
 .solicitar__error {
   background-color: var(--color-error-bg);
   border: 1px solid var(--color-error-border);
