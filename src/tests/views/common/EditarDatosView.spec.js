@@ -92,7 +92,11 @@ describe("EditarDatosView", () => {
 
     await enviarFormulario(wrapper, "", "ana@test.com", "600111222");
 
-    expect(wrapper.text()).toContain("Por favor, rellena todos los campos.");
+    expect(wrapper.find(".editar-datos__error").text()).toBe(
+      "Revisa los campos marcados en rojo.",
+    );
+    expect(wrapper.find("#error-nombre").exists()).toBe(true);
+    expect(wrapper.find("#nombre").attributes("aria-invalid")).toBe("true");
     expect(espia).not.toHaveBeenCalled();
   });
 
@@ -105,7 +109,10 @@ describe("EditarDatosView", () => {
 
     await enviarFormulario(wrapper, "Ana", "esto-no-es-un-email", "600111222");
 
-    expect(wrapper.text()).toContain("El email no tiene un formato válido.");
+    expect(wrapper.find("#error-email").text()).toBe(
+      "El email no tiene un formato válido.",
+    );
+    expect(wrapper.find("#email").attributes("aria-invalid")).toBe("true");
     expect(espia).not.toHaveBeenCalled();
   });
 
