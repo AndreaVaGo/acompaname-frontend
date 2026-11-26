@@ -21,6 +21,7 @@ afterEach(() => {
 
 async function montarVista() {
   vi.spyOn(BloqueOcupadoRepository.prototype, "getMios").mockResolvedValue([]);
+  vi.spyOn(BloqueOcupadoRepository.prototype, "getSuscripcion").mockResolvedValue({ vinculado: false });
   vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue([]);
   const wrapper = mount(MiCalendarioView);
   await flushPromises();

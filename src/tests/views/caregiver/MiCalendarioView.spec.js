@@ -41,6 +41,7 @@ function solicitud(id, estado, fechaCuidado, extra = {}) {
 
 async function montarVista(bloques = [], solicitudes = []) {
   vi.spyOn(BloqueOcupadoRepository.prototype, "getMios").mockResolvedValue(bloques);
+  vi.spyOn(BloqueOcupadoRepository.prototype, "getSuscripcion").mockResolvedValue({ vinculado: false });
   vi.spyOn(SolicitudRepository.prototype, "getMisSolicitudes").mockResolvedValue(solicitudes);
   const wrapper = mount(MiCalendarioView);
   await flushPromises();
