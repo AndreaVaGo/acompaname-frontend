@@ -6,6 +6,7 @@ import SolicitudRepository from "@/repositories/SolicitudRepository";
 import CuidadorRepository from "@/repositories/CuidadorRepository";
 import SelectorGrupos from "@/components/SelectorGrupos.vue";
 import { CUIDADOS } from "@/utils/catalogoCuidados";
+import { HOSPITALES } from "@/utils/catalogoHospitales";
 import { GRUPOS, buscarGrupo } from "@/utils/catalogoGrupos";
 import {
   validarSolicitud,
@@ -354,12 +355,23 @@ async function enviarSolicitud() {
           <input
             type="text"
             id="hospital"
+            list="lista-hospitales"
+            autocomplete="off"
               aria-required="true"
             :aria-invalid="ariaInvalido('hospital')" :aria-describedby="ariaDescrito('hospital')"
             v-model="hospital"
             maxlength="100"
             placeholder="Hospital de Cabueñes"
           />
+          <!-- Sugerencias mientras se escribe; también se puede escribir un hospital que no salga -->
+          <datalist id="lista-hospitales">
+            <option
+              v-for="centro in HOSPITALES"
+              :key="centro.nombre + centro.municipio"
+              :value="centro.nombre"
+              :label="centro.municipio + ' (' + centro.provincia + ')'"
+            ></option>
+          </datalist>
           <p v-if="errores.hospital" id="error-hospital" class="campo-error">{{ errores.hospital }}</p>
 
           <label class="obligatorio" for="ubicacion">Planta, área y habitación</label>
