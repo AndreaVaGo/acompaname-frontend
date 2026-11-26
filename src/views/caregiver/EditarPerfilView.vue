@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, nextTick } from "vue";
 import CuidadorRepository from "@/repositories/CuidadorRepository";
 import FotoCuidador from "@/components/FotoCuidador.vue";
 import VerificacionPerfil from "@/components/VerificacionPerfil.vue";
@@ -9,6 +9,15 @@ import { CUIDADOS } from "@/utils/catalogoCuidados";
 import { TITULACIONES } from "@/utils/catalogoTitulaciones";
 import { useAuthStore } from "@/stores/auth";
 import { mensajeDeError } from "@/utils/mensajeDeError";
+import {
+  validarPerfilCuidador,
+  ORDEN_PERFIL,
+} from "@/utils/validarPerfilCuidador";
+import {
+  erroresDelServidor,
+  primerCampoConError,
+  hayErrores,
+} from "@/utils/erroresDeCampos";
 
 const cuidadorRepository = new CuidadorRepository();
 const authStore = useAuthStore();
@@ -32,7 +41,18 @@ const tieneVehiculo = ref(false);
 const disponibleAhora = ref(false);
 
 const cargando = ref(true);
+// Aviso general y errores de cada campo: { campo: "mensaje" }
 const error = ref("");
+const errores = ref({});
+const MENSAJE_REVISAR = "Revisa los campos marcados en rojo.";
+// Id del elemento de cada campo, para llevar el cursor al primero con error
+const ID_DE_CAMPO = {
+  especialidad: "especialidad",
+  anosExperiencia: "anos",
+  tarifaHora: "tarifa",
+  recargoPersonaExtra: "recargo",
+  bio: "bio",
+};
 const guardado = ref(false);
 
 onMounted(async () => {
@@ -82,28 +102,37 @@ function quitarFoto() {
   foto.value = "";
 }
 
+// Atributos de accesibilidad de un campo con error: lo marca como inválido y lo une a su mensaje
+function ariaInvalido(campo) {
+  return errores.value[campo] ? "true" : undefined;
+}
+
+function ariaDescrito(campo) {
+  return errores.value[campo] ? "error-" + campo : undefined;
+}
+
+async function llevarElCursorAlPrimerError() {
+  const campo = primerCampoConError(errores.value, ORDEN_PERFIL);
+  await nextTick();
+  if (campo) {
+    document.getElementById(ID_DE_CAMPO[campo])?.focus();
+  }
+}
+
 async function guardar() {
   guardado.value = false;
 
-  if (!especialidad.value.trim() || !bio.value.trim()) {
-    error.value = "Rellena la especialidad y la descripción.";
+  errores.value = validarPerfilCuidador({
+    especialidad: especialidad.value,
+    anosExperiencia: anosExperiencia.value,
+    tarifaHora: tarifaHora.value,
+    recargoPersonaExtra: recargoPersonaExtra.value,
+    bio: bio.value,
+  });
+  if (hayErrores(errores.value)) {
+    error.value = MENSAJE_REVISAR;
+    await llevarElCursorAlPrimerError();
     return;
-  }
-  if (Number(anosExperiencia.value) < 0) {
-    error.value = "Los años de experiencia no pueden ser negativos.";
-    return;
-  }
-  if (!(Number(tarifaHora.value) > 0)) {
-    error.value = "La tarifa por hora debe ser mayor que 0.";
-    return;
-  }
-  // El recargo es opcional, pero si se pone tiene que ser un número entero entre 0 y 100
-  if (recargoPersonaExtra.value !== "" && recargoPersonaExtra.value !== null) {
-    const recargo = Number(recargoPersonaExtra.value);
-    if (!Number.isInteger(recargo) || recargo < 0 || recargo > 100) {
-      error.value = "El recargo por persona extra debe ser un número entero entre 0 y 100.";
-      return;
-    }
   }
   error.value = "";
 
@@ -138,6 +167,20 @@ async function guardar() {
     // Subimos arriba para que se vea el mensaje de guardado
     window.scrollTo(0, 0);
   } catch (err) {
+    // Si el back dice qué campos fallan, se marcan; si no, un aviso general según el código HTTP
+    const delServidor = erroresDelServidor(err);
+    const visibles = {};
+    for (const campo of ORDEN_PERFIL) {
+      if (delServidor[campo]) {
+        visibles[campo] = delServidor[campo];
+      }
+    }
+    errores.value = visibles;
+    if (hayErrores(visibles)) {
+      error.value = MENSAJE_REVISAR;
+      await llevarElCursorAlPrimerError();
+      return;
+    }
     error.value = mensajeDeError(err, "No se pudo guardar tu perfil.");
   }
 }
@@ -199,10 +242,13 @@ async function guardar() {
                   type="text"
                   id="especialidad"
               aria-required="true"
+                  :aria-invalid="ariaInvalido('especialidad')"
+                  :aria-describedby="ariaDescrito('especialidad')"
                   v-model="especialidad"
                   maxlength="100"
                   placeholder="Geriatría, acompañamiento hospitalario..."
                 />
+                <p v-if="errores.especialidad" id="error-especialidad" class="campo-error">{{ errores.especialidad }}</p>
               </div>
               <div>
                 <label for="ciudad">Ciudad</label>
@@ -319,9 +365,12 @@ async function guardar() {
                 <input
                   type="number"
                   id="anos"
+                  :aria-invalid="ariaInvalido('anosExperiencia')"
+                  :aria-describedby="ariaDescrito('anosExperiencia')"
                   v-model="anosExperiencia"
                   min="0"
                 />
+                <p v-if="errores.anosExperiencia" id="error-anosExperiencia" class="campo-error">{{ errores.anosExperiencia }}</p>
               </div>
               <div>
                 <label class="obligatorio" for="tarifa">Tarifa por hora (€)</label>
@@ -329,10 +378,13 @@ async function guardar() {
                   type="number"
                   id="tarifa"
               aria-required="true"
+                  :aria-invalid="ariaInvalido('tarifaHora')"
+                  :aria-describedby="ariaDescrito('tarifaHora')"
                   v-model="tarifaHora"
                   min="0"
                   step="0.5"
                 />
+                <p v-if="errores.tarifaHora" id="error-tarifaHora" class="campo-error">{{ errores.tarifaHora }}</p>
               </div>
             </div>
             <p class="editar__ayuda" data-testid="ayuda-desplazamiento">
@@ -344,12 +396,15 @@ async function guardar() {
             <input
               type="number"
               id="recargo"
+              :aria-invalid="ariaInvalido('recargoPersonaExtra')"
+            :aria-describedby="ariaDescrito('recargoPersonaExtra')"
               v-model="recargoPersonaExtra"
               min="0"
               max="100"
               step="1"
               placeholder="25 (por defecto)"
             />
+            <p v-if="errores.recargoPersonaExtra" id="error-recargoPersonaExtra" class="campo-error">{{ errores.recargoPersonaExtra }}</p>
             <p class="editar__ayuda">
               Si cuidas a varias personas a la vez, cada persona extra suma este porcentaje de tu
               tarifa. Déjalo vacío para usar el 25 % por defecto.
@@ -359,10 +414,13 @@ async function guardar() {
             <textarea
               id="bio"
               aria-required="true"
+              :aria-invalid="ariaInvalido('bio')"
+            :aria-describedby="ariaDescrito('bio')"
               v-model="bio"
               maxlength="1000"
               placeholder="Cuéntales tu experiencia y cómo trabajas..."
             ></textarea>
+            <p v-if="errores.bio" id="error-bio" class="campo-error">{{ errores.bio }}</p>
 
             <h2 class="editar__seccion">Disponibilidad</h2>
             <div class="editar__opciones">
