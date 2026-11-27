@@ -246,6 +246,7 @@ Accepted services count as busy time too. Below the calendar, each day lists its
 - ⏱️ **Quick shifts**: one button each for Morning (07:00–15:00), Afternoon (15:00–23:00) and Night (23:00–07:00). The hours can be changed afterwards. A shift that ends earlier than it starts is a night shift and continues into the next day.
 - 🔁 **Repeat** a slot on chosen weekdays (Monday to Friday, every day, or any combination) up to a date, for at most 183 days (about six months). The app tells you how many slots were added and how many already existed.
 - 📥 **Import an `.ics` calendar** (Google Calendar, Outlook, Apple Calendar...). Events that are recurring, cancelled, marked as free or already in the past are left out, and a summary says how many were imported, duplicated and skipped.
+- 🔄 **Sync with an external calendar** (Google, Outlook or iCloud): paste the secret `.ics` address once and the busy slots stay up to date on their own (the server reads it every hour, and there is a "Sync now" button). Only dates and hours are read, never the event titles. The caregiver can unlink it at any time, which removes the slots that came from it but keeps the ones added by hand. The address is secret and never comes back from the server.
 - 🗑️ Remove a slot at any time.
 - 🕒 The timeline of a day shows the **free gaps** between busy slots.
 
@@ -380,10 +381,9 @@ npm run test:e2e       # e2e tests (with the backend running)
 
 - 💳 **Payments are simulated.** The checkout (`/pagar/:id`) marks the payment as completed in the backend, but card data is test data: nothing is charged and there is no real payment gateway.
 - 🖼️ Profile photos are sent shrunk and stored as text (Base64) in the database, not as files.
-- 📄 Lists (requests, search results) are not paginated yet.
+- 📄 Only the request list is paginated ("Load more"); the search results and the admin tables still load every record.
 - 🌍 The app is in Spanish only.
-- 📲 It is not an installable app (PWA) yet; that needs HTTPS.
-- 🔐 No two-factor authentication yet.
+- 📲 The app has a manifest and a service worker so it can be installed as a PWA, but installing needs HTTPS and it has not been tested on a real domain yet.
 - 🎨 Some views still have hand-written colours in their CSS instead of the palette variables.
 - 🚫 A person with a blocked account is not told why: the login shows the same message as for a wrong password.
 
@@ -393,10 +393,8 @@ npm run test:e2e       # e2e tests (with the backend running)
 
 - 💳 Connect the checkout to a real payment gateway (for example Stripe in test mode)
 - 🚀 Deploy frontend and backend (with HTTPS and the production environment variables)
-- 📄 Paginate long lists
+- 📄 Paginate the remaining long lists (search results and admin tables)
 - 🖼️ Store profile photos as files in external storage
-- 📲 Turn the app into a PWA
-- 🔐 Two-factor authentication
 - 🎞️ Review the animations with real users and add screenshots of the new screens to the wiki
 
 ---
