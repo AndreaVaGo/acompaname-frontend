@@ -59,10 +59,13 @@ async function handleSubmit() {
       passwordActual.value,
       passwordNueva.value,
     );
-    exito.value = "Contraseña cambiada correctamente.";
+    exito.value =
+      "Contraseña cambiada correctamente. Por seguridad hemos cerrado tu sesión: entra de nuevo con la nueva contraseña.";
     passwordActual.value = "";
     passwordNueva.value = "";
     passwordRepetida.value = "";
+    // El servidor cierra todas las sesiones al cambiar la contraseña, así que el token de ahora ya no vale
+    authStore.logout();
   } catch (err) {
     // 400: la contraseña actual no es correcta, o la nueva es igual que la actual
     if (err.status === 400) {
@@ -132,7 +135,10 @@ async function handleSubmit() {
           <p v-if="errores.passwordRepetida" id="error-passwordRepetida" class="campo-error">{{ errores.passwordRepetida }}</p>
 
           <p role="alert" v-if="error" class="cambiar-password__error">{{ error }}</p>
-          <p v-if="exito" class="cambiar-password__exito">{{ exito }}</p>
+          <p v-if="exito" class="cambiar-password__exito" role="status">{{ exito }}</p>
+          <a v-if="exito" id="ir-al-login" class="btn btn--secondary cambiar-password__login" href="/login">
+            Iniciar sesión
+          </a>
 
           <button type="submit" class="btn btn--primary">
             Cambiar contraseña
@@ -241,6 +247,12 @@ async function handleSubmit() {
   padding: 10px 14px;
   border-radius: var(--radius-input);
   margin: -4px 0 16px;
+}
+
+.cambiar-password__login {
+  display: block;
+  text-align: center;
+  margin-bottom: 12px;
 }
 
 .cambiar-password__exito {
