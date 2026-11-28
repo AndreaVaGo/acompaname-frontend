@@ -62,7 +62,7 @@ async function vincular() {
   try {
     estado.value = await repository.vincularCalendario(url.value.trim());
     url.value = "";
-    aviso.value = "Listo, tu calendario está vinculado y se actualizará solo cada hora.";
+    aviso.value = "Listo, tu calendario está vinculado y se mantendrá al día solo.";
     emit("cambio");
   } catch (err) {
     error.value = textoDelError(err, "No se pudo vincular el calendario.");
@@ -104,7 +104,38 @@ async function desvincular() {
   }
 }
 
-onMounted(cargarEstado);
+// Si hace mucho que no se lee (o nunca), se lee al abrir la pantalla, sin que la persona tenga que pulsar nada.
+// Si falla no se enseña nada: queda el último error del servidor y el botón "Sincronizar ahora"
+const MINUTOS_SIN_LEER = 5;
+
+function hayQueLeer(actual) {
+  if (!actual || !actual.vinculado) {
+    return false;
+  }
+  if (!actual.ultimaSincronizacion) {
+    return true;
+  }
+  const ultima = new Date(actual.ultimaSincronizacion.slice(0, 19)).getTime();
+  return Number.isNaN(ultima) || Date.now() - ultima > MINUTOS_SIN_LEER * 60 * 1000;
+}
+
+async function iniciar() {
+  await cargarEstado();
+  if (!hayQueLeer(estado.value)) {
+    return;
+  }
+  trabajando.value = true;
+  try {
+    estado.value = await repository.sincronizarCalendario();
+    emit("cambio");
+  } catch {
+    // Sin aviso: la persona puede pulsar "Sincronizar ahora"
+  } finally {
+    trabajando.value = false;
+  }
+}
+
+onMounted(iniciar);
 </script>
 
 <template>
@@ -122,7 +153,7 @@ onMounted(cargarEstado);
       <p v-if="estado.ultimoError" class="sincronizar__error" data-testid="ultimo-error">
         La última lectura falló: {{ estado.ultimoError }}. Se mantienen los ratos que ya tenías.
       </p>
-      <p class="sincronizar__ayuda">Se actualiza solo cada hora. También puedes hacerlo ahora.</p>
+      <p class="sincronizar__ayuda">Se actualiza solo al abrir esta pantalla y cada 15 minutos. También puedes hacerlo ahora.</p>
 
       <div class="sincronizar__botones">
         <button
