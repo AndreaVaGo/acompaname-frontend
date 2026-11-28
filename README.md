@@ -246,7 +246,7 @@ Accepted services count as busy time too. Below the calendar, each day lists its
 - ⏱️ **Quick shifts**: one button each for Morning (07:00–15:00), Afternoon (15:00–23:00) and Night (23:00–07:00). The hours can be changed afterwards. A shift that ends earlier than it starts is a night shift and continues into the next day.
 - 🔁 **Repeat** a slot on chosen weekdays (Monday to Friday, every day, or any combination) up to a date, for at most 183 days (about six months). The app tells you how many slots were added and how many already existed.
 - 📥 **Import an `.ics` calendar** (Google Calendar, Outlook, Apple Calendar...). Events that are recurring, cancelled, marked as free or already in the past are left out, and a summary says how many were imported, duplicated and skipped.
-- 🔄 **Sync with an external calendar** (Google, Outlook or iCloud): paste the secret `.ics` address once and the busy slots stay up to date on their own (the server reads it every 15 minutes, it is also read when the screen is opened, and there is a "Sync now" button). Only dates and hours are read, never the event titles. The caregiver can unlink it at any time, which removes the slots that came from it but keeps the ones added by hand. The address is secret and never comes back from the server.
+- 🔄 **Sync with an external calendar** (Google, Outlook or iCloud): paste the secret `.ics` address once and the busy slots stay up to date on their own (the server reads it every 15 minutes, it is also read when the screen is opened, and there is a "Sync now" button). Only dates and hours are read, never the event titles. The caregiver can unlink it at any time, which removes the slots that came from it but keeps the ones added by hand. The address is secret and never comes back from the server. **The sync is one-way** (external calendar → Acompáñame): the `.ics` address is read-only by design, so slots created in the app never appear in the external calendar, and a synced slot deleted here comes back on the next read while the event still exists there. Google can also take hours to publish changes in its feed.
 - 🗑️ Remove a slot at any time.
 - 🕒 The timeline of a day shows the **free gaps** between busy slots.
 
@@ -384,6 +384,7 @@ npm run test:e2e       # e2e tests (with the backend running)
 - 📄 Only the request list is paginated ("Load more"); the search results and the admin tables still load every record.
 - 🌍 The app is in Spanish only.
 - 📲 The app has a manifest and a service worker so it can be installed as a PWA, but installing needs HTTPS and it has not been tested on a real domain yet.
+- 🔄 Calendar sync only goes one way (external calendar → app), because the secret `.ics` address is read-only. Two-way sync would need access to the person's account through the provider's API.
 - 🎨 Some views still have hand-written colours in their CSS instead of the palette variables.
 - 🚫 A person with a blocked account is not told why: the login shows the same message as for a wrong password.
 
@@ -395,6 +396,7 @@ npm run test:e2e       # e2e tests (with the backend running)
 - 🚀 Deploy frontend and backend (with HTTPS and the production environment variables)
 - 📄 Paginate the remaining long lists (search results and admin tables)
 - 🖼️ Store profile photos as files in external storage
+- 🔄 Offer an outgoing `.ics` address so accepted services also show up in the caregiver's own calendar
 - 🎞️ Review the animations with real users and add screenshots of the new screens to the wiki
 
 ---
