@@ -97,7 +97,7 @@ describe("CambiarPasswordView", () => {
     expect(espia).toHaveBeenCalledWith(1, "1234", PASSWORD_NUEVA);
   });
 
-  test("cambia la contraseña y no cambia el token de la sesión", async () => {
+  test("cambia la contraseña y cierra la sesión porque el servidor invalida el token (ACOM-260)", async () => {
     const espia = vi
       .spyOn(UsuarioRepository.prototype, "cambiarPassword")
       .mockResolvedValue();
@@ -107,7 +107,20 @@ describe("CambiarPasswordView", () => {
 
     expect(espia).toHaveBeenCalledWith(1, "actual1234", PASSWORD_NUEVA);
     expect(wrapper.text()).toContain("Contraseña cambiada correctamente.");
-    expect(authStore.token).toBe("token-de-prueba");
+    expect(wrapper.text()).toContain("hemos cerrado tu sesión");
+    expect(authStore.token).toBe("");
+    expect(authStore.estaAutenticado).toBe(false);
+    expect(sessionStorage.getItem("token")).toBeNull();
+  });
+
+  test("después de cambiarla ofrece un enlace para iniciar sesión", async () => {
+    vi.spyOn(UsuarioRepository.prototype, "cambiarPassword").mockResolvedValue();
+    const { wrapper } = montarVista();
+
+    expect(wrapper.find("#ir-al-login").exists()).toBe(false);
+    await rellenarFormulario(wrapper, "actual1234", PASSWORD_NUEVA, PASSWORD_NUEVA);
+
+    expect(wrapper.find("#ir-al-login").attributes("href")).toBe("/login");
   });
 
   test("vacía los campos después de cambiar la contraseña", async () => {
