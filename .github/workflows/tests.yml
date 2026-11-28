@@ -1,0 +1,38 @@
+# Pasa los tests del front y comprueba que compila, en cada push a dev o main y en cada pull request.
+name: Tests
+
+on:
+  push:
+    branches: [dev, main]
+  pull_request:
+
+# Solo lectura del código: este flujo no necesita más permisos
+permissions:
+  contents: read
+
+# Si llega otro push a la misma rama, se cancela la ejecución anterior
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # Instala exactamente lo que dice package-lock.json
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Pasar los tests
+        run: npx vitest run
+
+      - name: Comprobar que compila
+        run: npm run build
