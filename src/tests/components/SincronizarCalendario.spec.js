@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, afterEach } from "vitest";
+import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import { mount, flushPromises } from "@vue/test-utils";
 import SincronizarCalendario from "../../components/SincronizarCalendario.vue";
 import BloqueOcupadoRepository from "../../repositories/BloqueOcupadoRepository";
@@ -14,7 +14,14 @@ async function montar(estado) {
 
 const VINCULADO = { vinculado: true, ultimaSincronizacion: "2026-11-26T10:10:05.123456", ultimoError: null };
 
+// Se fija la hora (solo la fecha, no los temporizadores): a las 10:12 la última lectura de las 10:10 es reciente
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ["Date"] });
+  vi.setSystemTime(new Date("2026-11-26T10:12:00"));
+});
+
 afterEach(() => {
+  vi.useRealTimers();
   vi.restoreAllMocks();
 });
 
@@ -193,5 +200,54 @@ describe("SincronizarCalendario · carga", () => {
 
     expect(wrapper.find("[data-testid='error-carga']").exists()).toBe(true);
     expect(wrapper.find("#calendario-url").exists()).toBe(false);
+  });
+});
+
+describe("SincronizarCalendario · lectura al abrir", () => {
+  test("si la última lectura es reciente no vuelve a leer", async () => {
+    const sincronizar = vi.spyOn(PROTO, "sincronizarCalendario").mockResolvedValue(VINCULADO);
+
+    const wrapper = await montar(VINCULADO);
+
+    expect(sincronizar).not.toHaveBeenCalled();
+    expect(wrapper.emitted("cambio")).toBeUndefined();
+  });
+
+  test("si hace más de 5 minutos que no se lee, lee solo y avisa al padre sin mensaje", async () => {
+    const antigua = { ...VINCULADO, ultimaSincronizacion: "2026-11-26T09:50:00.000000" };
+    const nueva = { ...VINCULADO, ultimaSincronizacion: "2026-11-26T10:12:00.000000" };
+    const sincronizar = vi.spyOn(PROTO, "sincronizarCalendario").mockResolvedValue(nueva);
+
+    const wrapper = await montar(antigua);
+
+    expect(sincronizar).toHaveBeenCalledTimes(1);
+    expect(wrapper.emitted("cambio")).toHaveLength(1);
+    expect(wrapper.find("[data-testid='ultima-sincronizacion']").text()).toContain("26-11-2026 · 10:12");
+    expect(wrapper.text()).not.toContain("Calendario actualizado");
+  });
+
+  test("si todavía no se había leído nunca, lee solo", async () => {
+    const sincronizar = vi.spyOn(PROTO, "sincronizarCalendario").mockResolvedValue(VINCULADO);
+
+    await montar({ vinculado: true, ultimaSincronizacion: null, ultimoError: null });
+
+    expect(sincronizar).toHaveBeenCalledTimes(1);
+  });
+
+  test("si no está vinculado no lee nada", async () => {
+    const sincronizar = vi.spyOn(PROTO, "sincronizarCalendario").mockResolvedValue(VINCULADO);
+
+    await montar({ vinculado: false });
+
+    expect(sincronizar).not.toHaveBeenCalled();
+  });
+
+  test("si la lectura al abrir falla no enseña ningún error y el botón sigue disponible", async () => {
+    vi.spyOn(PROTO, "sincronizarCalendario").mockRejectedValue(new Error("sin conexión"));
+
+    const wrapper = await montar({ ...VINCULADO, ultimaSincronizacion: "2026-11-26T09:00:00.000000" });
+
+    expect(wrapper.find("[role='alert']").exists()).toBe(false);
+    expect(wrapper.find("#sincronizar-ahora").exists()).toBe(true);
   });
 });
